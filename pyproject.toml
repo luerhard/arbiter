@@ -1,0 +1,60 @@
+[tool.poetry]
+name = "annotationtool"
+version = "0.0.1"
+description = "The Annotation Tool."
+authors = [
+    "MananCoder29 <example@email.com>",
+    "Lukas Erhard <luerhard@googlemail.com>",
+    "shindenach <example@email.com>",
+]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "core"}]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<4.0"
+django = "^5.0.6"
+django-widget-tweaks = "^1.5.0"
+pandas = ">=2.2,<3.0"
+
+[tool.ruff]
+fix = true
+include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+ignore = ["D107", "E712"]
+ignore-init-module-imports = true
+select = [
+"ARG", # flake8-unused-arguments
+"B", # flake8-bugbear
+"C4", #flake8-comprehensions
+"COM", #flake8-commas
+"E", # pycodestyle
+"EM", # flake8-errmsg
+"F", # pyflakes
+"I", # isort
+"N", # pep8-naming
+"PT", #flake8-pytest-style
+"PTH", # flake8-use-pathlib
+"Q", # flake8-quotes
+"UP", # pyupgrade
+]
+
+[tool.ruff.lint.per-file-ignores]
+"docs/**" = ["D"]
+"tests/**" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.isort]
+force-single-line = true
+force-sort-within-sections = true
+lines-after-imports = 2
+known-local-folder = ["core"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
