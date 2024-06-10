@@ -1,11 +1,36 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>{% block title %}Admin Panel{% endblock %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
 </head>
 <body>
-    Welcome to the home page!!
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{% url 'admin_panel:project_list' %}">Projects</a></li>
+                <li><a href="{% url 'admin_panel:assignment_list' %}">Assignments</a></li>
+                <li><a href="{% url 'admin_panel:sentence_list' %}">Sentences</a></li>
+                <li><a href="{% url 'admin_panel:create_project' %}">Create Project</a></li>
+                <li><a href="{% url 'admin_panel:assign_annotators' %}">Assign Users</a></li>
+                <li><a href="{% url 'admin_panel:upload_sentences' %}">Upload Sentences</a></li>
+                {% if user.is_authenticated and not user.is_admin.%}
+                    <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% else %}
+                    <li><a href="{% url 'login' %}">Login</a></li>
+                    <li><a href="{% url 'register' %}">Register</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
 </body>
 </html>

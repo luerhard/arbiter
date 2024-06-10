@@ -1,0 +1,16 @@
+{% extends 'home.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+{% if sentences %}
+    <ul>
+        {% for sentence in sentences %}
+            <li>{{ sentence.content }}</li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No sentences assigned.</p>
+{% endif %}
+{% endblock %}
