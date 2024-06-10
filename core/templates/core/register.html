@@ -1,0 +1,21 @@
+{% extends 'home.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+{% load widget_tweaks %}
+<section class="content-section">
+    <h1>Register</h1>
+    <form method="post">
+  {% csrf_token %}
+
+  {% for field in form.visible_fields %}
+    <div class="form-group">
+      {{ field.label_tag }}
+      {% render_field field class="form-control" %}
+    </div>
+  {% endfor %}
+  <button type="submit">Create Account</button>
+</form>
+</section>
+{% endblock %}

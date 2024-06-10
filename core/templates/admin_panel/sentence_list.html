@@ -1,0 +1,14 @@
+{% extends 'home.html' %}
+
+{% block title %}Sentence List{% endblock %}
+
+{% block content %}
+<section class="content-section">
+    <h1>Sentence List</h1>
+    <ul>
+        {% for sentence in sentences %}
+        <li>Project: {{ sentence.project.name }} - Sentence: {{ sentence.content }}</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

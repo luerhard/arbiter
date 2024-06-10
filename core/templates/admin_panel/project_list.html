@@ -1,0 +1,31 @@
+{% extends 'home.html' %} 
+{% comment %} {% block title %}Project List{% endblock %}  {% endcomment %}
+{% block content %} 
+
+<!-- CARD -->
+<section id="advertisers" class="advertisers-service-sec pt-5 pb-5">
+    <div class="container">
+      <div class="row">
+        <div class="section-header text-center">
+          <h2 class="fw-bold fs-1">
+            Our
+            <span class="b-class-secondary">Project List </span>
+          </h2>
+          <p class="sec-icon"><i class="fa-solid fa-gear"></i></p>
+        </div>
+      </div>
+      <div class="row mt-5 mt-md-4 row-cols-1 row-cols-sm-1 row-cols-md-3 justify-content-center grid">
+        {% for project in projects %}
+        <div class="col">
+          <div class="service-card">
+            <h3>{{ project.name }}</h3>
+            <p>{{ project.description }}</p>
+          </div>
+        </div>
+        {% endfor %} 
+     </div>
+    </div>
+  </section>
+  <!-- CARD ENDED -->
+
+{% endblock %}
