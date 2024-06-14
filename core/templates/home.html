@@ -12,13 +12,15 @@
     <header>
         <nav>
             <ul>
+                {% if user.is_authenticated and user.is_staff %}
                 <li><a href="{% url 'admin_panel:project_list' %}">Projects</a></li>
                 <li><a href="{% url 'admin_panel:assignment_list' %}">Assignments</a></li>
                 <li><a href="{% url 'admin_panel:sentence_list' %}">Sentences</a></li>
                 <li><a href="{% url 'admin_panel:create_project' %}">Create Project</a></li>
                 <li><a href="{% url 'admin_panel:assign_annotators' %}">Assign Users</a></li>
                 <li><a href="{% url 'admin_panel:upload_sentences' %}">Upload Sentences</a></li>
-                {% if user.is_authenticated and not user.is_admin.%}
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+                {% elif user.is_authenticated %}
                     <li><a href="{% url 'dashboard' %}">Dashboard</a></li>
                     <li><a href="{% url 'logout' %}">Logout</a></li>
                 {% else %}
