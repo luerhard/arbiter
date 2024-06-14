@@ -27,7 +27,10 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('core:dashboard')
+            if(user.is_staff):
+                return redirect('admin_panel:project_list')
+            else:
+                return redirect('dashboard')
     else:
         form = AuthenticationForm()
     return render(request, 'core/login.html', {'form': form})
@@ -42,4 +45,4 @@ def dashboard(request):
 
 def user_logout(request):
     logout(request)
-    return redirect('core/login')
+    return redirect('login')
