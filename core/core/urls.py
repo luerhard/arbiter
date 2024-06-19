@@ -27,4 +27,7 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('dashboard/', dashboard, name='dashboard'),
     path('logout/', user_logout, name='logout'),
+    path('project/<int:project_id>/sentence/<int:sentence_id>/', views.annotate_sentence, name='annotate_sentence'),
+    path('save_annotation/', views.save_annotation, name='save_annotation'),
+    path('save_annotations/', views.save_annotations, name='save_annotations'),
 ]

@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    labels = models.CharField(max_length=500, help_text="Comma-separated labels for this project", default='default_label_value')
 
     def __str__(self):
         return self.name

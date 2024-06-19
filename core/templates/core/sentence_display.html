@@ -1,0 +1,148 @@
+{% extends 'home.html' %}
+
+{% block title %}Annotate Sentence{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <h1>Annotate Sentence</h1>
+    <div id="sentence-content">{{ sentence.content }}</div>
+
+<div class="label-container">
+    <label>Select Label:</label>
+    <div id="label-buttons">
+        {% comment %} <div>{{ labels }}</div> {% endcomment %}
+        {% for label in labels %}
+            <button class="label-btn" data-label="{{ label.id }}" style="background-color: {{ label.color }}">{{ label.name }}</button>
+        {% endfor %}
+    </div>
+</div>
+
+{% comment %} <button id="save-annotation">Next</button>
+<a href="{% url 'dashboard' %}">Back to Dashboard</a> {% endcomment %}
+
+</div>
+<div class="custom-btn-container">
+    <button class="custom-btn">Reset</button>
+    <button class="custom-btn">Save</button>
+    <button class="custom-btn">Next</button>
+    <button class="custom-btn">Back</button>
+<div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let selectedText = '';
+        const sentenceContent = document.getElementById('sentence-content');
+    
+        sentenceContent.addEventListener('mouseup', function() {
+            const selection = window.getSelection();
+            console.log(`selection is: ${selection.toString()}`)
+            selectedText = selection.toString();
+        });
+    
+        document.querySelectorAll('.label-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const labelId = this.getAttribute('data-label');
+                const labelColor = this.style.backgroundColor;
+                const labelText = this.innerHTML;
+                console.log(`TEXT IS: ${selectedText}`)
+                if (selectedText) {
+                    // 1. Highlight the selected text
+                    const annotatedText = `<span class="annotated" style="background-color: ${labelColor}; position: relative; display: inline-block;cursor: pointer;">
+                        ${selectedText}
+                        <span style="position: absolute; bottom: -1.2em; left: 0; font-size: 0.8em; color: black;">${labelText}</span>
+                    </span>`
+                    //<span >${button.innerHTML}</span>
+                    sentenceContent.innerHTML = sentenceContent.innerHTML.replace(selectedText, annotatedText);
+    
+                    // 2. Save the annotation (using AJAX)
+                    const sentenceId = {{ sentence.id }};
+                    const startOffset = sentenceContent.innerHTML.indexOf(selectedText); // Find position
+                    const endOffset = startOffset + selectedText.length;
+                    console.log(`${labelId}`)
+                    fetch("{% url 'save_annotation' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        body: JSON.stringify({
+                            sentence_id: sentenceId,
+                            label_id: labelId,
+                            start_offset: startOffset,
+                            end_offset: endOffset,
+                            text: selectedText
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Annotation saved successfully:', data);
+                        selectedText = ''; // Reset the selection
+                    })
+                    .catch(error => {
+                        console.error('Error saving annotation:', error);
+                    });
+                }
+            });
+        });
+    
+        document.getElementById('save-annotation').addEventListener('click', function() {
+            // Get all annotated spans
+            const annotatedSpans = document.querySelectorAll('.annotated');
+            const annotations = [];
+
+            annotatedSpans.forEach(span => {
+                const labelId = span.style.backgroundColor; // Assuming you store label IDs as color codes
+                const startOffset = sentenceContent.innerHTML.indexOf(span.textContent);
+                const endOffset = startOffset + span.textContent.length;
+
+                annotations.push({
+                    label_id: labelId,
+                    start_offset: startOffset,
+                    end_offset: endOffset,
+                    text: span.textContent
+                });
+            });
+
+            const sentenceId = {{ sentence.id }};
+
+            // Send AJAX request to save annotations
+            fetch("{% url 'save_annotations' %}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    sentence_id: sentenceId,
+                    annotations: annotations
+                })
+            })
+            .then(response => {
+                // Handle success/error
+            });
+        });
+    });
+    
+        // Function to get CSRF cookie value
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+</script>
+{% endblock %}
