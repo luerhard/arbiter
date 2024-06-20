@@ -17,6 +17,9 @@ django = "^5.0.6"
 django-widget-tweaks = "^1.5.0"
 pandas = ">=2.2,<3.0"
 
+[tool.poetry.group.dev.dependencies]
+django-debug-toolbar = "^4.4.2"
+
 [tool.ruff]
 fix = true
 include = ["*.py", "*.pyi", "**/pyproject.toml", "*.ipynb"]
@@ -43,6 +46,7 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"core/core/settings/*" = ["F403", "F405"]
 "docs/**" = ["D"]
 "tests/**" = ["D"]
 

@@ -15,19 +15,34 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include
+from django.urls import path
+
+from . import settings
 from . import views
-from .views import register, user_login, dashboard, user_logout
+from .views import dashboard
+from .views import register
+from .views import user_login
+from .views import user_logout
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', views.core),
-    path('admin_panel/', include('admins.urls', namespace='admin_panel')),
-    path('register/', register, name='register'),
-    path('login/', user_login, name='login'),
-    path('dashboard/', dashboard, name='dashboard'),
-    path('logout/', user_logout, name='logout'),
-    path('project/<int:project_id>/sentence/<int:sentence_id>/', views.annotate_sentence, name='annotate_sentence'),
-    path('save_annotation/', views.save_annotation, name='save_annotation'),
-    path('save_annotations/', views.save_annotations, name='save_annotations'),
+    path("admin/", admin.site.urls),
+    path("", views.core),
+    path("admin_panel/", include("admins.urls", namespace="admin_panel")),
+    path("register/", register, name="register"),
+    path("login/", user_login, name="login"),
+    path("dashboard/", dashboard, name="dashboard"),
+    path("logout/", user_logout, name="logout"),
+    path("project/<int:project_id>/sentence/<int:sentence_id>/", views.annotate_sentence, name="annotate_sentence"),
+    path("save_annotation/", views.save_annotation, name="save_annotation"),
+    path("save_annotations/", views.save_annotations, name="save_annotations"),
 ]
+
+# Additional settings for development
+if settings.DEBUG:
+    from django.conf.urls.static import static
+
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += [path("__debug__", include("debug_toolbar.urls"))]
+
