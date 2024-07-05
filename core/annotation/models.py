@@ -18,7 +18,6 @@ class Label(models.Model):
 
 class Annotation(models.Model):
     sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
-    label = models.ForeignKey(Label, on_delete=models.CASCADE)
-    start_offset = models.IntegerField()
-    end_offset = models.IntegerField()
-    text = models.CharField(max_length=255)
+    pre_label = models.ForeignKey(Label, related_name='pre_annotations', on_delete=models.CASCADE, null=True, blank=True)
+    post_label = models.ForeignKey(Label, related_name='post_annotations', on_delete=models.CASCADE, null=True, blank=True)
+    # text = models.CharField(max_length=255)

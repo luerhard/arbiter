@@ -1,6 +1,5 @@
 {% extends 'home.html' %}
 
-{% comment %} 
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
@@ -9,24 +8,7 @@
     {% for item in projects_with_sentences %}
         {% if item.first_sentence_id %}
             <li>
-                <a href="{% url 'annotate_sentence' item.project.id item.first_sentence_id %}">{{ item.project.name }}</a>
-            </li>
-        {% else %}
-            <li>{{ item.project.name }} (No sentences available)</li>
-        {% endif %}
-    {% endfor %}
-</ul>
-{% endblock %} {% endcomment %}
-
-{% block title %}Dashboard{% endblock %}
-
-{% block content %}
-<h1>Dashboard</h1>
-<ul>
-    {% for item in projects_with_sentences %}
-        {% if item.first_sentence_id %}
-            <li>
-                <a href="{% url 'annotate_sentence' item.project.id item.first_sentence_id %}">{{ item.project.name }}</a>
+                <a href="{% url 'annotate_sentence' item.project.id %}">{{ item.project.name }}</a>
             </li>
         {% else %}
             <li>{{ item.project.name }} (No sentences available)</li>

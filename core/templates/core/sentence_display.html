@@ -5,144 +5,163 @@
 {% block content %}
 <div class="content-section">
     <h1>Annotate Sentence</h1>
-    <div id="sentence-content">{{ sentence.content }}</div>
+    <div id="sentence-content">{{ sentences.0.content }}</div>
 
-<div class="label-container">
-    <label>Select Label:</label>
-    <div id="label-buttons">
-        {% comment %} <div>{{ labels }}</div> {% endcomment %}
-        {% for label in labels %}
-            <button class="label-btn" data-label="{{ label.id }}" style="background-color: {{ label.color }}">{{ label.name }}</button>
-        {% endfor %}
+    <div class="label-container">
+        <label>Select Label:</label>
+        <div id="label-buttons">
+            {% for label in labels %}
+                <button class="label-btn" data-label="{{ label.name }}" style="background-color: {{ label.color }}">{{ label.name }}</button>
+            {% endfor %}
+        </div>
     </div>
+
+    <div class="custom-btn-container">
+        <button id="reset-btn" class="custom-btn">Reset</button>
+        <button id="save-btn" class="custom-btn">Save</button>
+    </div>
+
 </div>
 
-{% comment %} <button id="save-annotation">Next</button>
-<a href="{% url 'dashboard' %}">Back to Dashboard</a> {% endcomment %}
-
-</div>
 <div class="custom-btn-container">
-    <button class="custom-btn">Reset</button>
-    <button class="custom-btn">Save</button>
-    <button class="custom-btn">Next</button>
-    <button class="custom-btn">Back</button>
-<div>
+    <button id="prev-btn" class="custom-btn">Previous</button>
+    <button id="next-btn" class="custom-btn">Next</button>
+    {% comment %} <a href="{% url 'dashboard' %}" class="custom-btn">Back to Dashboard</a> {% endcomment %}
+</div>
+
+{% csrf_token %}
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        let selectedText = '';
+        let sentences = {{ sentences|safe }};
+        let currentSentenceIndex = 0;
         const sentenceContent = document.getElementById('sentence-content');
-    
-        sentenceContent.addEventListener('mouseup', function() {
-            const selection = window.getSelection();
-            console.log(`selection is: ${selection.toString()}`)
-            selectedText = selection.toString();
-        });
-    
-        document.querySelectorAll('.label-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const labelId = this.getAttribute('data-label');
-                const labelColor = this.style.backgroundColor;
-                const labelText = this.innerHTML;
-                console.log(`TEXT IS: ${selectedText}`)
-                if (selectedText) {
-                    // 1. Highlight the selected text
-                    const annotatedText = `<span class="annotated" style="background-color: ${labelColor}; position: relative; display: inline-block;cursor: pointer;">
-                        ${selectedText}
-                        <span style="position: absolute; bottom: -1.2em; left: 0; font-size: 0.8em; color: black;">${labelText}</span>
-                    </span>`
-                    //<span >${button.innerHTML}</span>
-                    sentenceContent.innerHTML = sentenceContent.innerHTML.replace(selectedText, annotatedText);
-    
-                    // 2. Save the annotation (using AJAX)
-                    const sentenceId = {{ sentence.id }};
-                    const startOffset = sentenceContent.innerHTML.indexOf(selectedText); // Find position
-                    const endOffset = startOffset + selectedText.length;
-                    console.log(`${labelId}`)
-                    fetch("{% url 'save_annotation' %}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken')
-                        },
-                        body: JSON.stringify({
-                            sentence_id: sentenceId,
-                            label_id: labelId,
-                            start_offset: startOffset,
-                            end_offset: endOffset,
-                            text: selectedText
-                        })
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        function displaySentence(index) {
+            const sentence = sentences[index];
+            sentenceContent.textContent = sentence.content;
+
+            // To fix this: Enable/Disable Prev and Next buttons
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === sentences.length - 1;
+
+            // Fetch existing annotation for the sentence
+            fetch(`/get_annotation/${sentence.id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.pre_label_name)
+                    const labelButtons = document.querySelectorAll('.label-btn');
+                    labelButtons.forEach(btn => {
+                        if (data.pre_label_name && btn.innerHTML === data.pre_label_name) {
+                            btn.classList.add('selected');
+                        } else {
+                            btn.classList.remove('selected');
                         }
-                        return response.json();
-                    })
-                    .then(data => {
-                        console.log('Annotation saved successfully:', data);
-                        selectedText = ''; // Reset the selection
-                    })
-                    .catch(error => {
-                        console.error('Error saving annotation:', error);
                     });
-                }
-            });
-        });
-    
-        document.getElementById('save-annotation').addEventListener('click', function() {
-            // Get all annotated spans
-            const annotatedSpans = document.querySelectorAll('.annotated');
-            const annotations = [];
-
-            annotatedSpans.forEach(span => {
-                const labelId = span.style.backgroundColor; // Assuming you store label IDs as color codes
-                const startOffset = sentenceContent.innerHTML.indexOf(span.textContent);
-                const endOffset = startOffset + span.textContent.length;
-
-                annotations.push({
-                    label_id: labelId,
-                    start_offset: startOffset,
-                    end_offset: endOffset,
-                    text: span.textContent
                 });
-            });
+        }
 
-            const sentenceId = {{ sentence.id }};
+        function selectEntireSentence() {
+            const range = document.createRange();
+            range.selectNodeContents(sentenceContent);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
 
-            // Send AJAX request to save annotations
-            fetch("{% url 'save_annotations' %}", {
+        sentenceContent.addEventListener('click', selectEntireSentence);
+
+        displaySentence(currentSentenceIndex);
+
+        nextBtn.addEventListener('click', function() {
+            if (currentSentenceIndex < sentences.length - 1) {
+                currentSentenceIndex++;
+                displaySentence(currentSentenceIndex);
+            }
+        });
+
+        prevBtn.addEventListener('click', function() {
+            if (currentSentenceIndex > 0) {
+                currentSentenceIndex--;
+                displaySentence(currentSentenceIndex);
+            }
+        });
+
+        resetBtn.addEventListener('click', function() {
+            const sentenceId = sentences[currentSentenceIndex].id;
+            fetch(`/save_annotations/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
+                    'X-CSRFToken': csrftoken
                 },
                 body: JSON.stringify({
                     sentence_id: sentenceId,
-                    annotations: annotations
+                    pre_label_name: null
                 })
             })
-            .then(response => {
-                // Handle success/error
+            .then(response => response.json())
+            .then(data => {
+                console.log('Annotation reset successfully:', data);
+                document.querySelectorAll('.label-btn').forEach(btn => btn.classList.remove('selected'));
+            })
+            .catch(error => {
+                console.error('Error resetting annotation:', error);
+            });
+        });
+
+        // Need to fix the save functionality 
+        saveBtn.addEventListener('click', function() {
+            const selectedLabel = document.querySelector('.label-btn.selected');
+            
+            if (selectedLabel) {
+                const sentenceId = sentences[currentSentenceIndex].id;
+                const labelText = selectedLabel.innerText.trim();
+                console.log(labelText)
+                const jsonString = JSON.stringify({
+                    sentence_id: sentenceId,
+                    pre_label_name: labelText
+                })
+                console.log(jsonString)
+                fetch(`/save_annotations/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: jsonString
+                })
+                .then(response => 
+                {
+                    
+                    response.json()
+                })
+                .then(data => {
+                    console.log('Annotation saved successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error saving annotation:', error);
+                });
+            }
+        });
+
+        document.querySelectorAll('.label-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.label-btn').forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
             });
         });
     });
-    
-        // Function to get CSRF cookie value
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
 </script>
+
+<style>
+    .label-btn.selected {
+        border: 2px solid black;
+    }
+</style>
 {% endblock %}
