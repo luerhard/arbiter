@@ -68,39 +68,55 @@ def annotate_sentence(request, project_id):
     return render(request, 'core/sentence_display.html', {
         'project': project,
         'sentences': list(sentences),
-        'labels': labels_list,
+        'labels': labels_list
     })
 
 @login_required
 def save_annotations(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        sentence_id = data.get('sentence_id')
-        pre_label_name = data.get('pre_label_name')
+        try:
+            data = json.loads(request.body)
+            print("Received data:", data)  # Debugging statement
+            sentence_id = data.get('sentence_id')
+            pre_label_name = data.get('pre_label_name')
+            project_id = data.get('project_id')  # Assuming you have project_id in your data
 
-        if sentence_id is not None:
+            # Fetch the sentence and project objects
             sentence = get_object_or_404(Sentence, id=sentence_id)
-            if pre_label_name:
-                label = get_object_or_404(Label, name=pre_label_name)
-                annotation, created = Annotation.objects.update_or_create(
-                    sentence=sentence,
-                    pre_label=label
-                )
-                # annotation.pre_label_name = pre_label_name
-                annotation.save()
-            else:
-                Annotation.objects.filter(sentence=sentence).delete()
+            project = get_object_or_404(Project, id=project_id)
 
-            return JsonResponse({'status': 'success'})
-        return JsonResponse({'status': 'error', 'message': 'Invalid sentence ID'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+            # Handle the pre_label_name
+            if pre_label_name:
+                try:
+                    # Create or get the label
+                    label, created = Label.objects.get_or_create(name=pre_label_name, project=project)
+                    print("Found or created label:", label)
+                    annotation, created = Annotation.objects.update_or_create(
+                        sentence=sentence,
+                        defaults={'pre_label': label, 'post_label': None}  # Use the label object here
+                    )
+                    print("Annotation saved:", annotation)
+                except Exception as e:
+                    print("Error finding label or saving annotation:", str(e))
+                    return JsonResponse({'error': str(e)}, status=400)
+            else:
+                print("No pre_label_name provided")
+                return JsonResponse({'error': 'pre_label_name is required'}, status=400)
+
+            return JsonResponse({'message': 'Annotation saved successfully'}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON'}, status=400)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 @login_required
 def get_annotation(request, sentence_id):
     try:
         sentence = Sentence.objects.get(id=sentence_id)
         annotation = Annotation.objects.filter(sentence=sentence).first()
-        pre_label_name = annotation.pre_label_name if annotation else None
+        pre_label_name = annotation.pre_label.name if annotation else None
         return JsonResponse({'pre_label_name': pre_label_name})
     except Sentence.DoesNotExist:
         return JsonResponse({'pre_label_name': None})
