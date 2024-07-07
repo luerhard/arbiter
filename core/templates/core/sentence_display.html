@@ -95,8 +95,6 @@
 
         resetBtn.addEventListener('click', function() {
             const sentenceId = sentences[currentSentenceIndex].id;
-           
-            console.log(project)
             fetch(`/save_annotations/`, {
                 method: 'POST',
                 headers: {

@@ -99,9 +99,10 @@ def save_annotations(request):
                 except Exception as e:
                     print("Error finding label or saving annotation:", str(e))
                     return JsonResponse({'error': str(e)}, status=400)
-            else:
-                print("No pre_label_name provided")
-                return JsonResponse({'error': 'pre_label_name is required'}, status=400)
+            elif pre_label_name is None:
+                print("Pre_label_name is none")
+                Annotation.objects.filter(sentence=sentence).delete()
+                return JsonResponse({'message': 'Annotation Reset Successful'}, status=200)
 
             return JsonResponse({'message': 'Annotation saved successfully'}, status=200)
         except json.JSONDecodeError:
