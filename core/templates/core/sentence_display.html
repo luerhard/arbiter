@@ -21,7 +21,7 @@
     </div>
 
 </div>
-
+<p id="output-message"></p>
 <div class="custom-btn-container">
     <button id="prev-btn" class="custom-btn">Previous</button>
     <button id="next-btn" class="custom-btn">Next</button>
@@ -79,6 +79,7 @@
         displaySentence(currentSentenceIndex);
 
         nextBtn.addEventListener('click', function() {
+            saveButtonLogic();
             document.querySelectorAll('.label-btn').forEach(btn => btn.classList.remove('selected'));
             if (currentSentenceIndex < sentences.length - 1) {
                 currentSentenceIndex++;
@@ -117,36 +118,7 @@
             });
         });
 
-        saveBtn.addEventListener('click', function() {
-            const selectedLabel = document.querySelector('.label-btn.selected');
-            
-            if (selectedLabel) {
-                const sentenceId = sentences[currentSentenceIndex].id;
-                const labelText = selectedLabel.innerText.trim();
-                console.log(labelText)
-                const jsonString = JSON.stringify({
-                    sentence_id: sentenceId,
-                    pre_label_name: labelText,
-                    project_id: projectId
-                })
-                console.log(jsonString)
-                fetch(`/save_annotations/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: jsonString
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Annotation saved successfully:', data);
-                })
-                .catch(error => {
-                    console.error('Error saving annotation:', error);
-                });
-            }
-        });
+        saveBtn.addEventListener('click', saveButtonLogic())
 
         document.querySelectorAll('.label-btn').forEach(button => {
             button.addEventListener('click', function() {
@@ -157,7 +129,41 @@
                 }
             });
         });
+
+        function saveButtonLogic() {
+                const selectedLabel = document.querySelector('.label-btn.selected');
+                if (selectedLabel) {
+                    const sentenceId = sentences[currentSentenceIndex].id;
+                    const labelText = selectedLabel.innerText.trim();
+                    console.log(labelText)
+                    const jsonString = JSON.stringify({
+                        sentence_id: sentenceId,
+                        pre_label_name: labelText,
+                        project_id: projectId
+                    })
+                    console.log(jsonString)
+                    fetch(`/save_annotations/`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: jsonString
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Annotation saved successfully:', data);
+                    })
+                    .catch(error => {
+                        console.error('Error saving annotation:', error);
+                    });
+                }
+        }
+
+
     });
+
+    
 </script>
 
 <style>
