@@ -1,11 +1,29 @@
 from django import forms
-from core.models import Project, ProjectAssignment
 from django.contrib.auth.models import User
 
-class ProjectForm(forms.ModelForm):
-    class Meta:
-        model = Project
-        fields = ['name', 'description', 'labels']
+from core.models import Label
+from core.models import Project
+from core.models import ProjectAssignment
+
+
+class ProjectForm(forms.Form):
+    name = forms.CharField(max_length=100, help_text="Name of the Project")
+    description = forms.CharField(widget=forms.Textarea)
+    labels = forms.CharField(max_length=512, help_text="all labels in comma-separated values")
+    
+    def save(self, commit=True):
+        data = self.cleaned_data
+        project = Project(name=data["name"], description=data["description"])
+        project.save()
+        labels = []
+        for label in data["labels"].split(","):
+            obj = Label(project=project, label=label)
+            labels.append(obj)
+        
+        Label.objects.bulk_create(labels)
+
+
+
 
 # class ProjectAssignmentForm(forms.ModelForm):
 #     user = forms.ModelMultipleChoiceField(
@@ -20,19 +38,19 @@ class ProjectForm(forms.ModelForm):
 class ProjectAssignmentForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.exclude(is_superuser=True),
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
     )
 
     class Meta:
         model = ProjectAssignment
-        fields = ['project']  # Exclude the 'user' field
+        fields = ["project"]  # Exclude the 'user' field
 
     def save(self, commit=True):
         project_assignment = super().save(commit=False)
-        users = self.cleaned_data['users']
+        users = self.cleaned_data["users"]
         if commit:
             for user in users:
-                ProjectAssignment.objects.create(project=self.cleaned_data['project'], user=user)
+                ProjectAssignment.objects.create(project=self.cleaned_data["project"], user=user)
         return project_assignment        
 
     # class Meta:
