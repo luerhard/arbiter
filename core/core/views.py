@@ -1,4 +1,3 @@
-from annotation.models import Sentence
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
@@ -43,17 +42,24 @@ def dashboard(request):
     assignments = ProjectAssignment.objects.filter(user=request.user)
     projects_with_sentences = []
 
+    all_assignments = []
+
     for assignment in assignments:
         project = assignment.project
-        first_sentence = Sentence.objects.filter(project=project).first()
-        projects_with_sentences.append({
-            "project": project,
-            "first_sentence_id": first_sentence.id if first_sentence else None,
-        })
+        batch_numbers = [batch.batch_number for batch in project.batches.all()]
+        all_assignments.append((project.name, project.pk, batch_numbers))
 
-    return render(request, "core/dashboard.html", {
-        "projects_with_sentences": projects_with_sentences,
-    })
+        # first_sentence = Sentence.objects.filter(project=project).first()
+        # projects_with_sentences.append({
+        #     "project": project,
+        #     "first_sentence_id": first_sentence.id if first_sentence else None,
+        # })
+    
+    context = {
+        "assignments": all_assignments,
+    }
+
+    return render(request, "core/dashboard.html", context)
 
 def colors():
     return ["#AF7AC5", "#E74C3C", "#27AE60", "#5DADE2", "#F7DC6F"]

@@ -4,15 +4,14 @@
 
 {% block content %}
 <h1>Dashboard</h1>
-<ul>
-    {% for item in projects_with_sentences %}
-        {% if item.first_sentence_id %}
-            <li>
-                <a href="{% url 'annotate_sentence' item.project.id %}">{{ item.project.name }}</a>
-            </li>
-        {% else %}
-            <li>{{ item.project.name }} (No sentences available)</li>
-        {% endif %}
-    {% endfor %}
-</ul>
+
+{% for project_name, project_id, batch_numbers in assignments %}
+    <h2>{{ project_name }}</h2>
+    <ul>
+        {% for batch_number in batch_numbers %}
+            <li><a href="{% url 'annotate-batch' project_id batch_number %}">Annotate Batch {{ batch_number }}</a></li>
+
+        {% endfor %}
+    </ul>
+{% endfor %}
 {% endblock %}

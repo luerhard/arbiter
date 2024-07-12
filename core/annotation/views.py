@@ -3,6 +3,7 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
+from .models import Batch
 from .models import Sentence
 from .models import UserAnnotation
 from core.models import Project
@@ -11,12 +12,50 @@ from core.models import Project
 # Create your views here.
 
 
-def simple(request):
-    return HttpResponse("Simple Success!")
+def show_batches(request, batch_id):
+    pass
+
+
+def annotate_sentence(request, sentence_id):
+    pass
+
+
+def annotate_batch(request, project_id, batch_number):
+    project = get_object_or_404(Project, id=project_id)
+    batch = get_object_or_404(Batch, project=project, batch_number=batch_number)
+    sentences = batch.sentences.all()
+    labels = project.labels.all()
+    paginator = Paginator(sentences, 1)
+    sent_number = request.GET.get("sentence", 1)
+    sent_obj = paginator.get_page(sent_number)
+    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
+        sentence__id=sent_obj.object_list[0].id, user=request.user.id,
+    )
+    checked_labels = []
+    for label in labels:
+        try:
+            user_label = next(anno for anno in user_annotations if label.pk == anno.label.pk)
+            if user_label.is_set:
+                checked_labels.append(True)
+            else:
+                checked_labels.append(False)
+        except StopIteration:
+            checked_labels.append(False)
+
+    context = {
+        "project_id": project_id,
+        "batch_number": batch_number,
+        "sent_obj": sent_obj,
+        "labels": list(zip(labels, checked_labels, strict=False)),
+    }
+    if request.htmx:
+        return render(request, "annotation/partials/sentence.html", context)
+    else:
+        return render(request, "annotation/sentence_view.html", context)
 
 
 def edit_sentence(request, sentence_id):
-    user_annotations = UserAnnotation.objects.filter(
+    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
         sentence__id=sentence_id,
         user=request.user.id,
     )
@@ -27,17 +66,17 @@ def edit_sentence(request, sentence_id):
     update_annotations = []
     for project_label in project_labels.all():
         try:
-            annotation = next(anno for anno in user_annotations if anno.pk == project_label.pk)
+            annotation = next(anno for anno in user_annotations if anno.label.pk == project_label.pk)
             is_new = False
         except StopIteration:
             annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
             is_new = True
-        
+
         if project_label.pk in submitted_labels:
             annotation.is_set = True
         else:
             annotation.is_set = False
-        
+
         if is_new:
             new_annotations.append(annotation)
         else:
@@ -47,22 +86,7 @@ def edit_sentence(request, sentence_id):
     UserAnnotation.objects.bulk_update(update_annotations, fields=["is_set", "last_updated"])
 
     user_annotations = UserAnnotation.objects.filter(
-        sentence__id=sentence_id,
+        sentence=sentence_id,
         user=request.user.id,
-    )
-    # return render(request, "annotation/partials/sentence.html", context)
-    return HttpResponse(f"{list(user_annotations)}")
-
-
-def annotate_sentence(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    sentences = Sentence.objects.filter(project_id=project.id)
-    labels = project.labels
-    paginator = Paginator(sentences, 1)
-    sent_number = request.GET.get("sentence", 1)
-    sent_obj = paginator.get_page(sent_number)
-    context = {
-        "sent_obj": sent_obj,
-        "labels": labels,
-    }
-    return render(request, "annotation/sentence_view.html", context)
+    ).all()
+    return HttpResponse("saved")

@@ -1,10 +1,16 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import user_passes_test
-
-from annotation.models import Sentence
-from .forms import ProjectForm, ProjectAssignmentForm
-from core.models import Project, ProjectAssignment
+from django.db.models import Max
+from django.shortcuts import redirect
+from django.shortcuts import render
 import pandas as pd
+
+from .forms import ProjectAssignmentForm
+from .forms import ProjectForm
+from annotation.models import Batch
+from annotation.models import Sentence
+from core.models import Project
+from core.models import ProjectAssignment
+
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -12,23 +18,23 @@ def is_admin(user):
 @user_passes_test(is_admin)
 def assignment_list(request):
     assignments = ProjectAssignment.objects.all()
-    return render(request, 'admin_panel/assignment_list.html', {'assignments': assignments})
+    return render(request, "admin_panel/assignment_list.html", {"assignments": assignments})
 
 @user_passes_test(is_admin)
 def project_list(request):
     projects = Project.objects.all()
-    return render(request, 'admin_panel/project_list.html', {'projects': projects})
+    return render(request, "admin_panel/project_list.html", {"projects": projects})
 
 @user_passes_test(is_admin)
 def create_project(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ProjectForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_panel:project_list')
+            return redirect("admin_panel:project_list")
     else:
         form = ProjectForm()
-    return render(request, 'admin_panel/create_project.html', {'form': form})
+    return render(request, "admin_panel/create_project.html", {"form": form})
 
 @user_passes_test(is_admin)
 # def assign_users(request):
@@ -59,35 +65,49 @@ def create_project(request):
 #     return render(request, 'admin_panel/assign_annotators.html', {'form': form})
 
 def assign_users(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ProjectAssignmentForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('admin_panel:assignment_list')  # Ensure this URL name matches your URL configuration
+            return redirect("admin_panel:assignment_list")  # Ensure this URL name matches your URL configuration
     else:
         form = ProjectAssignmentForm()
-    return render(request, 'admin_panel/assign_annotators.html', {'form': form})
+    return render(request, "admin_panel/assign_annotators.html", {"form": form})
 
 def sentence_list(request):
     # Fetch all sentences from the database
     sentences = Sentence.objects.all()
     print(sentences)
     # Render the template with the sentences
-    return render(request, 'admin_panel/sentence_list.html', {'sentences': sentences})
+    return render(request, "admin_panel/sentence_list.html", {"sentences": sentences})
 
 
 @user_passes_test(is_admin)
 def upload_sentences(request):
-    if request.method == 'POST':
-        project_id = request.POST.get('project')
-        file = request.FILES['file']
+    if request.method == "POST":
+        project_id = request.POST.get("project")
+        file = request.FILES["file"]
         project = Project.objects.get(id=project_id)
-        if file.name.endswith('.csv'):
+        if file.name.endswith(".csv"):
             df = pd.read_csv(file)
-        elif file.name.endswith('.xlsx'):
+        elif file.name.endswith(".xlsx"):
             df = pd.read_excel(file)
-        for index, row in df.iterrows():
-            Sentence.objects.create(project=project, content=row['text'])
-        return redirect('admin_panel:sentence_list')
+        
+        #get max previous batch number and increment by one
+        max_batch_number = Batch.objects.filter(project=project).aggregate(Max("batch_number"))
+        max_batch_number = max_batch_number["batch_number__max"]
+        if max_batch_number is None:
+            max_batch_number = 0
+
+        max_batch_number += 1
+
+        batch = Batch(project=project, batch_number=max_batch_number)
+        batch.save()
+        sentences = []
+        for _, row in df.iterrows():
+            sent = Sentence(project=project, batch=batch, content=row["text"])
+            sentences.append(sent)
+        Sentence.objects.bulk_create(sentences)
+        return redirect("admin_panel:sentence_list")
     projects = Project.objects.all()
-    return render(request, 'admin_panel/upload_sentences.html', {'projects': projects})
+    return render(request, "admin_panel/upload_sentences.html", {"projects": projects})

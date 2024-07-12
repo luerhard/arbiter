@@ -16,6 +16,7 @@ python = ">=3.10,<4.0"
 django = "^5.0.6"
 django-widget-tweaks = "^1.5.0"
 pandas = ">=2.2,<3.0"
+django-htmx = "^1.18.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.4.2"
@@ -57,7 +58,7 @@ convention = "google"
 force-single-line = true
 force-sort-within-sections = true
 lines-after-imports = 2
-known-local-folder = ["core"]
+known-local-folder = ["core", "annotation"]
 
 [build-system]
 requires = ["poetry-core"]

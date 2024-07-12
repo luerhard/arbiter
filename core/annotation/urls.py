@@ -4,7 +4,12 @@ from . import views
 
 
 urlpatterns = [
-    path("", views.simple, name="index"),
-    path("sentences/<int:project_id>", views.annotate_sentence, name="sentences"),
+    path("batch/<int:project_id>", views.show_batches, name="show-batches"),
+    path("sentences/<int:project_id>/<int:batch_number>", views.annotate_batch, name="annotate-batch"),
+]
+
+htmx_patterns = [
     path("sentences/<int:sentence_id>/edit", views.edit_sentence, name="edit-sentence"),
 ]
+
+urlpatterns += htmx_patterns

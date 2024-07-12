@@ -1,4 +1,42 @@
-{% for label in labels.all %}
-    <input type="checkbox" class="btn-check" name="labels" id="{{ label.pk }}" value="{{ label.pk }}" autocomplete="off">
-    <label class="btn btn-outline-primary" for="{{ label.pk }}"> {{ label.name }} </label>
-{% endfor %}
+<div id="sentence-content">{{ sent_obj.object_list.0.content }}</div>
+<div class="row">
+    <form id="annotation-labels" class="btn-group" role="group"
+        hx-post="{% url 'edit-sentence' sentence_id=sent_obj.object_list.0.pk %}" hx-target="#result">
+        {% csrf_token %}
+        <div id="sentence-annotation" class="d-flex justify-content-center">
+            {% for label, is_checked in labels %}
+            <input type="checkbox"
+                class="btn-check"
+                name="labels"
+                id="{{ label.pk }}"
+                value="{{ label.pk }}"
+                {% if is_checked %}CHECKED{% endif %}
+                autocomplete="off">
+            <label class="btn btn-outline-primary" for="{{ label.pk }}">
+                {{ label.name }}
+            </label>
+            {% endfor %}
+        </div>
+    </form>
+</div>
+
+<div class="btn-group">
+    {% if sent_obj.has_previous %}
+    <button id="next-btn"
+        class="btn btn-outline-primary"
+        form="annotation-labels"
+        hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.previous_page_number }}"
+        hx-target="#sentence-section">Previous</button>
+    {% endif %}
+
+    <button id="save-btn" form="annotation-labels" class="btn btn-outline-primary">Save</button>
+
+    {% if sent_obj.has_next %}
+    <button id="next-btn"
+        class="btn btn-outline-primary"
+        form="annotation-labels"
+        hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.next_page_number }}"
+        hx-target="#sentence-section">Next</button>
+    {% endif %}
+
+</div>

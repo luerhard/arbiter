@@ -4,9 +4,18 @@ from django.db import models
 from core.models import Project
 
 
+class Batch(models.Model):
+    project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
+    batch_number = models.SmallIntegerField()
+
+
 class Sentence(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
+
+    class Meta:
+        ordering = ["pk"]
 
     def __str__(self):
         return self.content
