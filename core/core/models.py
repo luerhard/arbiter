@@ -10,11 +10,6 @@ class Project(models.Model):
     def __str__(self):
         return self.name
 
-class Label(models.Model):
-    label = models.CharField(max_length=100)
-    project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
-    hotkey = models.CharField(max_length=1, null=True)
-
 
 class ProjectAssignment(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

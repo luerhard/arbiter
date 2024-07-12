@@ -22,7 +22,7 @@
             <p>{{ project.description }}</p>
             <p class="wrap-text">
               {% for label in project.labels.all %}
-                <b>{{ label.label}}</b>
+                <b>{{ label.name}}</b>
               {% endfor %}
             </p>
           </div>

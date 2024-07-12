@@ -1,0 +1,4 @@
+{% for label in labels.all %}
+    <input type="checkbox" class="btn-check" name="labels" id="{{ label.pk }}" value="{{ label.pk }}" autocomplete="off">
+    <label class="btn btn-outline-primary" for="{{ label.pk }}"> {{ label.name }} </label>
+{% endfor %}

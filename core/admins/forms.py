@@ -1,7 +1,7 @@
+from annotation.models import Label
 from django import forms
 from django.contrib.auth.models import User
 
-from core.models import Label
 from core.models import Project
 from core.models import ProjectAssignment
 
@@ -17,7 +17,7 @@ class ProjectForm(forms.Form):
         project.save()
         labels = []
         for label in data["labels"].split(","):
-            obj = Label(project=project, label=label)
+            obj = Label(project=project, name=label)
             labels.append(obj)
         
         Label.objects.bulk_create(labels)

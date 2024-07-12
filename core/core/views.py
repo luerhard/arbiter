@@ -1,40 +1,42 @@
-from django.http import JsonResponse
-from django.shortcuts import render, get_object_or_404, redirect
+from annotation.models import Sentence
+from django.contrib.auth import login
+from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import redirect
+from django.shortcuts import render
+
 from .forms import UserRegistrationForm
-from annotation.models import Sentence, Label, Annotation
-from core.models import Project, ProjectAssignment
-import json
+from core.models import ProjectAssignment
+
 
 def core(request):
-    return render(request, 'home.html')
+    return render(request, "home.html")
 
 def register(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('dashboard')
+            return redirect("dashboard")
     else:
         form = UserRegistrationForm()
-    return render(request, 'core/register.html', {'form': form})
+    return render(request, "core/register.html", {"form": form})
 
 def user_login(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
             if user.is_staff:
-                return redirect('admin_panel:project_list')
+                return redirect("admin_panel:project_list")
             else:
-                return redirect('dashboard')
+                return redirect("dashboard")
     else:
         form = AuthenticationForm()
-    return render(request, 'core/login.html', {'form': form})
+    return render(request, "core/login.html", {"form": form})
 
 @login_required
 def dashboard(request):
@@ -45,66 +47,66 @@ def dashboard(request):
         project = assignment.project
         first_sentence = Sentence.objects.filter(project=project).first()
         projects_with_sentences.append({
-            'project': project,
-            'first_sentence_id': first_sentence.id if first_sentence else None
+            "project": project,
+            "first_sentence_id": first_sentence.id if first_sentence else None,
         })
 
-    return render(request, 'core/dashboard.html', {
-        'projects_with_sentences': projects_with_sentences
+    return render(request, "core/dashboard.html", {
+        "projects_with_sentences": projects_with_sentences,
     })
 
 def colors():
     return ["#AF7AC5", "#E74C3C", "#27AE60", "#5DADE2", "#F7DC6F"]
 
 
-@login_required
-def annotate_sentence(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
-    sentences = Sentence.objects.filter(project=project).order_by('id').values('id', 'content')
-    labels = project.labels.split(',')
-    get_color = colors()
-    labels_list = [{"name": value, "color": get_color[index]} for index, value in enumerate(labels)]
+# @login_required
+# def annotate_sentence(request, project_id):
+#     project = get_object_or_404(Project, id=project_id)
+#     sentences = Sentence.objects.filter(project=project).order_by('id').values('id', 'content')
+#     labels = project.labels.split(',')
+#     get_color = colors()
+#     labels_list = [{"name": value, "color": get_color[index]} for index, value in enumerate(labels)]
 
-    return render(request, 'core/sentence_display.html', {
-        'project': project,
-        'sentences': list(sentences),
-        'labels': labels_list,
-    })
+#     return render(request, 'core/sentence_display.html', {
+#         'project': project,
+#         'sentences': list(sentences),
+#         'labels': labels_list,
+#     })
 
-@login_required
-def save_annotations(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        sentence_id = data.get('sentence_id')
-        pre_label_name = data.get('pre_label_name')
+# @login_required
+# def save_annotations(request):
+#     if request.method == 'POST':
+#         data = json.loads(request.body)
+#         sentence_id = data.get('sentence_id')
+#         pre_label_name = data.get('pre_label_name')
 
-        if sentence_id is not None:
-            sentence = get_object_or_404(Sentence, id=sentence_id)
-            if pre_label_name:
-                label = get_object_or_404(Label, name=pre_label_name)
-                annotation, created = Annotation.objects.update_or_create(
-                    sentence=sentence,
-                    pre_label=label
-                )
-                # annotation.pre_label_name = pre_label_name
-                annotation.save()
-            else:
-                Annotation.objects.filter(sentence=sentence).delete()
+#         if sentence_id is not None:
+#             sentence = get_object_or_404(Sentence, id=sentence_id)
+#             if pre_label_name:
+#                 label = get_object_or_404(Label, name=pre_label_name)
+#                 annotation, created = Annotation.objects.update_or_create(
+#                     sentence=sentence,
+#                     pre_label=label
+#                 )
+#                 # annotation.pre_label_name = pre_label_name
+#                 annotation.save()
+#             else:
+#                 Annotation.objects.filter(sentence=sentence).delete()
 
-            return JsonResponse({'status': 'success'})
-        return JsonResponse({'status': 'error', 'message': 'Invalid sentence ID'}, status=400)
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+#             return JsonResponse({'status': 'success'})
+#         return JsonResponse({'status': 'error', 'message': 'Invalid sentence ID'}, status=400)
+#     return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
 
-@login_required
-def get_annotation(request, sentence_id):
-    try:
-        sentence = Sentence.objects.get(id=sentence_id)
-        annotation = Annotation.objects.filter(sentence=sentence).first()
-        pre_label_name = annotation.pre_label_name if annotation else None
-        return JsonResponse({'pre_label_name': pre_label_name})
-    except Sentence.DoesNotExist:
-        return JsonResponse({'pre_label_name': None})
+# @login_required
+# def get_annotation(request, sentence_id):
+#     try:
+#         sentence = Sentence.objects.get(id=sentence_id)
+#         annotation = Annotation.objects.filter(sentence=sentence).first()
+#         pre_label_name = annotation.pre_label_name if annotation else None
+#         return JsonResponse({'pre_label_name': pre_label_name})
+#     except Sentence.DoesNotExist:
+#         return JsonResponse({'pre_label_name': None})
 
 def user_logout(request):
     logout(request)
-    return redirect('login')
+    return redirect("login")

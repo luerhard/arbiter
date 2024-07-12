@@ -1,0 +1,184 @@
+{% extends 'home.html' %}
+
+{% block title %}Annotate Sentence{% endblock %}
+
+{% block content %}
+<div class="content-section">
+    <h1>Annotate Sentence</h1>
+    <div id="sentence-content">{{ sent_obj.object_list.0.content }}</div>
+        <div class="row">
+            <form
+            id="annotation-labels"
+            class="btn-group"
+            role="group"
+            hx-post="{% url 'edit-sentence' sentence_id=sent_obj.object_list.0.pk %}"
+            hx-target="#result">
+                {% csrf_token %}
+                <div id="sentence-annotation" class="row">
+                    {% include "annotation/partials/sentence.html" %}
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="result"></div>
+    <div class="btn-group">
+        <button id="reset-btn" class="btn btn-outline-primary">Reset</button>
+
+        <button id="save-btn"
+            form="annotation-labels"
+            class="btn btn-outline-primary"
+            >Save</button>
+
+
+        <button type="submit" class="btn btn-outline-primary">Save New</button>
+    </div>
+</div>
+    <!-- <div class="custom-btn-container">
+        <button id="reset-btn" class="custom-btn">Reset</button>
+        <button id="save-btn" class="custom-btn">Save</button>
+    </div> -->
+
+</div>
+
+<!-- <div class="custom-btn-container">
+    <button id="prev-btn" class="custom-btn">Previous</button>
+    <button id="next-btn" class="custom-btn">Next</button>
+    {% comment %} <a href="{% url 'dashboard' %}" class="custom-btn">Back to Dashboard</a> {% endcomment %}
+</div>
+
+{% csrf_token %}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let sentences = {{ sentences|safe }};
+        let currentSentenceIndex = 0;
+        const sentenceContent = document.getElementById('sentence-content');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        function displaySentence(index) {
+            const sentence = sentences[index];
+            sentenceContent.textContent = sentence.content;
+
+            // To fix this: Enable/Disable Prev and Next buttons
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === sentences.length - 1;
+
+            // Fetch existing annotation for the sentence
+            fetch(`/get_annotation/${sentence.id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.pre_label_name)
+                    const labelButtons = document.querySelectorAll('.label-btn');
+                    labelButtons.forEach(btn => {
+                        if (data.pre_label_name && btn.innerHTML === data.pre_label_name) {
+                            btn.classList.add('selected');
+                        } else {
+                            btn.classList.remove('selected');
+                        }
+                    });
+                });
+        }
+
+        function selectEntireSentence() {
+            const range = document.createRange();
+            range.selectNodeContents(sentenceContent);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+        }
+
+        sentenceContent.addEventListener('click', selectEntireSentence);
+
+        displaySentence(currentSentenceIndex);
+
+        nextBtn.addEventListener('click', function() {
+            if (currentSentenceIndex < sentences.length - 1) {
+                currentSentenceIndex++;
+                displaySentence(currentSentenceIndex);
+            }
+        });
+
+        prevBtn.addEventListener('click', function() {
+            if (currentSentenceIndex > 0) {
+                currentSentenceIndex--;
+                displaySentence(currentSentenceIndex);
+            }
+        });
+
+        resetBtn.addEventListener('click', function() {
+            const sentenceId = sentences[currentSentenceIndex].id;
+            fetch(`/save_annotations/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    sentence_id: sentenceId,
+                    pre_label_name: null
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Annotation reset successfully:', data);
+                document.querySelectorAll('.label-btn').forEach(btn => btn.classList.remove('selected'));
+            })
+            .catch(error => {
+                console.error('Error resetting annotation:', error);
+            });
+        });
+
+        // Need to fix the save functionality 
+        saveBtn.addEventListener('click', function() {
+            const selectedLabel = document.querySelector('.label-btn.selected');
+            
+            if (selectedLabel) {
+                const sentenceId = sentences[currentSentenceIndex].id;
+                const labelText = selectedLabel.innerText.trim();
+                console.log(labelText)
+                const jsonString = JSON.stringify({
+                    sentence_id: sentenceId,
+                    pre_label_name: labelText
+                })
+                console.log(jsonString)
+                fetch(`/save_annotations/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: jsonString
+                })
+                .then(response => 
+                {
+                    
+                    response.json()
+                })
+                .then(data => {
+                    console.log('Annotation saved successfully:', data);
+                })
+                .catch(error => {
+                    console.error('Error saving annotation:', error);
+                });
+            }
+        });
+
+        document.querySelectorAll('.label-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                document.querySelectorAll('.label-btn').forEach(btn => btn.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+    });
+</script>
+
+<style>
+    .label-btn.selected {
+        border: 2px solid black;
+    }
+</style> -->
+{% endblock %}

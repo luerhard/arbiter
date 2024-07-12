@@ -1,5 +1,8 @@
+from django.contrib.auth.models import User
 from django.db import models
+
 from core.models import Project
+
 
 class Sentence(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
@@ -7,17 +10,32 @@ class Sentence(models.Model):
 
     def __str__(self):
         return self.content
-    
+
 class Label(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     color = models.CharField(max_length=7, default="#007bff")  # Store color codes
-    
-    # def __str__(self):
-    #     return {"name": self.name, "color": self.color}
+    hotkey = models.CharField(max_length=1, null=True)
 
-class Annotation(models.Model):
-    sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
-    pre_label = models.ForeignKey(Label, related_name='pre_annotations', on_delete=models.CASCADE, null=True, blank=True)
-    post_label = models.ForeignKey(Label, related_name='post_annotations', on_delete=models.CASCADE, null=True, blank=True)
-    # text = models.CharField(max_length=255)
+    def __str__(self):
+        return self.name
+
+class UserAnnotation(models.Model):
+    sentence = models.ForeignKey(Sentence, related_name="user_annotation", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
+    label = models.ForeignKey(Label, on_delete=models.CASCADE, null=True, blank=True)
+    is_set = models.BooleanField(default=False)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
+
+# class Annotation(models.Model):
+#     sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
+#     pre_label = models.ForeignKey(
+#         Label, related_name="pre_annotations", on_delete=models.CASCADE, null=True, blank=True,
+#     )
+#     post_label = models.ForeignKey(
+#         Label, related_name="post_annotations", on_delete=models.CASCADE, null=True, blank=True,
+#     )
+#     # text = models.CharField(max_length=255)

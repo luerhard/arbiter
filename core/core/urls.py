@@ -34,9 +34,10 @@ urlpatterns = [
     path("login/", user_login, name="login"),
     path("dashboard/", dashboard, name="dashboard"),
     path("logout/", user_logout, name="logout"),
-    path('annotate/<int:project_id>/', views.annotate_sentence, name='annotate_sentence'),
-    path('save_annotations/', views.save_annotations, name='save_annotations'),
-    path('get_annotation/<int:sentence_id>/', views.get_annotation, name='get_annotation'),
+    # path("annotate/<int:project_id>/", views.annotate_sentence, name="annotate_sentence"),
+    # path("save_annotations/", views.save_annotations, name="save_annotations"),
+    # path("get_annotation/<int:sentence_id>/", views.get_annotation, name="get_annotation"),
+    path("annotate/", include("annotation.urls")),
 ]
 
 # Additional settings for development
