@@ -1,7 +1,14 @@
-<div id="sentence-content">{{ sent_obj.object_list.0.content }}</div>
-<div class="row">
-    <form id="annotation-labels" class="btn-group" role="group"
-        hx-post="{% url 'edit-sentence' sentence_id=sent_obj.object_list.0.pk %}" hx-target="#result">
+<div class="card">
+<div class="card-body">
+    <div id="sentence-content card-text mt-5">{{ sent_obj.object_list.0.content }}</div>
+</div>
+</div>
+<div class="container">
+    <form id="annotation-labels"
+        class="btn-group mt-5"
+        role="group"
+        hx-post="{% url 'edit-sentence' sentence_id=sent_obj.object_list.0.pk %}"
+        hx-target="#result" >
         {% csrf_token %}
         <div id="sentence-annotation" class="d-flex justify-content-center">
             {% for label, is_checked in labels %}
@@ -20,13 +27,14 @@
     </form>
 </div>
 
-<div class="btn-group">
+<div class="btn-group mt-5">
     {% if sent_obj.has_previous %}
     <button id="next-btn"
         class="btn btn-outline-primary"
         form="annotation-labels"
         hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.previous_page_number }}"
-        hx-target="#sentence-section">Previous</button>
+        hx-target="#sentence-section"
+        hx-push-url="true">Previous</button>
     {% endif %}
 
     <button id="save-btn" form="annotation-labels" class="btn btn-outline-primary">Save</button>
@@ -36,7 +44,9 @@
         class="btn btn-outline-primary"
         form="annotation-labels"
         hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.next_page_number }}"
-        hx-target="#sentence-section">Next</button>
+        hx-target="#sentence-section"
+        hx-push-url="true"
+        >Next</button>
     {% endif %}
 
 </div>
