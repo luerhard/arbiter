@@ -29,6 +29,7 @@ line-length = 100
 
 [tool.ruff.lint]
 ignore = ["D107", "E712"]
+unfixable = ["F401"] # don't auto-remove unused imports
 ignore-init-module-imports = true
 select = [
 "ARG", # flake8-unused-arguments
