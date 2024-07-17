@@ -20,24 +20,20 @@ from django.urls import path
 
 from . import settings
 from . import views
-from .views import dashboard
-from .views import register
-from .views import user_login
-from .views import user_logout
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.core),
     path("admin_panel/", include("admins.urls", namespace="admin_panel")),
-    path("register/", register, name="register"),
-    path("login/", user_login, name="login"),
-    path("dashboard/", dashboard, name="dashboard"),
-    path("logout/", user_logout, name="logout"),
+    # path("dashboard/", views.dashboard, name="dashboard"),
     # path("annotate/<int:project_id>/", views.annotate_sentence, name="annotate_sentence"),
     # path("save_annotations/", views.save_annotations, name="save_annotations"),
     # path("get_annotation/<int:sentence_id>/", views.get_annotation, name="get_annotation"),
     path("annotate/", include("annotation.urls")),
+    path("users/", include("users.urls")),
+    path("projects/", views.ProjectListView.as_view(), name="list-projects"),
+    path("projects/<int:pk>", views.ProjectDetailView.as_view(), name="project-view"),
 ]
 
 # Additional settings for development
@@ -46,4 +42,3 @@ if settings.DEBUG:
 
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += [path("__debug__", include("debug_toolbar.urls"))]
-

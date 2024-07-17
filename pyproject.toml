@@ -49,6 +49,7 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "core/core/settings/*" = ["F403", "F405"]
+"**/migrations/**" = ["E501"]
 "docs/**" = ["D"]
 "tests/**" = ["D"]
 
@@ -59,7 +60,7 @@ convention = "google"
 force-single-line = true
 force-sort-within-sections = true
 lines-after-imports = 2
-known-local-folder = ["core", "annotation"]
+known-local-folder = ["core", "annotation", "users"]
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,14 +1,14 @@
-{% extends 'home.html' %}
+{% extends 'base.html' %}
 
 {% comment %} {% block title %}Assignment List{% endblock %}
 
-{% block content %} 
+{% block content %}
 <h1>Assignment List</h1>
  <ul>
     {% for assignment in assignments %}
         <li>Project: {{ assignment.project.name }} - User: {{ assignment.user.username }}</li>
     {% endfor %}
-</ul> 
+</ul>
 <table>
     <thead>
         <tr>
@@ -42,5 +42,3 @@
     </ul>
 </section>
 {% endblock %}
-
-

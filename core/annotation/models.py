@@ -1,13 +1,15 @@
-from django.contrib.auth.models import User
 from django.db import models
 
 from core.models import Project
+from users.models import User
 
 
 class Batch(models.Model):
     project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
 
+    def __str__(self) -> str:
+        return f"Batch {self.batch_number}"
 
 class Sentence(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

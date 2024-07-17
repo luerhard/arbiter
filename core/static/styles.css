@@ -1,197 +1,209 @@
 body {
-    font-family: Arial, sans-serif;
+  font-family: Arial, sans-serif;
 }
 
-header nav ul {
-    list-style-type: none;
-}
-
-header nav ul li {
-    display: inline;
-    margin-right: 10px;
-}
+/* header nav ul li {
+  display: inline;
+} */
 
 header nav ul li a {
-    text-decoration: none;
-    color: #000;
+  color: #000;
+  margin-top: 0rem;
+  padding: 0;
 }
+
+header nav ul .dropdown-menu {
+  padding: 0;
+
+}
+
+
+/* header nav .nav-link {
+  margin-top: 0rem;
+} */
+
 
 /* CARD */
 body {
-    font-family: "Roboto", sans-serif !important;
-  }
-  
-  .sec-icon {
-    position: relative;
-    display: inline-block;
-    padding: 0;
-    margin: 0 auto;
-  }
-  
-  .sec-icon::before {
-    content: "";
-    position: absolute;
-    height: 1px;
-    left: -70px;
-    margin-top: -5.5px;
-    top: 60%;
-    background: #f5f5f5;
-    width: 50px;
-  }
-  
-  /* .advertisers-service-sec {
+  font-family: "Roboto", sans-serif !important;
+}
+
+.sec-icon {
+  position: relative;
+  display: inline-block;
+  padding: 0;
+  margin: 0 auto;
+}
+
+.sec-icon::before {
+  content: "";
+  position: absolute;
+  height: 1px;
+  left: -70px;
+  margin-top: -5.5px;
+  top: 60%;
+  background: #f5f5f5;
+  width: 50px;
+}
+
+/* .advertisers-service-sec {
     background-color: #f5f5f5;
   } */
-  
-  .advertisers-service-sec span {
-    color: rgb(255, 23, 131);
-  }
-  
-  .advertisers-service-sec .col {
-    padding: 0 1em 1em 1em;
-    text-align: center;
-  }
-  
-  .advertisers-service-sec .service-card {
-    width: 150px;
-    height: 100%;
-    padding: 2em 1.5em;
-    border-radius: 5px;
-    box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
-    cursor: pointer;
-    transition: 0.5s;
-    position: relative;
-    z-index: 2;
-    overflow: hidden;
-    background: #fff;
-  }
 
-  .wrap-text {
-    word-wrap: break-word;
-  }
-  
-  .advertisers-service-sec .service-card::after {
-    content: "";
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(#0dcaf0, rgb(215, 23, 131));
-    position: absolute;
-    left: 0%;
-    top: -98%;
-    z-index: -2;
-    transition: all 0.4s cubic-bezier(0.77, -0.04, 0, 0.99);
-  }
-  
-  .advertisers-service-sec h3 {
-    font-size: 20px;
-    text-transform: capitalize;
-    font-weight: 600;
-    color: #1f194c;
-    margin: 1em 0;
-    z-index: 3;
-  }
-  
-  .advertisers-service-sec p {
-    color: #575a7b;
-    font-size: 15px;
-    line-height: 1.6;
-    letter-spacing: 0.03em;
-    z-index: 3;
-  }
-  
-  .advertisers-service-sec .icon-wrapper {
-    background-color: #2c7bfe;
-    position: relative;
-    margin: auto;
-    font-size: 30px;
-    height: 2.5em;
-    width: 2.5em;
-    color: #ffffff;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    transition: 0.5s;
-    z-index: 3;
-  }
-  
-  .advertisers-service-sec .service-card:hover:after {
-    top: 0%;
-  }
-  
-  .service-card .icon-wrapper {
-    background-color: #ffffff;
-    color: rgb(215, 23, 131);
-  }
-  
-  .advertisers-service-sec .service-card:hover .icon-wrapper {
-    color: #0dcaf0;
-  }
-  
-  .advertisers-service-sec .service-card:hover h3 {
-    color: #ffffff;
-  }
-  
-  .advertisers-service-sec .service-card:hover p {
-    color: #f0f0f0;
-  }
-  /* CARD ENDED */
-.grid {display: flex;}
-.container {
-    height: 100%;
+.advertisers-service-sec span {
+  color: rgb(255, 23, 131);
 }
+
+.advertisers-service-sec .col {
+  padding: 0 1em 1em 1em;
+  text-align: center;
+}
+
+.advertisers-service-sec .service-card {
+  width: 150px;
+  height: 100%;
+  padding: 2em 1.5em;
+  border-radius: 5px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  transition: 0.5s;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  background: #fff;
+}
+
+.wrap-text {
+  word-wrap: break-word;
+}
+
+.advertisers-service-sec .service-card::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(#0dcaf0, rgb(215, 23, 131));
+  position: absolute;
+  left: 0%;
+  top: -98%;
+  z-index: -2;
+  transition: all 0.4s cubic-bezier(0.77, -0.04, 0, 0.99);
+}
+
+.advertisers-service-sec h3 {
+  font-size: 20px;
+  text-transform: capitalize;
+  font-weight: 600;
+  color: #1f194c;
+  margin: 1em 0;
+  z-index: 3;
+}
+
+.advertisers-service-sec p {
+  color: #575a7b;
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  z-index: 3;
+}
+
+.advertisers-service-sec .icon-wrapper {
+  background-color: #2c7bfe;
+  position: relative;
+  margin: auto;
+  font-size: 30px;
+  height: 2.5em;
+  width: 2.5em;
+  color: #ffffff;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  transition: 0.5s;
+  z-index: 3;
+}
+
+.advertisers-service-sec .service-card:hover:after {
+  top: 0%;
+}
+
+.service-card .icon-wrapper {
+  background-color: #ffffff;
+  color: rgb(215, 23, 131);
+}
+
+.advertisers-service-sec .service-card:hover .icon-wrapper {
+  color: #0dcaf0;
+}
+
+.advertisers-service-sec .service-card:hover h3 {
+  color: #ffffff;
+}
+
+.advertisers-service-sec .service-card:hover p {
+  color: #f0f0f0;
+}
+
+/* CARD ENDED */
+.grid {
+  display: flex;
+}
+
+.container {
+  height: 100%;
+}
+
 /* .grid-item{padding-top:100%; } */
 .content-section {
-    padding: 2em 0;
-    background-color: #f5f5f5;
-    text-align: center;
+  padding: 2em 0;
+  background-color: #f5f5f5;
+  text-align: center;
 }
 
 .content-section h1 {
-    font-size: 2em;
-    color: rgb(215, 23, 131);
-    margin-bottom: 1em;
+  font-size: 2em;
+  color: rgb(215, 23, 131);
+  margin-bottom: 1em;
 }
 
 .content-section form {
-    display: inline-block;
-    text-align: left;
-    padding: 2em;
-    border-radius: 5px;
-    box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
-    background: #fff;
+  display: inline-block;
+  text-align: left;
+  padding: 2em;
+  border-radius: 5px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
+  background: #fff;
 }
 
 .content-section form button {
-    background: linear-gradient(#0dcaf0, rgb(215, 23, 131));
-    border: none;
-    color: white;
-    padding: 0.5em 1em;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: 0.5s;
+  background: linear-gradient(#0dcaf0, rgb(215, 23, 131));
+  border: none;
+  color: white;
+  padding: 0.5em 1em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.5s;
 }
 
 .content-section form button:hover {
-    background: linear-gradient(rgb(215, 23, 131), #0dcaf0);
+  background: linear-gradient(rgb(215, 23, 131), #0dcaf0);
 }
 
 .content-section ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 .content-section ul li {
-    background: #fff;
-    padding: 1em;
-    margin-bottom: 0.5em;
-    border-radius: 5px;
-    box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
+  background: #fff;
+  padding: 1em;
+  margin-bottom: 0.5em;
+  border-radius: 5px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.12);
 }
 
 .content-section ul li:hover {
-    background: linear-gradient(rgb(215, 23, 131), #0dcaf0);
-    color: white;
-    transition: 0.5s;
+  background: linear-gradient(rgb(215, 23, 131), #0dcaf0);
+  color: white;
+  transition: 0.5s;
 }
 
 #sentence-content {
@@ -210,8 +222,10 @@ body {
 .annotated {
   padding: 2px;
   border-radius: 3px;
-  color: black; /* Text color of annotated text */
-  background-color: yellow; /* Default background color */
+  color: black;
+  /* Text color of annotated text */
+  background-color: yellow;
+  /* Default background color */
 }
 
 #save-annotation {
@@ -242,7 +256,8 @@ span.labeled {
   display: inline-block;
   vertical-align: top;
 }
-span > .label {
+
+span>.label {
   font-size: xx-small;
   color: #1f194c;
   background-color: yellow;
@@ -252,27 +267,27 @@ span.labeled span.label {
   display: block;
   text-align: center;
   border-top: 1px solid black;
-} 
+}
 
-.label-container{
+.label-container {
   margin-top: 108px;
 }
 
-.wordContainer{
-  position:relative;
-  display:inline-block;
-  width:50px; 
-  top:8px;
+.wordContainer {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  top: 8px;
 }
 
-.top{
-  position:absolute;
-  top:0px;
+.top {
+  position: absolute;
+  top: 0px;
 }
 
-.down{
-  position:absolute;
-  top:20px;
+.down {
+  position: absolute;
+  top: 20px;
 }
 
 .annotated {
@@ -284,37 +299,53 @@ span.labeled span.label {
   content: attr(title);
   position: absolute;
   top: 2em;
-  left:0;
+  left: 0;
   font-size: 0.5em;
   text-transform: uppercase;
 }
 
 .custom-btn-container {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  gap: 10px; /* Add some space between buttons */
-  margin-top: 50px; /* Some top margin */
+  justify-content: center;
+  /* Center horizontally */
+  gap: 10px;
+  /* Add some space between buttons */
+  margin-top: 50px;
+  /* Some top margin */
 }
 
 .custom-btn {
-  background-color: #007bff; /* Blue background */
+  background-color: #007bff;
+  /* Blue background */
   border: none;
-  color: white; /* White text */
-  padding: 10px 20px; /* Some padding */
-  text-align: center; /* Center the text */
-  text-decoration: none; /* Remove underline */
-  display: inline-block; /* Inline-block for alignment */
-  font-size: 16px; /* Increase font size */
-  margin: 5px 2px; /* Some margin */
-  cursor: pointer; /* Pointer/hand icon */
-  border-radius: 5px; /* Rounded corners */
-  transition: background-color 0.3s; /* Transition effect */
+  color: white;
+  /* White text */
+  padding: 10px 20px;
+  /* Some padding */
+  text-align: center;
+  /* Center the text */
+  text-decoration: none;
+  /* Remove underline */
+  display: inline-block;
+  /* Inline-block for alignment */
+  font-size: 16px;
+  /* Increase font size */
+  margin: 5px 2px;
+  /* Some margin */
+  cursor: pointer;
+  /* Pointer/hand icon */
+  border-radius: 5px;
+  /* Rounded corners */
+  transition: background-color 0.3s;
+  /* Transition effect */
 }
 
 .btn:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3;
+  /* Darker blue on hover */
 }
 
 .btn:active {
-  background-color: #004080; /* Even darker blue when clicked */
+  background-color: #004080;
+  /* Even darker blue when clicked */
 }
