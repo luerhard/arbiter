@@ -13,6 +13,7 @@
 
         </div>
 
+        <!-- show annotators assigned to this project -->
         <div class="row">
             <table class="table">
                 <tr>
@@ -26,6 +27,7 @@
             </table>
         </div>
 
+        <!-- show experts assigned to this project -->
         <div class="row">
             <table class="table">
                 <tr>
@@ -38,18 +40,24 @@
                 {% endfor %}
             </table>
         </div>
+
+        <!-- show batches assigned to this project if there are any -->
+        {% if batches %}
         <div class="row">
             <table class="table">
                 <tr>
                     <th>Batches</th>
+                    <th>done?</th>
                 </tr>
-                {% for user in batches.all %}
+                {% for batch in batches %}
                 <tr>
-                    <td>{{ user.username }}</td>
+                    <td> <a href="{% url 'annotate-batch' project_id=project.pk batch_number=batch.batch.batch_number %}">Batch {{ batch.batch.batch_number }}</a> </td>
+                    <td> {{batch.annotated}} / {{ batch.length }}</td>
                 </tr>
                 {% endfor %}
             </table>
         </div>
+        {% endif %}
 
     </div>
 </div>

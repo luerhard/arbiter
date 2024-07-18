@@ -26,7 +26,7 @@ class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     color = models.CharField(max_length=7, default="#007bff")  # Store color codes
-    hotkey = models.CharField(max_length=1, null=True)
+    hotkey = models.CharField(max_length=1, null=True, blank=True)
 
     def __str__(self):
         return self.name

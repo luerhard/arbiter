@@ -3,28 +3,14 @@ from django.db.models import Max
 import pandas as pd
 
 from annotation.models import Batch
-from annotation.models import Label
 from annotation.models import Sentence
-from core.models import Project
 from core.models import ProjectUser
 from users.models import User
 
 
-class ProjectForm(forms.Form):
+class ProjectForm(forms.ModelForm):
     name = forms.CharField(max_length=100, help_text="Name of the Project")
     description = forms.CharField(widget=forms.Textarea)
-    labels = forms.CharField(max_length=512, help_text="all labels in comma-separated values")
-
-    def save(self, commit=True):  # noqa: ARG002
-        data = self.cleaned_data
-        project = Project(name=data["name"], description=data["description"])
-        project.save()
-        labels = []
-        for label in data["labels"].split(","):
-            obj = Label(project=project, name=label)
-            labels.append(obj)
-
-        Label.objects.bulk_create(labels)
 
 
 class ProjectAssignmentForm(forms.ModelForm):

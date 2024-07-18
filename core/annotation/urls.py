@@ -4,8 +4,11 @@ from . import views
 
 
 urlpatterns = [
-    path("batch/<int:project_id>", views.show_batches, name="show-batches"),
-    path("sentences/project<int:project_id>/batch<int:batch_number>", views.annotate_batch, name="annotate-batch"),
+    path(
+        "sentences/project<int:project_id>/batch<int:batch_number>",
+        views.annotate_batch,
+        name="annotate-batch",
+    ),
 ]
 
 htmx_patterns = [

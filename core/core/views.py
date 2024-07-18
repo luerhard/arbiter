@@ -1,12 +1,14 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.shortcuts import render
 from django.views.generic import DetailView
 from django.views.generic import ListView
 
 from .models import Project
 from .models import ProjectUser
+from annotation.models import Sentence
 
 
 User = get_user_model()
@@ -22,7 +24,6 @@ class ProjectListView(ListView):
     template_name = "core/project_list.html"
 
     def get_queryset(self):
-
         # for simplicity now: show admin all projects
         if "Admin" in (group.name for group in self.request.user.groups.all()):
             return self.model.objects.all()
@@ -40,14 +41,33 @@ class ProjectDetailView(DetailView):
 
         # can probably be a single db query
         context["annotators"] = User.objects.filter(
-            projectuser__project=context["project"], projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__project=context["project"],
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
         )
         context["experts"] = User.objects.filter(
-            projectuser__project=context["project"], projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__project=context["project"],
+            projectuser__role=ProjectUser.Role.EXPERT,
         )
 
-
-        context["batches"] = [1,2,3]
+        batches = context["project"].batches.all()
+        context["batches"] = []
+        for batch in batches:
+            already_annotated = (
+                Sentence.objects.filter(
+                    batch=batch,
+                    user_annotation__user=self.request.user,
+                )
+                .values("id")
+                .annotate(label_count=Count("user_annotation"))
+                .filter(label_count__gt=0)
+                .count()
+            )
+            b = {
+                "batch": batch,
+                "length": batch.sentences.count(),
+                "annotated": already_annotated,
+            }
+            context["batches"].append(b)
         return context
 
 

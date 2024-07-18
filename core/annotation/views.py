@@ -12,14 +12,6 @@ from core.models import Project
 # Create your views here.
 
 
-def show_batches(request, batch_id):
-    pass
-
-
-def annotate_sentence(request, sentence_id):
-    pass
-
-
 def annotate_batch(request, project_id, batch_number):
     project = get_object_or_404(Project, id=project_id)
     batch = get_object_or_404(Batch, project=project, batch_number=batch_number)
@@ -29,7 +21,8 @@ def annotate_batch(request, project_id, batch_number):
     sent_number = request.GET.get("sentence", 1)
     sent_obj = paginator.get_page(sent_number)
     user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
-        sentence__id=sent_obj.object_list[0].id, user=request.user.id,
+        sentence__id=sent_obj.object_list[0].id,
+        user=request.user.id,
     )
     checked_labels = []
     for label in labels:
@@ -66,7 +59,9 @@ def edit_sentence(request, sentence_id):
     update_annotations = []
     for project_label in project_labels.all():
         try:
-            annotation = next(anno for anno in user_annotations if anno.label.pk == project_label.pk)
+            annotation = next(
+                anno for anno in user_annotations if anno.label.pk == project_label.pk
+            )
             is_new = False
         except StopIteration:
             annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
@@ -89,4 +84,12 @@ def edit_sentence(request, sentence_id):
         sentence=sentence_id,
         user=request.user.id,
     ).all()
-    return HttpResponse("saved")
+    button = """ <button id="save-btn"
+        type="submit"
+        form="annotation-labels"
+        class="btn btn-primary"
+        style="width: 8rem; display: inline-block; margin: 0px; border-radius: 0px;"
+        > Saved <i class="bi bi-check"></i>
+    </button>
+    """
+    return HttpResponse(button)
