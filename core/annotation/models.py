@@ -12,7 +12,6 @@ class Batch(models.Model):
         return f"Batch {self.batch_number}"
 
 class Sentence(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
 
@@ -40,13 +39,3 @@ class UserAnnotation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
-
-# class Annotation(models.Model):
-#     sentence = models.ForeignKey(Sentence, on_delete=models.CASCADE)
-#     pre_label = models.ForeignKey(
-#         Label, related_name="pre_annotations", on_delete=models.CASCADE, null=True, blank=True,
-#     )
-#     post_label = models.ForeignKey(
-#         Label, related_name="post_annotations", on_delete=models.CASCADE, null=True, blank=True,
-#     )
-#     # text = models.CharField(max_length=255)

@@ -53,10 +53,18 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    #login required by default
+    "users.login_required_middleware.LoginRequiredMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
 AUTH_USER_MODEL = "users.User"
+
+LOGIN_URL = "/users/login"
+LOGIN_EXEMPT_URLS = [
+    "^$",
+    "/users/login",
+]
 
 TEMPLATES = [
     {

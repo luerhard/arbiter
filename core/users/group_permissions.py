@@ -15,7 +15,7 @@ GROUPS = {
     },
     "Expert": {
         ("project", ("view", "add", "change", "delete")),
-        ("projectassignment", ("view", "add", "change", "delete")),
+        ("projectuser", ("view", "add", "change", "delete")),
         ("batch", ("view", "add", "change", "delete")),
         ("sentence", ("view", "add", "change", "delete")),
         ("label", ("view", "add", "change", "delete")),
@@ -23,7 +23,7 @@ GROUPS = {
     },
     "Annotator": {
         ("project", ("view",)),
-        ("projectassignment", ("view",)),
+        ("projectuser", ("view",)),
         ("batch", ("view",)),
         ("sentence", ("view",)),
         ("label", ("view",)),
@@ -44,6 +44,8 @@ def create_groups(apps, schema_editor):  # noqa: ARG001
         for permisson, modes in permissions:
             for mode in modes:
                 codename = f"{mode}_{permisson}"
-                # print(f"Granting {group} permisson: {codename}")
-                permission = Permission.objects.get(codename=codename)
-                group.permissions.add(permission)
+                try:
+                    permission = Permission.objects.get(codename=codename)
+                    group.permissions.add(permission)
+                except:
+                    raise

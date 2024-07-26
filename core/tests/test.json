@@ -1,0 +1,358 @@
+[
+{
+  "model": "auth.group",
+  "pk": 1,
+  "fields": {
+    "name": "Admin",
+    "permissions": [
+      [
+        "add_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "change_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "delete_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "view_logentry",
+        "admin",
+        "logentry"
+      ],
+      [
+        "add_group",
+        "auth",
+        "group"
+      ],
+      [
+        "change_group",
+        "auth",
+        "group"
+      ],
+      [
+        "delete_group",
+        "auth",
+        "group"
+      ],
+      [
+        "view_group",
+        "auth",
+        "group"
+      ],
+      [
+        "add_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "change_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "delete_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "view_permission",
+        "auth",
+        "permission"
+      ],
+      [
+        "add_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "change_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "delete_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "view_contenttype",
+        "contenttypes",
+        "contenttype"
+      ],
+      [
+        "add_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "change_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "delete_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "view_session",
+        "sessions",
+        "session"
+      ],
+      [
+        "add_user",
+        "users",
+        "user"
+      ],
+      [
+        "change_user",
+        "users",
+        "user"
+      ],
+      [
+        "delete_user",
+        "users",
+        "user"
+      ],
+      [
+        "view_user",
+        "users",
+        "user"
+      ]
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 2,
+  "fields": {
+    "name": "Expert",
+    "permissions": [
+      [
+        "add_batch",
+        "annotation",
+        "batch"
+      ],
+      [
+        "change_batch",
+        "annotation",
+        "batch"
+      ],
+      [
+        "delete_batch",
+        "annotation",
+        "batch"
+      ],
+      [
+        "view_batch",
+        "annotation",
+        "batch"
+      ],
+      [
+        "add_label",
+        "annotation",
+        "label"
+      ],
+      [
+        "change_label",
+        "annotation",
+        "label"
+      ],
+      [
+        "delete_label",
+        "annotation",
+        "label"
+      ],
+      [
+        "view_label",
+        "annotation",
+        "label"
+      ],
+      [
+        "add_sentence",
+        "annotation",
+        "sentence"
+      ],
+      [
+        "change_sentence",
+        "annotation",
+        "sentence"
+      ],
+      [
+        "delete_sentence",
+        "annotation",
+        "sentence"
+      ],
+      [
+        "view_sentence",
+        "annotation",
+        "sentence"
+      ],
+      [
+        "view_userannotation",
+        "annotation",
+        "userannotation"
+      ],
+      [
+        "add_project",
+        "core",
+        "project"
+      ],
+      [
+        "change_project",
+        "core",
+        "project"
+      ],
+      [
+        "delete_project",
+        "core",
+        "project"
+      ],
+      [
+        "view_project",
+        "core",
+        "project"
+      ]
+    ]
+  }
+},
+{
+  "model": "auth.group",
+  "pk": 3,
+  "fields": {
+    "name": "Annotator",
+    "permissions": [
+      [
+        "view_batch",
+        "annotation",
+        "batch"
+      ],
+      [
+        "view_label",
+        "annotation",
+        "label"
+      ],
+      [
+        "view_sentence",
+        "annotation",
+        "sentence"
+      ],
+      [
+        "add_userannotation",
+        "annotation",
+        "userannotation"
+      ],
+      [
+        "change_userannotation",
+        "annotation",
+        "userannotation"
+      ],
+      [
+        "delete_userannotation",
+        "annotation",
+        "userannotation"
+      ],
+      [
+        "view_userannotation",
+        "annotation",
+        "userannotation"
+      ],
+      [
+        "view_project",
+        "core",
+        "project"
+      ]
+    ]
+  }
+},
+{
+  "model": "sessions.session",
+  "pk": "0sujsf1tc0x1mzn5mth4hc2j6py7ttzu",
+  "fields": {
+    "session_data": ".eJxVjDsOwjAQBe_iGlnxxr9Q0nMGa-1d4wCypTipEHeHSCmgfTPzXiLgtpawdV7CTOIslDj9bhHTg-sO6I711mRqdV3mKHdFHrTLayN-Xg7376BgL996yMpP5JSL2mdCQzarBMbDaK1jzYwENjIpPWUCMhmG0SfIQJrGmEC8P-weOGU:1sUtYV:bf7MqvDlXae0gMJ2nzAzTSNA7RkAnLyvXzAYA91Nmv4",
+    "expire_date": "2024-08-02T19:46:15.859Z"
+  }
+},
+{
+  "model": "users.user",
+  "pk": 1,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$NMxc52V2JYe1U1CGRcUzeY$xrbG8vyw36GuZ/mCZoVOMzT8FqNco+lrLOovBN6nbRQ=",
+    "last_login": "2024-07-19T19:46:15.842Z",
+    "is_superuser": true,
+    "username": "admin",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": true,
+    "is_active": true,
+    "date_joined": "2024-07-19T19:46:05.710Z",
+    "email": null,
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "users.user",
+  "pk": 2,
+  "fields": {
+    "password": "pbkdf2_sha256$720000$50YUgbzcnhscXoVJIfCOZr$5pABrNvnFc295CpwcBcYJFFz3MVt+oex5AaOwBmOW0A=",
+    "last_login": null,
+    "is_superuser": false,
+    "username": "annotator1",
+    "first_name": "",
+    "last_name": "",
+    "is_staff": false,
+    "is_active": true,
+    "date_joined": "2024-07-19T19:46:53.151Z",
+    "email": "",
+    "groups": [
+      [
+        "Annotator"
+      ]
+    ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 1,
+  "fields": {
+    "action_time": "2024-07-19T19:46:53.325Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "users",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "annotator1",
+    "action_flag": 1,
+    "change_message": "[{\"added\": {}}]"
+  }
+},
+{
+  "model": "admin.logentry",
+  "pk": 2,
+  "fields": {
+    "action_time": "2024-07-19T19:47:01.709Z",
+    "user": [
+      "admin"
+    ],
+    "content_type": [
+      "users",
+      "user"
+    ],
+    "object_id": "2",
+    "object_repr": "annotator1",
+    "action_flag": 2,
+    "change_message": "[{\"changed\": {\"fields\": [\"Groups\"]}}]"
+  }
+}
+]

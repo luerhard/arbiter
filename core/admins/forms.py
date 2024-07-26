@@ -60,19 +60,17 @@ class ProjectAssignmentForm(forms.ModelForm):
 
 
 class BatchForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ("file",)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         if self.instance and self.instance.pk:
             if self.instance.sentences.exists():
-  # replace `your_file_field` with the actual field name
                 self.fields["file"].disabled = True
 
-
-
-    class Meta:
-        model = Batch
-        fields = ("file",)
 
     file = forms.FileField(required=False)
 
