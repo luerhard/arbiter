@@ -53,7 +53,7 @@ def edit_sentence(request, sentence_id):
         user=request.user.id,
     )
     sentence = get_object_or_404(Sentence, id=sentence_id)
-    project_labels = sentence.project.labels
+    project_labels = sentence.batch.project.labels
     submitted_labels = [int(i) for i in request.POST.getlist("labels")]
     new_annotations = []
     update_annotations = []

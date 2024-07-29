@@ -99,7 +99,7 @@ class BatchForm(forms.ModelForm):
         batch.save()
         sentences = []
         for _, row in df.iterrows():
-            sent = Sentence(project=project, batch=batch, content=row["text"])
+            sent = Sentence(batch=batch, content=row["text"])
             sent.save()
 
         Sentence.objects.bulk_create(sentences)

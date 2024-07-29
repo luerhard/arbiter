@@ -2,24 +2,8 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-lg-0">
 
-                {% if perms.core.add_project %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle"
-                    href="#"
-                    role="button"
-                        data-bs-toggle="dropdown" aria-expanded="false">Projects</a>
-                    <ul class="dropdown-menu">
-                        <li ><a class="dropdown-item" href="{% url 'list-projects' %}">Projects</a></li>
-                        <li><a class="dropdown-item" href="{% url 'admin_panel:create_project' %}">Create Project</a></li>
-                        <li ><a class="dropdown-item" href="{% url 'admin_panel:assign_annotators' %}">Assign Users</a></li>
-                    </ul>
-                </li>
-                {% elif perms.core.view_project %}
+                {% if perms.core.view_project %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'list-projects' %}">Projects</a></li>
-                {% endif %}
-
-                {% if perms.annotation.add_sentences %}
-                    <li class="nav-item"><a class="nav-link" href="{% url 'admin_panel:upload_sentences' %}">Upload Sentences</a></li>
                 {% endif %}
 
                 <!-- Login / Logout -->

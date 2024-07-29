@@ -17,11 +17,14 @@ django = "^5.0.6"
 django-widget-tweaks = "^1.5.0"
 pandas = ">=2.2,<3.0"
 django-htmx = "^1.18.0"
-pytest-django = "^4.8.0"
-pytest = "^8.2.2"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.4.2"
+libsass = "^0.23.0"
+django-compressor = "^4.5.1"
+django-sass-processor = "^1.4.1"
+pytest-django = "^4.8.0"
+pytest = "^8.2.2"
 
 [tool.ruff]
 fix = true
