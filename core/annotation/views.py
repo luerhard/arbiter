@@ -88,7 +88,7 @@ def edit_sentence(request, sentence_id):
         type="submit"
         form="annotation-labels"
         class="btn btn-primary"
-        style="width: 8rem; display: inline-block; margin: 0px; border-radius: 0px;"
+        style="width: 8rem"
         > Saved <i class="bi bi-check"></i>
     </button>
     """
