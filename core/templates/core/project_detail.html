@@ -51,9 +51,15 @@
                 </tr>
                 {% for batch in batches %}
                 <tr>
+                    {% if batch.batch.annotation_done %}
+                    <td>Batch {{ batch.batch.batch_number }} (locked) </td>
+                    {% else %}
                     <td> <a href="{% url 'annotate-batch' project_id=project.pk batch_number=batch.batch.batch_number %}">Batch {{ batch.batch.batch_number }}</a> </td>
+                    {% endif %}
                     <td> {{batch.annotated}} / {{ batch.length }}</td>
+
                 </tr>
+
                 {% endfor %}
             </table>
         </div>

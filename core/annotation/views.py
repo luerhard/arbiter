@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
@@ -53,7 +54,10 @@ def edit_sentence(request, sentence_id):
         user=request.user.id,
     )
     sentence = get_object_or_404(Sentence, id=sentence_id)
-    project_labels = sentence.batch.project.labels
+    batch = sentence.batch
+    if batch.annotation_done:
+        raise PermissionDenied()
+    project_labels = batch.project.labels
     submitted_labels = [int(i) for i in request.POST.getlist("labels")]
     new_annotations = []
     update_annotations = []
