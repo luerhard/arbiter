@@ -34,5 +34,17 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    @property
+    def is_annotator(self):
+        return "Annotator" in [g.name for g in self.groups.all()]
+
+    @property
+    def is_expert(self):
+        return "Expert" in [g.name for g in self.groups.all()]
+
+    @property
+    def is_admin(self):
+        return "Admin" in [g.name for g in self.groups.all()]
+
     def __str__(self) -> str:
         return self.username

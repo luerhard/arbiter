@@ -15423,4 +15423,17 @@ textarea.form-control-lg {
 .bi-vignette::before {
   content: "賈"; }
 
+@keyframes fade-out-info {
+  0% {
+    opacity: 1; }
+  66% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+
+.fadeout-2 {
+  margin-left: 20px;
+  min-width: 50px;
+  animation: fade-out-info 2s forwards; }
+
 /*# sourceMappingURL=custom.css.map */

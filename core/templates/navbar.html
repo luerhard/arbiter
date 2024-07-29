@@ -2,8 +2,12 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mb-lg-0">
 
-                {% if perms.core.view_project %}
+                {% if user.is_annotator %}
                     <li class="nav-item"><a class="nav-link" href="{% url 'list-projects' %}">Projects</a></li>
+                {% endif %}
+
+                {% if user.is_admin %}
+                    <li class="nav-item"><a class="nav-link" href="{% url 'manage-projects' %}">Manage Projects</a></li>
                 {% endif %}
 
                 <!-- Login / Logout -->

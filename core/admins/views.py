@@ -1,80 +1,96 @@
-from django.contrib.auth.decorators import user_passes_test
-from django.db.models import Max
-from django.shortcuts import redirect
-from django.shortcuts import render
-import pandas as pd
+from typing import Any
 
-from .forms import ProjectAssignmentForm
-from .forms import ProjectForm
+from django.contrib.auth import get_user_model
+from django.db.models import Count
+from django.shortcuts import HttpResponse
+from django.views.generic import DetailView
+from django.views.generic import ListView
+
 from annotation.models import Batch
 from annotation.models import Sentence
 from core.models import Project
+from core.models import ProjectUser
 
 
-def is_admin(user):
-    return "Admin" in [g.name for g in user.groups]
+User = get_user_model()
 
-@user_passes_test(is_admin)
-def project_list(request):
-    projects = Project.objects.all()
-    return render(request, "admin_panel/project_list.html", {"projects": projects})
 
-@user_passes_test(is_admin)
-def create_project(request):
+class ProjectListView(ListView):
+    model = Project
+    context_object_name = "projects"
+    template_name = "admin_panel/manage_projects.html"
+
+    def get_queryset(self):
+        # for simplicity now: show admin all projects
+        if "Admin" in (group.name for group in self.request.user.groups.all()):
+            return self.model.objects.all()
+        else:
+            return self.model.objects.filter(users=self.request.user)
+
+
+class ProjectDetailView(DetailView):
+    model = Project
+    context_object_name = "project"
+    template_name = "admin_panel/manage_project_detail.html"
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+
+        # can probably be a single db query
+        context["annotators"] = User.objects.filter(
+            projectuser__project=context["project"],
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
+        )
+        context["experts"] = User.objects.filter(
+            projectuser__project=context["project"],
+            projectuser__role=ProjectUser.Role.EXPERT,
+        )
+
+        batches = context["project"].batches.all()
+        context["batches"] = []
+        for batch in batches:
+            batch_data = {
+                "batch": batch,
+                "annotation_done": batch.annotation_done,
+                "batch_users": [],
+            }
+
+            for user in context["annotators"]:
+                already_annotated = (
+                    Sentence.objects.filter(
+                        batch=batch,
+                        user_annotation__user=user,
+                    )
+                    .values("id")
+                    .annotate(label_count=Count("user_annotation"))
+                    .filter(label_count__gt=0)
+                    .count()
+                )
+                b = {
+                    "user": user.username,
+                    "length": batch.sentences.count(),
+                    "annotated": already_annotated,
+                }
+                batch_data["batch_users"].append(b)
+            context["batches"].append(batch_data)
+        return context
+
+def toggle_finalize(request):
+    # TODO: check for access control
     if request.method == "POST":
-        form = ProjectForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("admin_panel:project_list")
+        batch_id = request.POST.get("batch")
+        if batch_id is None:
+            msg = "batch id was none!"
+            raise Exception(msg)
+
+    batch = Batch.objects.get(id=batch_id)
+
+    if batch.annotation_done:
+        batch.annotation_done = False
     else:
-        form = ProjectForm()
-    return render(request, "admin_panel/create_project.html", {"form": form})
+        batch.annotation_done = True
 
-def assign_users(request):
-    if request.method == "POST":
-        form = ProjectAssignmentForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect("admin_panel:assignment_list")  # Ensure this URL name
-                                                            # matches your URL configuration
-    else:
-        form = ProjectAssignmentForm()
-    return render(request, "admin_panel/assign_annotators.html", {"form": form})
+    batch.save()
 
-def sentence_list(request):
-    # Fetch all sentences from the database
-    sentences = Sentence.objects.all()
-    print(sentences)
-    # Render the template with the sentences
-    return render(request, "admin_panel/sentence_list.html", {"sentences": sentences})
-
-
-@user_passes_test(is_admin)
-def upload_sentences(request):
-    if request.method == "POST":
-        project_id = request.POST.get("project")
-        file = request.FILES["file"]
-        project = Project.objects.get(id=project_id)
-        if file.name.endswith(".csv"):
-            df = pd.read_csv(file)
-        elif file.name.endswith(".xlsx"):
-            df = pd.read_excel(file)
-
-        #get max previous batch number and increment by one
-        max_batch_number = Batch.objects.filter(project=project).aggregate(Max("batch_number"))
-        max_batch_number = max_batch_number["batch_number__max"]
-        if max_batch_number is None:
-            max_batch_number = 0
-
-        max_batch_number += 1
-
-        batch = Batch(project=project, batch_number=max_batch_number)
-        batch.save()
-        sentences = []
-        for _, row in df.iterrows():
-            sent = Sentence(project=project, batch=batch, content=row["text"])
-            sentences.append(sent)
-        Sentence.objects.bulk_create(sentences)
-        return redirect("admin_panel:sentence_list")
-    projects = Project.objects.all()
-    return render(request, "admin_panel/upload_sentences.html", {"projects": projects})
+    response = f'<div class="fadeout-2" id="output{batch_id}"><i class="bi bi-check"></i></div>'
+    return HttpResponse(response)

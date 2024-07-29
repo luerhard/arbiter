@@ -7,6 +7,7 @@ from users.models import User
 class Batch(models.Model):
     project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
+    annotation_done = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
