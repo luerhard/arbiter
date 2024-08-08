@@ -43,3 +43,12 @@ To access it, you need to be in the University of Stuttgart VPN (or physically o
 ### Passwords
 
 every user has a password of "123".
+
+## Keyboard Shortcuts
+
+For the Annotation phase, some keyboard shortcuts are implemented.
+
+- Left Arrow Key: Go backwards through the samples (sentences)
+- Right Arrow Key: Go to the next sample (sentence)
+- Number keys: The number in parentheses behind the label can be used to toggle the annotation.
+- Up Arrow and Enter Key: Can be used to saved the annotation (send the latest state of all labels to the server)
