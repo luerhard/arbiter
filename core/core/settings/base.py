@@ -24,7 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-b2k)b2h_mlh+%&fv*-urp04_orpb9byj&=-+uruo7qv8=oh!zh"
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -54,7 +53,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
-    #login required by default
+    # login required by default
     "users.login_required_middleware.LoginRequiredMiddleware",
 ]
 
