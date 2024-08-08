@@ -6,6 +6,8 @@ We now have a development Server which serves as a showcase of the current state
 
 The adress is: [http://193.196.54.251](http://193.196.54.251)
 
+To access it, you need to be in the University of Stuttgart VPN (or physically on campus).
+
 ### Current Users
 
 #### admin
