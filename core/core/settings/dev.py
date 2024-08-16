@@ -19,7 +19,7 @@ from .base import *
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS" : {"min_length": 2},
+        "OPTIONS": {"min_length": 2},
     },
 ]
 

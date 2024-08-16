@@ -12,6 +12,7 @@ class UserCreationForm(OrigUserCreationForm):
     Specify the user model created while adding a user
     on the admin page.
     """
+
     class Meta:
         model = User
         fields = (
@@ -29,6 +30,7 @@ class UserChangeForm(OrigUserChangeForm):
     Specify the user model edited while editing a user on the
     admin page.
     """
+
     class Meta:
         model = User
         fields = (

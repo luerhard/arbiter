@@ -12,6 +12,7 @@ class Batch(models.Model):
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
 
+
 class Sentence(models.Model):
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
@@ -22,6 +23,7 @@ class Sentence(models.Model):
     def __str__(self):
         return self.content
 
+
 class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -30,6 +32,7 @@ class Label(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class UserAnnotation(models.Model):
     sentence = models.ForeignKey(Sentence, related_name="user_annotation", on_delete=models.CASCADE)

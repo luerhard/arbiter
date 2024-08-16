@@ -6,10 +6,12 @@ from core.models import Project
 
 pytestmark = pytest.mark.django_db
 
+
 @pytest.fixture()
 def client_a(client):
     client.login(username="annotator1")
     return client
+
 
 @pytest.mark.usefixtures("_populate_db")
 def test_testdata(db, django_user_model):

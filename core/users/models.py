@@ -5,9 +5,9 @@ from django.db import models
 
 # Create your models here.
 
+
 class UserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
-
         user = self.model(
             username=username,
             **extra_fields,
@@ -29,8 +29,7 @@ class User(AbstractUser):
     email = models.EmailField(verbose_name="Email Adress", blank=True, null=True)
 
     USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = [
-    ]
+    REQUIRED_FIELDS = []
 
     objects = UserManager()
 

@@ -10,7 +10,6 @@ class Command(BaseCommand):
     help = "Updates permissons for user groups"
 
     def handle(self, *args, **kwargs):  # noqa: ARG002
-
         for group_name, permissions in GROUPS.items():
             group, created_at = Group.objects.get_or_create(name=group_name)
             for permisson, modes in permissions:

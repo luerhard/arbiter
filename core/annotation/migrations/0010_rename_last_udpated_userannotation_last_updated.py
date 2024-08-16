@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0009_userannotation_delete_userpreannotation"),
     ]

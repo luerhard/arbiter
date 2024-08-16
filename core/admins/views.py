@@ -75,6 +75,7 @@ class ProjectDetailView(DetailView):
             context["batches"].append(batch_data)
         return context
 
+
 def toggle_finalize(request):
     # TODO: check for access control
     if request.method == "POST":

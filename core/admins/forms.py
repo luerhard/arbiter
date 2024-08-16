@@ -35,7 +35,8 @@ class ProjectAssignmentForm(forms.ModelForm):
         existing = []
         for annotator in data["annotators"]:
             assign, created = ProjectUser.objects.get_or_create(
-                user=annotator, project=data["project"],
+                user=annotator,
+                project=data["project"],
             )
             assign.role = assign.Role.ANNOTATOR
             if created:
@@ -45,7 +46,8 @@ class ProjectAssignmentForm(forms.ModelForm):
 
         for annotator in data["experts"]:
             assign, created = ProjectUser.objects.get_or_create(
-                user=annotator, project=data["project"],
+                user=annotator,
+                project=data["project"],
             )
             assign.role = assign.Role.EXPERT
             if created:
@@ -71,10 +73,9 @@ class BatchForm(forms.ModelForm):
             if self.instance.sentences.exists():
                 self.fields["file"].disabled = True
 
-
     file = forms.FileField(required=False)
 
-    def save(self, commit=True): ## noqa: ARG002
+    def save(self, commit=True):  ## noqa: ARG002
         data = self.cleaned_data
         project = data["project"]
         project.save()
@@ -87,7 +88,7 @@ class BatchForm(forms.ModelForm):
         elif file.name.endswith(".xlsx"):
             df = pd.read_excel(file)
 
-        #get max previous batch number and increment by one
+        # get max previous batch number and increment by one
         max_batch_number = Batch.objects.filter(project=project).aggregate(Max("batch_number"))
         max_batch_number = max_batch_number["batch_number__max"]
         if max_batch_number is None:

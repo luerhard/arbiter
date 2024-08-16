@@ -8,6 +8,7 @@ from .models import User
 
 # Register your models here.
 
+
 class UserAdmin(OrigUserAdmin):
     model = User
     add_form = UserCreationForm
@@ -30,15 +31,13 @@ class UserAdmin(OrigUserAdmin):
         ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
     )
 
-
-    search_fields = (
-        "username",
-    )
+    search_fields = ("username",)
 
     ordering = (
         "is_superuser",
         "is_staff",
         "username",
     )
+
 
 admin.site.register(User, UserAdmin)

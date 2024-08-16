@@ -5,6 +5,7 @@ from django.db import models
 
 User = get_user_model()
 
+
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
