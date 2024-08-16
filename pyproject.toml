@@ -17,6 +17,9 @@ django = "^5.1"
 django-widget-tweaks = "^1.5.0"
 pandas = ">=2.2,<3.0"
 django-htmx = "^1.18.0"
+daphne = "^4.1.2"
+django-channels = "^0.7.0"
+channels = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.4.2"
