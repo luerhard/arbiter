@@ -9,7 +9,7 @@ from annotation.models import Sentence
 from core.models import Project
 
 
-@pytest.fixture()
+@pytest.fixture
 def create_user(django_user_model, db):
     def make_user(username, group=None):
         user = django_user_model.objects.create_user(username=username, password="123")
@@ -21,7 +21,7 @@ def create_user(django_user_model, db):
     return make_user
 
 
-@pytest.fixture()
+@pytest.fixture
 def create_project(db):
     def make_project(name, n_batches=1):
         project = Project.objects.create(name=name)
@@ -35,7 +35,7 @@ def create_project(db):
     return make_project
 
 
-@pytest.fixture()
+@pytest.fixture
 def _populate_db(db, create_user, create_project):
     for i in range(4):
         create_user(username=f"annotator{i}", group="Annotator")

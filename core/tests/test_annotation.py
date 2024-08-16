@@ -7,7 +7,7 @@ from core.models import Project
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture()
+@pytest.fixture
 def client_a(client):
     client.login(username="annotator1")
     return client

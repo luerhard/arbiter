@@ -22,7 +22,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.BigAutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("name", models.CharField(max_length=100)),
@@ -30,7 +33,8 @@ class Migration(migrations.Migration):
                 (
                     "project",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="core.project",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="core.project",
                     ),
                 ),
             ],
@@ -41,7 +45,10 @@ class Migration(migrations.Migration):
                 (
                     "id",
                     models.BigAutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID",
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("start_offset", models.IntegerField()),
@@ -50,13 +57,15 @@ class Migration(migrations.Migration):
                 (
                     "sentence",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="annotation.sentence",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="annotation.sentence",
                     ),
                 ),
                 (
                     "label",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="annotation.label",
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="annotation.label",
                     ),
                 ),
             ],
