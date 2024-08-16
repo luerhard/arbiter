@@ -1,5 +1,6 @@
 from django.contrib.auth import login
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -8,6 +9,7 @@ from .forms import UserRegistrationForm
 
 
 # Create your views here.
+
 
 def register(request):
     if request.method == "POST":
@@ -20,6 +22,8 @@ def register(request):
         form = UserRegistrationForm()
     return render(request, "core/register.html", {"form": form})
 
+
+@login_not_required
 def user_login(request):
     if request.method == "POST":
         form = AuthenticationForm(request, data=request.POST)
@@ -34,9 +38,11 @@ def user_login(request):
         form = AuthenticationForm()
     return render(request, "core/login.html", {"form": form})
 
+
 def user_logout(request):
     logout(request)
     return redirect("login")
+
 
 def user_profile(request):
     user = request.user
