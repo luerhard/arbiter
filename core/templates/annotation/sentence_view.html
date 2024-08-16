@@ -1,35 +1,30 @@
-{% extends 'base.html' %}
-
-{% block title %}Annotate Sentence{% endblock %}
-
+{% extends "base.html" %}
+{% block title %}
+    Annotate Sentence
+{% endblock title %}
 {% block content %}
-
-<script>
-    function uncheckSave() {
-        var btn = document.getElementById("save-btn");
-        btn.innerHTML = "Save <i class='bi bi-floppy'></i>";
-        btn.classList.replace("btn-primary", "btn-outline-primary")
-    }
-
-    document.addEventListener("keypress", function onPress(event) {
-        console.log("keypress");
-        var label = document.getElementById(event.key);
-
-        if (label !== null) {
-            console.log("Triggering " + label.checked, )
-            label.checked = !label.checked;
-            uncheckSave();
-            event.preventDefault();
+    <script>
+        function uncheckSave() {
+            var btn = document.getElementById("save-btn");
+            btn.innerHTML = "Save <i class='bi bi-floppy'></i>";
+            btn.classList.replace("btn-primary", "btn-outline-primary")
         }
+
+        document.addEventListener("keypress", function onPress(event) {
+            console.log("keypress");
+            var label = document.getElementById(event.key);
+
+            if (label !== null) {
+                console.log("Triggering " + label.checked, )
+                label.checked = !label.checked;
+                uncheckSave();
+                event.preventDefault();
+            }
         });
-</script>
-
-<div class="content-section">
-    <h1>Annotate Sentence</h1>
-    <div id="sentence-section">
-        {% include "annotation/partials/sentence.html" %}
+    </script>
+    <div class="content-section">
+        <h1>Annotate Sentence</h1>
+        <div id="sentence-section">{% include "annotation/partials/sentence.html" %}</div>
     </div>
-</div>
-<div id="result"></div>
-
-{% endblock %}
+    <div id="result"></div>
+{% endblock content %}

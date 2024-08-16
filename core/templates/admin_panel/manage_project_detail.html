@@ -1,80 +1,80 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-
-
-<div class="card">
-    <div class="card-body">
-        <div class="row">
-            <h1>Project: {{ project.name }}</h1>
-        </div>
-
-        <div clas="row">
-
-        </div>
-
-        <!-- show annotators assigned to this project -->
-        <div class="row">
-            <table class="table">
-                <tr>
-                    <th>Annotators</th>
-                </tr>
-                {% for user in annotators %}
-                <tr>
-                    <td>{{ user }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <!-- show experts assigned to this project -->
-        <div class="row">
-            <table class="table">
-                <tr>
-                    <th>Experts</th>
-                </tr>
-                {% for user in experts.all %}
-                <tr>
-                    <td>{{ user.username }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <!-- show batches assigned to this project if there are any -->
-        {% if batches %}
-        <div class="container">
-            {% for batch in batches %}
-            <div class="card mt-3">
-                <div class="card-body">
-                    <h5 class="card-title mb-4">Batch {{ batch.batch.batch_number }}</h5>
-                    <div class="d-flex flex-row mb-4">
-                        <form id="form{{batch.batch.id}}" class="form-check form-switch" hx-post="{% url 'toggle-finalize' %}"
-                            hx-trigger="change" hx-target="#output{{batch.batch.id}}" hx-swap="outerHTML">
-                            {% csrf_token %}
-                            <input class="form-check-input" type="checkbox" id="check{{batch.batch.id}}" {% if batch.annotation_done %} checked {% endif %}>
-                            <label class="form-check-label" for="check{{batch.batch.id}}">locked</label>
-                            <input type="hidden" name="batch" value="{{batch.batch.id}}">
-                        </form>
-                        <div class="fadeout-2" id="output{{batch.batch.id}}">&nbsp;</div>
-                    </div>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>done?</th>
-                            </tr>
-                        </thead>
-                        {% for batch_user in batch.batch_users %}
-                        <tr>
-                            <td>{{ batch_user.user }}</td>
-                            <td>{{batch_user.annotated}} / {{ batch_user.length }}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </div>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <h1>Project: {{ project.name }}</h1>
             </div>
-            {% endfor %}
+            <div clas="row"></div>
+            <!-- show annotators assigned to this project -->
+            <div class="row">
+                <table class="table">
+                    <tr>
+                        <th>Annotators</th>
+                    </tr>
+                    {% for user in annotators %}
+                        <tr>
+                            <td>{{ user }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <!-- show experts assigned to this project -->
+            <div class="row">
+                <table class="table">
+                    <tr>
+                        <th>Experts</th>
+                    </tr>
+                    {% for user in experts.all %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <!-- show batches assigned to this project if there are any -->
+            {% if batches %}
+                <div class="container">
+                    {% for batch in batches %}
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Batch {{ batch.batch.batch_number }}</h5>
+                                <div class="d-flex flex-row mb-4">
+                                    <form id="form{{ batch.batch.id }}"
+                                          class="form-check form-switch"
+                                          hx-post="{% url 'toggle-finalize' %}"
+                                          hx-trigger="change"
+                                          hx-target="#output{{ batch.batch.id }}"
+                                          hx-swap="outerHTML">
+                                        {% csrf_token %}
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               id="check{{ batch.batch.id }}"
+                                               {% if batch.annotation_done %}checked{% endif %}>
+                                        <label class="form-check-label" for="check{{ batch.batch.id }}">locked</label>
+                                        <input type="hidden" name="batch" value="{{ batch.batch.id }}">
+                                    </form>
+                                    <div class="fadeout-2" id="output{{ batch.batch.id }}">&nbsp;</div>
+                                </div>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>done?</th>
+                                        </tr>
+                                    </thead>
+                                    {% for batch_user in batch.batch_users %}
+                                        <tr>
+                                            <td>{{ batch_user.user }}</td>
+                                            <td>{{ batch_user.annotated }} / {{ batch_user.length }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% endif %}
+        </div>
     </div>
-    {% endblock %}
+{% endblock content %}

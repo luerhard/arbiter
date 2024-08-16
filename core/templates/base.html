@@ -1,24 +1,29 @@
+<!DOCTYPE html>
 {% load static %}
 {% load sass_tags %}
-<!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% sass_src 'css/custom.scss' %}" type="text/css">
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <header>
-        {% include 'navbar.html' %}
-    </header>
-    <main>
-        <div class="container">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </main>
-</body>
-
-<script type="module" src="{% static 'js/main.js' %}"></script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="keywords"
+              content="annotation label labeling text sentence collaborative" />
+        <meta name="description" content="Text Annotation Tool">
+        <meta name="author" content="Lukas Erhard">
+        <link rel="stylesheet"
+              href="{% sass_src 'css/custom.scss' %}"
+              type="text/css">
+        <title>AnnotationTool</title>
+    </head>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+        <header>
+            {% include "navbar.html" %}
+        </header>
+        <main>
+            <div class="container">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        </main>
+    </body>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
 </html>

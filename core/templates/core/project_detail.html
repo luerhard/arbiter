@@ -1,71 +1,60 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-
-
-<div class="card">
-    <div class="card-body">
-        <div class="row">
-            <h1>Project: {{ project.name }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <div class="row">
+                <h1>Project: {{ project.name }}</h1>
+            </div>
+            <div clas="row"></div>
+            <!-- show annotators assigned to this project -->
+            <div class="row">
+                <table class="table">
+                    <tr>
+                        <th>Annotators</th>
+                    </tr>
+                    {% for user in annotators %}
+                        <tr>
+                            <td>{{ user }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <!-- show experts assigned to this project -->
+            <div class="row">
+                <table class="table">
+                    <tr>
+                        <th>Experts</th>
+                    </tr>
+                    {% for user in experts.all %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <!-- show batches assigned to this project if there are any -->
+            {% if batches %}
+                <div class="row">
+                    <table class="table">
+                        <tr>
+                            <th>Batches</th>
+                            <th>done?</th>
+                        </tr>
+                        {% for batch in batches %}
+                            <tr>
+                                {% if batch.batch.annotation_done %}
+                                    <td>Batch {{ batch.batch.batch_number }} (locked)</td>
+                                {% else %}
+                                    <td>
+                                        <a href="{% url 'annotate-batch' project_id=project.pk batch_number=batch.batch.batch_number %}">Batch {{ batch.batch.batch_number }}</a>
+                                    </td>
+                                {% endif %}
+                                <td>{{ batch.annotated }} / {{ batch.length }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endif %}
         </div>
-
-        <div clas="row">
-
-        </div>
-
-        <!-- show annotators assigned to this project -->
-        <div class="row">
-            <table class="table">
-                <tr>
-                    <th>Annotators</th>
-                </tr>
-                {% for user in annotators %}
-                <tr>
-                    <td>{{ user }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <!-- show experts assigned to this project -->
-        <div class="row">
-            <table class="table">
-                <tr>
-                    <th>Experts</th>
-                </tr>
-                {% for user in experts.all %}
-                <tr>
-                    <td>{{ user.username }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        <!-- show batches assigned to this project if there are any -->
-        {% if batches %}
-        <div class="row">
-            <table class="table">
-                <tr>
-                    <th>Batches</th>
-                    <th>done?</th>
-                </tr>
-                {% for batch in batches %}
-                <tr>
-                    {% if batch.batch.annotation_done %}
-                    <td>Batch {{ batch.batch.batch_number }} (locked) </td>
-                    {% else %}
-                    <td> <a href="{% url 'annotate-batch' project_id=project.pk batch_number=batch.batch.batch_number %}">Batch {{ batch.batch.batch_number }}</a> </td>
-                    {% endif %}
-                    <td> {{batch.annotated}} / {{ batch.length }}</td>
-
-                </tr>
-
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
-
     </div>
-</div>
-
-{% endblock %}
+{% endblock content %}
