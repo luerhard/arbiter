@@ -72,7 +72,6 @@ convention = "google"
 [tool.ruff.lint.isort]
 force-single-line = true
 force-sort-within-sections = true
-lines-after-imports = 2
 known-local-folder = ["core", "annotation", "users"]
 
 [tool.pytest.ini_options]
