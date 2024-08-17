@@ -58,6 +58,7 @@ ignore = [
   "E712",
   "COM812", # missing trailing comma, conflicts with formatter
   "F401", # unused-import, is re-selected explicitly in gh-actions
+  "F841", # remove unused-variables
 ]
 
 [tool.ruff.lint.per-file-ignores]

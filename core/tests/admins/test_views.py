@@ -1,7 +1,6 @@
 from django.urls import reverse
 import pytest
 
-
 URLS_LOGIN_REQUIRED = [("manage-projects", None)]
 URLS_EXPERT_REQUIRED = [("manage-project-detail", (1,))]
 
