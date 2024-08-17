@@ -22,13 +22,13 @@ from django.urls import path
 from . import settings
 from . import views
 
-
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.core, name="home"),
     path("manage/", include("admins.urls")),
     path("annotate/", include("annotation.urls")),
     path("users/", include("users.urls")),
+    path("discuss/", include("discuss.urls")),
     path("projects/", views.ProjectListView.as_view(), name="list-projects"),
     path("projects/<int:pk>", views.ProjectDetailView.as_view(), name="project-view"),
 ]
