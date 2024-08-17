@@ -11,8 +11,6 @@ from core.models import Project
 
 
 # Create your views here.
-
-
 def annotate_batch(request, project_id, batch_number):
     project = get_object_or_404(Project, id=project_id)
     batch = get_object_or_404(Batch, project=project, batch_number=batch_number)

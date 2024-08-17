@@ -1,6 +1,7 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.shortcuts import HttpResponse
 from django.views.generic import DetailView
@@ -34,6 +35,9 @@ class ProjectDetailView(DetailView):
     template_name = "admin_panel/manage_project_detail.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        if self.request.user not in self.get_queryset().first().experts:
+            raise PermissionDenied()
+
         context = super().get_context_data(**kwargs)
 
         # can probably be a single db query

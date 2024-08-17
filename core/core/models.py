@@ -11,12 +11,28 @@ class Project(models.Model):
     description = models.TextField()
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
 
+    @property
+    def annotators(self):
+        return {
+            user_project.user
+            for user_project in self.project_users.all()
+            if user_project.get_role_display() == "Annotator"
+        }
+
+    @property
+    def experts(self):
+        return {
+            user_project.user
+            for user_project in self.project_users.all()
+            if user_project.get_role_display() == "Expert"
+        }
+
     def __str__(self):
         return self.name
 
 
 class ProjectUser(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, related_name="project_users", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Role(models.TextChoices):

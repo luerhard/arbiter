@@ -25,12 +25,8 @@ from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.core),
+    path("", views.core, name="home"),
     path("manage/", include("admins.urls")),
-    # path("dashboard/", views.dashboard, name="dashboard"),
-    # path("annotate/<int:project_id>/", views.annotate_sentence, name="annotate_sentence"),
-    # path("save_annotations/", views.save_annotations, name="save_annotations"),
-    # path("get_annotation/<int:sentence_id>/", views.get_annotation, name="get_annotation"),
     path("annotate/", include("annotation.urls")),
     path("users/", include("users.urls")),
     path("projects/", views.ProjectListView.as_view(), name="list-projects"),

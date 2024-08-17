@@ -1,11 +1,10 @@
+from django.apps import apps
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
 # Create your models here.
-
-
 class UserManager(BaseUserManager):
     def create_user(self, username, password, **extra_fields):
         user = self.model(
@@ -44,6 +43,15 @@ class User(AbstractUser):
     @property
     def is_admin(self):
         return "Admin" in [g.name for g in self.groups.all()]
+
+    @property
+    def assigned_projects(self):
+        projectusermodel = apps.get_model("core.ProjectUser")
+        all_assigned_projects = projectusermodel.objects.filter(user_id=self.pk)
+        grouped = {role.label: set() for role in projectusermodel.Role}
+        for project_user in all_assigned_projects:
+            grouped[project_user.get_role_display()].add(project_user.project)
+        return grouped
 
     def __str__(self) -> str:
         return self.username
