@@ -5,7 +5,6 @@ from .forms import UserChangeForm
 from .forms import UserCreationForm
 from .models import User
 
-
 # Register your models here.
 
 

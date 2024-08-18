@@ -2,7 +2,6 @@ from django.contrib.auth.management import create_permissions
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 
-
 GROUPS = {
     "Admin": {
         # django specific roles
