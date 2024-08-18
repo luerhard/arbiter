@@ -58,7 +58,9 @@ class Label(models.Model):
 
 class UserAnnotation(models.Model):
     sentence = models.ForeignKey(
-        Sentence, related_name="user_annotations", on_delete=models.CASCADE,
+        Sentence,
+        related_name="user_annotations",
+        on_delete=models.CASCADE,
     )
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
     label = models.ForeignKey(Label, on_delete=models.CASCADE, null=True, blank=True)

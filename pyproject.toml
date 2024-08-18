@@ -73,7 +73,12 @@ convention = "google"
 [tool.ruff.lint.isort]
 force-single-line = true
 force-sort-within-sections = true
-known-local-folder = ["core", "annotation", "users"]
+known-local-folder = [
+  "annotation",
+  "core",
+  "discuss",
+  "users",
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.core.settings"
