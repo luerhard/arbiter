@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "django_htmx",
-    "sass_processor",
     "annotation",
     "discuss",
     "expert",
@@ -83,6 +82,24 @@ TEMPLATES = [
 
 # Daphne
 ASGI_APPLICATION = "core.asgi.application"
+
+
+# For InMemory channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+# For Redis, if it ever becomes slow...
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "asgi_redis.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("redis-host-url", 6379)],
+#         },
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
