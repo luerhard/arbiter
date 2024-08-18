@@ -33,3 +33,5 @@ INSTALLED_APPS += [
 MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
+
+STATICFILES_DIRS = [BASE_DIR.parent.parent / "dist", BASE_DIR.parent / "static"]

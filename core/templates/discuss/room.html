@@ -5,7 +5,7 @@
             <div class="card-body">
                 <h5 class="card-title">BATCH ID: {{ batch_id }}</h5>
                 <div hx-ext="ws" ws-connect="/ws/chat">
-                    <form hx-ws="send:submit">
+                    <form ws-send>
                         <input class="form-control" autocomplete="off" name="message">
                         <input class="btn btn-outline-primary" type="submit">
                     </form>

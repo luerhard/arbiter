@@ -5,7 +5,8 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "start": "webpack --config webpack.config.js"
+    "start": "webpack --config webpack.config.js",
+    "django": "cd core && poetry run python manage.py runserver"
   },
   "author": "Lukas Erhard",
   "license": "MIT",
@@ -15,9 +16,11 @@
     "babel-loader": "^9.1.3",
     "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
+    "glob": "^11.0.0",
     "mini-css-extract-plugin": "^2.9.0",
     "node-sass": "^9.0.0",
     "postcss-loader": "^8.1.1",
+    "purgecss-webpack-plugin": "^6.0.0",
     "sass": "^1.77.8",
     "sass-loader": "^16.0.0",
     "style-loader": "^4.0.0",
@@ -29,6 +32,6 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "htmx.org": "^1.9.12"
+    "htmx.org": "^2.0.2"
   }
 }

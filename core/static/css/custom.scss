@@ -1,15 +1,5 @@
-// Custom.scss
-// Option A: Include all of Bootstrap
-
-@import 'bootstrap/scss/bootstrap';
-@import 'bootstrap-icons/font/bootstrap-icons';
-
-
-@font-face {
-    font-display: block;
-    font-family: "bootstrap-icons";
-    src: local("bootstrap-icons"), url("./fonts/bootstrap-icons.woff2") format("woff2"), url("./fonts/bootstrap-icons.woff") format("woff");
-}
+// import full boostrap -- css is purged afterwards
+@import "bootstrap/scss/bootstrap";
 
 // custom css and scss
 

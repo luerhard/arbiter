@@ -4,21 +4,29 @@
 {% endblock title %}
 {% block content %}
     <table class="table">
-        <tr>
-            <td>Username</td>
-            <td>{{ user.username }}</td>
-        </tr>
-        <tr>
-            <td>Is Annotator</td>
-            <td>{{ is_annotator }}</td>
-        </tr>
-        <tr>
-            <td>Is Expert</td>
-            <td>{{ is_expert }}</td>
-        </tr>
-        <tr>
-            <td>Is Admin</td>
-            <td>{{ is_admin }}</td>
-        </tr>
+        <thead>
+            <tr>
+                <th>Variable</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Username</td>
+                <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+                <td>Is Annotator</td>
+                <td>{{ is_annotator }}</td>
+            </tr>
+            <tr>
+                <td>Is Expert</td>
+                <td>{{ is_expert }}</td>
+            </tr>
+            <tr>
+                <td>Is Admin</td>
+                <td>{{ is_admin }}</td>
+            </tr>
+        </tbody>
     </table>
 {% endblock content %}

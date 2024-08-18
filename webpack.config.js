@@ -1,22 +1,36 @@
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const path = require('path');
+const path = require("path");
+const glob = require("glob");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { PurgeCSSPlugin } = require('purgecss-webpack-plugin');
+
+const PATHS = {
+    templates: path.join(__dirname, "core/templates")
+}
 
 module.exports = {
-    entry: './core/static/js/index.js',
+    entry: "./core/static/js/index.js",
     mode: "development",
+    devtool: "source-map",
     output: {
-        filename: 'main.js',
-        path: path.resolve(__dirname, 'core/static/dist'),
+        filename: "main.js",
+        path: path.resolve(__dirname, "dist"),
     },
     plugins: [
-        new MiniCssExtractPlugin()
+        new MiniCssExtractPlugin(),
+        new PurgeCSSPlugin({
+            paths: glob.sync(path.resolve(__dirname, "core/**/*.{html,js}"), { nodir: true }),
+            sourceMap: true,
+            whitelistPatterns: [/thead/, /tbody/],
+            // whitelistPatternsChildren: [/table/],
+        })
     ],
+
     module: {
         rules: [
             {
                 test: /\.(js|jsx)$/,
                 exclude: /node_modules/,
-                use: ['babel-loader']
+                use: ["babel-loader"]
             },
             {
                 test: /\.scss$/,
@@ -26,10 +40,10 @@ module.exports = {
                         loader: MiniCssExtractPlugin.loader
                         // loader: "style-loader"
                     },
-                    "css-loader",   // 3. turn css into commonJS
+                    "css-loader",  // 3. turn css into commonJS
                     , {
                         // Run postcss actions
-                        loader: 'postcss-loader',
+                        loader: "postcss-loader",
                         options: {
                             // `postcssOptions` is needed for postcss 8.x;
                             // if you use postcss 7.x skip the key
@@ -37,7 +51,7 @@ module.exports = {
                                 // postcss plugins, can be exported to postcss.config.js
                                 plugins: function () {
                                     return [
-                                        require('autoprefixer')
+                                        require("autoprefixer")
                                     ];
                                 }
                             }
@@ -45,18 +59,32 @@ module.exports = {
                     }
                     , {
                         // 1. compiles Sass to CSS
-                        loader: 'sass-loader'
+                        loader: "sass-loader",
+                        options: {
+                            sassOptions: {
+                                quietDeps: true // Suppress deprecation warnings from dependencies
+                            }
+
+                        }
                     }]
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                type: "asset/inline",
+                type: "asset/resource",
+            },
+            {
+                mimetype: "image/svg+xml",
+                scheme: "data",
+                type: "asset/resource",
+                generator: {
+                    filename: "icons/[hash].svg"
+                }
             },
             {
                 test: /\.svg$/,
                 use: [
                     {
-                        loader: require.resolve('@svgr/webpack'),
+                        loader: require.resolve("@svgr/webpack"),
                         options: {
                             prettier: false,
                             svgo: false,
@@ -68,9 +96,9 @@ module.exports = {
                         },
                     },
                     {
-                        loader: require.resolve('file-loader'),
+                        loader: require.resolve("file-loader"),
                         options: {
-                            name: 'static/media/[name].[hash].[ext]',
+                            name: "static/media/[name].[hash].[ext]",
                         },
                     },
                 ],
@@ -82,8 +110,8 @@ module.exports = {
     },
     resolve: {
         alias: {
-            './fonts/bootstrap-icons.woff': path.resolve(__dirname, './node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff'),
-            './fonts/bootstrap-icons.woff2': path.resolve(__dirname, './node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2'),
+            "./fonts/bootstrap-icons.woff": path.resolve(__dirname, "./node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff"),
+            "./fonts/bootstrap-icons.woff2": path.resolve(__dirname, "./node_modules/bootstrap-icons/font/fonts/bootstrap-icons.woff2"),
         }
     },
 };

@@ -8,8 +8,7 @@
               content="annotation label labeling text sentence collaborative" />
         <meta name="description" content="Text Annotation Tool">
         <meta name="author" content="Lukas Erhard">
-        <link rel="stylesheet" href="{% static 'dist/main.css' %}" type="text/css">
-        <script src="{% static 'dist/main.js' %}"></script>
+        <link rel="stylesheet" href="{% static 'main.css' %}" type="text/css">
         <title>AnnotationTool</title>
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
@@ -23,4 +22,5 @@
             </div>
         </main>
     </body>
+    <script src="{% static 'main.js' %}"></script>
 </html>
