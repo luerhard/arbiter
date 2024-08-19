@@ -25,6 +25,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 INTERNAL_IPS = ["127.0.0.1"]
 
+ALLOWED_HOSTS = ["127.0.0.1", "193.196.54.251"]
+
 CSRF_TRUSTED_ORIGINS = ["http://193.196.54.251"]
 
 # Application definition
