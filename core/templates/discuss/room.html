@@ -13,10 +13,7 @@
                         {% comment %} send button and htmx logic {% endcomment %}
                         <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                             <form class="form" ws-send>
-                                <input id="message-input"
-                                       class="message-bar"
-                                       autocomplete="off"
-                                       name="message">
+                                <input id="message-input" autocomplete="off" name="message">
                                 <input class="btn btn-outline-primary mt-1 float-end"
                                        value="Send"
                                        type="submit">

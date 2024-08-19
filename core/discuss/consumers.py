@@ -33,10 +33,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if self.user.username == username:
             # if self-message
             div_class = "self-message"
-            container_class = "d-flex flex-row"
+            container_class = "d-flex flex-row-reverse"
         else:
             div_class = "other-message"
-            container_class = "d-flex flex-row-reverse"
+            container_class = "d-flex flex-row"
 
         message_html = (
             f"<div class='{container_class}'><div class='message {div_class}'>{message}</div></div>"
