@@ -12,9 +12,12 @@ class Room(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
 
-class DiscussMessage(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+class Message(models.Model):
+    # TODO: user is currently not a ForeignKey to User, cuz we want system messages.
+    # How should we handle that with ForeignKeys? Do we even need keys
+    # user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
+    room = models.ForeignKey(Room, related_name="messages", on_delete=models.CASCADE)
+    user = models.CharField(max_length=64)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

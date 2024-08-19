@@ -3,7 +3,7 @@ import json
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from .models import DiscussMessage
+from .models import Message
 from .models import Room
 
 
@@ -29,6 +29,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message = data["message"]
             username = self.user.username
 
+            # store message in db
+            await self.save_message_to_db(username=username, message=message)
+
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {"type": "chat_message", "message": message, "username": username},
@@ -50,12 +53,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             chat_message = self.create_chat_message(message, msg_type="other-message")
 
-        await self.send(
-            text_data=json.dumps(
-                {"message": chat_message, "username": username},
-                ensure_ascii=False,
-            ),
-        )
+        await self.send(text_data=json.dumps({"message": chat_message}, ensure_ascii=False))
 
     def get_or_create_room(self):
         room, _ = Room.objects.get_or_create(pk=self.room_name)
@@ -65,8 +63,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def update_n_online(self, change):
         room = self.get_or_create_room()
         room.n_online += change
+        if room.n_online < 0:
+            room.n_online = 0
         room.save()
         return room.n_online
+
+    @database_sync_to_async
+    def save_message_to_db(self, username, message):
+        room = self.get_or_create_room()
+        Message.objects.create(room=room, user=username, message=message)
+        return None
 
     @staticmethod
     def create_chat_message(msg, msg_type):
@@ -96,44 +102,41 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def increment_user_online(self):
         n_online = await self.update_n_online(1)
+
+        msg = f"{self.user.username} is now connected."
+        await self.save_message_to_db(username="system", message=msg)
+
+        chat_message = self.create_chat_message(msg, msg_type="system-message")
+        n_online_msg = self.create_n_online_message(n_online)
+
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "user_connected", "n": n_online, "user": self.user.username},
+            {"type": "user_connected", "message": chat_message, "n_online": n_online_msg},
+        )
+
+    async def user_connected(self, event):
+        msg = event["message"]
+        n_online = event["n_online"]
+        await self.send(
+            text_data=json.dumps({"message": msg, "n_online": n_online}, ensure_ascii=False),
         )
 
     async def decrement_user_online(self):
         n_online = await self.update_n_online(-1)
+
+        msg = f"{self.user.username} has disconnected."
+        chat_message = self.create_chat_message(msg, msg_type="system-message")
+        await self.save_message_to_db(username="system", message=msg)
+        n_online_msg = self.create_n_online_message(n_online)
+
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "user_disconnected", "n": n_online, "user": self.user.username},
-        )
-
-    async def user_connected(self, event):
-        n = event["n"]
-        n_message = self.create_n_online_message(n)
-        user = event["user"]
-
-        msg = f"{user} is now connected."
-        chat_message = self.create_chat_message(msg, msg_type="system-message")
-
-        await self.send(
-            text_data=json.dumps(
-                {"message": chat_message, "n_online": n_message},
-                ensure_ascii=False,
-            ),
+            {"type": "user_disconnected", "message": chat_message, "n_online": n_online_msg},
         )
 
     async def user_disconnected(self, event):
-        n = event["n"]
-        n_message = self.create_n_online_message(n)
-        user = event["user"]
-
-        msg = f"{user} has disconnected."
-        chat_message = self.create_chat_message(msg, msg_type="system-message")
-
+        msg = event["message"]
+        n_online = event["n_online"]
         await self.send(
-            text_data=json.dumps(
-                {"message": chat_message, "n_online": n_message},
-                ensure_ascii=False,
-            ),
+            text_data=json.dumps({"message": msg, "n_online": n_online}, ensure_ascii=False),
         )
