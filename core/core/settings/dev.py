@@ -25,6 +25,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 INTERNAL_IPS = ["127.0.0.1"]
 
+CSRF_TRUSTED_ORIGINS = ["http://193.196.54.251"]
+
 # Application definition
 INSTALLED_APPS += [
     "debug_toolbar",
