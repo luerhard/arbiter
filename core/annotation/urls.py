@@ -2,7 +2,6 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
     path(
         "sentences/project<int:project_id>/batch<int:batch_number>",

@@ -1,7 +1,6 @@
 from django.urls import reverse
 import pytest
 
-
 URLS_NO_LOGIN_REQUIRED = [("login", None)]
 URLS_LOGIN_REQUIRED = [("user-profile", None)]
 

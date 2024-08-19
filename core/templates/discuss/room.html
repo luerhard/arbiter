@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container py-3">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">BATCH ID: {{ batch_id }}</h5>
+                <div class="row align-items-center">
+                    <div class="col">
+                        <div class="d-flex flex-row">PLACE HOLDER</div>
+                    </div>
+                    <div class="col mb-2">
+                        <div id="messages" class="chat-message-container"></div>
+                        {% comment %} send button and htmx logic {% endcomment %}
+                        <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+                            <form class="form" ws-send>
+                                <input id="message-input" autocomplete="off" name="message">
+                                <input class="btn btn-outline-primary mt-1 float-end"
+                                       value="Send"
+                                       type="submit">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const container = document.getElementById('messages');
+
+    // Function to scroll to the bottom
+    function scrollToBottom() {
+        container.scrollTop = container.scrollHeight;
+    }
+
+    // Observe changes in the container
+    const observer = new MutationObserver(() => scrollToBottom());
+    observer.observe(container, {
+        childList: true,
+        subtree: true
+    });
+
+    // Listen for the HTMX event after the request
+    document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+        const inputField = document.getElementById('message-input');
+        if (inputField) {
+            inputField.value = ''; // Clear the input field
+        }
+    });
+</script>
+{% endblock content %}

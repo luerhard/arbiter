@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
     <table class="table">
-        <tr>
-            <th>Project</th>
-            <th>Meta</th>
-        </tr>
-        {% for project in projects %}
+        <thead>
             <tr>
-                <td>
-                    <a href="{% url 'manage-project-detail' project.pk %}">{{ project.name }}</a>
-                </td>
-                <td>Meta</td>
+                <th>Project</th>
+                <th>Meta</th>
             </tr>
-        {% endfor %}
+        </thead>
+        <tbody>
+            {% for project in projects %}
+                <tr>
+                    <td>
+                        <a href="{% url 'manage-project-detail' project.pk %}">{{ project.name }}</a>
+                    </td>
+                    <td>Meta</td>
+                </tr>
+            {% endfor %}
+        </tbody>
     </table>
 {% endblock content %}

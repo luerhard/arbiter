@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -36,9 +35,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "django_htmx",
-    "sass_processor",
     "annotation",
-    "chat",
+    "discuss",
     "expert",
     "admins",
     "core",
@@ -85,6 +83,24 @@ TEMPLATES = [
 # Daphne
 ASGI_APPLICATION = "core.asgi.application"
 
+
+# For InMemory channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
+}
+
+# For Redis, if it ever becomes slow...
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "asgi_redis.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("redis-host-url", 6379)],
+#         },
+#     },
+# }
+
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -110,27 +126,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = "/static/"
+
 # This is the directory where collectstatic will put the files in production
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-    "sass_processor.finders.CssFinder",
 ]
-
-
-STATICFILES_DIRS = [
-    BASE_DIR.parent / "static",
-    ("node_modules", BASE_DIR.parent.parent / "node_modules"),
-    ("css/fonts", BASE_DIR.parent.parent / "node_modules/bootstrap-icons/font/fonts"),
-]
-
-SASS_PROCESSOR_INCLUDE_DIRS = [
-    BASE_DIR.parent / "static",
-]
-
-SASS_PRECISION = 8
 
 
 # Default primary key field type

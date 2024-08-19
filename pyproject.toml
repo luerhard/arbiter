@@ -13,19 +13,16 @@ packages = [{include = "core"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<4.0"
+channels = "^4.1.0"
+daphne = "^4.1.2"
+pandas = ">=2.2,<3.0"
 django = "^5.1"
 django-widget-tweaks = "^1.5.0"
-pandas = ">=2.2,<3.0"
 django-htmx = "^1.18.0"
-daphne = "^4.1.2"
 django-channels = "^0.7.0"
-channels = "^4.1.0"
 
 [tool.poetry.group.dev.dependencies]
 django-debug-toolbar = "^4.4.2"
-libsass = "^0.23.0"
-django-compressor = "^4.5.1"
-django-sass-processor = "^1.4.1"
 pytest-django = "^4.8.0"
 pytest = "^8.2.2"
 djlint = "^1.34.1"
@@ -58,6 +55,7 @@ ignore = [
   "E712",
   "COM812", # missing trailing comma, conflicts with formatter
   "F401", # unused-import, is re-selected explicitly in gh-actions
+  "F841", # remove unused-variables
 ]
 
 [tool.ruff.lint.per-file-ignores]
@@ -72,8 +70,12 @@ convention = "google"
 [tool.ruff.lint.isort]
 force-single-line = true
 force-sort-within-sections = true
-lines-after-imports = 2
-known-local-folder = ["core", "annotation", "users"]
+known-local-folder = [
+  "annotation",
+  "core",
+  "discuss",
+  "users",
+]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "core.core.settings"

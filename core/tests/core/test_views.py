@@ -1,7 +1,6 @@
 from django.urls import reverse
 import pytest
 
-
 URLS_NO_LOGIN_REQUIRED = [("home", None)]
 URLS_LOGIN_REQUIRED = [("list-projects", None), ("project-view", (1,))]
 

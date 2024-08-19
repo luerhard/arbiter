@@ -1,7 +1,6 @@
 from django.urls import reverse
 import pytest
 
-
 URLS_LOGIN_REQUIRED = [("annotate-batch", (1, 1))]
 
 

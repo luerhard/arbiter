@@ -47,11 +47,34 @@ class User(AbstractUser):
     @property
     def assigned_projects(self):
         projectusermodel = apps.get_model("core.ProjectUser")
-        all_assigned_projects = projectusermodel.objects.filter(user_id=self.pk)
+        all_assigned_projects = projectusermodel.objects.prefetch_related("project").filter(
+            user_id=self.pk,
+        )
         grouped = {role.label: set() for role in projectusermodel.Role}
         for project_user in all_assigned_projects:
             grouped[project_user.get_role_display()].add(project_user.project)
         return grouped
+
+    @property
+    def discuss_batches(self):
+        # TODO: optimize!
+        projectusermodel = apps.get_model("core.ProjectUser")
+        all_projects = (
+            projectusermodel.objects.prefetch_related("project")
+            .prefetch_related("project__batches")
+            .filter(user_id=self.pk)
+            .all()
+        )
+        return_val = {}
+        for project_user in all_projects:
+            project = project_user.project
+            project_batches = []
+            for batch in project.batches.all():
+                if batch.annotation_done:
+                    project_batches.append(batch)
+            if project_batches:
+                return_val[project] = project_batches
+        return return_val
 
     def __str__(self) -> str:
         return self.username

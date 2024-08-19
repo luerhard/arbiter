@@ -12,7 +12,6 @@ from annotation.models import Sentence
 from core.models import Project
 from core.models import ProjectUser
 
-
 User = get_user_model()
 
 
@@ -63,10 +62,10 @@ class ProjectDetailView(DetailView):
                 already_annotated = (
                     Sentence.objects.filter(
                         batch=batch,
-                        user_annotation__user=user,
+                        user_annotations__user=user,
                     )
                     .values("id")
-                    .annotate(label_count=Count("user_annotation"))
+                    .annotate(label_count=Count("user_annotations"))
                     .filter(label_count__gt=0)
                     .count()
                 )
