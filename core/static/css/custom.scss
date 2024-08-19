@@ -22,3 +22,47 @@
     min-width: 50px;
     animation: fade-out-info 2s forwards;
 }
+
+
+// Discuss Module
+
+
+// chat
+
+#message-input {
+    @extend .form-control;
+    outline: none !important;
+    box-shadow: none !important;
+    // border-color: initial !important;
+}
+
+.chat-message-container {
+    @extend .p-2;
+    border: 1px solid rgb(193, 185, 185);
+    border-radius: 5px;
+    min-height: 100px;
+    height: 50vh;
+    overflow: auto;
+}
+
+.message {
+    @extend .p-2;
+    @extend .mt-1;
+
+    border-radius: 10px;
+    padding: 10px 20px;
+    position: relative;
+    min-width: 20%;
+    max-width: 80%;
+}
+
+.self-message {
+    background-color: #0d437c;
+    color: white;
+}
+
+
+.other-message {
+    background-color: #c8c8c8;
+    text-align: left;
+}

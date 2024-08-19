@@ -17,12 +17,13 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin(),
-        new PurgeCSSPlugin({
-            paths: glob.sync(path.resolve(__dirname, "core/**/*.{html,js}"), { nodir: true }),
-            sourceMap: true,
-            whitelistPatterns: [/thead/, /tbody/],
-            // whitelistPatternsChildren: [/table/],
-        })
+        // new PurgeCSSPlugin({
+        //     paths: glob.sync(path.resolve(__dirname, "core/**/*.{html,js}"), { nodir: true }),
+        //     sourceMap: true,
+        //     whitelist: ["message", "self-message", "other-message"],
+        //     whitelistPatterns: [/thead/, /tbody/],
+        // whitelistPatternsChildren: [/table/],
+        // })
     ],
 
     module: {
