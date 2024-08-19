@@ -5,10 +5,7 @@ User = get_user_model()
 
 
 # Create your models here.
-
-
 class Room(models.Model):
-    n_online = models.SmallIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
 

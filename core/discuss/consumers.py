@@ -13,6 +13,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.room_name = self.scope["url_route"]["kwargs"]["batch_id"]
         self.room_group_name = f"chat_{self.room_name}"
         self.user = self.scope["user"]
+
+        if "n_online" not in self.scope["room_state"]:
+            self.scope["room_state"]["n_online"] = 0
+
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.increment_user_online()
         await self.accept()
@@ -101,13 +105,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return msg
 
     async def increment_user_online(self):
-        n_online = await self.update_n_online(1)
-
+        self.scope["room_state"]["n_online"] += 1
         msg = f"{self.user.username} is now connected."
         await self.save_message_to_db(username="system", message=msg)
 
         chat_message = self.create_chat_message(msg, msg_type="system-message")
-        n_online_msg = self.create_n_online_message(n_online)
+        n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -122,12 +125,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
 
     async def decrement_user_online(self):
-        n_online = await self.update_n_online(-1)
+        self.scope["room_state"]["n_online"] -= 1
 
         msg = f"{self.user.username} has disconnected."
         chat_message = self.create_chat_message(msg, msg_type="system-message")
         await self.save_message_to_db(username="system", message=msg)
-        n_online_msg = self.create_n_online_message(n_online)
+        n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
         await self.channel_layer.group_send(
             self.room_group_name,
