@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0020_sentence_has_disagreement_labels"),
     ]

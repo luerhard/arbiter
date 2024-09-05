@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from django.db import models
 
 from core.models import Project
@@ -33,7 +31,11 @@ class UserAnnotation(models.Model):
     )
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
     label = models.ForeignKey(
-        Label, related_name="user_annotations", on_delete=models.CASCADE, null=True, blank=True,
+        Label,
+        related_name="user_annotations",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     is_set = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
