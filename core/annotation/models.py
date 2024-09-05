@@ -11,26 +11,6 @@ class Batch(models.Model):
     batch_number = models.SmallIntegerField()
     annotation_done = models.BooleanField(default=False)
 
-    @property
-    def discuss_disagreement_sentences(self):
-        sentences = (
-            self.sentences.prefetch_related("user_annotations")
-            .prefetch_related("user_annotations__user")
-            .all()
-        )
-        disagreement_sentences = []
-        for sentence in sentences:
-            annotation_groups = defaultdict(set)
-            user_annotations = sentence.user_annotations.all()
-            for user_annotation in user_annotations:
-                if user_annotation.is_set:
-                    annotation_groups[user_annotation.user].add(user_annotation.label_id)
-            annotations = list(annotation_groups.values())
-            if not all(annotation == annotations[0] for annotation in annotations):
-                disagreement_sentences.append(sentence)
-
-        return disagreement_sentences
-
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
 
@@ -38,6 +18,7 @@ class Batch(models.Model):
 class Sentence(models.Model):
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
+    has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
 
     class Meta:
         ordering = ["pk"]

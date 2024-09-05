@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any
 
 from django.contrib.auth import get_user_model
@@ -91,7 +92,28 @@ def toggle_finalize(request):
 
     if batch.annotation_done:
         batch.annotation_done = False
+        for sentence in batch.sentences.all():
+            sentence.has_disagreement_labels = None
+            sentence.save()
     else:
+        sentences = (
+            batch.sentences.prefetch_related("user_annotations")
+            .prefetch_related("user_annotations__user")
+            .all()
+        )
+
+        for sentence in sentences:
+            annotation_groups = defaultdict(set)
+            user_annotations = sentence.user_annotations.all()
+            for user_annotation in user_annotations:
+                if user_annotation.is_set:
+                    annotation_groups[user_annotation.user].add(user_annotation.label_id)
+            annotations = list(annotation_groups.values())
+            if not all(annotation == annotations[0] for annotation in annotations):
+                sentence.has_disagreement_labels = True
+            else:
+                sentence.has_disagreement_labels = False
+            sentence.save()
         batch.annotation_done = True
 
     batch.save()

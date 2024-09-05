@@ -2,10 +2,12 @@ import json
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.core.paginator import Paginator
 
 from .models import Message
 from .models import Room
 from annotation.models import Batch
+from annotation.models import Sentence
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -22,8 +24,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.scope["room_state"]["n_online"] = 0
 
         # SET UP SYNCED SENTENCES
-        if "sentences" not in self.scope["room_state"]:
-            self.scope["room_state"]["sentences"] = iter(await self.get_disagreement_sentences())
+        if "sentence" not in self.scope["room_state"]:
+            self.scope["room_state"]["sentence_page"] = 1
+            await self.next_sentence()
 
         # SET UP SYNCED BUTTONS
         if "clicked_done" not in self.scope["room_state"]:
@@ -52,8 +55,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return
             username = self.user.username
 
-            # store message in db
-            await self.save_message_to_db(username=username, message=message)
             # send to all users
             await self.group_send_chat_message(username=username, message=message)
 
@@ -62,21 +63,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # other case: not implemented yet
 
-    def get_or_create_room(self):
-        room, _ = Room.objects.get_or_create(pk=self.batch_id)
-        return room
-
     # SENTENCE UI
 
     @database_sync_to_async
-    def get_disagreement_sentences(self):
-        batch = Batch.objects.get(id=self.batch_id)
-        sentences = batch.discuss_disagreement_sentences
-        return sentences
+    def next_sentence(self):
+        if "sentence_page" not in self.scope["room_state"]:
+            self.scope["room_state"]["sentence_page"] = 1
+        else:
+            self.scope["room_state"]["sentence_page"] += 1
+
+        queryset = Sentence.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
+        paginator = Paginator(queryset, 1)
+        page = paginator.get_page(self.scope["room_state"]["sentence_page"])
+        if page.object_list:
+            sentence = page.object_list[0]
+        else:
+            sentence = Sentence(id=None, text="Done")
+        return sentence
 
     @staticmethod
     def sentence_html(sentence):
-        msg = f"<div id='current-sentence' hx-swap-oob='true'>{sentence}</div>"
+        msg = f"<div id='current-sentence' hx-swap-oob='true'>{sentence.content}</div>"
         return msg
 
     @staticmethod
@@ -91,10 +98,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         try:
-            next_sentence = next(self.scope["room_state"]["sentences"])
+            next_sentence = await self.next_sentence()
         except StopIteration:
             next_sentence = "ALL DONE."
         msg = self.sentence_html(next_sentence)
+
+        # store message in db
+        chat_msg = "Showing next sentence."
+        await self.save_message_to_db(username="system", message=chat_msg)
+        # send to all users
+        await self.group_send_chat_message(username="system", message=chat_msg)
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -112,6 +125,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"sentence": sentence}, ensure_ascii=False))
 
     # CHAT
+    def get_or_create_room(self):
+        room, _ = Room.objects.get_or_create(pk=self.batch_id)
+        return room
+
     @staticmethod
     def create_chat_message(msg, msg_type):
         if msg_type == "self-message":
@@ -133,22 +150,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
         composed_message = f"<div hx-swap-oob='beforeend:#messages'>{message_html}</div>"
         return composed_message
 
+    async def group_send_chat_message(self, username, message):
+        # store message in db
+        await self.save_message_to_db(username=username, message=message)
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {"type": "send_chat_message", "message": message, "username": username},
+        )
+
     async def send_chat_message(self, event):
         message = event["message"]
         username = event["username"]
 
         if self.user.username == username:
             chat_message = self.create_chat_message(message, msg_type="self-message")
+        elif username == "system":
+            chat_message = self.create_chat_message(message, msg_type="system-message")
         else:
             chat_message = self.create_chat_message(message, msg_type="other-message")
 
         await self.send(text_data=json.dumps({"message": chat_message}, ensure_ascii=False))
-
-    async def group_send_chat_message(self, username, message):
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_chat_message", "message": message, "username": username},
-        )
 
     @database_sync_to_async
     def save_message_to_db(self, username, message):
@@ -174,39 +195,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def group_send_user_connected(self):
         self.scope["room_state"]["n_online"] += 1
         msg = f"{self.user.username} is now connected."
-        await self.save_message_to_db(username="system", message=msg)
-
-        chat_message = self.create_chat_message(msg, msg_type="system-message")
+        await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "send_user_connected", "message": chat_message, "n_online": n_online_msg},
+            {"type": "send_user_connected", "n_online": n_online_msg},
         )
 
     async def send_user_connected(self, event):
-        msg = event["message"]
         n_online = event["n_online"]
         await self.send(
-            text_data=json.dumps({"message": msg, "n_online": n_online}, ensure_ascii=False),
+            text_data=json.dumps({"n_online": n_online}, ensure_ascii=False),
         )
 
     async def group_send_user_disconnected(self):
         self.scope["room_state"]["n_online"] -= 1
 
         msg = f"{self.user.username} has disconnected."
-        chat_message = self.create_chat_message(msg, msg_type="system-message")
-        await self.save_message_to_db(username="system", message=msg)
+        await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
         await self.channel_layer.group_send(
             self.room_group_name,
-            {"type": "send_user_disconnected", "message": chat_message, "n_online": n_online_msg},
+            {"type": "send_user_disconnected", "n_online": n_online_msg},
         )
 
     async def send_user_disconnected(self, event):
-        msg = event["message"]
         n_online = event["n_online"]
         await self.send(
-            text_data=json.dumps({"message": msg, "n_online": n_online}, ensure_ascii=False),
+            text_data=json.dumps({"n_online": n_online}, ensure_ascii=False),
         )
