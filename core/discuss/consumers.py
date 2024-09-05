@@ -1,4 +1,5 @@
 import json
+import textwrap
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -18,21 +19,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope["user"]
 
         # SET UP N ONLINE COUNT
-        if f"{self.user}_done" not in self.scope["room_state"]:
-            self.scope["room_state"][f"{self.user}_done"] = 0
         if "n_online" not in self.scope["room_state"]:
             self.scope["room_state"]["n_online"] = 0
-
-        # SET UP SYNCED SENTENCES
-        if "sentence" not in self.scope["room_state"]:
-            self.scope["room_state"]["sentence_page"] = 1
-            await self.next_sentence()
+        if "users" not in self.scope["room_state"]:
+            self.scope["room_state"]["users"] = {self.user}
+        else:
+            self.scope["room_state"]["users"].add(self.user)
 
         # SET UP SYNCED BUTTONS
         if "clicked_done" not in self.scope["room_state"]:
             self.scope["room_state"]["clicked_done"] = {self.user.username: 0}
         elif self.user.username not in self.scope["room_state"]["clicked_done"]:
             self.scope["room_state"]["clicked_done"][self.user.username] = 0
+
+        # SET UP SYNCED SENTENCES
+        if "sentence" not in self.scope["room_state"]:
+            await self.group_send_next_sentence()
 
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.group_send_user_connected()
@@ -54,17 +56,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             if not message.strip():
                 return
             username = self.user.username
-
             # send to all users
             await self.group_send_chat_message(username=username, message=message)
 
         elif "clicked-done" in data.keys():
-            await self.group_send_update_ui()
+            await self.group_send_user_done()
 
         # other case: not implemented yet
 
     # SENTENCE UI
-
     @database_sync_to_async
     def next_sentence(self):
         if "sentence_page" not in self.scope["room_state"]:
@@ -79,45 +79,101 @@ class ChatConsumer(AsyncWebsocketConsumer):
             sentence = page.object_list[0]
         else:
             sentence = Sentence(id=None, text="Done")
-        return sentence
+
+        annotations = {}
+        for user in self.scope["room_state"]["users"]:
+            annotation_set = sentence.annotations(user)
+            annotations[user] = annotation_set
+        return sentence, annotations
 
     @staticmethod
     def sentence_html(sentence):
         msg = f"<div id='current-sentence' hx-swap-oob='true'>{sentence.content}</div>"
         return msg
 
+    @database_sync_to_async
+    def annotation_html(self, annotations):
+        outer_start = "<div id='prev-labels' hx-swap-oob='true'>"
+        outer_end = "</div>"
+        inner_divs = []
+        for user, annotation_set in annotations.items():
+            inner_start = f"""
+                <p>Previous annotations of {user}</p>
+                <div class="d-flex justify-content-center btn-group">
+                """
+            buttons = []
+            for annotation in annotation_set:
+                label = annotation.label.name
+                button = "<button disabled class='btn "
+                if annotation.is_set:
+                    button += "btn-primary'>"
+                else:
+                    button += "btn-outline-primary'>"
+                button += label
+                button += "</button>"
+                buttons.append(button)
+
+            inner_end = "</div>"
+            inner_divs.append("".join([inner_start, *buttons, inner_end]))
+
+        msg = "".join([outer_start, *inner_divs, outer_end])
+        print(msg)
+        msg = "".join(textwrap.dedent(msg).splitlines())
+        return msg
+
     @staticmethod
     def update_button(self, button):
         pass
 
-    async def group_send_update_ui(self):
+    async def group_send_next_sentence(self):
+        sentence, annotations = await self.next_sentence()
+
+        sentence_html = self.sentence_html(sentence)
+        annotation_html = await self.annotation_html(annotations)
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "send_next_sentence",
+                "sentence": sentence_html,
+                "annotations": annotation_html,
+            },
+        )
+
+    async def send_next_sentence(self, event):
+        sentence_html = event["sentence"]
+        annotation_html = event["annotations"]
+
+        await self.send(
+            text_data=json.dumps(
+                {"sentence": sentence_html, "annotations": annotation_html},
+                ensure_ascii=False,
+            ),
+        )
+
+    async def group_send_user_done(self):
         self.scope["room_state"]["clicked_done"][self.user.username] = 1
-        print(f"CURRENT DONE STATE: {self.scope['room_state']['clicked_done']}")
         if not all(x == 1 for x in self.scope["room_state"]["clicked_done"].values()):
             # TODO: maybe UPDATE UI of other users to show that this user has clicked done.
             return
 
-        try:
-            next_sentence = await self.next_sentence()
-        except StopIteration:
-            next_sentence = "ALL DONE."
-        msg = self.sentence_html(next_sentence)
-
-        # store message in db
-        chat_msg = "Showing next sentence."
-        await self.save_message_to_db(username="system", message=chat_msg)
         # send to all users
+        chat_msg = "All users done. Next sentence."
         await self.group_send_chat_message(username="system", message=chat_msg)
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_update_ui", "sentence": msg},
-        )
+        await self.group_send_next_sentence()
 
         # reset clicked_done
         clicked_done = self.scope["room_state"]["clicked_done"]
         for key in clicked_done:
             clicked_done[key] = 0
+
+    async def group_send_update_ui(self):
+        try:
+            next_sentence = await self.next_sentence()
+        except StopIteration:
+            next_sentence = "ALL DONE."
+        msg = self.sentence_html(next_sentence)
 
     async def send_update_ui(self, event):
         sentence = event["sentence"]
@@ -178,14 +234,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return None
 
     # ONLINE STATUS
-    @database_sync_to_async
-    def update_n_online(self, change):
-        room = self.get_or_create_room()
-        room.n_online += change
-        if room.n_online < 0:
-            room.n_online = 0
-        room.save()
-        return room.n_online
 
     @staticmethod
     def create_n_online_message(n_online):
@@ -211,6 +259,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def group_send_user_disconnected(self):
         self.scope["room_state"]["n_online"] -= 1
+        self.scope["room_state"]["users"].discard(self.user)
 
         msg = f"{self.user.username} has disconnected."
         await self.group_send_chat_message(username="system", message=msg)

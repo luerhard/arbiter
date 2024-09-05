@@ -15,18 +15,6 @@ class Batch(models.Model):
         return f"Batch {self.batch_number}"
 
 
-class Sentence(models.Model):
-    batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
-    content = models.TextField()
-    has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
-
-    class Meta:
-        ordering = ["pk"]
-
-    def __str__(self):
-        return self.content
-
-
 class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -39,14 +27,34 @@ class Label(models.Model):
 
 class UserAnnotation(models.Model):
     sentence = models.ForeignKey(
-        Sentence,
+        "Sentence",
         related_name="user_annotations",
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
-    label = models.ForeignKey(Label, on_delete=models.CASCADE, null=True, blank=True)
+    label = models.ForeignKey(
+        Label, related_name="user_annotations", on_delete=models.CASCADE, null=True, blank=True,
+    )
     is_set = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
+
+
+class Sentence(models.Model):
+    batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
+    content = models.TextField()
+    has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
+
+    class Meta:
+        ordering = ["pk"]
+
+    def __str__(self):
+        return self.content
+
+    def annotations(self, user):
+        annotations = (
+            UserAnnotation.objects.prefetch_related("label").filter(user=user, sentence=self).all()
+        )
+        return annotations
