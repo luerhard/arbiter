@@ -97,7 +97,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         msg = self.sentence_html(next_sentence)
 
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "send_update_ui", "sentence": msg},
+            self.room_group_name,
+            {"type": "send_update_ui", "sentence": msg},
         )
 
         # reset clicked_done
