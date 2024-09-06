@@ -21,7 +21,7 @@ def overview(request):
             ]
             if not disagreement:
                 disagreement = 0
-            new_batches.append({"batch": batch, "total": total, "disagreement": disagreement})
+            new_batches.append({"batch": batch, "total": total, "disagreement": int(disagreement)})
         new[project] = new_batches
 
     context = {"projects": new}

@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 
 from .models import Message
 from .models import Room
+from annotation.models import Batch
 from annotation.models import Sentence
 
 
