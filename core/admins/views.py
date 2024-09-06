@@ -103,8 +103,8 @@ def toggle_finalize(request):
         )
 
         for sentence in sentences:
-            annotation_groups = defaultdict(set)
             user_annotations = sentence.user_annotations.all()
+            annotation_groups = {user: set() for user in {anno.user for anno in user_annotations}}
             for user_annotation in user_annotations:
                 if user_annotation.is_set:
                     annotation_groups[user_annotation.user].add(user_annotation.label_id)
