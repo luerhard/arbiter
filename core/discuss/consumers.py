@@ -16,28 +16,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.room_group_name = f"chat_{self.batch_id}"
         self.user = self.scope["user"]
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        await self.accept()
 
         # SET UP N ONLINE COUNT
         if "n_online" not in self.scope["room_state"]:
             self.scope["room_state"]["n_online"] = 0
-        if "users" not in self.scope["room_state"]:
-            self.scope["room_state"]["users"] = {self.user}
+
+        if "required_users" not in self.scope["room_state"]:
+            self.scope["room_state"]["required_users"] = await self.get_assigned_annotators()
+
+        if "online_users" not in self.scope["room_state"]:
+            self.scope["room_state"]["online_users"] = {self.user}
         else:
-            self.scope["room_state"]["users"].add(self.user)
+            self.scope["room_state"]["online_users"].add(self.user)
+
+        if "sentence_page" not in self.scope["room_state"]:
+            self.scope["room_state"]["sentence_page"] = 1
+
+        await self.group_send_user_connected()
+
+        if self.scope["room_state"]["online_users"] == self.scope["room_state"]["required_users"]:
+            await self.group_send_current_sentence()
 
         # SET UP SYNCED BUTTONS
         if "clicked_done" not in self.scope["room_state"]:
             self.scope["room_state"]["clicked_done"] = {self.user.username: 0}
         elif self.user.username not in self.scope["room_state"]["clicked_done"]:
             self.scope["room_state"]["clicked_done"][self.user.username] = 0
-
-        # SET UP SYNCED SENTENCES
-        if "sentence" not in self.scope["room_state"]:
-            await self.group_send_next_sentence()
-
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.group_send_user_connected()
-        await self.accept()
 
     # GENERAL
     async def disconnect(self, close_code):  # noqa: ARG002
@@ -46,7 +52,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        print(f"RECEIVED DATA: {data}")
 
         # if chat message is sent
         if "message" in data.keys():
@@ -61,30 +66,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif "clicked-done" in data.keys():
             await self.group_send_user_done()
 
-        # other case: not implemented yet
-
     # SENTENCE UI
-    @database_sync_to_async
-    def next_sentence(self):
-        if "sentence_page" not in self.scope["room_state"]:
-            self.scope["room_state"]["sentence_page"] = 1
-        else:
-            self.scope["room_state"]["sentence_page"] += 1
-
-        queryset = Sentence.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
-        paginator = Paginator(queryset, 1)
-        page = paginator.get_page(self.scope["room_state"]["sentence_page"])
-        if page.object_list:
-            sentence = page.object_list[0]
-        else:
-            sentence = Sentence(id=None, text="Done")
-
-        annotations = {}
-        for user in self.scope["room_state"]["users"]:
-            annotation_set = sentence.annotations(user)
-            annotations[user] = annotation_set
-        return sentence, annotations
-
     @staticmethod
     def sentence_html(sentence):
         msg = f"<div id='current-sentence' hx-swap-oob='true'>{sentence.content}</div>"
@@ -116,19 +98,68 @@ class ChatConsumer(AsyncWebsocketConsumer):
             inner_divs.append("".join([inner_start, *buttons, inner_end]))
 
         msg = "".join([outer_start, *inner_divs, outer_end])
-        print(msg)
         msg = "".join(textwrap.dedent(msg).splitlines())
         return msg
 
-    @staticmethod
-    def update_button(self, button):
-        pass
+    async def dashboard_html(self):
+        try:
+            sentence, annotations = await self.sentence_annotations(
+                self.scope["room_state"]["sentence_page"],
+            )
+            sentence_html = self.sentence_html(sentence)
+            annotation_html = await self.annotation_html(annotations)
+        except IndexError:
+            sentence_html = "<div id='current-sentence'>STOP ITERATION</div>"
+            annotation_html = "<div id='prev-labels'>STOP ITERATION</div>"
+
+        return sentence_html, annotation_html
+
+    def get_sentence(self, page):
+        queryset = Sentence.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
+        paginator = Paginator(queryset, 1)
+        page = paginator.get_page(page)
+        try:
+            sentence = page.object_list[0]
+        except IndexError as e:
+            raise e
+
+        return sentence
+
+    @database_sync_to_async
+    def sentence_annotations(self, page):
+        sentence = self.get_sentence(page)
+        annotations = {}
+        for user in self.scope["room_state"]["online_users"]:
+            annotation_set = sentence.annotations(user)
+            annotations[user] = annotation_set
+        return sentence, annotations
+
+    async def group_send_current_sentence(self):
+        sentence_html, annotation_html = await self.dashboard_html()
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "send_next_sentence",
+                "sentence": sentence_html,
+                "annotations": annotation_html,
+            },
+        )
+
+    async def send_current_sentence(self, event):
+        sentence_html = event["sentence"]
+        annotation_html = event["annotations"]
+
+        await self.send(
+            text_data=json.dumps(
+                {"sentence": sentence_html, "annotation": annotation_html},
+                ensure_ascii=False,
+            ),
+        )
 
     async def group_send_next_sentence(self):
-        sentence, annotations = await self.next_sentence()
-
-        sentence_html = self.sentence_html(sentence)
-        annotation_html = await self.annotation_html(annotations)
+        self.scope["room_state"]["sentence_page"] += 1
+        sentence_html, annotation_html = await self.dashboard_html()
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -166,18 +197,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         clicked_done = self.scope["room_state"]["clicked_done"]
         for key in clicked_done:
             clicked_done[key] = 0
-
-    async def group_send_update_ui(self):
-        try:
-            next_sentence = await self.next_sentence()
-        except StopIteration:
-            next_sentence = "ALL DONE."
-        msg = self.sentence_html(next_sentence)
-
-    async def send_update_ui(self, event):
-        sentence = event["sentence"]
-        print("sending", sentence)
-        await self.send(text_data=json.dumps({"sentence": sentence}, ensure_ascii=False))
 
     # CHAT
     def get_or_create_room(self):
@@ -229,10 +248,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message_to_db(self, username, message):
         room = self.get_or_create_room()
-        Message.objects.create(room=room, user=username, message=message)
+        sentence = self.get_sentence(self.scope["room_state"]["sentence_page"])
+        Message.objects.create(room=room, sentence=sentence, user=username, message=message)
         return None
 
     # ONLINE STATUS
+
+    @database_sync_to_async
+    def get_assigned_annotators(self):
+        return Batch.objects.get(id=self.batch_id).project.annotators
 
     @staticmethod
     def create_n_online_message(n_online):
@@ -258,7 +282,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def group_send_user_disconnected(self):
         self.scope["room_state"]["n_online"] -= 1
-        self.scope["room_state"]["users"].discard(self.user)
+        self.scope["room_state"]["online_users"].discard(self.user)
 
         msg = f"{self.user.username} has disconnected."
         await self.group_send_chat_message(username="system", message=msg)

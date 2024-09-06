@@ -4,15 +4,6 @@ from core.models import Project
 from users.models import User
 
 
-class Batch(models.Model):
-    project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
-    batch_number = models.SmallIntegerField()
-    annotation_done = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return f"Batch {self.batch_number}"
-
-
 class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -42,6 +33,15 @@ class UserAnnotation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
+
+
+class Batch(models.Model):
+    project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
+    batch_number = models.SmallIntegerField()
+    annotation_done = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"Batch {self.batch_number}"
 
 
 class Sentence(models.Model):
