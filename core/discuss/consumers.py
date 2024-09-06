@@ -75,13 +75,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def annotation_html(self, annotations):
-        outer_start = "<div id='prev-labels' hx-swap-oob='true'>"
+        outer_start = "<div id='prev-labels' class='mt-3 mb-3' hx-swap-oob='true'>"
         outer_end = "</div>"
         inner_divs = []
         for user, annotation_set in annotations.items():
             inner_start = f"""
-                <p>Previous annotations of {user}</p>
                 <div class="d-flex justify-content-center btn-group">
+                <p class='mt-3 mb-3 text-muted'>Previous annotations of {user}:</p>
                 """
             buttons = []
             for annotation in annotation_set:
