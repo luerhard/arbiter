@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0021_alter_userannotation_label"),
         ("discuss", "0002_room_message_delete_discussmessage"),
