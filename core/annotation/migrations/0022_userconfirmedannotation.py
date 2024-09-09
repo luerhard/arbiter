@@ -7,7 +7,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0021_alter_userannotation_label"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -17,12 +16,38 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="UserConfirmedAnnotation",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("is_set", models.BooleanField(default=False)),
                 ("last_updated", models.DateTimeField(auto_now=True)),
-                ("label", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="user_confirmed_annotations", to="annotation.label")),
-                ("sentence", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="user_confirmed_annotations", to="annotation.sentence")),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "label",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_confirmed_annotations",
+                        to="annotation.label",
+                    ),
+                ),
+                (
+                    "sentence",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="user_confirmed_annotations",
+                        to="annotation.sentence",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
     ]

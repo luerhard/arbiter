@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0022_userconfirmedannotation"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

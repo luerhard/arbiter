@@ -1,6 +1,5 @@
 import json
 from pprint import pprint
-import textwrap
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -9,7 +8,6 @@ from django.core.paginator import Paginator
 from .models import Message
 from .models import Room
 from annotation.models import Batch
-from annotation.models import Label
 from annotation.models import Sentence
 from annotation.models import UserConfirmedAnnotation
 
@@ -111,7 +109,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for label_id, is_set in annotations.items():
             label = project_labels[label_id]
             label_annotation = UserConfirmedAnnotation(
-                sentence=sentence, user=self.user, label=label, is_set=is_set,
+                sentence=sentence,
+                user=self.user,
+                label=label,
+                is_set=is_set,
             )
             new_labels.append(label_annotation)
 
