@@ -10,7 +10,23 @@
                 </div>
                 <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                     <div class="row align-items-center">
-                        <div class="col">PLACEHOLDER</div>
+                        <div class="col">
+                            <div id="current-sentence">SENTENCE PLACEHOLDER</div>
+                            <hr class="mt-3 mb-1" />
+                            <div id="prev-labels">LABEL PLACEHOLDER</div>
+                            <hr class="mt-3 mb-1" />
+                            <div id="current-labels">CURRENT LABLES PLACEHOLDER</div>
+                            <div class="d-flex float-end mt-3">
+                                <input type="checkbox"
+                                       class="btn-check"
+                                       id="save-done"
+                                       name="clicked-done"
+                                       value="done"
+                                       hx-vals="js:{'labels': collectLabels()}"
+                                       ws-send>
+                                <label for="save-done" class="btn btn-outline-primary">Save & Done</label>
+                            </div>
+                        </div>
                         <div class="col mb-2">
                             <div id="messages" class="chat-message-container"></div>
                             {% comment %} send button and htmx logic {% endcomment %}
@@ -27,26 +43,158 @@
         </div>
     </div>
     <script>
-        const container = document.getElementById('messages');
+        // if we want to log all the htmx output.
+        // htmx.logAll();
 
-        // Function to scroll to the bottom
-        function scrollToBottom() {
-            container.scrollTop = container.scrollHeight;
+        // COLLECT BUTTON STATES TO SEND ON done
+        function collectLabels() {
+            const container = document.getElementById("current-labels");
+            const boxes = container.querySelectorAll("input[type='checkbox']");
+            let selected = new Map();
+            boxes.forEach(box => {
+                selected[box.id] = Number(box.checked);
+            });
+
+            return JSON.stringify(selected);
         }
 
-        // Observe changes in the container
-        const observer = new MutationObserver(() => scrollToBottom());
-        observer.observe(container, {
-            childList: true,
-            subtree: true
-        });
+        function updateSentence(data) {
+            const sentenceField = document.getElementById("current-sentence");
+            sentenceField.innerHTML = data["update-sentence"];
+        }
 
-        // Listen for the HTMX event after the request
+        function updatePrevLabels(data) {
+            const container = document.getElementById("prev-labels");
+            container.innerHTML = "";
+            for (const [username, labels] of Object.entries(data["update-labels"])) {
+                let textDiv = document.createElement("div");
+                textDiv.className = "my-3";
+                container.appendChild(textDiv);
+
+
+                let titleText = document.createElement("p");
+                titleText.className = "d-flex mt-3 mb-3 text-muted"
+                titleText.innerHTML = `Previous annotations of ${username}:`
+                textDiv.appendChild(titleText);
+
+                let buttonDiv = document.createElement("div");
+                buttonDiv.className = "btn-group d-flex flex-wrap";
+                container.appendChild(buttonDiv);
+
+                labels.forEach(label => {
+
+                    let button = document.createElement("button");
+                    button.disabled = true;
+                    if (label["is_set"]) {
+                        button.className = "btn btn-primary";
+                    } else {
+                        button.className = "btn btn-outline-primary";
+                    }
+                    button.innerHTML = label["label"];
+                    buttonDiv.appendChild(button);
+                })
+            }
+        }
+
+        function updateCurrentLabels(data) {
+            const container = document.getElementById("current-labels");
+            container.innerHTML = "";
+            let titleText = document.createElement("p");
+            titleText.className = "mt-3 mb-3 text-muted";
+            titleText.innerHTML = "Change annotations:";
+            container.appendChild(titleText);
+
+            buttonGroup = document.createElement("div");
+            buttonGroup.className = "btn-group d-flex flex-wrap";
+            container.appendChild(buttonGroup);
+            const user = data["current-user"];
+            data["update-labels"][user].forEach(label => {
+                checkbox = document.createElement("input");
+                checkbox.type = "checkbox";
+                checkbox.className = "btn-check";
+                checkbox.id = label["id"];
+                checkbox.name = "label_" + label["id"];
+                buttonGroup.appendChild(checkbox);
+
+                checkboxLabel = document.createElement("label");
+                checkboxLabel.innerHTML = label["label"];
+                checkboxLabel.htmlFor = label["id"];
+                checkboxLabel.className = "btn btn-outline-primary";
+                buttonGroup.appendChild(checkboxLabel)
+
+
+                if (label["is_set"] == true) {
+                    checkbox.checked = true;
+                } else {
+                    checkbox.checked = false;
+                }
+            })
+        }
+
+
+        // handle everything after receiving data
         document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+            // parse JSON data to object
+            const data = JSON.parse(event.detail.message); // Event detail contains the message data
+            console.log("WebSocket Message Received: ", data);
+
+
+            // autoscroll down the chat on when new messages arrive
+            const container = document.getElementById('messages');
+            container.scrollTop = container.scrollHeight;
+
+            // handle incoming websocket messages
+            if ("update-sentence" in data) {
+                console.log("updating sentence");
+                updateSentence(data);
+            }
+
+            if ("update-labels" in data) {
+                console.log("updating prev labels");
+                updatePrevLabels(data);
+                console.log("updating current labels");
+                updateCurrentLabels(data);
+                console.log("unlock save button");
+                unlockSaveDone();
+            }
+        })
+
+        function lockButtons() {
+            const saveDoneButton = document.getElementById("save-done");
+            saveDoneButton.disabled = true;
+            saveDoneButton.checked = true;
+
+            const container = document.getElementById("current-labels");
+            boxes = container.querySelectorAll("input");
+            boxes.forEach(box => {
+                box.disabled = true;
+            })
+        }
+
+        function unlockSaveDone() {
+            const saveDoneButton = document.getElementById("save-done");
+            saveDoneButton.disabled = false;
+            saveDoneButton.checked = false;
+        }
+
+        // handle everything after sending data
+        document.body.addEventListener('htmx:wsAfterSend', function(event) {
+            const data = JSON.parse(event.detail.message); // Event detail contains the message data
+            console.log("triggered aftersend");
+
+            // Clear Chat text-input after message is sent or Save & Done.
             const inputField = document.getElementById('message-input');
             if (inputField) {
                 inputField.value = ''; // Clear the input field
             }
+
+            if ("clicked-done" in data) {
+                console.log("lock fields");
+                lockButtons();
+            }
+
+
+
         });
     </script>
 {% endblock content %}

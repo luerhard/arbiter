@@ -18,9 +18,9 @@
                                     <tbody>
                                         <tr>
                                             <td>
-                                                <a href="{% url 'discuss-batch' batch_id=batch.pk %}">Batch {{ batch.batch_number }}</a>
+                                                <a href="{% url 'discuss-batch' batch_id=batch.batch.pk %}">Batch {{ batch.batch.batch_number }}</a>
                                             </td>
-                                            <td>{{ batch.discuss_disagreement_sentences|length }} / {{ batch.sentences.all|length }}</td>
+                                            <td>{{ batch.disagreement }} / {{ batch.total }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

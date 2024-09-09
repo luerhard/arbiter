@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from annotation.models import Sentence
+
 User = get_user_model()
 
 
@@ -15,6 +17,7 @@ class Message(models.Model):
     # user = models.ForeignKey(User, on_delete=models.DO_NOTHING)
     room = models.ForeignKey(Room, related_name="messages", on_delete=models.CASCADE)
     user = models.CharField(max_length=64)
+    sentence = models.ForeignKey(Sentence, related_name="messages", on_delete=models.CASCADE)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 

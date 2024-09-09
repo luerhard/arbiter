@@ -58,34 +58,23 @@ def edit_sentence(request, sentence_id):
     project_labels = batch.project.labels
     submitted_labels = [int(i) for i in request.POST.getlist("labels")]
     new_annotations = []
-    update_annotations = []
     for project_label in project_labels.all():
-        try:
-            annotation = next(
-                anno for anno in user_annotations if anno.label.pk == project_label.pk
-            )
-            is_new = False
-        except StopIteration:
-            annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
-            is_new = True
+        annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
 
         if project_label.pk in submitted_labels:
             annotation.is_set = True
         else:
             annotation.is_set = False
 
-        if is_new:
-            new_annotations.append(annotation)
-        else:
-            update_annotations.append(annotation)
+        new_annotations.append(annotation)
 
-    UserAnnotation.objects.bulk_create(new_annotations)
-    UserAnnotation.objects.bulk_update(update_annotations, fields=["is_set", "last_updated"])
+    UserAnnotation.objects.bulk_create(
+        new_annotations,
+        update_conflicts=True,
+        update_fields=("is_set", "last_updated"),
+        unique_fields=("sentence", "user", "label"),
+    )
 
-    user_annotations = UserAnnotation.objects.filter(
-        sentence=sentence_id,
-        user=request.user.id,
-    ).all()
     button = """ <button id="save-btn"
         type="submit"
         form="annotation-labels"
