@@ -9,7 +9,9 @@ from django.core.paginator import Paginator
 from .models import Message
 from .models import Room
 from annotation.models import Batch
+from annotation.models import Label
 from annotation.models import Sentence
+from annotation.models import UserConfirmedAnnotation
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -67,6 +69,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_chat_message(username=username, message=message)
 
         elif "clicked-done" in data.keys():
+            await self.save_confirmed_annotations(json.loads(data["labels"]))
             await self.group_send_user_done()
 
     # SENTENCE UI
@@ -99,6 +102,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
             annotations[user.username] = labels
 
         return sentence, annotations
+
+    @database_sync_to_async
+    def save_confirmed_annotations(self, annotations):
+        sentence = self.get_sentence(self.scope["room_state"]["sentence_page"])
+        project_labels = {str(label.id): label for label in sentence.batch.project.labels.all()}
+        new_labels = []
+        for label_id, is_set in annotations.items():
+            label = project_labels[label_id]
+            label_annotation = UserConfirmedAnnotation(
+                sentence=sentence, user=self.user, label=label, is_set=is_set,
+            )
+            new_labels.append(label_annotation)
+
+        UserConfirmedAnnotation.objects.bulk_create(
+            new_labels,
+            update_conflicts=True,
+            update_fields=("is_set", "last_updated"),
+            unique_fields=("sentence", "user", "label"),
+        )
 
     async def group_send_current_sentence(self):
         sentence, prev_annotations = await self.sentence_annotations(

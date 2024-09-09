@@ -31,6 +31,33 @@ class UserAnnotation(models.Model):
     is_set = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        unique_together = ("sentence", "user", "label")
+
+    def __str__(self) -> str:
+        return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
+
+
+class UserConfirmedAnnotation(models.Model):
+    sentence = models.ForeignKey(
+        "Sentence",
+        related_name="user_confirmed_annotations",
+        on_delete=models.CASCADE,
+    )
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    label = models.ForeignKey(
+        Label,
+        related_name="user_confirmed_annotations",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    is_set = models.BooleanField(default=False)
+    last_updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("sentence", "user", "label")
+
     def __str__(self) -> str:
         return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
 

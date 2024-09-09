@@ -154,12 +154,12 @@
                 updatePrevLabels(data);
                 console.log("updating current labels");
                 updateCurrentLabels(data);
+                console.log("unlock save button");
                 unlockSaveDone();
             }
         })
 
         function lockButtons() {
-            console.log("lock fields");
             const saveDoneButton = document.getElementById("save-done");
             saveDoneButton.disabled = true;
             saveDoneButton.checked = true;
@@ -175,8 +175,6 @@
             const saveDoneButton = document.getElementById("save-done");
             saveDoneButton.disabled = false;
             saveDoneButton.checked = false;
-
-
         }
 
         // handle everything after sending data
@@ -191,6 +189,7 @@
             }
 
             if ("clicked-done" in data) {
+                console.log("lock fields");
                 lockButtons();
             }
 
