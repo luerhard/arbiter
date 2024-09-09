@@ -6,3 +6,11 @@ import "htmx-ext-ws";
 import "bootstrap-icons/font/bootstrap-icons.scss";
 
 // Place any custom JS here
+
+htmx.logger = function (elt, event, data) {
+    if (console) {
+        console.log(event, elt, data);
+    }
+}
+
+htmx.logAll();

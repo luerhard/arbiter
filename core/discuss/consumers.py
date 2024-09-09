@@ -1,4 +1,5 @@
 import json
+from pprint import pprint
 import textwrap
 
 from channels.db import database_sync_to_async
@@ -53,6 +54,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        pprint(data)
 
         # if chat message is sent
         if "message" in data.keys():
@@ -68,53 +70,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_user_done()
 
     # SENTENCE UI
-    @staticmethod
-    def sentence_html(sentence):
-        msg = f"<div id='current-sentence' hx-swap-oob='true'>{sentence.content}</div>"
-        return msg
-
-    @database_sync_to_async
-    def annotation_html(self, annotations):
-        outer_start = "<div id='prev-labels' class='mt-3 mb-3' hx-swap-oob='true'>"
-        outer_end = "</div>"
-        inner_divs = []
-        for user, annotation_set in annotations.items():
-            inner_start = f"""
-                <div class="d-flex justify-content-center btn-group">
-                <p class='mt-3 mb-3 text-muted'>Previous annotations of {user}:</p>
-                """
-            buttons = []
-            for annotation in annotation_set:
-                label = annotation.label.name
-                button = "<button disabled class='btn "
-                if annotation.is_set:
-                    button += "btn-primary'>"
-                else:
-                    button += "btn-outline-primary'>"
-                button += label
-                button += "</button>"
-                buttons.append(button)
-
-            inner_end = "</div>"
-            inner_divs.append("".join([inner_start, *buttons, inner_end]))
-
-        msg = "".join([outer_start, *inner_divs, outer_end])
-        msg = "".join(textwrap.dedent(msg).splitlines())
-        return msg
-
-    async def dashboard_html(self):
-        try:
-            sentence, annotations = await self.sentence_annotations(
-                self.scope["room_state"]["sentence_page"],
-            )
-            sentence_html = self.sentence_html(sentence)
-            annotation_html = await self.annotation_html(annotations)
-        except IndexError:
-            sentence_html = "<div id='current-sentence'>STOP ITERATION</div>"
-            annotation_html = "<div id='prev-labels'>STOP ITERATION</div>"
-
-        return sentence_html, annotation_html
-
     def get_sentence(self, page):
         queryset = Sentence.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
         paginator = Paginator(queryset, 1)
@@ -131,53 +86,69 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sentence = self.get_sentence(page)
         annotations = {}
         for user in self.scope["room_state"]["online_users"]:
+            labels = []
             annotation_set = sentence.annotations(user)
-            annotations[user] = annotation_set
+            for anno in annotation_set:
+                labels.append(
+                    {
+                        "id": anno.label.id,
+                        "is_set": anno.is_set,
+                        "label": anno.label.name,
+                    },
+                )
+            annotations[user.username] = labels
+
         return sentence, annotations
 
     async def group_send_current_sentence(self):
-        sentence_html, annotation_html = await self.dashboard_html()
+        sentence, prev_annotations = await self.sentence_annotations(
+            self.scope["room_state"]["sentence_page"],
+        )
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                "type": "send_next_sentence",
-                "sentence": sentence_html,
-                "annotations": annotation_html,
+                "type": "send_current_sentence",
+                "update-sentence": sentence.content,
+                "update-labels": prev_annotations,
             },
         )
 
     async def send_current_sentence(self, event):
-        sentence_html = event["sentence"]
-        annotation_html = event["annotations"]
-
         await self.send(
             text_data=json.dumps(
-                {"sentence": sentence_html, "annotation": annotation_html},
+                {
+                    "update-sentence": event["update-sentence"],
+                    "update-labels": event["update-labels"],
+                    "current-user": self.user.username,
+                },
                 ensure_ascii=False,
             ),
         )
 
     async def group_send_next_sentence(self):
         self.scope["room_state"]["sentence_page"] += 1
-        sentence_html, annotation_html = await self.dashboard_html()
+        sentence, prev_annotations = await self.sentence_annotations(
+            self.scope["room_state"]["sentence_page"],
+        )
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "send_next_sentence",
-                "sentence": sentence_html,
-                "annotations": annotation_html,
+                "update-sentence": sentence.content,
+                "update-labels": prev_annotations,
             },
         )
 
     async def send_next_sentence(self, event):
-        sentence_html = event["sentence"]
-        annotation_html = event["annotations"]
-
         await self.send(
             text_data=json.dumps(
-                {"sentence": sentence_html, "annotations": annotation_html},
+                {
+                    "update-sentence": event["update-sentence"],
+                    "update-labels": event["update-labels"],
+                    "current-user": self.user.username,
+                },
                 ensure_ascii=False,
             ),
         )
