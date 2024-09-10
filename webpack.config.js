@@ -11,8 +11,10 @@ module.exports = {
     entry: "./core/static/js/index.js",
     mode: "development",
     devtool: "source-map",
+    watch: true,
     output: {
         filename: "main.js",
+        library: "lib",
         path: path.resolve(__dirname, "dist"),
     },
     plugins: [

@@ -7,6 +7,12 @@ import "bootstrap-icons/font/bootstrap-icons.scss";
 
 // Place any custom JS here
 
+import * as funcs from "./functions";
+import * as discuss from "./discuss";
+
+export { funcs, discuss };
+
+// for debugging
 htmx.logger = function (elt, event, data) {
     if (console) {
         console.log(event, elt, data);
