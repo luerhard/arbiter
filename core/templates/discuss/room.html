@@ -66,23 +66,29 @@
         function updatePrevLabels(data) {
             const container = document.getElementById("prev-labels");
             container.innerHTML = "";
+            let mytitleText;
+            let mybuttonDiv;
             for (const [username, labels] of Object.entries(data["update-labels"])) {
                 let textDiv = document.createElement("div");
                 textDiv.className = "my-3";
                 container.appendChild(textDiv);
 
-
                 let titleText = document.createElement("p");
                 titleText.className = "d-flex mt-3 mb-3 text-muted"
-                titleText.innerHTML = `Previous annotations of ${username}:`
-                textDiv.appendChild(titleText);
+                if (username == data["current-user"]) {
+                    // save own title text to buffer
+                    titleText.innerHTML = "Your previous annotations:";
+                    mytitleText = titleText;
+                } else {
+                    titleText.innerHTML = `Previous annotations of ${username}:`
+                    textDiv.appendChild(titleText);
+                }
+
 
                 let buttonDiv = document.createElement("div");
                 buttonDiv.className = "btn-group d-flex flex-wrap";
-                container.appendChild(buttonDiv);
 
                 labels.forEach(label => {
-
                     let button = document.createElement("button");
                     button.disabled = true;
                     if (label["is_set"]) {
@@ -92,8 +98,20 @@
                     }
                     button.innerHTML = label["label"];
                     buttonDiv.appendChild(button);
+
                 })
+                if (username == data["current-user"]) {
+                    // save own title text to buffer
+                    mybuttonDiv = buttonDiv;
+                } else {
+                    container.appendChild(buttonDiv);
+
+                }
             }
+            // insert own previous annotations last;
+            container.appendChild(mytitleText);
+            container.appendChild(mybuttonDiv);
+
         }
 
         function updateCurrentLabels(data) {
@@ -101,7 +119,7 @@
             container.innerHTML = "";
             let titleText = document.createElement("p");
             titleText.className = "mt-3 mb-3 text-muted";
-            titleText.innerHTML = "Change annotations:";
+            titleText.innerHTML = "Your revised annotation:";
             container.appendChild(titleText);
 
             buttonGroup = document.createElement("div");
