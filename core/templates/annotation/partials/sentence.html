@@ -22,8 +22,9 @@
                        id="{{ forloop.counter }}"
                        value="{{ label.pk }}"
                        hx-on:click="uncheckSave()"
-                       {% if is_checked %}CHECKED{% endif %}
-                       autocomplete="off">
+                       {% if is_checked %}checked{% endif %}
+                       autocomplete="off"
+                       onchange="toggleSaveButton()">
                 <label class="btn btn-outline-primary" for="{{ forloop.counter }}">{{ label.name }} ({{ forloop.counter }})</label>
             {% endfor %}
         </div>
@@ -46,7 +47,8 @@
                     type="submit"
                     form="annotation-labels"
                     class="btn btn-outline-primary"
-                    style="width: 8rem">
+                    style="width: 8rem"
+                    disabled>
                 Save <i class="bi bi-floppy"></i>
             </button>
             {% if sent_obj.has_next %}
@@ -62,3 +64,29 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Function to toggle the save button based on checkbox states
+    function toggleSaveButton() {
+        const checkboxes = document.querySelectorAll('input[name="labels"]');
+        const saveBtn = document.getElementById('save-btn');
+        
+        let isAnyChecked = false;
+        
+        checkboxes.forEach(function(checkbox) {
+            if (checkbox.checked) {
+                isAnyChecked = true;
+            }
+        });
+        saveBtn.disabled = !isAnyChecked;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        toggleSaveButton(); 
+    });
+
+    // Listen for HTMX events after content has been swapped (after navigating)
+    document.addEventListener("htmx:afterSwap", function(e) {
+        toggleSaveButton();
+    });
+</script>
