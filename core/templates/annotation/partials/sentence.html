@@ -64,15 +64,14 @@
         </div>
     </div>
 </div>
-
 <script>
     // Function to toggle the save button based on checkbox states
     function toggleSaveButton() {
         const checkboxes = document.querySelectorAll('input[name="labels"]');
         const saveBtn = document.getElementById('save-btn');
-        
+
         let isAnyChecked = false;
-        
+
         checkboxes.forEach(function(checkbox) {
             if (checkbox.checked) {
                 isAnyChecked = true;
@@ -82,7 +81,7 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        toggleSaveButton(); 
+        toggleSaveButton();
     });
 
     // Listen for HTMX events after content has been swapped (after navigating)
