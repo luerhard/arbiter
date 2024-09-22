@@ -52,3 +52,26 @@ To access it, you need to be in the University of Stuttgart VPN (or physically o
 ### Passwords
 
 every user has a password of "123".
+
+## Steps with explanation to run the web application locally 
+- #### cd core: 
+This command changes the current working directory to the core folder, where the main project files are likely stored. It's essential to navigate to the correct directory before running any project-specific commands.
+
+- #### npm install: 
+This installs all the Node.js dependencies listed in the package.json file. These dependencies include libraries and frameworks that the web application needs to run, such as React, Webpack, or other JavaScript modules.
+
+- #### poetry install: 
+This command installs all the Python dependencies specified in the pyproject.toml file using Poetry, a dependency management tool for Python. It ensures that all the required libraries and frameworks are available for the backend.
+
+- #### npm start: 
+This runs the development server for the frontend, defined in the package.json file under the start script. It typically starts a local server (like webpack-dev-server) to serve the frontend assets and enable live reloading for development.
+
+- #### python manage.py runserver: 
+This command starts the Django development server on a local machine, allowing you to access the backend of the web application in your browser. It serves the API and the backend logic necessary for the application to function.
+
+## Some insights on Webpack with --watch Option
+Webpack is a powerful module bundler for JavaScript applications. The --watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.
+
+
+
+
