@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("annotation", "0023_alter_userannotation_unique_together_and_more"),
     ]

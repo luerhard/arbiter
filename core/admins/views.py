@@ -4,7 +4,6 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.shortcuts import HttpResponse
-from django.shortcuts import HttpResponseRedirect
 from django.views.generic import DetailView
 from django.views.generic import ListView
 import pandas as pd
