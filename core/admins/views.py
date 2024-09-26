@@ -4,11 +4,14 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.shortcuts import HttpResponse
+from django.shortcuts import HttpResponseRedirect
 from django.views.generic import DetailView
 from django.views.generic import ListView
+import pandas as pd
 
 from annotation.models import Batch
 from annotation.models import Sentence
+from annotation.models import UserAnnotation
 from core.models import Project
 from core.models import ProjectUser
 
@@ -120,3 +123,37 @@ def toggle_finalize(request):
 
     response = f'<div class="fadeout-2" id="output{batch_id}"><i class="bi bi-check"></i></div>'
     return HttpResponse(response)
+
+
+def export_annotations(request, batch_id):  # noqa: ARG001
+    batch = Batch.objects.prefetch_related("sentences").get(id=batch_id)
+    sentences = batch.sentences
+    rows = []
+    for sent in sentences.all():
+        row = {
+            "batch_number": batch.batch_number,
+            "text": sent.content,
+            "is_discussed": sent.is_discussed,
+            "has_disagreement_labels": sent.has_disagreement_labels,
+        }
+        annotations = UserAnnotation.objects.prefetch_related("label").filter(sentence=sent).all()
+        labels = []
+        for annotation in annotations.all():
+            group = {
+                "user": annotation.user.username,
+                "label": annotation.label.name,
+                "is_set": annotation.is_set,
+            }
+            labels.append(group)
+        row["labels"] = labels
+
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+
+    json = df.to_json(orient="records", lines=True)
+
+    response = HttpResponse(json, content_type="application/text")
+    response["Content-Disposition"] = f"attachment; filename=annotations_batch_{batch_id}.jsonl"
+
+    return response

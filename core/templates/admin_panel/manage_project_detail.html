@@ -57,7 +57,13 @@
                                 <table class="table simple-info-table">
                                     <thead>
                                         <tr>
-                                            <th colspan="2">Annotation Step</th>
+                                            <th>Annotation Step</th>
+                                            <th>
+                                                <div class="flex items-center">
+                                                    <a href="{% url 'export-annotations' batch_id=batch.batch.id %}"
+                                                       class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
+                                                </div>
+                                            </th>
                                         </tr>
                                         <tr>
                                             <th>User</th>
@@ -74,7 +80,12 @@
                                     </tbody>
                                     <thead>
                                         <tr>
-                                            <th colspan="2">Discussion Step</th>
+                                            <th>Discussion Step</th>
+                                            <th>
+                                                <div class="flex items-center">
+                                                    <a href="" class="link-pimary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
+                                                </div>
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
