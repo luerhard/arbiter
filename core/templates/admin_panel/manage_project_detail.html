@@ -54,15 +54,17 @@
                                     </form>
                                     <div class="fadeout-2" id="output{{ batch.batch.id }}">&nbsp;</div>
                                 </div>
+                                <div class="d-flex">
+                                    <a href="{% url 'export-batch' batch_id=batch.batch.id %}"
+                                       class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h6"></i> Download Batch</a>
+                                </div>
                                 <table class="table simple-info-table">
                                     <thead>
                                         <tr>
                                             <th>Annotation Step</th>
                                             <th>
-                                                <div class="flex items-center">
-                                                    <a href="{% url 'export-annotations' batch_id=batch.batch.id %}"
-                                                       class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
-                                                </div>
+                                                <a href="{% url 'export-annotations' batch_id=batch.batch.id %}"
+                                                   class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
                                             </th>
                                         </tr>
                                         <tr>
@@ -83,7 +85,8 @@
                                             <th>Discussion Step</th>
                                             <th>
                                                 <div class="flex items-center">
-                                                    <a href="" class="link-pimary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
+                                                    <a href="{% url 'export-confirmed-annotations' batch_id=batch.batch.id %}"
+                                                       class="link-pimary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
                                                 </div>
                                             </th>
                                         </tr>

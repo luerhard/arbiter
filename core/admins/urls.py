@@ -10,6 +10,12 @@ urlpatterns = [
         views.export_annotations,
         name="export-annotations",
     ),
+    path(
+        "project/export-confirmed-annotations/<int:batch_id>",
+        views.export_confirmed_annotations,
+        name="export-confirmed-annotations",
+    ),
+    path("project/export-batch/<int:batch_id>", views.export_batch, name="export-batch"),
 ]
 
 htmx_patterns = [

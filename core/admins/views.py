@@ -11,8 +11,10 @@ import pandas as pd
 from annotation.models import Batch
 from annotation.models import Sentence
 from annotation.models import UserAnnotation
+from annotation.models import UserConfirmedAnnotation
 from core.models import Project
 from core.models import ProjectUser
+from discuss.models import Message
 
 User = get_user_model()
 
@@ -124,35 +126,113 @@ def toggle_finalize(request):
     return HttpResponse(response)
 
 
-def export_annotations(request, batch_id):  # noqa: ARG001
+def _iter_batch_sentences(batch_id):
     batch = Batch.objects.prefetch_related("sentences").get(id=batch_id)
     sentences = batch.sentences
-    rows = []
     for sent in sentences.all():
         row = {
             "batch_number": batch.batch_number,
+            "text_id": sent.id,
             "text": sent.content,
             "is_discussed": sent.is_discussed,
             "has_disagreement_labels": sent.has_disagreement_labels,
         }
-        annotations = UserAnnotation.objects.prefetch_related("label").filter(sentence=sent).all()
-        labels = []
-        for annotation in annotations.all():
-            group = {
-                "user": annotation.user.username,
-                "label": annotation.label.name,
-                "is_set": annotation.is_set,
-            }
-            labels.append(group)
-        row["labels"] = labels
+        yield row, sent
 
+
+def _get_user_annotations(sentence):
+    annotations = UserAnnotation.objects.prefetch_related("label").filter(sentence=sentence).all()
+    labels = []
+    for annotation in annotations.all():
+        group = {
+            "user": annotation.user.username,
+            "label": annotation.label.name,
+            "is_set": annotation.is_set,
+        }
+        labels.append(group)
+    return labels
+
+
+def _get_confirmed_annotations(sentence):
+    annotations_qs = (
+        UserConfirmedAnnotation.objects.prefetch_related("label").filter(sentence=sentence).all()
+    )
+    labels = []
+    for annotation in annotations_qs.all():
+        group = {
+            "user": annotation.user.username,
+            "label": annotation.label.name,
+            "is_set": annotation.is_set,
+        }
+        labels.append(group)
+    return labels
+
+
+def export_annotations(request, batch_id):  # noqa: ARG001
+    rows = []
+    for row, sentence in _iter_batch_sentences(batch_id):
+        row["labels"] = _get_user_annotations(sentence)
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+    json = df.to_json(orient="records", lines=True)
+
+    batch = Batch.objects.get(id=batch_id)
+    response = HttpResponse(json, content_type="application/text")
+    response["Content-Disposition"] = (
+        f"attachment; filename=annotations_batch_{batch.batch_number}.jsonl"
+    )
+
+    return response
+
+
+def _get_messages(sentence):
+    messages_qs = Message.objects.filter(sentence=sentence).order_by("created_at").all()
+    messages = []
+    for message in messages_qs.all():
+        group = {
+            "user": message.user,
+            "date": message.created_at,
+            "content": message.message,
+        }
+        messages.append(group)
+    return messages
+
+
+def export_confirmed_annotations(request, batch_id):  # noqa: ARG001
+    rows = []
+    for row, sentence in _iter_batch_sentences(batch_id):
+        row["confirmed_labels"] = _get_confirmed_annotations(sentence)
+        row["messages"] = _get_messages(sentence)
         rows.append(row)
 
     df = pd.DataFrame(rows)
 
     json = df.to_json(orient="records", lines=True)
 
+    batch = Batch.objects.get(id=batch_id)
     response = HttpResponse(json, content_type="application/text")
-    response["Content-Disposition"] = f"attachment; filename=annotations_batch_{batch_id}.jsonl"
+    response["Content-Disposition"] = (
+        f"attachment; filename=confirmedannotations_batch_{batch.batch_number}.jsonl"
+    )
+
+    return response
+
+
+def export_batch(request, batch_id):  # noqa: ARG001
+    rows = []
+    for row, sentence in _iter_batch_sentences(batch_id):
+        row["labels"] = _get_user_annotations(sentence)
+        row["confirmed_labels"] = _get_confirmed_annotations(sentence)
+        row["messages"] = _get_messages(sentence)
+        rows.append(row)
+
+    df = pd.DataFrame(rows)
+
+    json = df.to_json(orient="records", lines=True)
+
+    batch = Batch.objects.get(id=batch_id)
+    response = HttpResponse(json, content_type="application/text")
+    response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
 
     return response
