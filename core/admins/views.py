@@ -56,6 +56,8 @@ class ProjectDetailView(DetailView):
                 "batch": batch,
                 "annotation_done": batch.annotation_done,
                 "batch_users": [],
+                "length": batch.sentences.count(),
+                "is_discussed": batch.sentences.filter(is_discussed=True).count(),
             }
 
             for user in context["annotators"]:
@@ -71,7 +73,6 @@ class ProjectDetailView(DetailView):
                 )
                 b = {
                     "user": user.username,
-                    "length": batch.sentences.count(),
                     "annotated": already_annotated,
                 }
                 batch_data["batch_users"].append(b)

@@ -122,6 +122,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             update_fields=("is_set", "last_updated"),
             unique_fields=("sentence", "user", "label"),
         )
+        sentence.is_discussed = True
+        sentence.save()
 
     async def group_send_current_sentence(self):
         sentence, prev_annotations = await self.sentence_annotations(

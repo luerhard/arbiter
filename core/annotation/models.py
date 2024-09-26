@@ -75,6 +75,7 @@ class Sentence(models.Model):
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
     has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
+    is_discussed = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["pk"]

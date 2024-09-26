@@ -73,3 +73,16 @@
     border-radius: 0;
     color: grey;
 }
+
+// project detail view
+
+.simple-info-table thead tr:first-child th {
+    padding-top: 2rem;
+    border-top: none;
+}
+
+.simple-info-table thead tr th:nth-child(2),
+.simple-info-table tbody tr td:nth-child(2) {
+    text-align: right;
+    padding-right: 2rem;
+}
