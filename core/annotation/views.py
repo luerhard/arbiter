@@ -19,7 +19,7 @@ def annotate_batch(request, project_id, batch_number):
     annotated_sentences_count = batch.annotated_sentences(request.user)
     total_sentences = sentences.count()
     progress = (annotated_sentences_count / total_sentences * 100) if total_sentences > 0 else 0
-    progress_formatted = format(progress, '.1f')
+    progress_formatted = format(progress, ".1f")
     paginator = Paginator(sentences, 1)
     sent_number = request.GET.get("sentence", 1)
     sent_obj = paginator.get_page(sent_number)
@@ -92,7 +92,7 @@ def edit_sentence(request, sentence_id):
     total_sentences = batch.sentences.count()
     annotated_sentences = batch.annotated_sentences(request.user)
     progress = (annotated_sentences / total_sentences) * 100 if total_sentences > 0 else 0
-    progress_formatted = format(progress, '.1f')
+    progress_formatted = format(progress, ".1f")
     # Return the updated progress context and button HTML
     button = """ <button id="save-btn"
         type="submit"
