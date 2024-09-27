@@ -70,6 +70,12 @@ class Batch(models.Model):
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
 
+    def annotated_sentences(self, user):
+        # Calculate the number of unique annotated sentences for the batch for the specific user
+        return UserAnnotation.objects.filter(
+            sentence__batch=self, 
+            user=user 
+        ).values('sentence').distinct().count()
 
 class Sentence(models.Model):
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
