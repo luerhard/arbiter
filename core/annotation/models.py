@@ -27,7 +27,9 @@ class Annotation(models.Model):
         EXPERT = "E", "ExpertDecision"
 
     user_sentence = models.ForeignKey(
-        "UserSentence", related_name="annotations", on_delete=models.CASCADE,
+        "UserSentence",
+        related_name="annotations",
+        on_delete=models.CASCADE,
     )
     label = models.ForeignKey(
         Label,
@@ -62,6 +64,15 @@ class UserSentence(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user} - {self.sentence.id} - {self.is_annotated} - {self.is_confirmed}"
+
+    def annotated_sentences(self, user):
+        # Calculate the number of unique annotated sentences for the batch for the specific user
+        return (
+            UserSentence.objects.filter(sentence__batch=self, user=user)
+            .values("sentence")
+            .distinct()
+            .count()
+        )
 
 
 class Sentence(models.Model):
