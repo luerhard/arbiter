@@ -3,8 +3,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("projects/", views.ProjectListView.as_view(), name="manage-projects"),
-    path("projects/<int:pk>", views.ProjectDetailView.as_view(), name="manage-project-detail"),
+    path("", views.project_list_view, name="project-list"),
+    path("<int:project_id>", views.project_detail_view, name="project-detail"),
     path(
         "project/export-annotations/<int:batch_id>",
         views.export_annotations,

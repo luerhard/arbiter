@@ -4,37 +4,37 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from .models import Annotation
-from .models import UserSentence
-from annotation.models import Sentence
-from core.models import Batch
-from core.models import Project
+from data.models import Example
+from projects.models import Batch
+from projects.models import Project
 
 
 # Create your views here.
-def annotate_batch(request, project_id, batch_number):
-    project = get_object_or_404(Project, id=project_id)
-    batch = get_object_or_404(Batch, project=project, batch_number=batch_number)
+def annotate_batch(request, batch_id, batch_order=None):
+    batch = Batch.objects.get(id=batch_id)
+    project = batch.project
 
-    sentences = Sentence.objects.filter(batch=batch)
+    examples = Example.objects.filter(batch=batch)
     labels = project.labels.all()
-    annotated_sentences_count = batch.annotated_sentences(request.user)
-    total_sentences = sentences.count()
-    progress = (annotated_sentences_count / total_sentences * 100) if total_sentences > 0 else 0
+    annotated_examples_count = batch.examples.filter(
+        assignments__user=request.user, assignments__is_annotated=1
+    ).count()
+    total_examples = examples.count()
+    progress = (annotated_examples_count / total_examples * 100) if total_examples > 0 else 0
     progress_formatted = format(progress, ".1f")
-    paginator = Paginator(sentences, 1)
-    sent_number = request.GET.get("sentence", 1)
-    sent_obj = paginator.get_page(sent_number)
-    sentence = sent_obj[0]
+    paginator = Paginator(examples, 1)
+    ex_number = request.GET.get("sentence", 1)
+    ex_obj = paginator.get_page(ex_number)
+    example = ex_obj[0]
 
     previous_annotations = (
-        sentence.get_user_annotations(request.user, phase="ANNOTATION")
+        example.get_user_annotations(user=request.user, phase="ANNOTATION")
         .select_related("label")
         .all()
     )
 
     labels = []
-    for label in sentence.labels.all():
+    for label in example.labels.all():
         new = {
             "name": label.name,
             "id": label.id,
@@ -46,9 +46,9 @@ def annotate_batch(request, project_id, batch_number):
         labels.append(new)
 
     context = {
-        "project_id": project_id,
-        "batch_number": batch_number,
-        "sent_obj": sent_obj,
+        "project_id": project.id,
+        "batch_number": batch.batch_number,
+        "sent_obj": ex_obj,
         "labels": labels,
         "progress": progress_formatted,
     }
@@ -60,7 +60,7 @@ def annotate_batch(request, project_id, batch_number):
 
 
 def edit_sentence(request, sentence_id):
-    sentence = Sentence.objects.get(id=sentence_id)
+    sentence = Example.objects.get(id=sentence_id)
     batch = sentence.batch
     if batch.annotation_done:
         raise PermissionDenied()

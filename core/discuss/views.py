@@ -3,8 +3,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
-
-from core.models import Batch
+from projects.models import Batch
 
 # Create your views here.
 

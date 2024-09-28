@@ -71,7 +71,9 @@ force-sort-within-sections = true
 known-local-folder = [
   "annotation",
   "core",
+  "data",
   "discuss",
+  "projects",
   "users",
 ]
 

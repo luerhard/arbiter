@@ -1,10 +1,11 @@
+from data.models import Label
 from django.contrib import admin
+
+from projects.models import Batch
+from projects.models import Project
 
 from .forms import BatchForm
 from .forms import ProjectForm
-from annotation.models import Label
-from core.models import Batch
-from core.models import Project
 
 
 # Register your models here.

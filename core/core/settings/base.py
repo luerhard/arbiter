@@ -35,12 +35,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "django_htmx",
+    "core",
+    "users",
+    "data",
+    "projects",
     "annotation",
     "discuss",
     "expert",
-    "admins",
-    "core",
-    "users",
 ]
 
 MIDDLEWARE = [

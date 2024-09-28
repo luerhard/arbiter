@@ -2,8 +2,8 @@ from typing import Literal
 
 from django.db import models
 
-from core.models import Batch
-from core.models import Project
+from projects.models import Batch
+from projects.models import Project
 from users.models import User
 
 
@@ -26,8 +26,8 @@ class Annotation(models.Model):
         DISCUSSION = "D", "Discussion"
         EXPERT = "E", "ExpertDecision"
 
-    user_sentence = models.ForeignKey(
-        "UserSentence",
+    assignment = models.ForeignKey(
+        "ExampleAssignment",
         related_name="annotations",
         on_delete=models.CASCADE,
     )
@@ -42,43 +42,36 @@ class Annotation(models.Model):
 
     @property
     def sentence(self):
-        return self.user_sentence.sentence
+        return self.user_example.example
 
     class Meta:
-        unique_together = ("user_sentence", "phase", "label")
+        unique_together = ("assignment", "phase", "label")
 
 
-class UserSentence(models.Model):
-    sentence = models.ForeignKey(
-        "Sentence",
-        related_name="user_sentence",
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
+class ExampleAssignment(models.Model):
+    example = models.ForeignKey("Example", related_name="assignments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="assignments", on_delete=models.CASCADE)
+    order = models.PositiveIntegerField(db_index=True)
     is_annotated = models.BooleanField(default=False)
     is_confirmed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        unique_together = ("sentence", "user")
+    def save(self, *args, **kwargs):
+        # auto set order for the first time
+        if self.order is None:
+            max_order = ExampleAssignment.objects.filter(
+                user=self.user, example__batch=self.example.batch
+            ).aggregate(max_order=models.Max("order"))["max_order"]
 
-    def __str__(self) -> str:
-        return f"{self.user} - {self.sentence.id} - {self.is_annotated} - {self.is_confirmed}"
+            # if there are no other entries
+            self.order = (max_order or 0) + 1
 
-    def annotated_sentences(self, user):
-        # Calculate the number of unique annotated sentences for the batch for the specific user
-        return (
-            UserSentence.objects.filter(sentence__batch=self, user=user)
-            .values("sentence")
-            .distinct()
-            .count()
-        )
+        super().save(*args, **kwargs)
 
 
-class Sentence(models.Model):
-    batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
+class Example(models.Model):
+    batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
-    # has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
 
     class Meta:
         ordering = ["pk"]
@@ -96,12 +89,24 @@ class Sentence(models.Model):
 
     def get_user_annotations(self, user, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"]):
         phase = getattr(Annotation.Phase, phase)
-        return Annotation.objects.filter(
-            user_sentence__sentence=self,
-            user_sentence__user=user,
-            user_sentence__is_annotated=1,
-            phase=phase,
-        )
+
+        if phase == Annotation.Phase.ANNOTATION:
+            return Annotation.objects.filter(
+                assignment__example=self,
+                assignment__user=user,
+                assignment__is_annotated=1,
+                phase=phase,
+            )
+        elif phase == Annotation.Phase.DISCUSSION:
+            return Annotation.objects.filter(
+                assignment__example=self,
+                assignment__user=user,
+                assignment__is_discussed=1,
+                phase=phase,
+            )
+        else:
+            msg = "NOT IMPLMEEEEMENTEd"
+            raise NotImplementedError(msg)
 
     def set_user_annotations(
         self,
@@ -109,17 +114,17 @@ class Sentence(models.Model):
         phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
         label_ids: list[int],
     ):
-        user_sentence, _ = UserSentence.objects.get_or_create(sentence=self, user=user)
-        user_sentence.is_annotated = 1
+        assignment, _ = ExampleAssignment.objects.get_or_create(sentence=self, user=user)
+        assignment.is_annotated = 1
 
         phase = getattr(Annotation.Phase, phase)
 
-        Annotation.objects.filter(phase=phase, user_sentence=user_sentence).delete()
+        Annotation.objects.filter(phase=phase, assignment=assignment).delete()
 
         updates = []
         for label in self.labels.all():
             if label.pk in label_ids:
-                new = Annotation(user_sentence=user_sentence, label=label, phase=phase)
+                new = Annotation(assignment=assignment, label=label, phase=phase)
                 updates.append(new)
         Annotation.objects.bulk_create(updates)
-        user_sentence.save()
+        assignment.save()

@@ -6,33 +6,8 @@ from django.db import models
 User = get_user_model()
 
 
-class Project(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
-
-    @property
-    def annotators(self):
-        return {
-            user_project.user
-            for user_project in self.project_users.all()
-            if user_project.get_role_display() == "Annotator"
-        }
-
-    @property
-    def experts(self):
-        return {
-            user_project.user
-            for user_project in self.project_users.all()
-            if user_project.get_role_display() == "Expert"
-        }
-
-    def __str__(self):
-        return self.name
-
-
 class ProjectUser(models.Model):
-    project = models.ForeignKey(Project, related_name="project_users", on_delete=models.CASCADE)
+    project = models.ForeignKey("Project", related_name="project_users", on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Role(models.TextChoices):
@@ -43,6 +18,27 @@ class ProjectUser(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} -> {self.role} -> {self.project.name}"
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
+
+    @property
+    def annotators(self):
+        return User.objects.filter(
+            projectuser__project=self, projectuser__role=ProjectUser.Role.ANNOTATOR
+        )
+
+    @property
+    def experts(self):
+        return User.objects.filter(
+            projectuser__project=self, projectuser__role=ProjectUser.Role.EXPERT
+        )
+
+    def __str__(self):
+        return self.name
 
 
 class Batch(models.Model):
@@ -60,5 +56,7 @@ class Batch(models.Model):
     def already_annotated_count(self, user):
         user_sentence = apps.get_model("annotation.UserSentence")
         return user_sentence.objects.filter(
-            sentence__batch=self, user=user, is_annotated=True,
+            sentence__batch=self,
+            user=user,
+            is_annotated=True,
         ).count()

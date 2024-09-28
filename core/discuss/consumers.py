@@ -7,8 +7,8 @@ from django.core.paginator import Paginator
 
 from .models import Message
 from .models import Room
-from annotation.models import Sentence
-from core.models import Batch
+from data.models import Example
+from projects.models import Batch
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -71,7 +71,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # SENTENCE UI
     def get_sentence(self, page):
-        queryset = Sentence.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
+        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
         paginator = Paginator(queryset, 1)
         page = paginator.get_page(page)
         try:

@@ -2,9 +2,10 @@ from django import forms
 from django.db.models import Max
 import pandas as pd
 
-from annotation.models import Sentence
-from core.models import Batch
-from core.models import ProjectUser
+from data.models import Example
+from data.models import ExampleAssignment
+from projects.models import Batch
+from projects.models import ProjectUser
 from users.models import User
 
 
@@ -70,7 +71,7 @@ class BatchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance and self.instance.pk:
-            if self.instance.sentences.exists():
+            if self.instance.examples.exists():
                 self.fields["file"].disabled = True
 
     file = forms.FileField(required=False)
@@ -98,10 +99,12 @@ class BatchForm(forms.ModelForm):
 
         batch = Batch(project=project, batch_number=max_batch_number)
         batch.save()
-        sentences = []
+        default_annotators = batch.project.annotators.all()
         for _, row in df.iterrows():
-            sent = Sentence(batch=batch, content=row["text"])
-            sent.save()
+            example = Example(batch=batch, content=row["text"])
+            example.save()
+            for annotator in default_annotators:
+                assignment = ExampleAssignment(user=annotator, example=example)
+                assignment.save()
 
-        Sentence.objects.bulk_create(sentences)
         return batch

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+    {% include "projects/partials/detail_header.html" %}
+    <!-- show batches assigned to this project if there are any -->
+    {% if batches %}
+        <div class="row">
+            <table class="table">
+                <tr>
+                    <th>Batches</th>
+                    <th>done?</th>
+                </tr>
+                {% for batch in batches %}
+                    <tr>
+                        {% if batch.batch.annotation_done %}
+                            <td>Batch {{ batch.batch.batch_number }} (locked)</td>
+                        {% else %}
+                            <td>
+                                <a href="{% url 'annotate-batch' batch_id=batch.batch.id %}">Batch {{ batch.batch.batch_number }}</a>
+                            </td>
+                        {% endif %}
+                        <td>{{ batch.done }} / {{ batch.length }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
+{% endblock content %}

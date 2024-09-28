@@ -5,32 +5,7 @@
             <h1>Project: {{ project.name }}</h1>
             <!-- show annotators assigned to this project -->
             <div class="container">
-                <table class="table simple-info-table">
-                    <thead>
-                        <tr>
-                            <th>Annotators</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in annotators %}
-                            <tr>
-                                <td>{{ user }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    <thead>
-                        <tr>
-                            <th>Experts</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in experts.all %}
-                            <tr>
-                                <td>{{ user.username }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% include "partials/assigned_users.html" %}
                 <!-- show batches assigned to this project if there are any -->
                 {% if batches %}
                     {% for batch in batches %}
