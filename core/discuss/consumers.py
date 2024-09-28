@@ -7,9 +7,8 @@ from django.core.paginator import Paginator
 
 from .models import Message
 from .models import Room
-from annotation.models import Batch
 from annotation.models import Sentence
-from annotation.models import UserConfirmedAnnotation
+from core.models import Batch
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -108,7 +107,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         new_labels = []
         for label_id, is_set in annotations.items():
             label = project_labels[label_id]
-            label_annotation = UserConfirmedAnnotation(
+            label_annotation = ConfirmedAnnotation(
                 sentence=sentence,
                 user=self.user,
                 label=label,
@@ -116,7 +115,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             new_labels.append(label_annotation)
 
-        UserConfirmedAnnotation.objects.bulk_create(
+        ConfirmedAnnotation.objects.bulk_create(
             new_labels,
             update_conflicts=True,
             update_fields=("is_set", "last_updated"),

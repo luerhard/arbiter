@@ -1,5 +1,8 @@
+from typing import Literal
+
 from django.db import models
 
+from core.models import Batch
 from core.models import Project
 from users.models import User
 
@@ -13,69 +16,58 @@ class Label(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ("project", "name")
 
-class UserAnnotation(models.Model):
+
+class Annotation(models.Model):
+    class Phase(models.TextChoices):
+        ANNOTATION = "A", "Annotation"
+        DISCUSSION = "D", "Discussion"
+        EXPERT = "E", "ExpertDecision"
+
+    user_sentence = models.ForeignKey(
+        "UserSentence", related_name="annotations", on_delete=models.CASCADE,
+    )
+    label = models.ForeignKey(
+        Label,
+        related_name="label",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    phase = models.CharField(max_length=1, choices=Phase, db_index=True)
+
+    @property
+    def sentence(self):
+        return self.user_sentence.sentence
+
+    class Meta:
+        unique_together = ("user_sentence", "phase", "label")
+
+
+class UserSentence(models.Model):
     sentence = models.ForeignKey(
         "Sentence",
-        related_name="user_annotations",
+        related_name="user_sentence",
         on_delete=models.CASCADE,
     )
     user = models.ForeignKey(User, related_name="user", on_delete=models.CASCADE)
-    label = models.ForeignKey(
-        Label,
-        related_name="user_annotations",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-    is_set = models.BooleanField(default=False)
+    is_annotated = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ("sentence", "user", "label")
+        unique_together = ("sentence", "user")
 
     def __str__(self) -> str:
-        return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
-
-
-class UserConfirmedAnnotation(models.Model):
-    sentence = models.ForeignKey(
-        "Sentence",
-        related_name="user_confirmed_annotations",
-        on_delete=models.CASCADE,
-    )
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    label = models.ForeignKey(
-        Label,
-        related_name="user_confirmed_annotations",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-    )
-    is_set = models.BooleanField(default=False)
-    last_updated = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ("sentence", "user", "label")
-
-    def __str__(self) -> str:
-        return f"{self.user} - {self.label} - {self.is_set} - {self.last_updated}"
-
-
-class Batch(models.Model):
-    project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
-    batch_number = models.SmallIntegerField()
-    annotation_done = models.BooleanField(default=False)
-
-    def __str__(self) -> str:
-        return f"Batch {self.batch_number}"
+        return f"{self.user} - {self.sentence.id} - {self.is_annotated} - {self.is_confirmed}"
 
 
 class Sentence(models.Model):
     batch = models.ForeignKey(Batch, related_name="sentences", on_delete=models.CASCADE)
     content = models.TextField()
-    has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
-    is_discussed = models.BooleanField(default=False)
+    # has_disagreement_labels = models.BooleanField(default=None, null=True, blank=True)
 
     class Meta:
         ordering = ["pk"]
@@ -83,8 +75,40 @@ class Sentence(models.Model):
     def __str__(self):
         return self.content
 
-    def annotations(self, user):
-        annotations = (
-            UserAnnotation.objects.prefetch_related("label").filter(user=user, sentence=self).all()
+    @property
+    def project(self):
+        return self.batch.project
+
+    @property
+    def labels(self):
+        return self.batch.project.labels
+
+    def get_user_annotations(self, user, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"]):
+        phase = getattr(Annotation.Phase, phase)
+        return Annotation.objects.filter(
+            user_sentence__sentence=self,
+            user_sentence__user=user,
+            user_sentence__is_annotated=1,
+            phase=phase,
         )
-        return annotations
+
+    def set_user_annotations(
+        self,
+        user,
+        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
+        label_ids: list[int],
+    ):
+        user_sentence, _ = UserSentence.objects.get_or_create(sentence=self, user=user)
+        user_sentence.is_annotated = 1
+
+        phase = getattr(Annotation.Phase, phase)
+
+        Annotation.objects.filter(phase=phase, user_sentence=user_sentence).delete()
+
+        updates = []
+        for label in self.labels.all():
+            if label.pk in label_ids:
+                new = Annotation(user_sentence=user_sentence, label=label, phase=phase)
+                updates.append(new)
+        Annotation.objects.bulk_create(updates)
+        user_sentence.save()

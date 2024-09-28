@@ -22,9 +22,22 @@
             }
         });
     </script>
-    <div class="content-section">
-        <h1>Annotate Sentence</h1>
-        <div id="sentence-section">{% include "annotation/partials/sentence.html" %}</div>
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center pb-5">Annotate Sentence</h2>
+                <div class="card">
+                    <div class="card-body" id="sentence"></div>
+                </div>
+                <div class="container">
+                    <div id="labels"></div>
+                </div>
+                <div class="container text-center">
+                    <div id="buttons" class="mt-5 btn-group" role="group"></div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div id="result"></div>
+    <div hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.page_number }}"
+         hx-trigger="load"></div>
 {% endblock content %}

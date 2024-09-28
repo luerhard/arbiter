@@ -2,14 +2,12 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_not_required
-from django.db.models import Count
 from django.shortcuts import render
 from django.views.generic import DetailView
 from django.views.generic import ListView
 
 from .models import Project
 from .models import ProjectUser
-from annotation.models import Sentence
 
 User = get_user_model()
 
@@ -53,16 +51,7 @@ class ProjectDetailView(DetailView):
         batches = context["project"].batches.all()
         context["batches"] = []
         for batch in batches:
-            already_annotated = (
-                Sentence.objects.filter(
-                    batch=batch,
-                    user_annotations__user=self.request.user,
-                )
-                .values("id")
-                .annotate(label_count=Count("user_annotations"))
-                .filter(label_count__gt=0)
-                .count()
-            )
+            already_annotated = batch.already_annotated_count(self.request.user)
             b = {
                 "batch": batch,
                 "length": batch.sentences.count(),

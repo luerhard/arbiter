@@ -2,8 +2,8 @@ from django import forms
 from django.db.models import Max
 import pandas as pd
 
-from annotation.models import Batch
 from annotation.models import Sentence
+from core.models import Batch
 from core.models import ProjectUser
 from users.models import User
 

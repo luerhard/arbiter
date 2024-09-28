@@ -4,9 +4,10 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from .models import Batch
-from .models import Sentence
-from .models import UserAnnotation
+from .models import Annotation
+from .models import UserSentence
+from annotation.models import Sentence
+from core.models import Batch
 from core.models import Project
 
 
@@ -14,32 +15,38 @@ from core.models import Project
 def annotate_batch(request, project_id, batch_number):
     project = get_object_or_404(Project, id=project_id)
     batch = get_object_or_404(Batch, project=project, batch_number=batch_number)
-    sentences = batch.sentences.all()
-    labels = project.labels.all()
+
+    sentences = Sentence.objects.filter(batch=batch)
     paginator = Paginator(sentences, 1)
     sent_number = request.GET.get("sentence", 1)
     sent_obj = paginator.get_page(sent_number)
-    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
-        sentence__id=sent_obj.object_list[0].id,
-        user=request.user.id,
+    sentence = sent_obj[0]
+
+    previous_annotations = (
+        sentence.get_user_annotations(request.user, phase="ANNOTATION")
+        .select_related("label")
+        .all()
     )
-    checked_labels = []
-    for label in labels:
-        try:
-            user_label = next(anno for anno in user_annotations if label.pk == anno.label.pk)
-            if user_label.is_set:
-                checked_labels.append(True)
-            else:
-                checked_labels.append(False)
-        except StopIteration:
-            checked_labels.append(False)
+
+    labels = []
+    for label in sentence.labels.all():
+        new = {
+            "name": label.name,
+            "id": label.id,
+        }
+        if label in previous_annotations:
+            new["is_set"] = True
+        else:
+            new["is_set"] = False
+        labels.append(new)
 
     context = {
         "project_id": project_id,
         "batch_number": batch_number,
         "sent_obj": sent_obj,
-        "labels": list(zip(labels, checked_labels, strict=False)),
+        "labels": labels,
     }
+
     if request.htmx:
         return render(request, "annotation/partials/sentence.html", context)
     else:
@@ -47,40 +54,18 @@ def annotate_batch(request, project_id, batch_number):
 
 
 def edit_sentence(request, sentence_id):
-    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
-        sentence__id=sentence_id,
-        user=request.user.id,
-    )
-    sentence = get_object_or_404(Sentence, id=sentence_id)
+    sentence = Sentence.objects.get(id=sentence_id)
     batch = sentence.batch
     if batch.annotation_done:
         raise PermissionDenied()
-    project_labels = batch.project.labels
-    submitted_labels = [int(i) for i in request.POST.getlist("labels")]
-    new_annotations = []
-    for project_label in project_labels.all():
-        annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
+    submitted_labels = [int(i) for i in request.POST.getlist("labels") if i.strip()]
+    sentence.set_user_annotations(user=request.user, phase="ANNOTATION", label_ids=submitted_labels)
 
-        if project_label.pk in submitted_labels:
-            annotation.is_set = True
-        else:
-            annotation.is_set = False
-
-        new_annotations.append(annotation)
-
-    UserAnnotation.objects.bulk_create(
-        new_annotations,
-        update_conflicts=True,
-        update_fields=("is_set", "last_updated"),
-        unique_fields=("sentence", "user", "label"),
-    )
-
-    button = """ <button id="save-btn"
-        type="submit"
-        form="annotation-labels"
-        class="btn btn-primary"
-        style="width: 8rem"
-        > Saved <i class="bi bi-check"></i>
-    </button>
-    """
+    button = """<button id="save-btn"
+            type="submit"
+            form="label-form"
+            class="btn btn-outline-primary"
+            hx-swap-oob='true'>
+            Saved <i class="bi bi-check"></i>
+    </button>"""
     return HttpResponse(button)

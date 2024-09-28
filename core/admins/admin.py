@@ -2,8 +2,8 @@ from django.contrib import admin
 
 from .forms import BatchForm
 from .forms import ProjectForm
-from annotation.models import Batch
 from annotation.models import Label
+from core.models import Batch
 from core.models import Project
 
 

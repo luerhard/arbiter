@@ -1,4 +1,5 @@
 # core/models.py
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -42,3 +43,22 @@ class ProjectUser(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user.username} -> {self.role} -> {self.project.name}"
+
+
+class Batch(models.Model):
+    project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
+    batch_number = models.SmallIntegerField()
+    annotation_done = models.BooleanField(default=False)
+
+    def __str__(self) -> str:
+        return f"Batch {self.batch_number}"
+
+    @property
+    def labels(self):
+        return self.project.labels
+
+    def already_annotated_count(self, user):
+        user_sentence = apps.get_model("annotation.UserSentence")
+        return user_sentence.objects.filter(
+            sentence__batch=self, user=user, is_annotated=True,
+        ).count()

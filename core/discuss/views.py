@@ -4,7 +4,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
 
-from annotation.models import Batch
+from core.models import Batch
 
 # Create your views here.
 

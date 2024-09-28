@@ -1,64 +1,50 @@
-<div class="card">
-    <div class="card-body">
-        <div id="sentence-content card-text mt-5">{{ sent_obj.object_list.0.content }}</div>
-    </div>
-</div>
-<div class="container">
-    <form id="annotation-labels"
-          hx-swap="outerHTML"
+<div id="sentence" hx-swap-oob="innerHTML:#sentence">{{ sent_obj.object_list.0.content }}</div>
+<div id="labels" hx-swap-oob="innerHTML:#labels">
+    <form id="label-form"
           hx-post="{% url 'edit-sentence' sentence_id=sent_obj.object_list.0.pk %}"
           hx-trigger="submit,keydown[key=='Enter' || keyCode==38] from:window"
           hx-target="#save-btn"
           class="mt-5"
           method="post">
         {% csrf_token %}
-        <div id="sentence-annotation"
-             class="d-flex justify-content-center btn-group"
-             role="group">
-            {% for label, is_checked in labels %}
+        <div class="d-flex btn-group" role="group">
+            {% for label in labels %}
                 <input type="checkbox"
                        class="btn-check"
                        name="labels"
                        id="{{ forloop.counter }}"
-                       value="{{ label.pk }}"
+                       value="{{ label.id }}"
                        hx-on:click="uncheckSave()"
-                       {% if is_checked %}CHECKED{% endif %}
+                       {% if labels.is_set %}CHECKED{% endif %}
                        autocomplete="off">
                 <label class="btn btn-outline-primary" for="{{ forloop.counter }}">{{ label.name }} ({{ forloop.counter }})</label>
             {% endfor %}
         </div>
     </form>
 </div>
-<div class="container-fluid">
-    <div class="d-flex justify-content-center">
-        <div class="btn-group mt-5" role="group">
-            {% if sent_obj.has_previous %}
-                <button id="next-btn"
-                        class="btn btn-outline-primary"
-                        hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.previous_page_number }}"
-                        hx-target="#sentence-section"
-                        hx-trigger="click,keydown[keyCode==37] from:window"
-                        hx-push-url="true">
-                    <i class="bi bi-arrow-left"></i>
-                </button>
-            {% endif %}
-            <button id="save-btn"
-                    type="submit"
-                    form="annotation-labels"
-                    class="btn btn-outline-primary"
-                    style="width: 8rem">
-                Save <i class="bi bi-floppy"></i>
-            </button>
-            {% if sent_obj.has_next %}
-                <button id="next-btn"
-                        class="btn btn-outline-primary"
-                        hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.next_page_number }}"
-                        hx-target="#sentence-section"
-                        hx-trigger="click,keydown[keyCode==39] from:body"
-                        hx-push-url="true">
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-            {% endif %}
-        </div>
-    </div>
+<div id="buttons" hx-swap-oob="innerHTML:#buttons">
+    {% if sent_obj.has_previous %}
+        <button id="next-btn"
+                class="btn btn-outline-primary"
+                hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.previous_page_number }}"
+                hx-trigger="click,keydown[keyCode==37] from:window"
+                hx-push-url="true">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+    {% endif %}
+    <button id="save-btn"
+            type="submit"
+            form="label-form"
+            class="btn btn-outline-primary">
+        Save <i class="bi bi-floppy"></i>
+    </button>
+    {% if sent_obj.has_next %}
+        <button id="next-btn"
+                class="btn btn-outline-primary"
+                hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.next_page_number }}"
+                hx-trigger="click,keydown[keyCode==39] from:body"
+                hx-push-url="true">
+            <i class="bi bi-arrow-right"></i>
+        </button>
+    {% endif %}
 </div>

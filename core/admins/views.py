@@ -2,16 +2,13 @@ from typing import Any
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
 from django.shortcuts import HttpResponse
 from django.views.generic import DetailView
 from django.views.generic import ListView
 import pandas as pd
 
-from annotation.models import Batch
-from annotation.models import Sentence
-from annotation.models import UserAnnotation
-from annotation.models import UserConfirmedAnnotation
+from annotation.models import Annotation
+from core.models import Batch
 from core.models import Project
 from core.models import ProjectUser
 from discuss.models import Message
@@ -65,16 +62,7 @@ class ProjectDetailView(DetailView):
             }
 
             for user in context["annotators"]:
-                already_annotated = (
-                    Sentence.objects.filter(
-                        batch=batch,
-                        user_annotations__user=user,
-                    )
-                    .values("id")
-                    .annotate(label_count=Count("user_annotations"))
-                    .filter(label_count__gt=0)
-                    .count()
-                )
+                already_annotated = batch.sentences.already_annotated_count.sum()
                 b = {
                     "user": user.username,
                     "annotated": already_annotated,
@@ -141,7 +129,7 @@ def _iter_batch_sentences(batch_id):
 
 
 def _get_user_annotations(sentence):
-    annotations = UserAnnotation.objects.prefetch_related("label").filter(sentence=sentence).all()
+    annotations = Annotation.objects.prefetch_related("label").filter(sentence=sentence).all()
     labels = []
     for annotation in annotations.all():
         group = {
@@ -155,7 +143,7 @@ def _get_user_annotations(sentence):
 
 def _get_confirmed_annotations(sentence):
     annotations_qs = (
-        UserConfirmedAnnotation.objects.prefetch_related("label").filter(sentence=sentence).all()
+        ConfirmedAnnotation.objects.prefetch_related("label").filter(sentence=sentence).all()
     )
     labels = []
     for annotation in annotations_qs.all():
