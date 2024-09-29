@@ -80,7 +80,7 @@ def annotate_batch(
 def edit(request, assignment_id):
     assignment = ExampleAssignment.objects.get(id=assignment_id)
     batch = assignment.example.batch
-    if batch.annotation_done:
+    if batch.phase != Batch.Phase.ANNOTATION:
         raise PermissionDenied()
     if assignment.user != request.user:
         raise PermissionDenied()
