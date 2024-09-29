@@ -1,0 +1,17 @@
+{% load widget_tweaks %}
+<div id="labels" hx-swap-oob="innerHTML:#labels">
+    <form id="label-form"
+          hx-post="{% url 'annotate-edit' assignment_id=assignment.id %}"
+          hx-trigger="submit,keydown[key=='Enter'] from:window"
+          hx-target="#save-btn"
+          class="mt-5"
+          method="post">
+        {% csrf_token %}
+        <div class="d-flex btn-group" role="group">
+            {% for checkbox in label_form.labels %}
+                <input type="checkbox" name="labels" class="btn-check" id={{ checkbox.id_for_label }} value="{{ checkbox.data.value }}"  autocomplete="off" {% if checkbox.data.value in label_form.labels.value %}checked{% endif %} />
+                <label for="{{ checkbox.id_for_label }}" class="btn btn-outline-primary">{{ checkbox.choice_label }}</label>
+            {% endfor %}
+        </div>
+    </form>
+</div>

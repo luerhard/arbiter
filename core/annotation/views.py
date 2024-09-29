@@ -1,8 +1,10 @@
 from typing import Literal
 
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
+from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
 
@@ -71,6 +73,9 @@ def annotate_batch(
         "has_prev": has_prev,
     }
 
+    form = MultiLabelForm(assignment=assignment)
+    context["label_form"] = form
+
     if request.htmx:
         return render(request, "annotation/partials/annotation.html", context)
     else:
@@ -85,10 +90,17 @@ def edit(request, assignment_id):
     if assignment.user != request.user:
         raise PermissionDenied()
 
+    if request.method == "POST":
+        form = MultiLabelForm(request.POST, assignment=assignment)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Saved.")
+        else:
+            messages.error(request, f"Something was invalid: {form}")
+
     submitted_labels = [int(i) for i in request.POST.getlist("labels") if i.strip()]
     assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
-    # Progress Bar
     # Progress Bar
     done = batch.examples.filter(
         assignments__user=request.user,

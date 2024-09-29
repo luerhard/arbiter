@@ -1,28 +1,7 @@
+{% load widget_tweaks %}
 {% include "annotation/partials/progress.html" %}
 <div id="sentence" hx-swap-oob="innerHTML:#sentence">{{ example.content }}</div>
-<div id="labels" hx-swap-oob="innerHTML:#labels">
-    <form id="label-form"
-          hx-post="{% url 'annotate-edit' assignment_id=assignment.id %}"
-          hx-trigger="submit,keydown[key=='Enter'] from:window"
-          hx-target="#save-btn"
-          class="mt-5"
-          method="post">
-        {% csrf_token %}
-        <div class="d-flex btn-group" role="group">
-            {% for label in labels %}
-                <input type="checkbox"
-                       class="btn-check"
-                       name="labels"
-                       id="{{ forloop.counter }}"
-                       value="{{ label.id }}"
-                       hx-on:click="uncheckSave()"
-                       {% if labels.is_set %}CHECKED{% endif %}
-                       autocomplete="off">
-                <label class="btn btn-outline-primary" for="{{ forloop.counter }}">{{ label.name }} ({{ forloop.counter }})</label>
-            {% endfor %}
-        </div>
-    </form>
-</div>
+{% include "annotation/partials/label_form.html" %}
 <div id="buttons" hx-swap-oob="innerHTML:#buttons">
     {% if has_prev %}
         <button id="next-btn"
@@ -36,8 +15,8 @@
     {% if saved %}
         {% include "annotation/partials/saved.html" %}
     {% else %}
-        <button id="save-btn"
-                type="submit"
+        <button type="submit"
+                id="save-btn"
                 form="label-form"
                 class="btn btn-outline-primary">
             Save <i class="bi bi-floppy"></i>
