@@ -12,6 +12,17 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 
+from django.contrib import messages
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "bg-light",
+    messages.INFO: "text-white bg-primary",
+    messages.SUCCESS: "text-white bg-success",
+    messages.WARNING: "text-dark bg-warning",
+    messages.ERROR: "text-white bg-danger",
+}
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -35,12 +46,13 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "widget_tweaks",
     "django_htmx",
+    "core",
+    "users",
+    "data",
+    "projects",
     "annotation",
     "discuss",
     "expert",
-    "admins",
-    "core",
-    "users",
 ]
 
 MIDDLEWARE = [
@@ -53,6 +65,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
+    "core.middleware.HtmxMessageMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"

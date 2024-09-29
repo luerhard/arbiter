@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <h1>Project: {{ project.name }}</h1>
+            <!-- show annotators assigned to this project -->
+            <div class="container">
+                {% include "projects/partials/detail_header.html" %}
+                <!-- show batches assigned to this project if there are any -->
+                {% if batches %}
+                    {% for batch in batches %}
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h5 class="card-title mb-4">Batch {{ batch.batch.batch_number }}</h5>
+                                <div class="d-flex flex-row mb-4">
+                                    <form id="form{{ batch.batch.id }}"
+                                          class="form-check form-switch"
+                                          hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
+                                          hx-trigger="change">
+                                        {% csrf_token %}
+                                        {{ batch.batch_phase_form.as_p }}
+                                    </form>
+                                    <div class="fadeout-2" id="output{{ batch.batch.id }}">&nbsp;</div>
+                                </div>
+                                <div class="d-flex">
+                                    <a href="{% url 'export-batch' batch_id=batch.batch.id %}"
+                                       class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h6"></i> Download Batch</a>
+                                </div>
+                                <table class="table simple-info-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Annotation Step</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>done?</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in batch.users %}
+                                            <tr>
+                                                <td>{{ user.user.username }}</td>
+                                                <td>{{ user.annotated }} / {{ batch.length }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                    <thead>
+                                        <tr>
+                                            <th>Discussion Step</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for user in batch.users %}
+                                            <tr>
+                                                <td>{{ user.user.username }}</td>
+                                                <td>{{ user.discussed }} / {{ batch.disagreement }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}

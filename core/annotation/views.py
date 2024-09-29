@@ -1,111 +1,103 @@
+from typing import Literal
+
 from django.core.exceptions import PermissionDenied
-from django.core.paginator import Paginator
-from django.shortcuts import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 
-from .models import Batch
-from .models import Sentence
-from .models import UserAnnotation
-from core.models import Project
+from data.models import ExampleAssignment
+from projects.models import Batch
 
 
 # Create your views here.
-def annotate_batch(request, project_id, batch_number):
-    project = get_object_or_404(Project, id=project_id)
-    batch = get_object_or_404(Batch, project=project, batch_number=batch_number)
-    sentences = batch.sentences.all()
+def annotate_batch(
+    request,
+    batch_id,
+    assignment_id: int = None,
+    cursor: Literal["next", "prev"] | None = None,
+):
+    batch = Batch.objects.get(id=batch_id)
+    project = batch.project
+
+    if assignment_id:
+        assignment = ExampleAssignment.objects.get(id=assignment_id)
+    else:
+        assignment = (
+            ExampleAssignment.objects.filter(user=request.user, example__batch=batch)
+            .order_by("order")
+            .first()
+        )
+
+    if cursor == "next":
+        assignment = assignment.next()
+    elif cursor == "prev":
+        assignment = assignment.previous()
+
+    has_next = True if assignment.next() else False
+    has_prev = True if assignment.previous() else False
+    example = assignment.example
     labels = project.labels.all()
-    annotated_sentences_count = batch.annotated_sentences(request.user)
-    total_sentences = sentences.count()
-    progress = (annotated_sentences_count / total_sentences * 100) if total_sentences > 0 else 0
-    progress_formatted = format(progress, ".1f")
-    paginator = Paginator(sentences, 1)
-    sent_number = request.GET.get("sentence", 1)
-    sent_obj = paginator.get_page(sent_number)
-    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
-        sentence__id=sent_obj.object_list[0].id,
-        user=request.user.id,
+
+    # Progress Bar
+    done = batch.examples.filter(
+        assignments__user=request.user,
+        assignments__is_annotated=1,
+    ).count()
+    total = batch.examples.count()
+    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
+
+    previous_annotations = (
+        assignment.annotations.filter(phase="ANNOTATION").select_related("label").all()
     )
-    checked_labels = []
-    for label in labels:
-        try:
-            user_label = next(anno for anno in user_annotations if label.pk == anno.label.pk)
-            if user_label.is_set:
-                checked_labels.append(True)
-            else:
-                checked_labels.append(False)
-        except StopIteration:
-            checked_labels.append(False)
+
+    labels = []
+    for label in example.labels.all():
+        new = {
+            "name": label.name,
+            "id": label.id,
+        }
+        if label in previous_annotations:
+            new["is_set"] = True
+        else:
+            new["is_set"] = False
+        labels.append(new)
 
     context = {
-        "project_id": project_id,
-        "batch_number": batch_number,
-        "sent_obj": sent_obj,
-        "labels": list(zip(labels, checked_labels, strict=False)),
-        "progress": progress_formatted,
+        "project_id": project.id,
+        "batch": batch,
+        "example": example,
+        "labels": labels,
+        "assignment": assignment,
+        "progress": progress,
+        "has_next": has_next,
+        "has_prev": has_prev,
     }
+
     if request.htmx:
-        return render(request, "annotation/partials/sentence.html", context)
+        return render(request, "annotation/partials/annotation.html", context)
     else:
-        return render(request, "annotation/sentence_view.html", context)
+        return render(request, "annotation/batch.html", context)
 
 
-def edit_sentence(request, sentence_id):
-    user_annotations = UserAnnotation.objects.prefetch_related("label").filter(
-        sentence__id=sentence_id,
-        user=request.user.id,
-    )
-    sentence = get_object_or_404(Sentence, id=sentence_id)
-    batch = sentence.batch
+def edit(request, assignment_id):
+    assignment = ExampleAssignment.objects.get(id=assignment_id)
+    batch = assignment.example.batch
     if batch.annotation_done:
         raise PermissionDenied()
-    project_labels = batch.project.labels
-    submitted_labels = [int(i) for i in request.POST.getlist("labels")]
-    new_annotations = []
-    for project_label in project_labels.all():
-        annotation = UserAnnotation(user=request.user, sentence=sentence, label=project_label)
+    if assignment.user != request.user:
+        raise PermissionDenied()
 
-        if project_label.pk in submitted_labels:
-            annotation.is_set = True
-        else:
-            annotation.is_set = False
+    submitted_labels = [int(i) for i in request.POST.getlist("labels") if i.strip()]
+    assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
-        new_annotations.append(annotation)
-
-    UserAnnotation.objects.bulk_create(
-        new_annotations,
-        update_conflicts=True,
-        update_fields=("is_set", "last_updated"),
-        unique_fields=("sentence", "user", "label"),
-    )
-
-    button = """ <button id="save-btn"
-        type="submit"
-        form="annotation-labels"
-        class="btn btn-primary"
-        style="width: 8rem"
-        > Saved <i class="bi bi-check"></i>
-    </button>
-    """
-    # Calculate progress using the updated count
-    total_sentences = batch.sentences.count()
-    annotated_sentences = batch.annotated_sentences(request.user)
-    progress = (annotated_sentences / total_sentences) * 100 if total_sentences > 0 else 0
-    progress_formatted = format(progress, ".1f")
-    # Return the updated progress context and button HTML
-    button = """ <button id="save-btn"
-        type="submit"
-        form="annotation-labels"
-        class="btn btn-primary"
-        style="width: 8rem"
-        > Saved <i class="bi bi-check"></i>
-    </button>
-    """
-    return HttpResponse(f"""
-        {button}
-        <script>
-            document.querySelector('.progress-bar').style.width = '{progress_formatted}%';
-            document.querySelector('.progress-bar').innerHTML= '{progress_formatted}%';
-        </script>
-    """)
+    # Progress Bar
+    # Progress Bar
+    done = batch.examples.filter(
+        assignments__user=request.user,
+        assignments__is_annotated=1,
+    ).count()
+    total = batch.examples.count()
+    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
+    context = {
+        "progress": progress,
+        "saved": True,
+    }
+    return render(request, "annotation/partials/edit.html", context)

@@ -25,12 +25,10 @@ from . import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.core, name="home"),
-    path("manage/", include("admins.urls")),
-    path("annotate/", include("annotation.urls")),
+    path("projects/", include("projects.urls")),
     path("users/", include("users.urls")),
+    path("annotation/", include("annotation.urls")),
     path("discuss/", include("discuss.urls")),
-    path("projects/", views.ProjectListView.as_view(), name="list-projects"),
-    path("projects/<int:pk>", views.ProjectDetailView.as_view(), name="project-view"),
 ]
 
 # Additional settings for development

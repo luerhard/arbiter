@@ -1,6 +1,6 @@
 import pytest
 
-from annotation.models import Batch
+from data.models import Batch
 
 
 class TestBatchModel:

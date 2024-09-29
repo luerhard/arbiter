@@ -1,6 +1,6 @@
 import pytest
 
-from core.models import Project
+from projects.models import Project
 from users.models import User
 
 

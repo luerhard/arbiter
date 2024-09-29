@@ -5,20 +5,17 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from .forms import UserRegistrationForm
-
-
 # Create your views here.
-def register(request):
-    if request.method == "POST":
-        form = UserRegistrationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect("list-projects")
-    else:
-        form = UserRegistrationForm()
-    return render(request, "core/register.html", {"form": form})
+# def register(request):
+#     if request.method == "POST":
+#         form = UserRegistrationForm(request.POST)
+#         if form.is_valid():
+#             user = form.save()
+#             login(request, user)
+#             return redirect("list-projects")
+#     else:
+#         form = UserRegistrationForm()
+#     return render(request, "core/register.html", {"form": form})
 
 
 @login_not_required
@@ -29,9 +26,9 @@ def user_login(request):
             user = form.get_user()
             login(request, user)
             if user.is_staff:
-                return redirect("list-projects")
+                return redirect("project-list")
             else:
-                return redirect("list-projects")
+                return redirect("project-list")
     else:
         form = AuthenticationForm()
     return render(request, "core/login.html", {"form": form})
