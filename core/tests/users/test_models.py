@@ -1,6 +1,6 @@
-from projects.models import Project
 import pytest
 
+from projects.models import Project
 from users.models import User
 
 

@@ -1,4 +1,3 @@
-from django.db.models import Sum
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -17,7 +16,8 @@ def overview(request):
     user = request.user
     context = {"projects": {}}
     projects = Project.objects.filter(
-        project_users__user=user, project_users__role=ProjectUser.Role.ANNOTATOR,
+        project_users__user=user,
+        project_users__role=ProjectUser.Role.ANNOTATOR,
     )
     for project in projects.prefetch_related("batches"):
         batches = []

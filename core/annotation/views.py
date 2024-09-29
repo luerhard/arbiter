@@ -1,18 +1,18 @@
 from typing import Literal
-from typing import Optional
 
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import HttpResponse
 from django.shortcuts import render
 
-from data.models import Example
 from data.models import ExampleAssignment
 from projects.models import Batch
 
 
 # Create your views here.
 def annotate_batch(
-    request, batch_id, assignment_id: int = None, cursor: Literal["next", "prev"] | None = None,
+    request,
+    batch_id,
+    assignment_id: int = None,
+    cursor: Literal["next", "prev"] | None = None,
 ):
     batch = Batch.objects.get(id=batch_id)
     project = batch.project
@@ -38,7 +38,8 @@ def annotate_batch(
 
     # Progress Bar
     done = batch.examples.filter(
-        assignments__user=request.user, assignments__is_annotated=1,
+        assignments__user=request.user,
+        assignments__is_annotated=1,
     ).count()
     total = batch.examples.count()
     progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
@@ -90,7 +91,8 @@ def edit(request, assignment_id):
     # Progress Bar
     # Progress Bar
     done = batch.examples.filter(
-        assignments__user=request.user, assignments__is_annotated=1,
+        assignments__user=request.user,
+        assignments__is_annotated=1,
     ).count()
     total = batch.examples.count()
     progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}

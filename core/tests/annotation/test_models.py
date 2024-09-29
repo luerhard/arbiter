@@ -1,5 +1,6 @@
-from data.models import Batch
 import pytest
+
+from data.models import Batch
 
 
 class TestBatchModel:

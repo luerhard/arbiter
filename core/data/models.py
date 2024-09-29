@@ -181,7 +181,10 @@ class Example(models.Model):
             raise NotImplementedError(msg)
 
     def set_user_annotations(
-        self, user, label_ids: list[int], phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
+        self,
+        user,
+        label_ids: list[int],
+        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
     ):
         assignment = ExampleAssignment.objects.get(example=self, user=user)
         assignment.set_user_annotations(label_ids=label_ids, phase=phase)

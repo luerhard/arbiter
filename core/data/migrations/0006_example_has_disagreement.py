@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0005_rename_is_confirmed_exampleassignment_is_discussed"),
     ]

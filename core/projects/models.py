@@ -28,13 +28,15 @@ class Project(models.Model):
     @property
     def annotators(self):
         return User.objects.filter(
-            projectuser__project=self, projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__project=self,
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
         )
 
     @property
     def experts(self):
         return User.objects.filter(
-            projectuser__project=self, projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__project=self,
+            projectuser__role=ProjectUser.Role.EXPERT,
         )
 
     def __str__(self):
