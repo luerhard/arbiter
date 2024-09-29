@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Literal
 
 from django.db import models
@@ -53,14 +54,84 @@ class ExampleAssignment(models.Model):
     user = models.ForeignKey(User, related_name="assignments", on_delete=models.CASCADE)
     order = models.PositiveIntegerField(db_index=True)
     is_annotated = models.BooleanField(default=False)
-    is_confirmed = models.BooleanField(default=False)
+    is_discussed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
+
+    def previous(self):
+        return (
+            ExampleAssignment.objects.filter(
+                example__batch=self.example.batch,
+                user=self.user,
+                order__lt=self.order,
+            )
+            .order_by("-order")
+            .first()
+        )
+
+    def next(self):
+        return (
+            ExampleAssignment.objects.filter(
+                example__batch=self.example.batch,
+                user=self.user,
+                order__gt=self.order,
+            )
+            .order_by("order")
+            .first()
+        )
+
+    def set_user_annotations(
+        self,
+        label_ids: list[int],
+        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
+    ):
+        phase = getattr(Annotation.Phase, phase)
+        self.is_annotated = 1
+
+        # delete previous annotations if any
+        Annotation.objects.filter(phase=phase, assignment=self).delete()
+
+        # set new annotations
+        updates = []
+        for label in self.example.labels.all():
+            if label.pk in label_ids:
+                new = Annotation(assignment=self, label=label, phase=phase)
+                updates.append(new)
+        Annotation.objects.bulk_create(updates)
+        self.save()
+
+        # check for disagreement during annotation phase
+        if phase == Annotation.Phase.ANNOTATION:
+            self.check_for_disagreement()
+
+    def check_for_disagreement(self):
+        # Get annotations for anntation phase
+        assignments = ExampleAssignment.objects.filter(
+            example=self.example,
+            is_annotated=True,
+            annotations__phase=Annotation.Phase.ANNOTATION,
+        ).prefetch_related("annotations__label", "user")
+
+        # group by user
+        user_annotations = defaultdict(set)
+        for assignment in assignments:
+            for annotation in assignment.annotations.all():
+                user_annotations[assignment.user.id].add(annotation.label.id)
+
+        unique_annotations = {frozenset(labels) for labels in user_annotations.values()}
+
+        if len(unique_annotations) > 1:
+            self.example.has_disagreement = True
+        else:
+            self.example.has_disagreement = False
+
+        self.example.save()
 
     def save(self, *args, **kwargs):
         # auto set order for the first time
         if self.order is None:
             max_order = ExampleAssignment.objects.filter(
-                user=self.user, example__batch=self.example.batch
+                user=self.user,
+                example__batch=self.example.batch,
             ).aggregate(max_order=models.Max("order"))["max_order"]
 
             # if there are no other entries
@@ -72,6 +143,7 @@ class ExampleAssignment(models.Model):
 class Example(models.Model):
     batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
+    has_disagreement = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["pk"]
@@ -109,22 +181,7 @@ class Example(models.Model):
             raise NotImplementedError(msg)
 
     def set_user_annotations(
-        self,
-        user,
-        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
-        label_ids: list[int],
+        self, user, label_ids: list[int], phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
     ):
-        assignment, _ = ExampleAssignment.objects.get_or_create(sentence=self, user=user)
-        assignment.is_annotated = 1
-
-        phase = getattr(Annotation.Phase, phase)
-
-        Annotation.objects.filter(phase=phase, assignment=assignment).delete()
-
-        updates = []
-        for label in self.labels.all():
-            if label.pk in label_ids:
-                new = Annotation(assignment=assignment, label=label, phase=phase)
-                updates.append(new)
-        Annotation.objects.bulk_create(updates)
-        assignment.save()
+        assignment = ExampleAssignment.objects.get(example=self, user=user)
+        assignment.set_user_annotations(label_ids=label_ids, phase=phase)

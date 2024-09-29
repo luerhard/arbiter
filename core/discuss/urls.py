@@ -3,9 +3,10 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("overview/", views.overview, name="discuss-list"),
+    path("", views.overview, name="discuss-list"),
     # path("batch<int:batch_id>/", views.discuss_batch, name="discuss-batch"),
-    path("chat/<int:batch_id>/", views.chat_simple, name="discuss-batch"),
+    path("<int:batch_id>", views.chat_simple, name="discuss-batch"),
+    path("done", views.done, name="discussion-done"),
 ]
 
 htmx_patterns = [

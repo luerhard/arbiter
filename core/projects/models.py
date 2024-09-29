@@ -28,13 +28,13 @@ class Project(models.Model):
     @property
     def annotators(self):
         return User.objects.filter(
-            projectuser__project=self, projectuser__role=ProjectUser.Role.ANNOTATOR
+            projectuser__project=self, projectuser__role=ProjectUser.Role.ANNOTATOR,
         )
 
     @property
     def experts(self):
         return User.objects.filter(
-            projectuser__project=self, projectuser__role=ProjectUser.Role.EXPERT
+            projectuser__project=self, projectuser__role=ProjectUser.Role.EXPERT,
         )
 
     def __str__(self):
@@ -42,9 +42,16 @@ class Project(models.Model):
 
 
 class Batch(models.Model):
+    class Phase(models.TextChoices):
+        SETUP = "S", "Setup"
+        ANNOTATION = "A", "Annotation"
+        DISCUSSION = "D", "Discussion"
+        EXPERT = "E", "ExpertDecision"
+        FINAL = "F", "Finalized"
+
     project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
-    annotation_done = models.BooleanField(default=False)
+    phase = models.CharField(max_length=1, choices=Phase, db_index=True)
 
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"

@@ -24,16 +24,16 @@ module.exports = (env, argv) => {
             path: path.resolve(__dirname, "dist"),
         },
         plugins: [
-            new CleanWebpackPlugin(),
+            // new CleanWebpackPlugin(),
             new MiniCssExtractPlugin({
                 filename: isProduction ? '[name].[contenthash].css' : '[name].css',
             }),
-            new PurgeCSSPlugin({
-                paths: glob.sync(path.resolve(__dirname, "core/**/*.{html,js}"), { nodir: true }),
-                safelist: ["message", "self-message", "other-message"],
-                safelistPatterns: [/thead/, /tbody/],
-                safelistPatternsChildren: [/table/],
-            }),
+            // new PurgeCSSPlugin({
+            //     paths: glob.sync(path.resolve(__dirname, "core/**/*.{html,js}"), { nodir: true }),
+            //     safelist: ["message", "self-message", "other-message"],
+            //     safelistPatterns: [/thead/, /tbody/],
+            //     safelistPatternsChildren: [/table/],
+            // }),
         ],
         module: {
             rules: [

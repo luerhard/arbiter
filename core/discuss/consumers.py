@@ -1,9 +1,10 @@
 import json
-from pprint import pprint
 
+from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.paginator import Paginator
+from django.urls import reverse
 
 from .models import Message
 from .models import Room
@@ -32,13 +33,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             self.scope["room_state"]["online_users"].add(self.user)
 
-        if "sentence_page" not in self.scope["room_state"]:
-            self.scope["room_state"]["sentence_page"] = 1
+        if "page" not in self.scope["room_state"]:
+            self.scope["room_state"]["page"] = 1
 
         await self.group_send_user_connected()
 
         if self.scope["room_state"]["online_users"] == self.scope["room_state"]["required_users"]:
-            await self.group_send_current_sentence()
+            await self.group_send_current_example()
 
         # SET UP SYNCED BUTTONS
         if "clicked_done" not in self.scope["room_state"]:
@@ -53,7 +54,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        pprint(data)
 
         # if chat message is sent
         if "message" in data.keys():
@@ -66,83 +66,83 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_chat_message(username=username, message=message)
 
         elif "clicked-done" in data.keys():
-            await self.save_confirmed_annotations(json.loads(data["labels"]))
+            labels = [int(label_id) for label_id in json.loads(data["labels"]) if label_id.strip()]
+            await self.save_annotation(labels)
             await self.group_send_user_done()
 
-    # SENTENCE UI
-    def get_sentence(self, page):
-        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement_labels=True).all()
+    @async_to_sync
+    async def group_send_done(self):
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                "type": "send_done",
+            },
+        )
+
+    async def send_done(self, event):  # noqa: ARG002
+        await self.send(
+            text_data=json.dumps({"done": reverse("discussion-done")}, ensure_ascii=False),
+        )
+
+    # Example UI
+    def get_example(self, page):
+        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).all()
         paginator = Paginator(queryset, 1)
-        page = paginator.get_page(page)
+        page_obj = paginator.get_page(page)
+
+        if page_obj.number < page:
+            self.group_send_done()
         try:
-            sentence = page.object_list[0]
+            example = page_obj.object_list[0]
         except IndexError as e:
             raise e
 
-        return sentence
+        return example
 
     @database_sync_to_async
-    def sentence_annotations(self, page):
-        sentence = self.get_sentence(page)
+    def example_annotations(self, page):
+        example = self.get_example(page)
         annotations = {}
         for user in self.scope["room_state"]["online_users"]:
             labels = []
-            annotation_set = sentence.annotations(user)
-            for anno in annotation_set:
+            query = example.get_user_annotations(user, phase="ANNOTATION").select_related("label")
+            label_set = {anno.label for anno in query}
+            for label in example.labels.all():
                 labels.append(
                     {
-                        "id": anno.label.id,
-                        "is_set": anno.is_set,
-                        "label": anno.label.name,
+                        "id": label.id,
+                        "label": label.name,
+                        "is_set": True if label in label_set else False,
                     },
                 )
             annotations[user.username] = labels
 
-        return sentence, annotations
+        return example, annotations
 
     @database_sync_to_async
-    def save_confirmed_annotations(self, annotations):
-        sentence = self.get_sentence(self.scope["room_state"]["sentence_page"])
-        project_labels = {str(label.id): label for label in sentence.batch.project.labels.all()}
-        new_labels = []
-        for label_id, is_set in annotations.items():
-            label = project_labels[label_id]
-            label_annotation = ConfirmedAnnotation(
-                sentence=sentence,
-                user=self.user,
-                label=label,
-                is_set=is_set,
-            )
-            new_labels.append(label_annotation)
+    def save_annotation(self, label_ids):
+        example = self.get_example(self.scope["room_state"]["page"])
+        example.set_user_annotations(user=self.user, label_ids=label_ids, phase="DISCUSSION")
 
-        ConfirmedAnnotation.objects.bulk_create(
-            new_labels,
-            update_conflicts=True,
-            update_fields=("is_set", "last_updated"),
-            unique_fields=("sentence", "user", "label"),
-        )
-        sentence.is_discussed = True
-        sentence.save()
-
-    async def group_send_current_sentence(self):
-        sentence, prev_annotations = await self.sentence_annotations(
-            self.scope["room_state"]["sentence_page"],
+    async def group_send_current_example(self):
+        example, prev_annotations = await self.example_annotations(
+            self.scope["room_state"]["page"],
         )
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                "type": "send_current_sentence",
-                "update-sentence": sentence.content,
+                "type": "send_current_example",
+                "update-example": example.content,
                 "update-labels": prev_annotations,
             },
         )
 
-    async def send_current_sentence(self, event):
+    async def send_current_example(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "update-sentence": event["update-sentence"],
+                    "update-example": event["update-example"],
                     "update-labels": event["update-labels"],
                     "current-user": self.user.username,
                 },
@@ -150,26 +150,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
             ),
         )
 
-    async def group_send_next_sentence(self):
-        self.scope["room_state"]["sentence_page"] += 1
-        sentence, prev_annotations = await self.sentence_annotations(
-            self.scope["room_state"]["sentence_page"],
+    async def group_send_next_example(self):
+        self.scope["room_state"]["page"] += 1
+        example, prev_annotations = await self.example_annotations(
+            self.scope["room_state"]["page"],
         )
 
         await self.channel_layer.group_send(
             self.room_group_name,
             {
-                "type": "send_next_sentence",
-                "update-sentence": sentence.content,
+                "type": "send_next_example",
+                "update-example": example.content,
                 "update-labels": prev_annotations,
             },
         )
 
-    async def send_next_sentence(self, event):
+    async def send_next_example(self, event):
         await self.send(
             text_data=json.dumps(
                 {
-                    "update-sentence": event["update-sentence"],
+                    "update-example": event["update-example"],
                     "update-labels": event["update-labels"],
                     "current-user": self.user.username,
                 },
@@ -187,7 +187,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         chat_msg = "All users done. Next sentence."
         await self.group_send_chat_message(username="system", message=chat_msg)
 
-        await self.group_send_next_sentence()
+        await self.group_send_next_example()
 
         # reset clicked_done
         clicked_done = self.scope["room_state"]["clicked_done"]
@@ -244,15 +244,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message_to_db(self, username, message):
         room = self.get_or_create_room()
-        sentence = self.get_sentence(self.scope["room_state"]["sentence_page"])
-        Message.objects.create(room=room, sentence=sentence, user=username, message=message)
+        example = self.get_example(self.scope["room_state"]["page"])
+        Message.objects.create(room=room, example=example, user=username, message=message)
         return None
 
     # ONLINE STATUS
 
     @database_sync_to_async
     def get_assigned_annotators(self):
-        return Batch.objects.get(id=self.batch_id).project.annotators
+        return set(Batch.objects.get(id=self.batch_id).project.annotators)
 
     @staticmethod
     def create_n_online_message(n_online):

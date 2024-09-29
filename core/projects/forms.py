@@ -108,3 +108,12 @@ class BatchForm(forms.ModelForm):
                 assignment.save()
 
         return batch
+
+
+class BatchPhaseForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ["phase"]
+        widgets = {
+            "phase": forms.Select(choices=Batch.Phase.choices, attrs={"class": "form-select"}),
+        }

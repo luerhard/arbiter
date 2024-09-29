@@ -26,6 +26,7 @@
         <div class="card">
             <div class="card-body">
                 <h2 class="card-title text-center pb-5">Annotate Sentence</h2>
+                <div id="progress-bar-container"></div>
                 <div class="card">
                     <div class="card-body" id="sentence"></div>
                 </div>
@@ -38,6 +39,6 @@
             </div>
         </div>
     </div>
-    <div hx-get="{% url 'annotate-batch' project_id=project_id batch_number=batch_number %}?sentence={{ sent_obj.page_number }}"
+    <div hx-get="{% url 'annotate-batch' batch_id=batch.id assignment_id=assignment.id %}"
          hx-trigger="load"></div>
 {% endblock content %}

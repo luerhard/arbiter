@@ -5,7 +5,7 @@
             <h1>Project: {{ project.name }}</h1>
             <!-- show annotators assigned to this project -->
             <div class="container">
-                {% include "partials/assigned_users.html" %}
+                {% include "projects/partials/detail_header.html" %}
                 <!-- show batches assigned to this project if there are any -->
                 {% if batches %}
                     {% for batch in batches %}
@@ -15,17 +15,10 @@
                                 <div class="d-flex flex-row mb-4">
                                     <form id="form{{ batch.batch.id }}"
                                           class="form-check form-switch"
-                                          hx-post="{% url 'toggle-finalize' %}"
-                                          hx-trigger="change"
-                                          hx-target="#output{{ batch.batch.id }}"
-                                          hx-swap="outerHTML">
+                                          hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
+                                          hx-trigger="change">
                                         {% csrf_token %}
-                                        <input class="form-check-input"
-                                               type="checkbox"
-                                               id="check{{ batch.batch.id }}"
-                                               {% if batch.annotation_done %}checked{% endif %}>
-                                        <label class="form-check-label" for="check{{ batch.batch.id }}">Annotation Step Locked</label>
-                                        <input type="hidden" name="batch" value="{{ batch.batch.id }}">
+                                        {{ batch.batch_phase_form.as_p }}
                                     </form>
                                     <div class="fadeout-2" id="output{{ batch.batch.id }}">&nbsp;</div>
                                 </div>
@@ -37,10 +30,7 @@
                                     <thead>
                                         <tr>
                                             <th>Annotation Step</th>
-                                            <th>
-                                                <a href="{% url 'export-annotations' batch_id=batch.batch.id %}"
-                                                   class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
-                                            </th>
+                                            <th></th>
                                         </tr>
                                         <tr>
                                             <th>User</th>
@@ -48,29 +38,26 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {% for batch_user in batch.batch_users %}
+                                        {% for user in batch.users %}
                                             <tr>
-                                                <td>{{ batch_user.user }}</td>
-                                                <td>{{ batch_user.annotated }} / {{ batch.length }}</td>
+                                                <td>{{ user.user.username }}</td>
+                                                <td>{{ user.annotated }} / {{ batch.length }}</td>
                                             </tr>
                                         {% endfor %}
                                     </tbody>
                                     <thead>
                                         <tr>
                                             <th>Discussion Step</th>
-                                            <th>
-                                                <div class="flex items-center">
-                                                    <a href="{% url 'export-confirmed-annotations' batch_id=batch.batch.id %}"
-                                                       class="link-pimary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h3"></i></a>
-                                                </div>
-                                            </th>
+                                            <th></th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
-                                            <td>Sentences discussed:</td>
-                                            <td>{{ batch.is_discussed }} / {{ batch.length }}</td>
-                                        </tr>
+                                        {% for user in batch.users %}
+                                            <tr>
+                                                <td>{{ user.user.username }}</td>
+                                                <td>{{ user.discussed }} / {{ batch.disagreement }}</td>
+                                            </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>

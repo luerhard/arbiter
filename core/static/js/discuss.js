@@ -88,17 +88,19 @@ export function updateCurrentLabels(data) {
 export function collectLabels() {
     const container = document.getElementById("current-labels");
     const boxes = container.querySelectorAll("input[type='checkbox']");
-    let selected = new Map();
+    let selected = [];
     boxes.forEach(box => {
-        selected[box.id] = Number(box.checked);
+        if (box.checked) {
+            selected.push(box.id);
+        }
     });
 
     return JSON.stringify(selected);
 }
 
-export function updateSentence(data) {
-    const sentenceField = document.getElementById("current-sentence");
-    sentenceField.innerHTML = data["update-sentence"];
+export function updateExample(data) {
+    const exampleField = document.getElementById("current-example");
+    exampleField.innerHTML = data["update-example"];
 }
 
 export function lockButtons() {

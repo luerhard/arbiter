@@ -20,7 +20,7 @@
                                             <td>
                                                 <a href="{% url 'discuss-batch' batch_id=batch.batch.pk %}">Batch {{ batch.batch.batch_number }}</a>
                                             </td>
-                                            <td>{{ batch.disagreement }} / {{ batch.total }}</td>
+                                            <td>{{ batch.disagreement }} / {{ batch.length }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

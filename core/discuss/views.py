@@ -1,30 +1,44 @@
 from django.db.models import Sum
+from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
+
+from data.models import Example
 from projects.models import Batch
+from projects.models import Project
+from projects.models import ProjectUser
 
 # Create your views here.
 
 
 def overview(request):
     user = request.user
-    new = {}
-    for project, batches in user.discuss_batches.items():
-        new_batches = []
-        for batch in batches:
-            total = batch.sentences.count()
-            disagreement = list(batch.sentences.aggregate(Sum("has_disagreement_labels")).values())[
-                0
-            ]
-            if not disagreement:
-                disagreement = 0
-            new_batches.append({"batch": batch, "total": total, "disagreement": int(disagreement)})
-        new[project] = new_batches
+    context = {"projects": {}}
+    projects = Project.objects.filter(
+        project_users__user=user, project_users__role=ProjectUser.Role.ANNOTATOR,
+    )
+    for project in projects.prefetch_related("batches"):
+        batches = []
+        for batch in project.batches.all():
+            if not batch.phase == Batch.Phase.DISCUSSION:
+                continue
 
-    context = {"projects": new}
+            batch_data = {
+                "batch": batch,
+                "length": batch.examples.count(),
+                "disagreement": Example.objects.filter(batch=batch, has_disagreement=True).count(),
+            }
+            batches.append(batch_data)
+
+        context["projects"][project] = batches
+
     return render(request, "discuss/overview.html", context)
+
+
+def done(request):  # noqa: ARG001
+    return HttpResponse("ALL DONE.")
 
 
 def chat_simple(request, batch_id):
