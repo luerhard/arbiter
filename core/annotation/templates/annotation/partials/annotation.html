@@ -7,8 +7,7 @@
         <button id="next-btn"
                 class="btn btn-outline-primary"
                 hx-get="{% url 'annotate-batch' batch_id=batch.id assignment_id=assignment.id cursor='prev' %}"
-                hx-trigger="click,keydown[keyCode==37] from:window"
-                hx-push-url="true">
+                hx-trigger="click,keydown[keyCode==37] from:window">
             <i class="bi bi-arrow-left"></i>
         </button>
     {% endif %}
@@ -26,8 +25,7 @@
         <button id="next-btn"
                 class="btn btn-outline-primary"
                 hx-get="{% url 'annotate-batch' batch_id=batch.id assignment_id=assignment.id cursor='next' %}"
-                hx-trigger="click,keydown[keyCode==39] from:body"
-                hx-push-url="true">
+                hx-trigger="click,keydown[keyCode==39] from:body">
             <i class="bi bi-arrow-right"></i>
         </button>
     {% endif %}

@@ -77,7 +77,9 @@ def annotate_batch(
     context["label_form"] = form
 
     if request.htmx:
-        return render(request, "annotation/partials/annotation.html", context)
+        response = render(request, "annotation/partials/annotation.html", context)
+        response["Hx-Replace-Url"] = f"{assignment.id}"
+        return response
     else:
         return render(request, "annotation/batch.html", context)
 
