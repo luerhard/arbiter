@@ -80,7 +80,8 @@ def annotate_batch(
     if request.htmx:
         response = render(request, "annotation/partials/annotation.html", context)
         response["Hx-Replace-Url"] = reverse(
-            "annotate-batch", kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
+            "annotate-batch",
+            kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
         )
         return response
     else:
