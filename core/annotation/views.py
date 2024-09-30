@@ -3,6 +3,7 @@ from typing import Literal
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
+from django.urls import reverse
 
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
@@ -78,7 +79,9 @@ def annotate_batch(
 
     if request.htmx:
         response = render(request, "annotation/partials/annotation.html", context)
-        response["Hx-Replace-Url"] = f"{assignment.id}"
+        response["Hx-Replace-Url"] = reverse(
+            "annotate-batch", kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
+        )
         return response
     else:
         return render(request, "annotation/batch.html", context)
