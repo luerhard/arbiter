@@ -1,17 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
-    <table class="table">
-        <tr>
-            <th>Project</th>
-            <th>Meta</th>
-        </tr>
-        {% for project in projects %}
-            <tr>
-                <td>
-                    <a href="{% url 'project-detail' project.pk %}">{{ project.name }}</a>
-                </td>
-                <td>Meta</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="row">
+        <div class="col mt-4">
+            {% for project in projects %}
+                <div class="card">
+                    <div class="card-header px-3 bg-white">
+                        <h6 class="mb-0">{{ project.name }}</h6>
+                    </div>
+                    <div class="card-body pt-0 p-3">
+                        <ul class="list-group">
+                            <li class="list-group-item border-0 d-flex p-4 mb-2 border-radius-lg">
+                                <a class="btn btn-primary" href="{% url 'project-detail' project.pk %}">Go to Project</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock content %}

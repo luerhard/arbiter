@@ -53,7 +53,9 @@ class Batch(models.Model):
 
     project = models.ForeignKey(Project, related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
-    phase = models.CharField(max_length=1, choices=Phase, db_index=True)
+    phase = models.CharField(
+        default=Phase.SETUP, null=False, blank=False, max_length=1, choices=Phase, db_index=True,
+    )
 
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"

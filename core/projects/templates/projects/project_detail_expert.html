@@ -1,30 +1,37 @@
 {% extends "base.html" %}
+{% load widget_tweaks %}
 {% block content %}
-    <div class="card">
-        <div class="card-body">
-            <h1>Project: {{ project.name }}</h1>
-            <!-- show annotators assigned to this project -->
-            <div class="container">
-                {% include "projects/partials/detail_header.html" %}
-                <!-- show batches assigned to this project if there are any -->
-                {% if batches %}
-                    {% for batch in batches %}
-                        <div class="card mt-3">
-                            <div class="card-body">
-                                <h5 class="card-title mb-4">Batch {{ batch.batch.batch_number }}</h5>
-                                <div class="d-flex flex-row mb-4">
-                                    <form id="form{{ batch.batch.id }}"
-                                          class="form-check form-switch"
-                                          hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
-                                          hx-trigger="change">
-                                        {% csrf_token %}
-                                        {{ batch.batch_phase_form.as_p }}
-                                    </form>
-                                    <div class="fadeout-2" id="output{{ batch.batch.id }}">&nbsp;</div>
+    <div class="row pb-5">
+        <div class="col-sm-4 mt-3">{% include "projects/partials/detail_header.html" %}</div>
+        <div class="col-sm-8 mt-3">
+            <div class="card">
+                <div class="card-header border-bottom-0">
+                    <div class="d-flex justify-content-center">
+                        <h2 class="fw-bold">Batches</h2>
+                    </div>
+                </div>
+                <div class="card-body card-list">
+                    {% if batches %}
+                        {% for batch in batches reversed %}
+                            <div class="card">
+                                <div class="card-header">
+                                    <div class="d-flex justify-content-between">
+                                        <h4 class="fw-bold">Batch {{ batch.batch.batch_number }}</h4>
+                                        <a href="{% url 'export-batch' batch_id=batch.batch.id %}"
+                                           class="btn btn-primary btn-rounded"><i class="bi bi-file-earmark-arrow-down-fill h6"></i> Download</a>
+                                    </div>
                                 </div>
-                                <div class="d-flex">
-                                    <a href="{% url 'export-batch' batch_id=batch.batch.id %}"
-                                       class="link-primary text-decoration-none"><i class="bi bi-file-earmark-arrow-down-fill h6"></i> Download Batch</a>
+                                <div class="card-body m-1">
+                                    <div class="d-flex flex-row align-items-center">
+                                        <span class="fw-bold">Change Batch Phase:</span>
+                                        <form id="form{{ batch.batch.id }}"
+                                              class="form-check form-switch"
+                                              hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
+                                              hx-trigger="change">
+                                            {% csrf_token %}
+                                            {% render_field batch.batch_phase_form.phase class="form-control border border-info" %}
+                                        </form>
+                                    </div>
                                 </div>
                                 <table class="table simple-info-table">
                                     <thead>
@@ -61,10 +68,10 @@
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    {% endif %}
                 </div>
-            {% endif %}
+            </div>
         </div>
     </div>
 {% endblock content %}
