@@ -32,8 +32,12 @@ def project_detail_view(request, project_id):
     context["project"] = project
 
     # get assigned users
-    context["annotators"] = all_project_users.filter(projectuser__role=ProjectUser.Role.ANNOTATOR)
-    context["experts"] = all_project_users.filter(projectuser__role=ProjectUser.Role.EXPERT)
+    context["annotators"] = all_project_users.filter(
+        projectuser__project=project, projectuser__role=ProjectUser.Role.ANNOTATOR,
+    )
+    context["experts"] = all_project_users.filter(
+        projectuser__project=project, projectuser__role=ProjectUser.Role.EXPERT,
+    )
 
     # get associated batches
     batches = context["project"].batches.all()
