@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0003_remove_batch_annotation_done_batch_phase"),
     ]
@@ -14,6 +13,17 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="batch",
             name="phase",
-            field=models.CharField(choices=[("S", "Setup"), ("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision"), ("F", "Finalized")], db_index=True, default="S", max_length=1),
+            field=models.CharField(
+                choices=[
+                    ("S", "Setup"),
+                    ("A", "Annotation"),
+                    ("D", "Discussion"),
+                    ("E", "ExpertDecision"),
+                    ("F", "Finalized"),
+                ],
+                db_index=True,
+                default="S",
+                max_length=1,
+            ),
         ),
     ]
