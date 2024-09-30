@@ -5,6 +5,8 @@ import "htmx-ext-ws";
 // boostrap-icons
 import "bootstrap-icons/font/bootstrap-icons.scss";
 import * as bootstrap from 'bootstrap';
+// Mouse hotkeys
+import * as mousetrap from 'mousetrap';
 // Place any custom JS here
 
 import * as funcs from "./functions";

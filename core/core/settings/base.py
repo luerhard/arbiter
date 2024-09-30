@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "projects",
     "annotation",
     "discuss",
+    "expert",
 ]
 
 MIDDLEWARE = [
