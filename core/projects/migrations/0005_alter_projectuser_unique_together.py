@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0004_alter_batch_phase"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
