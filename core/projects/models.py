@@ -16,6 +16,9 @@ class ProjectUser(models.Model):
 
     role = models.CharField(max_length=1, choices=Role, default=Role.ANNOTATOR)
 
+    class Meta:
+        unique_together = ("project", "user")
+
     def __str__(self) -> str:
         return f"{self.user.username} -> {self.role} -> {self.project.name}"
 
