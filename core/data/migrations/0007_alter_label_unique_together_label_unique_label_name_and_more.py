@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0006_example_has_disagreement"),
         ("projects", "0006_alter_projectuser_unique_together_and_more"),
@@ -18,7 +17,9 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="label",
-            constraint=models.UniqueConstraint(fields=("project", "name"), name="unique_label_name"),
+            constraint=models.UniqueConstraint(
+                fields=("project", "name"), name="unique_label_name"
+            ),
         ),
         migrations.AddConstraint(
             model_name="label",
