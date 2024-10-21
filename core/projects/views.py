@@ -17,7 +17,11 @@ User = get_user_model()
 
 
 def project_list_view(request):
-    project_users = ProjectUser.objects.filter(user=request.user)
+    project_users = (
+        ProjectUser.objects.filter(user=request.user)
+        .prefetch_related("project")
+        .order_by("-project__pk")
+    )
     context = {"project_users": project_users}
     return render(request, "projects/project_list.html", context)
 
