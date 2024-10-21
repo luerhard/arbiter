@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0005_alter_projectuser_unique_together"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -19,6 +18,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="projectuser",
-            constraint=models.UniqueConstraint(fields=("project", "user"), name="unique_project_user"),
+            constraint=models.UniqueConstraint(
+                fields=("project", "user"), name="unique_project_user"
+            ),
         ),
     ]
