@@ -18,7 +18,10 @@ class Label(models.Model):
         return self.name
 
     class Meta:
-        unique_together = ("project", "name")
+        constraints = [
+            models.UniqueConstraint(fields=("project", "name"), name="unique_label_name"),
+            models.UniqueConstraint(fields=("project", "hotkey"), name="unique_hotkey"),
+        ]
 
 
 class Annotation(models.Model):
