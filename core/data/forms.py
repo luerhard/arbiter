@@ -20,9 +20,9 @@ class MultiLabelForm(forms.Form):
         self.shortcuts = []
         choices = []
         initial = []
-        for shortcut, label in enumerate(self.example.labels.all(), 1):
-            text = f"{label.name} ({shortcut})"
-            self.shortcuts.append(shortcut)
+        for label in self.example.labels.all():
+            text = f"{label.name}"
+            self.shortcuts.append(label.hotkey)
             choice = (label.id, text)
             choices.append(choice)
             if label in annotation_labels:

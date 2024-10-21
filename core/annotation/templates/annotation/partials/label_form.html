@@ -1,3 +1,4 @@
+{% load custom_tags %}
 {% load widget_tweaks %}
 <div id="labels" hx-swap-oob="innerHTML:#labels">
     <form id="label-form"
@@ -7,10 +8,13 @@
           method="post">
         {% csrf_token %}
         <div class="d-flex btn-group" role="group">
-            {% for checkbox in label_form.labels %}
-                <input type="checkbox" name="labels" class="btn-check" id={{ checkbox.id_for_label }} value="{{ checkbox.data.value }}" autocomplete="off" {% if checkbox.data.value in label_form.labels.value %}checked{% endif %} data-hotkey="{{ forloop.counter }}" />
-                <label for="{{ checkbox.id_for_label }}" class="btn btn-outline-primary">{{ checkbox.choice_label }}</label>
-            {% endfor %}
-        </div>
-    </form>
-</div>
+            {% for checkbox, shortcut in label_form.labels|zip_lists:label_form.shortcuts %}
+                <input type="checkbox" name="labels" class="btn-check" id={{ checkbox.id_for_label }} value="{{ checkbox.data.value }}" autocomplete="off" {% if checkbox.data.value in label_form.labels.value %}checked{% endif %} data-hotkey="{{ shortcut }}" />
+                <label for="{{ checkbox.id_for_label }}" class="btn btn-outline-primary">
+                    {{ checkbox.choice_label }}
+                    {% if shortcut %}({{ shortcut }}){% endif %}
+                    </label>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
