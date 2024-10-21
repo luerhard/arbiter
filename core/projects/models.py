@@ -17,7 +17,9 @@ class ProjectUser(models.Model):
     role = models.CharField(max_length=1, choices=Role, default=Role.ANNOTATOR)
 
     class Meta:
-        unique_together = ("project", "user")
+        constraints = [
+            models.UniqueConstraint(fields=("project", "user"), name="unique_project_user"),
+        ]
 
     def __str__(self) -> str:
         return f"{self.user.username} -> {self.role} -> {self.project.name}"
@@ -28,19 +30,43 @@ class Project(models.Model):
     description = models.TextField()
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
 
+    def user_role(self, user):
+        return ProjectUser.objects.filter(project=self, user=user)
+
+    @property
+    def annotator_n_active_batches(self):
+        return Batch.objects.filter(
+            project=self,
+            phase__in=[Batch.Phase.ANNOTATION, Batch.Phase.DISCUSSION],
+        ).count()
+
+    @property
+    def annotator_any_annotation_batches(self):
+        return Batch.objects.filter(
+            project=self,
+            phase__in=[Batch.Phase.ANNOTATION],
+        ).exists()
+
+    @property
+    def annotator_any_discussion_batches(self):
+        return Batch.objects.filter(
+            project=self,
+            phase__in=[Batch.Phase.DISCUSSION],
+        ).exists()
+
     @property
     def annotators(self):
         return User.objects.filter(
             projectuser__project=self,
             projectuser__role=ProjectUser.Role.ANNOTATOR,
-        )
+        ).select_related("projectuser")
 
     @property
     def experts(self):
         return User.objects.filter(
             projectuser__project=self,
             projectuser__role=ProjectUser.Role.EXPERT,
-        )
+        ).select_related("projectuser")
 
     def __str__(self):
         return self.name

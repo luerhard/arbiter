@@ -17,8 +17,8 @@ User = get_user_model()
 
 
 def project_list_view(request):
-    projects = Project.objects.filter(project_users__user=request.user)
-    context = {"projects": projects}
+    project_users = ProjectUser.objects.filter(user=request.user)
+    context = {"project_users": project_users}
     return render(request, "projects/project_list.html", context)
 
 
