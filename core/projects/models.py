@@ -59,14 +59,14 @@ class Project(models.Model):
         return User.objects.filter(
             projectuser__project=self,
             projectuser__role=ProjectUser.Role.ANNOTATOR,
-        ).select_related("projectuser")
+        )
 
     @property
     def experts(self):
         return User.objects.filter(
             projectuser__project=self,
             projectuser__role=ProjectUser.Role.EXPERT,
-        ).select_related("projectuser")
+        )
 
     def __str__(self):
         return self.name
