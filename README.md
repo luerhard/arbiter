@@ -64,10 +64,15 @@ This installs all the Node.js dependencies listed in the package.json file. Thes
 This command installs all the Python dependencies specified in the pyproject.toml file using Poetry, a dependency management tool for Python. It ensures that all the required libraries and frameworks are available for the backend.
 
 - #### npm start: 
-This runs the development server for the frontend, defined in the package.json file under the start script. It typically starts a local server (like webpack-dev-server) to serve the frontend assets and enable live reloading for development.
+This runs the development server for the frontend, defined in the package.json file under the start script. It typically starts a local server (like webpack-dev-server) to serve the frontend assets and enable live reloading for development. If you keep this running in a seperate terminal, it will continuously monitor the files for changes and reload upon changes (see Some insights on Webpack with --watch Option below)
 
 - #### python manage.py runserver: 
 This command starts the Django development server on a local machine, allowing you to access the backend of the web application in your browser. It serves the API and the backend logic necessary for the application to function.
+
+- #### test the web application
+You can typically access the django server with a local url like http://127.0.0.1:8000/ (this will be output in your terminal). If you want to test it using the users created for the development server, you need to copy the database from the development server to your local directory. To get the right version, it is best to ask Lukas for it.
+
+
 
 ## Some insights on Webpack with --watch Option
 Webpack is a powerful module bundler for JavaScript applications. The --watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.
