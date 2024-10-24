@@ -17,6 +17,7 @@ def annotate_batch(
     assignment_id: int = None,
     cursor: Literal["next", "prev"] | None = None,
 ):
+    """This is some text - wow"""
     batch = Batch.objects.get(id=batch_id)
     project = batch.project
 

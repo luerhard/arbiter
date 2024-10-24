@@ -64,6 +64,9 @@ python manage.py migrate
 
 We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.
 
+Webpack is a powerful module bundler for JavaScript applications. The --watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.
+
+
 To run webpack, run
 ```bash
 npm start
@@ -97,3 +100,5 @@ Whenever the output tells you that there are **unapplied migrations**, run:
 cd core
 poetry run python manage.py migrate
 ```
+
+This should spawn a webserver that is accessible in the browser via [http://127.0.0.1:8000](http://127.0.0.1:8000).
