@@ -116,9 +116,11 @@ You can configure <code class="docutils literal notranslate"><span class="pre">p
 <section id="copy-the-sqlite-test-db">
 <h3>3. Copy the sqlite Test-DB<a class="headerlink" href="#copy-the-sqlite-test-db" title="Link to this heading"></a></h3>
 <p>The test database is necessary to have some sample data in your database while developing locally.
-The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.
-You can download the sqlite test database from here: <code class="xref download myst docutils literal notranslate"><span class="pre">db.sqlite3</span></code></p>
-<p>Download it to the root of the repo and you should be good to go.</p>
+The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.</p>
+<p>To copy the test database to its required location, run (from the root of the repo):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>docs/db.sqlite3<span class="w"> </span>.
+</pre></div>
+</div>
 <p>In case django tells you that migrations are unapplied, run (from the root of the repo):</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
 
