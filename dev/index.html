@@ -20,7 +20,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Welcome" href="../index.html" /> 
+    <link rel="next" title="API Documentation" href="../api/index.html" />
+    <link rel="prev" title="Usage" href="../usage/index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -43,6 +44,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">A guide for devs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-python-dependencies">1. Install python dependencies</a></li>
@@ -55,8 +57,22 @@
 <li class="toctree-l3"><a class="reference internal" href="#run-django-server">2. Run Django Server</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#development-server">Development Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#access">Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#current-users">Current Users</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#admin">admin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotator1">annotator1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotator2">annotator2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expert1">expert1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expert2">expert2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#passwords">Passwords</a></li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a></li>
 </ul>
 
         </div>
@@ -75,7 +91,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">A guide for devs</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/dev/installation.md.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/dev/index.md.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -138,6 +154,7 @@ python<span class="w"> </span>manage.py<span class="w"> </span>migrate
 <section id="run-webpack">
 <h3>1. Run webpack<a class="headerlink" href="#run-webpack" title="Link to this heading"></a></h3>
 <p>We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.</p>
+<p>Webpack is a powerful module bundler for JavaScript applications. The –watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.</p>
 <p>To run webpack, run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>start
 </pre></div>
@@ -164,6 +181,54 @@ poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> 
 poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
 </pre></div>
 </div>
+<p>This should spawn a webserver that is accessible in the browser via <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
+</section>
+</section>
+<section id="development-server">
+<h2>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h2>
+<section id="access">
+<h3>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h3>
+<p>We now have a development Server which serves as a showcase of the current state of the project.</p>
+<p>The adress is: <a class="reference external" href="http://193.196.54.251">http://193.196.54.251</a></p>
+<p>To access it, you need to be in the University of Stuttgart VPN (or physically on campus).</p>
+</section>
+<section id="current-users">
+<h3>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h3>
+<section id="admin">
+<h4>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on <a class="reference external" href="http://193.196.54.251/admin">http://193.196.54.251/admin</a>. If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.</p></li>
+</ul>
+</section>
+<section id="annotator1">
+<h4>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>default annotator without special permissions</p></li>
+</ul>
+</section>
+<section id="annotator2">
+<h4>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>same as annotator1. Exists because we want 2 annotators for each project</p></li>
+</ul>
+</section>
+<section id="expert1">
+<h4>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>A role to show the expert interface.</p></li>
+</ul>
+</section>
+<section id="expert2">
+<h4>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h4>
+<ul class="simple">
+<li><p>A second expert.</p></li>
+<li><p>expert2 should behave the same as expert1.</p></li>
+</ul>
+</section>
+<section id="passwords">
+<h4>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h4>
+<p>every user has a password of “123”.</p>
+</section>
 </section>
 </section>
 </section>
@@ -172,7 +237,8 @@ poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../usage/index.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../api/index.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
