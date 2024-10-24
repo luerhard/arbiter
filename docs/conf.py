@@ -23,11 +23,14 @@ release = "0.0.1"
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
+    "sphinxcontrib_django",
 ]
 
 myst_enable_extensions = [
     "colon_fence",
 ]
+
+autodoc_member_order = "bysource"
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
@@ -38,6 +41,12 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**.ipynb_checkpoints"]
 sys.path.append(str(Path(__file__).parent.parent / "core"))
 os.environ["DJANGO_SETTINGS_MODULE"] = "core.settings"
 django.setup()
+
+django_settings = "core.settings"
+# Include the database table names of Django models
+django_show_db_tables = True  # Boolean, default: False
+# Add abstract database tables names (only takes effect if django_show_db_tables is True)
+django_show_db_tables_abstract = True  # Boolean, default: False
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

@@ -1012,6 +1012,17 @@ dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
+name = "pprintpp"
+version = "0.4.0"
+description = "A drop-in replacement for pprint that's actually pretty"
+optional = false
+python-versions = "*"
+files = [
+    {file = "pprintpp-0.4.0-py2.py3-none-any.whl", hash = "sha256:b6b4dcdd0c0c0d75e4d7b2f21a9e933e5b2ce62b26e1a54537f9651ae5a5c01d"},
+    {file = "pprintpp-0.4.0.tar.gz", hash = "sha256:ea826108e2c7f49dc6d66c752973c3fc9749142a798d6b254e1e301cfdbc6403"},
+]
+
+[[package]]
 name = "pyasn1"
 version = "0.6.0"
 description = "Pure-Python implementation of ASN.1 types and DER/BER/CER codecs (X.208)"
@@ -1497,6 +1508,28 @@ standalone = ["Sphinx (>=5)"]
 test = ["pytest"]
 
 [[package]]
+name = "sphinxcontrib-django"
+version = "2.5"
+description = "Improve the Sphinx autodoc for Django classes."
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "sphinxcontrib-django-2.5.tar.gz", hash = "sha256:45a54c0cc1f641d6c15872828862f0738348ca8d7d5b92777bcaa530678c2cc4"},
+    {file = "sphinxcontrib_django-2.5-py3-none-any.whl", hash = "sha256:70148af4ccbb5184c5b1add939c3827c79a29a7d20ed18c25ceab347e3f14ca8"},
+]
+
+[package.dependencies]
+Django = ">=3.2"
+pprintpp = "*"
+Sphinx = ">=3.4.0"
+
+[package.extras]
+dev = ["pre-commit"]
+doc = ["sphinx-last-updated-by-git", "sphinx-rtd-theme"]
+optional = ["django-mptt", "django-phonenumber-field[phonenumbers]", "psycopg2-binary"]
+test = ["coverage", "pytest", "pytest-icdiff", "requests-mock"]
+
+[[package]]
 name = "sphinxcontrib-htmlhelp"
 version = "2.1.0"
 description = "sphinxcontrib-htmlhelp is a sphinx extension which renders HTML help files"
@@ -1765,4 +1798,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<4.0"
-content-hash = "2208f20b158e3354253962c7c3dd00adbcc5e217a6e63c27400a3ffe405eda60"
+content-hash = "adced284cf37c7cf2b815114f48c82b1837f826252d6176ac8c9b6de5765b987"
