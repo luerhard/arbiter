@@ -1,0 +1,199 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>A guide for devs &mdash; AnnotationTool 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0432c510" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="Welcome" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            AnnotationTool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">A guide for devs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#install-python-dependencies">1. Install python dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-node-requirements">2. Install node requirements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#copy-the-sqlite-test-db">3. Copy the sqlite Test-DB</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-app-locally">Running the app locally</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-webpack">1. Run webpack</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-django-server">2. Run Django Server</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">AnnotationTool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">A guide for devs</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev/installation.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="a-guide-for-devs">
+<h1>A guide for devs<a class="headerlink" href="#a-guide-for-devs" title="Link to this heading"></a></h1>
+<p>We currently use a couple of techonologies that are required to contribute.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<section id="install-python-dependencies">
+<h3>1. Install python dependencies<a class="headerlink" href="#install-python-dependencies" title="Link to this heading"></a></h3>
+<p>To manage our python environment, we use <code class="docutils literal notranslate"><span class="pre">poetry</span></code>. Install poetry in your system or any other python installation or (better) via <code class="docutils literal notranslate"><span class="pre">pipx</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>poetry
+</pre></div>
+</div>
+<p>I would strongly advise to keep your virtual environment close to your source code.
+You can configure <code class="docutils literal notranslate"><span class="pre">poetry</span></code> in that way by running</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>virtualenvs.in-project<span class="w"> </span><span class="nb">true</span>
+</pre></div>
+</div>
+<p>To create the virtual environment and install all requirements, run (from the root of the repo):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">install</span>
+</pre></div>
+</div>
+</section>
+<section id="install-node-requirements">
+<h3>2. Install node requirements<a class="headerlink" href="#install-node-requirements" title="Link to this heading"></a></h3>
+<p>For everything JavaScript and SCSS, we use npm as a package manager.
+<a class="reference external" href="https://nodejs.org/en/learn/getting-started/how-to-install-nodejs">Click here</a> for installation instructions.</p>
+<p>Once node (and npm) are installed, run (from the root of the repo):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="copy-the-sqlite-test-db">
+<h3>3. Copy the sqlite Test-DB<a class="headerlink" href="#copy-the-sqlite-test-db" title="Link to this heading"></a></h3>
+<p>The test database is necessary to have some sample data in your database while developing locally.
+The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.
+You can download the sqlite test database from here: <code class="xref download myst docutils literal notranslate"><span class="pre">db.sqlite3</span></code></p>
+<p>Download it to the root of the repo and you should be good to go.</p>
+<p>In case django tells you that migrations are unapplied, run (from the root of the repo):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
+
+<span class="c1"># either</span>
+poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+<span class="c1"># or</span>
+poetry<span class="w"> </span>shell
+python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</pre></div>
+</div>
+</section>
+</section>
+<section id="running-the-app-locally">
+<h2>Running the app locally<a class="headerlink" href="#running-the-app-locally" title="Link to this heading"></a></h2>
+<section id="run-webpack">
+<h3>1. Run webpack<a class="headerlink" href="#run-webpack" title="Link to this heading"></a></h3>
+<p>We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.</p>
+<p>To run webpack, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>start
+</pre></div>
+</div>
+<p>Initially, this will create the <code class="docutils literal notranslate"><span class="pre">dist/</span></code> folder and put all necessary static files in it.
+If you do not intend to change any CSS, SCSS or .js files, you can just kill the server by <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> in the terminal.
+However, I would strongly recommend to just keep it running.
+It will automatically recompile all necessary files if they change.</p>
+</section>
+<section id="run-django-server">
+<h3>2. Run Django Server<a class="headerlink" href="#run-django-server" title="Link to this heading"></a></h3>
+<p>To run the django server that actually serves the site, there are a couple of options.</p>
+<p>First, you can run (from the root of the directory):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>django
+</pre></div>
+</div>
+<p>This is just a shortcut for</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
+poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>runserver
+</pre></div>
+</div>
+<p>Whenever the output tells you that there are <strong>unapplied migrations</strong>, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
+poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Welcome" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

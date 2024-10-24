@@ -1,4 +1,0 @@
-{
-    "python.testing.cwd": "${workspaceFolder}/core",
-    "python.analysis.extraPaths": ["${workspaceFolder}/core"]
-}
