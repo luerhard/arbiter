@@ -40,9 +40,12 @@ npm install
 
 The test database is necessary to have some sample data in your database while developing locally.
 The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.
-You can download the sqlite test database from here: <path:db.sqlite3>
 
-Download it to the root of the repo and you should be good to go.
+To copy the test database to its required location, run (from the root of the repo):
+
+```bash
+cp docs/db.sqlite3 .
+```
 
 In case django tells you that migrations are unapplied, run (from the root of the repo):
 ```bash
