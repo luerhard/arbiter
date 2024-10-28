@@ -10,6 +10,77 @@
     --breakpoint-xl: 1200px;
 }
 
+
+/* Checked state */
+.btn-check-color:checked+.btn-custom-color {
+    background-color: var(--label-color);
+    border-color: var(--label-color);
+    color: var(--text-color);
+
+    &:hover {
+        background-color: var(--label-color);
+        border-color: var(--label-color);
+        color: var(--text-color);
+        filter: brightness(110%);
+
+    }
+}
+
+.btn-check-color:not(checked)+.btn-custom-color {
+    background-color: transparent;
+    border-color: var(--label-color);
+    color: var(--label-color);
+
+    &:hover {
+        background-color: transparent;
+        border-color: var(--label-color);
+        color: var(--label-color);
+        filter: brightness(110%);
+    }
+}
+
+/*
+.btn-group .btn-check-custom {
+    border-color: var(--custom-color) !important;
+    color: var(--custom-color) !important;
+    background-color: transparent;
+
+}
+
+.btn-group .btn-check-custom:checked {
+    color: var(--text-color) !important;
+    background-color: var(--custom-color) !important;
+    border-color: var(--custom-color) !important;
+
+}
+
+.btn-group .btn-custom-outline {
+    border-color: var(--custom-color) !important;
+    color: var(--custom-color) !important;
+    background-color: transparent;
+}
+
+.btn-group .btn-custom-outline:checked {
+    background-color: var(--custom-color) !important;
+    border-color: var(--custom-color) !important;
+    color: var(--text-color) !important;
+}
+
+.btn-group .btn-custom-outline:hover {
+    background-color: var(--custom-color);
+    color: var(--text-color);
+}
+
+.btn-custom-outline.btn-check:checked+.btn-custom-outline,
+.btn-custom-outline:checked,
+.btn-custom-outline[aria-pressed="true"] {
+    background-color: var(--custom-color) !important;
+    color: var(--text-color) !important;
+}
+    */
+
+
+
 .card-list {
     padding: 0;
     border-collapse: collapse;
@@ -28,13 +99,6 @@
     ;
 }
 
-#message-input {
-    @extend .form-control;
-    outline: none !important;
-    box-shadow: none !important;
-    // border-color: initial !important;
-}
-
 .chat-message-container {
     @extend .p-2;
     border: 1px solid rgb(193, 185, 185);
@@ -43,6 +107,14 @@
     height: 50vh;
     overflow: auto;
 }
+
+#message-input {
+    @extend .form-control;
+    outline: none !important;
+    box-shadow: none !important;
+    // border-color: initial !important;
+}
+
 
 .message {
     @extend .p-2;

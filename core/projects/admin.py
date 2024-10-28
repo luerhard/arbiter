@@ -15,7 +15,8 @@ class ProjectUserInline(admin.TabularInline):
 
 class LabelInline(admin.TabularInline):
     model = Label
-    extra = 2
+    min_num = 1
+    extra = 0
 
 
 class BatchInline(admin.TabularInline):
