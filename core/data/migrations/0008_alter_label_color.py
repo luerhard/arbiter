@@ -5,7 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0007_alter_label_unique_together_label_unique_label_name_and_more"),
     ]
@@ -14,6 +13,8 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="label",
             name="color",
-            field=colorfield.fields.ColorField(default="#2c3e50", image_field=None, max_length=7, samples=None),
+            field=colorfield.fields.ColorField(
+                default="#2c3e50", image_field=None, max_length=7, samples=None
+            ),
         ),
     ]
