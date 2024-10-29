@@ -39,8 +39,19 @@
     }
 }
 
-.btn-check-color:disabled+.btn-custom-color {
-    filter: brightness(50%);
+.btn-check-color:not(checked):disabled+.btn-custom-color {
+    border-color: var(--label-color);
+    background-color: transparent;
+    color: var(--label-color);
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.btn-check-color:checked:disabled+.btn-custom-color {
+    border-color: var(--label-color);
+    background-color: var(--label-color);
+    color: var(--text-color);
+    opacity: 0.8;
     cursor: not-allowed;
 }
 
