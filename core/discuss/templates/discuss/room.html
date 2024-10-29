@@ -73,6 +73,11 @@
                 console.log("unlock save button");
                 lib.discuss.unlockSaveDone();
             }
+            document.querySelectorAll('.btn-custom-color').forEach(button => {
+                const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
+                const textColor = lib.funcs.inferTextColorByContrast(color)
+                button.style.setProperty("--text-color", textColor);
+            });
         })
 
         // handle everything after sending data

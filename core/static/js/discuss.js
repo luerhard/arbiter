@@ -24,15 +24,27 @@ export function updatePrevLabels(data) {
         buttonDiv.className = "btn-group d-flex flex-wrap";
 
         labels.forEach(label => {
-            let button = document.createElement("button");
-            button.disabled = true;
+
+            let checkbox = document.createElement("input");
+            checkbox.disabled = true;
+            checkbox.id = username + label["id"];
+            checkbox.type = "checkbox";
+            checkbox.className = "btn-check btn-check-color";
+            checkbox.innerHTML = label["label"];
             if (label["is_set"]) {
-                button.className = "btn btn-primary";
+                checkbox.checked = true;
             } else {
-                button.className = "btn btn-outline-primary";
+                checkbox.checked = false;
             }
-            button.innerHTML = label["label"];
-            buttonDiv.appendChild(button);
+            buttonDiv.appendChild(checkbox);
+
+            let checkboxLabel = document.createElement("label");
+            checkboxLabel.innerHTML = label["label"];
+            checkboxLabel.htmlFor = username + label["id"];
+            checkboxLabel.className = "btn btn-custom-color";
+            checkboxLabel.style.setProperty("--label-color", label["color"]);
+
+            buttonDiv.appendChild(checkboxLabel);
 
         })
         if (username == data["current-user"]) {
@@ -66,7 +78,7 @@ export function updateCurrentLabels(data) {
     data["update-labels"][user].forEach(label => {
         let checkbox = document.createElement("input");
         checkbox.type = "checkbox";
-        checkbox.className = "btn-check";
+        checkbox.className = "btn-check btn-check-color";
         checkbox.id = label["id"];
         checkbox.name = "label_" + label["id"];
         buttonGroup.appendChild(checkbox);
@@ -74,7 +86,8 @@ export function updateCurrentLabels(data) {
         let checkboxLabel = document.createElement("label");
         checkboxLabel.innerHTML = label["label"];
         checkboxLabel.htmlFor = label["id"];
-        checkboxLabel.className = "btn btn-outline-primary";
+        checkboxLabel.className = "btn btn-custom-color";
+        checkboxLabel.style.setProperty("--label-color", label["color"]);
         buttonGroup.appendChild(checkboxLabel)
 
         if (label["is_set"] == true) {
