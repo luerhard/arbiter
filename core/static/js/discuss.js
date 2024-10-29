@@ -9,7 +9,7 @@ export function updatePrevLabels(data) {
         container.appendChild(textDiv);
 
         let titleText = document.createElement("p");
-        titleText.className = "d-flex mt-3 mb-3 text-muted"
+        titleText.className = "d-flex mt-3 mb-3";
         if (username == data["current-user"]) {
             // save own title text to buffer
             titleText.innerHTML = "Your previous annotations:";
@@ -67,7 +67,7 @@ export function updateCurrentLabels(data) {
     const container = document.getElementById("current-labels");
     container.innerHTML = "";
     let titleText = document.createElement("p");
-    titleText.className = "mt-3 mb-3 text-muted";
+    titleText.className = "mt-3 mb-3";
     titleText.innerHTML = "Your revised annotation:";
     container.appendChild(titleText);
 

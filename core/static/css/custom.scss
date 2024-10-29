@@ -39,6 +39,11 @@
     }
 }
 
+.btn-check-color:disabled+.btn-custom-color {
+    filter: brightness(50%);
+    cursor: not-allowed;
+}
+
 .card-list {
     padding: 0;
     border-collapse: collapse;
