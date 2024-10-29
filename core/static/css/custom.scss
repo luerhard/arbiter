@@ -11,7 +11,7 @@
 }
 
 
-/* Checked state */
+/* Colored checkboxes for labels*/
 .btn-check-color:checked+.btn-custom-color {
     background-color: var(--label-color);
     border-color: var(--label-color);
@@ -38,48 +38,6 @@
         filter: brightness(110%);
     }
 }
-
-/*
-.btn-group .btn-check-custom {
-    border-color: var(--custom-color) !important;
-    color: var(--custom-color) !important;
-    background-color: transparent;
-
-}
-
-.btn-group .btn-check-custom:checked {
-    color: var(--text-color) !important;
-    background-color: var(--custom-color) !important;
-    border-color: var(--custom-color) !important;
-
-}
-
-.btn-group .btn-custom-outline {
-    border-color: var(--custom-color) !important;
-    color: var(--custom-color) !important;
-    background-color: transparent;
-}
-
-.btn-group .btn-custom-outline:checked {
-    background-color: var(--custom-color) !important;
-    border-color: var(--custom-color) !important;
-    color: var(--text-color) !important;
-}
-
-.btn-group .btn-custom-outline:hover {
-    background-color: var(--custom-color);
-    color: var(--text-color);
-}
-
-.btn-custom-outline.btn-check:checked+.btn-custom-outline,
-.btn-custom-outline:checked,
-.btn-custom-outline[aria-pressed="true"] {
-    background-color: var(--custom-color) !important;
-    color: var(--text-color) !important;
-}
-    */
-
-
 
 .card-list {
     padding: 0;
