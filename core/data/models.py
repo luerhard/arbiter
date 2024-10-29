@@ -1,6 +1,7 @@
 from collections import defaultdict
 from typing import Literal
 
+from colorfield.fields import ColorField
 from django.db import models
 
 from projects.models import Batch
@@ -11,7 +12,7 @@ from users.models import User
 class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    color = models.CharField(max_length=7, default="#007bff")  # Store color codes
+    color = ColorField(max_length=7, default="#2c3e50")
     hotkey = models.CharField(max_length=1, null=True, blank=True)
 
     def __str__(self):

@@ -17,19 +17,22 @@ class MultiLabelForm(forms.Form):
             ).select_related("label")
         }
 
-        self.shortcuts = []
-        choices = []
+        label_details = []
         initial = []
         for label in self.example.labels.all():
-            text = f"{label.name}"
-            self.shortcuts.append(label.hotkey)
-            choice = (label.id, text)
-            choices.append(choice)
+            label_data = {
+                "id": label.id,
+                "name": label.name,
+                "color": label.color,
+                "hotkey": label.hotkey,
+            }
+            label_details.append(label_data)
             if label in annotation_labels:
                 initial.append(label.id)
 
-        self.fields["labels"].choices = choices
         self.fields["labels"].initial = initial
+        self.fields["labels"].choices = [(label["id"], label["name"]) for label in label_details]
+        self.label_details = label_details
 
     def save(self, commit=True):  # noqa: ARG002
         data = self.cleaned_data

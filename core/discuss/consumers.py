@@ -112,6 +112,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     {
                         "id": label.id,
                         "label": label.name,
+                        "color": label.color,
                         "is_set": True if label in label_set else False,
                     },
                 )

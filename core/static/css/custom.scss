@@ -10,6 +10,51 @@
     --breakpoint-xl: 1200px;
 }
 
+
+/* Colored checkboxes for labels*/
+.btn-check-color:checked+.btn-custom-color {
+    background-color: var(--label-color);
+    border-color: var(--label-color);
+    color: var(--text-color);
+
+    &:hover {
+        background-color: var(--label-color);
+        border-color: var(--label-color);
+        color: var(--text-color);
+        filter: brightness(110%);
+
+    }
+}
+
+.btn-check-color:not(checked)+.btn-custom-color {
+    background-color: transparent;
+    border-color: var(--label-color);
+    color: var(--label-color);
+
+    &:hover {
+        background-color: transparent;
+        border-color: var(--label-color);
+        color: var(--label-color);
+        filter: brightness(110%);
+    }
+}
+
+.btn-check-color:not(checked):disabled+.btn-custom-color {
+    border-color: var(--label-color);
+    background-color: transparent;
+    color: var(--label-color);
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+.btn-check-color:checked:disabled+.btn-custom-color {
+    border-color: var(--label-color);
+    background-color: var(--label-color);
+    color: var(--text-color);
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
 .card-list {
     padding: 0;
     border-collapse: collapse;
@@ -28,13 +73,6 @@
     ;
 }
 
-#message-input {
-    @extend .form-control;
-    outline: none !important;
-    box-shadow: none !important;
-    // border-color: initial !important;
-}
-
 .chat-message-container {
     @extend .p-2;
     border: 1px solid rgb(193, 185, 185);
@@ -43,6 +81,14 @@
     height: 50vh;
     overflow: auto;
 }
+
+#message-input {
+    @extend .form-control;
+    outline: none !important;
+    box-shadow: none !important;
+    // border-color: initial !important;
+}
+
 
 .message {
     @extend .p-2;
