@@ -17,6 +17,9 @@ from django.shortcuts import render
 #         form = UserRegistrationForm()
 #     return render(request, "core/register.html", {"form": form})
 
+# Finishing page
+def thank_you(request):
+    return render(request, "Thank_you.html")
 
 @login_not_required
 def user_login(request):
@@ -44,6 +47,12 @@ def user_profile(request):
 
     groups = {group.name for group in user.groups.all()}
 
+ #redirection
+    if "Annotator" in groups:
+        task_completed = True  
+        if task_completed:
+            return redirect("thank_you")
+
     context = {
         "is_admin": "Admin" in groups,
         "is_expert": "Expert" in groups,
@@ -51,3 +60,5 @@ def user_profile(request):
     }
 
     return render(request, "users/profile.html", context)
+
+
