@@ -1,4 +1,5 @@
 import json
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
@@ -10,6 +11,9 @@ from .models import Message
 from .models import Room
 from data.models import Example
 from projects.models import Batch
+
+
+log = logging.getLogger(__name__)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -54,6 +58,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        log.debug(f'Received: {data}')
 
         # if chat message is sent
         if "message" in data.keys():
@@ -91,10 +96,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         page_obj = paginator.get_page(page)
 
         if page_obj.number < page:
+            log.debug('Sending done to group.')
             self.group_send_done()
         try:
             example = page_obj.object_list[0]
         except IndexError as e:
+            log.error('Couldn\'t get new examples.')
             raise e
 
         return example
@@ -103,6 +110,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def example_annotations(self, page):
         example = self.get_example(page)
         annotations = {}
+        log.debug(f'Got example: {example}')
         for user in self.scope["room_state"]["online_users"]:
             labels = []
             query = example.get_user_annotations(user, phase="ANNOTATION").select_related("label")
@@ -117,7 +125,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
             annotations[user.username] = labels
-
+        
+        log.debug(f'Returning annotations: {annotations}')
         return example, annotations
 
     @database_sync_to_async
@@ -219,9 +228,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             f"<div class='{container_class}'><div class='message {div_class}'>{msg}</div></div>"
         )
         composed_message = f"<div hx-swap-oob='beforeend:#messages'>{message_html}</div>"
+        log.debug(f'Created the following message: {composed_message}')
         return composed_message
 
     async def group_send_chat_message(self, username, message):
+        log.debug(f'Send message from {username}: {message}')
         # store message in db
         await self.save_message_to_db(username=username, message=message)
         await self.channel_layer.group_send(
@@ -244,6 +255,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def save_message_to_db(self, username, message):
+        log.debug(f'Save message from {username}: {message}')
         room = self.get_or_create_room()
         example = self.get_example(self.scope["room_state"]["page"])
         Message.objects.create(room=room, example=example, user=username, message=message)
@@ -263,6 +275,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def group_send_user_connected(self):
         self.scope["room_state"]["n_online"] += 1
         msg = f"{self.user.username} is now connected."
+        log.debug(msg)
         await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
@@ -282,6 +295,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.scope["room_state"]["online_users"].discard(self.user)
 
         msg = f"{self.user.username} has disconnected."
+        log.debug(msg)
         await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
