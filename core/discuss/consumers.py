@@ -99,7 +99,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def send_end_annotation(self, event):  # noqa: ARG002
         """Notify the connected clients in group that annotation ended."""
         await self.send(
-            text_data=json.dumps({"done": reverse("projects")}, ensure_ascii=False),
+            text_data=json.dumps({"done": "/projects"}, ensure_ascii=False),
         )
 
     # Example UI
@@ -111,11 +111,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if page_obj.number < page:
             log.debug("No more annotations left, initiating the end of discussing annotations.")
             return
-        try:
-            example = page_obj.object_list[0]
-        except IndexError as e:
-            log.error("Couldn't get new examples.")
-            raise e
+
+        # This code will always return the last page when the last page was reached
+        # Therefore, try/except clause is redundant
+        example = page_obj.object_list[0]
 
         return example
 
@@ -156,7 +155,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         result = await self.example_annotations(
             self.scope["room_state"]["page"],
         )
-        if not result:
+        if not result and not self.annotation_ended:
             await self.manage_end_annotation()
             return
 
@@ -189,7 +188,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.scope["room_state"]["page"],
         )
 
-        if not result:
+        if not result and not self.annotation_ended:
+            # This should fire only once
             await self.manage_end_annotation()
             return
 
