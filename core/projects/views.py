@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import HttpResponse
@@ -9,7 +11,6 @@ from .forms import BatchPhaseForm
 from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
-import logging
 from projects.models import Batch
 from projects.models import Project
 from projects.models import ProjectUser

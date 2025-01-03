@@ -51,8 +51,16 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        "file_discuss": {"class": "logging.FileHandler", "filename": "discuss.log", "formatter": "verbose"},
-        "file_projects": {"class": "logging.FileHandler", "filename": "projects.log", "formatter": "verbose"},
+        "file_discuss": {
+            "class": "logging.FileHandler",
+            "filename": "discuss.log",
+            "formatter": "verbose",
+        },
+        "file_projects": {
+            "class": "logging.FileHandler",
+            "filename": "projects.log",
+            "formatter": "verbose",
+        },
     },
     "formatters": {
         "verbose": {

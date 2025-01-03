@@ -5,7 +5,6 @@ from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.paginator import Paginator
-from django.urls import reverse
 
 from .models import AnnotationEndReason
 from .models import Message
@@ -98,16 +97,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Notify the connected clients in group that annotation ended."""
         await self.channel_layer.group_send(
             self.room_group_name,
-            {
-                "type": "send_end_annotation",
-                "reason": reason.value
-            },
+            {"type": "send_end_annotation", "reason": reason.value},
         )
 
     async def send_end_annotation(self, event):  # noqa: ARG002
         """Notify the connected clients in group that annotation ended."""
         await self.send(
-            text_data=json.dumps({"done": "/projects", "reason": event["reason"]}, ensure_ascii=False),
+            text_data=json.dumps(
+                {"done": "/projects", "reason": event["reason"]}, ensure_ascii=False
+            ),
         )
 
     # Example UI
@@ -123,9 +121,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         if not queryset.count():
-            # For now the only assumption will be that there 
+            # For now the only assumption will be that there
             # is no disagreement and the examples are PRESENT
-            log.warning("Failed to get example. Examples with disagreements queryset count is zero.")
+            log.warning(
+                "Failed to get example. Examples with disagreements queryset count is zero."
+            )
             if not self.discussion_ended:
                 # batch = next(iter(Batch.objects.filter(batch_number=self.batch_id-1)))
                 # batch.set_phase(Batch.Phase.EXPERT)
