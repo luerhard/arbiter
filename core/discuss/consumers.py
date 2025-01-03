@@ -1,9 +1,6 @@
 import json
 import logging
-import asyncio
-import traceback
 
-from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.paginator import Paginator
@@ -13,7 +10,6 @@ from .models import Message
 from .models import Room
 from data.models import Example
 from projects.models import Batch
-
 
 log = logging.getLogger(__name__)
 
@@ -58,7 +54,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def disconnect(self, close_code):  # noqa: ARG002
         if not self.annotation_ended:
             await self.group_send_user_disconnected()
-            
+
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         if self.annotation_ended and self.scope["room_state"]["n_online"] == 0:
@@ -66,7 +62,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        log.debug(f'Received: {data}')
+        log.debug(f"Received: {data}")
 
         # if chat message is sent
         if "message" in data.keys():
@@ -85,7 +81,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def manage_end_annotation(self):
         """Run when no more examples left in the project."""
-        log.debug('Notifying the group that annotation ended.')
+        log.debug("Notifying the group that annotation ended.")
         message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
         await self.group_send_chat_message(username="system", message=message)
         await self.group_end_annotation()
@@ -112,12 +108,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         page_obj = paginator.get_page(page)
 
         if page_obj.number < page:
-            log.debug('No more annotations left, initiating the end of discussing annotations.')
+            log.debug("No more annotations left, initiating the end of discussing annotations.")
             return
         try:
             example = page_obj.object_list[0]
         except IndexError as e:
-            log.error('Couldn\'t get new examples.')
+            log.error("Couldn't get new examples.")
             raise e
 
         return example
@@ -128,7 +124,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not example:
             return
         annotations = {}
-        log.debug(f'Got example: {example}')
+        log.debug(f"Got example: {example}")
         for user in self.scope["room_state"]["online_users"]:
             labels = []
             query = example.get_user_annotations(user, phase="ANNOTATION").select_related("label")
@@ -143,8 +139,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     },
                 )
             annotations[user.username] = labels
-        
-        log.debug(f'Returning annotations: {annotations}')
+
+        log.debug(f"Returning annotations: {annotations}")
         return [example, annotations]
 
     @database_sync_to_async
@@ -260,11 +256,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             f"<div class='{container_class}'><div class='message {div_class}'>{msg}</div></div>"
         )
         composed_message = f"<div hx-swap-oob='beforeend:#messages'>{message_html}</div>"
-        log.debug(f'Created the following message: {composed_message}')
+        log.debug(f"Created the following message: {composed_message}")
         return composed_message
 
     async def group_send_chat_message(self, username, message):
-        log.debug(f'Send message from {username}: {message}')
+        log.debug(f"Send message from {username}: {message}")
         # store message in db
         await self.save_message_to_db(username=username, message=message)
         await self.channel_layer.group_send(
@@ -286,15 +282,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": chat_message}, ensure_ascii=False))
 
     @database_sync_to_async
-    def save_message_to_db(self, username:str, message:str) -> None:
+    def save_message_to_db(self, username: str, message: str) -> None:
         """Save a message from a user to the database.
-        
+
         Parameters:
         -------
         username: [str] The origin username of the message.
         message: [str] The message to be saved.
         """
-        log.debug(f'Save message from {username}: {message}')
+        log.debug(f"Save message from {username}: {message}")
         room = self.get_or_create_room()
         example = self.get_example(self.scope["room_state"]["page"])
         if example:
