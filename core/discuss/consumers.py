@@ -81,7 +81,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def manage_end_annotation(self):
         """Run when no more examples left in the project."""
         self.annotation_ended = True
-        log.debug('Notifying the group that annotation ended.')
+        log.debug("Notifying the group that annotation ended.")
         log.debug("Notifying the group that annotation ended.")
         message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
         await self.group_send_chat_message(username="system", message=message)
