@@ -43,38 +43,31 @@ MIDDLEWARE += [
 STATICFILES_DIRS = [BASE_DIR.parent.parent / "dist", BASE_DIR.parent / "static"]
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
         },
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'discuss.log',
-            'formatter': 'verbose'
+        "file": {"class": "logging.FileHandler", "filename": "discuss.log", "formatter": "verbose"},
+    },
+    "formatters": {
+        "verbose": {
+            "format": "{name} {levelname} {asctime} {filename}:{lineno} {funcName}\n{message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'formatters': {
-        'verbose': {
-            'format': '{name} {levelname} {asctime} {filename}:{lineno} {funcName}\n{message}',
-            'style': '{',
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
-        'discuss': {
-            'level': 'DEBUG',
-            'handlers': ['file']
-        },
+        "discuss": {"level": "DEBUG", "handlers": ["file"]},
     },
 }
