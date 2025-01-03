@@ -1,7 +1,5 @@
 import json
 import logging
-import asyncio
-import traceback
 
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
@@ -56,9 +54,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # GENERAL
     async def disconnect(self, close_code):  # noqa: ARG002
-        if not self.annotation_ended:
-            await self.group_send_user_disconnected()
-            
+        await self.group_send_user_disconnected()
+
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
         if self.annotation_ended and self.scope["room_state"]["n_online"] == 0:
@@ -85,6 +82,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def manage_end_annotation(self):
         """Run when no more examples left in the project."""
+        self.annotation_ended = True
         log.debug('Notifying the group that annotation ended.')
         message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
         await self.group_send_chat_message(username="system", message=message)
