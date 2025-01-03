@@ -5,7 +5,6 @@ from . import views
 urlpatterns = [
     # path("", views.overview, name="discuss-list"),
     path("<int:batch_id>", views.chat_simple, name="discuss-batch"),
-    path("done", views.done, name="discussion-done"),
 ]
 
 htmx_patterns = [

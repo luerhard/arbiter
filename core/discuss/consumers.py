@@ -1,11 +1,13 @@
 import json
 import logging
 
+from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.paginator import Paginator
 from django.urls import reverse
 
+from .models import AnnotationEndReason
 from .models import Message
 from .models import Room
 from data.models import Example
@@ -20,7 +22,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.room_group_name = f"chat_{self.batch_id}"
         self.user = self.scope["user"]
-        self.annotation_ended = False
+        self.discussion_ended = False
+        self.discussion_start = True
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
@@ -56,8 +59,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-        if self.annotation_ended and self.scope["room_state"]["n_online"] == 0:
-            await self.close()
+        if self.discussion_ended and self.scope["room_state"]["n_online"] == 0:
+            log.debug("No users, closing websocket.")
+            await self.close(code=1000)
 
     async def receive(self, text_data):
         data = json.loads(text_data)
@@ -78,28 +82,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.save_annotation(labels)
             await self.group_send_user_done()
 
-    async def manage_end_annotation(self):
+    @async_to_sync
+    async def manage_end_annotation(self, reason):
         """Run when no more examples left in the project."""
-        self.annotation_ended = True
-        log.debug("Notifying the group that annotation ended.")
-        log.debug("Notifying the group that annotation ended.")
-        message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
-        await self.group_send_chat_message(username="system", message=message)
-        await self.group_end_annotation()
+        self.discussion_ended = True
+        log.debug(f"Notifying the group that annotation ended for the following reason {reason}.")
+        if reason == AnnotationEndReason.DISCUSSION_END:
+            message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
+            await self.group_send_chat_message(username="system", message=message)
+        elif reason == AnnotationEndReason.NO_EXAMPLES:
+            ...
+        await self.group_end_annotation(reason)
 
-    async def group_end_annotation(self):
+    async def group_end_annotation(self, reason):
         """Notify the connected clients in group that annotation ended."""
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": "send_end_annotation",
+                "reason": reason.value
             },
         )
 
     async def send_end_annotation(self, event):  # noqa: ARG002
         """Notify the connected clients in group that annotation ended."""
         await self.send(
-            text_data=json.dumps({"done": "/projects"}, ensure_ascii=False),
+            text_data=json.dumps({"done": "/projects", "reason": event["reason"]}, ensure_ascii=False),
         )
 
     # Example UI
@@ -110,19 +118,29 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         if page_obj.number < page:
             log.debug("No more annotations left, initiating the end of discussing annotations.")
+            if not self.discussion_ended:
+                self.manage_end_annotation(AnnotationEndReason.DISCUSSION_END)
             return
 
-        # This code will always return the last page when the last page was reached
-        # Therefore, try/except clause is redundant
+        if not queryset.count():
+            # For now the only assumption will be that there 
+            # is no disagreement and the examples are PRESENT
+            log.warning("Failed to get example. Examples with disagreements queryset count is zero.")
+            if not self.discussion_ended:
+                # batch = next(iter(Batch.objects.filter(batch_number=self.batch_id-1)))
+                # batch.set_phase(Batch.Phase.EXPERT)
+                self.manage_end_annotation(AnnotationEndReason.NO_EXAMPLES)
+            return
         example = page_obj.object_list[0]
-
         return example
 
     @database_sync_to_async
     def example_annotations(self, page):
         example = self.get_example(page)
-        if not example:
+
+        if self.discussion_ended:
             return
+
         annotations = {}
         log.debug(f"Got example: {example}")
         for user in self.scope["room_state"]["online_users"]:
@@ -155,8 +173,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         result = await self.example_annotations(
             self.scope["room_state"]["page"],
         )
-        if not result and not self.annotation_ended:
-            await self.manage_end_annotation()
+
+        if self.discussion_ended:
             return
 
         example, prev_annotations = result
@@ -188,9 +206,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.scope["room_state"]["page"],
         )
 
-        if not result and not self.annotation_ended:
-            # This should fire only once
-            await self.manage_end_annotation()
+        if self.discussion_ended:
             return
 
         example, prev_annotations = result
@@ -263,7 +279,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def group_send_chat_message(self, username, message):
         log.debug(f"Send message from {username}: {message}")
         # store message in db
-        await self.save_message_to_db(username=username, message=message)
+        if not self.discussion_ended:
+            await self.save_message_to_db(username=username, message=message)
         await self.channel_layer.group_send(
             self.room_group_name,
             {"type": "send_chat_message", "message": message, "username": username},

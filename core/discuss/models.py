@@ -1,3 +1,4 @@
+from enum import Enum
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -23,3 +24,10 @@ class Message(models.Model):
 
     def __str__(self) -> str:
         return f"[{self.user.username : self.created_at}] {self.message}"
+
+
+class AnnotationEndReason(Enum):
+    # Signifies that a discussion occurred and all examples were exhausted  
+    DISCUSSION_END: str = "end_discuss"
+    # Signifies that no valid examples had been querried from the database
+    NO_EXAMPLES: str = "no_examples"

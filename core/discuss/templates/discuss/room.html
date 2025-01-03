@@ -62,6 +62,10 @@
                 console.log(intervalID);
             }
 
+            if ("no_examples" == data["reason"]) {
+                document.getElementById("current-example").innerText = "No examples have disagreements."
+            }
+
             // handle incoming websocket messages
             if ("update-example" in data) {
                 console.log("updating example");

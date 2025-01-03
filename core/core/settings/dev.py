@@ -51,7 +51,8 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        "file": {"class": "logging.FileHandler", "filename": "discuss.log", "formatter": "verbose"},
+        "file_discuss": {"class": "logging.FileHandler", "filename": "discuss.log", "formatter": "verbose"},
+        "file_projects": {"class": "logging.FileHandler", "filename": "projects.log", "formatter": "verbose"},
     },
     "formatters": {
         "verbose": {
@@ -68,6 +69,7 @@ LOGGING = {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
-        "discuss": {"level": "DEBUG", "handlers": ["file"]},
+        "discuss": {"level": "DEBUG", "handlers": ["file_discuss"]},
+        "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
     },
 }

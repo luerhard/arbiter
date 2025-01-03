@@ -37,10 +37,6 @@ def overview(request):
     return render(request, "discuss/overview.html", context)
 
 
-def done(request):  # noqa: ARG001
-    return HttpResponse("ALL DONE.")
-
-
 def chat_simple(request, batch_id):
     if request.method == "POST":
         return redirect(reverse("chat", kwargs={"batch_id": batch_id}))
