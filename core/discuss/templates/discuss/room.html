@@ -44,6 +44,9 @@
         </div>
     </div>
     <script>
+        function close_room(data) {
+            window.location = data["done"];
+        }
         // handle everything after receiving data
         document.body.addEventListener('htmx:wsAfterMessage', function(event) {
             // parse JSON data to object
@@ -55,8 +58,12 @@
             container.scrollTop = container.scrollHeight;
 
             if ("done" in data) {
-                a = alert("ALL DONE BYE");
-                window.location.href = data["done"];
+                const intervalID = setInterval(close_room, 60000, data);
+                console.log(intervalID);
+            }
+
+            if ("no_examples" == data["reason"]) {
+                document.getElementById("current-example").innerText = "No examples have disagreements."
             }
 
             // handle incoming websocket messages

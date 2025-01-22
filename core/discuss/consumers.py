@@ -1,15 +1,18 @@
 import json
+import logging
 
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.core.paginator import Paginator
-from django.urls import reverse
 
+from .models import AnnotationEndReason
 from .models import Message
 from .models import Room
 from data.models import Example
 from projects.models import Batch
+
+log = logging.getLogger(__name__)
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -18,6 +21,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.room_group_name = f"chat_{self.batch_id}"
         self.user = self.scope["user"]
+        self.discussion_ended = False
+        self.discussion_start = True
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
@@ -50,10 +55,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # GENERAL
     async def disconnect(self, close_code):  # noqa: ARG002
         await self.group_send_user_disconnected()
+
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+        if self.discussion_ended and self.scope["room_state"]["n_online"] == 0:
+            log.debug("No users, closing websocket.")
+            await self.close(code=1000)
 
     async def receive(self, text_data):
         data = json.loads(text_data)
+        log.debug(f"Received: {data}")
 
         # if chat message is sent
         if "message" in data.keys():
@@ -71,17 +82,30 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_user_done()
 
     @async_to_sync
-    async def group_send_done(self):
+    async def manage_end_annotation(self, reason):
+        """Run when no more examples left in the project."""
+        self.discussion_ended = True
+        log.debug(f"Notifying the group that annotation ended for the following reason {reason}.")
+        if reason == AnnotationEndReason.DISCUSSION_END:
+            message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
+            await self.group_send_chat_message(username="system", message=message)
+        elif reason == AnnotationEndReason.NO_EXAMPLES:
+            ...
+        await self.group_end_annotation(reason)
+
+    async def group_end_annotation(self, reason):
+        """Notify the connected clients in group that annotation ended."""
         await self.channel_layer.group_send(
             self.room_group_name,
-            {
-                "type": "send_done",
-            },
+            {"type": "send_end_annotation", "reason": reason.value},
         )
 
-    async def send_done(self, event):  # noqa: ARG002
+    async def send_end_annotation(self, event):  # noqa: ARG002
+        """Notify the connected clients in group that annotation ended."""
         await self.send(
-            text_data=json.dumps({"done": reverse("discussion-done")}, ensure_ascii=False),
+            text_data=json.dumps(
+                {"done": "/projects", "reason": event["reason"]}, ensure_ascii=False
+            ),
         )
 
     # Example UI
@@ -91,18 +115,34 @@ class ChatConsumer(AsyncWebsocketConsumer):
         page_obj = paginator.get_page(page)
 
         if page_obj.number < page:
-            self.group_send_done()
-        try:
-            example = page_obj.object_list[0]
-        except IndexError as e:
-            raise e
+            log.debug("No more annotations left, initiating the end of discussing annotations.")
+            if not self.discussion_ended:
+                self.manage_end_annotation(AnnotationEndReason.DISCUSSION_END)
+            return
 
+        if not queryset.count():
+            # For now the only assumption will be that there
+            # is no disagreement and the examples are PRESENT
+            log.warning(
+                "Failed to get example. Examples with disagreements queryset count is zero."
+            )
+            if not self.discussion_ended:
+                # batch = next(iter(Batch.objects.filter(batch_number=self.batch_id-1)))
+                # batch.set_phase(Batch.Phase.EXPERT)
+                self.manage_end_annotation(AnnotationEndReason.NO_EXAMPLES)
+            return
+        example = page_obj.object_list[0]
         return example
 
     @database_sync_to_async
     def example_annotations(self, page):
         example = self.get_example(page)
+
+        if self.discussion_ended:
+            return
+
         annotations = {}
+        log.debug(f"Got example: {example}")
         for user in self.scope["room_state"]["online_users"]:
             labels = []
             query = example.get_user_annotations(user, phase="ANNOTATION").select_related("label")
@@ -118,17 +158,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
             annotations[user.username] = labels
 
-        return example, annotations
+        log.debug(f"Returning annotations: {annotations}")
+        return [example, annotations]
 
     @database_sync_to_async
     def save_annotation(self, label_ids):
         example = self.get_example(self.scope["room_state"]["page"])
+        if not example:
+            log.error(f"Couldn't get example for {self.scope["room_state"]["page"] = }")
+            return
         example.set_user_annotations(user=self.user, label_ids=label_ids, phase="DISCUSSION")
 
     async def group_send_current_example(self):
-        example, prev_annotations = await self.example_annotations(
+        result = await self.example_annotations(
             self.scope["room_state"]["page"],
         )
+
+        if self.discussion_ended:
+            return
+
+        example, prev_annotations = result
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -153,9 +202,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def group_send_next_example(self):
         self.scope["room_state"]["page"] += 1
-        example, prev_annotations = await self.example_annotations(
+        result = await self.example_annotations(
             self.scope["room_state"]["page"],
         )
+
+        if self.discussion_ended:
+            return
+
+        example, prev_annotations = result
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -219,11 +273,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             f"<div class='{container_class}'><div class='message {div_class}'>{msg}</div></div>"
         )
         composed_message = f"<div hx-swap-oob='beforeend:#messages'>{message_html}</div>"
+        log.debug(f"Created the following message: {composed_message}")
         return composed_message
 
     async def group_send_chat_message(self, username, message):
+        log.debug(f"Send message from {username}: {message}")
         # store message in db
-        await self.save_message_to_db(username=username, message=message)
+        if not self.discussion_ended:
+            await self.save_message_to_db(username=username, message=message)
         await self.channel_layer.group_send(
             self.room_group_name,
             {"type": "send_chat_message", "message": message, "username": username},
@@ -243,14 +300,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": chat_message}, ensure_ascii=False))
 
     @database_sync_to_async
-    def save_message_to_db(self, username, message):
+    def save_message_to_db(self, username: str, message: str) -> None:
+        """Save a message from a user to the database.
+
+        Parameters:
+        -------
+        username: [str] The origin username of the message.
+        message: [str] The message to be saved.
+        """
+        log.debug(f"Save message from {username}: {message}")
         room = self.get_or_create_room()
         example = self.get_example(self.scope["room_state"]["page"])
-        Message.objects.create(room=room, example=example, user=username, message=message)
-        return None
+        if example:
+            Message.objects.create(room=room, example=example, user=username, message=message)
 
     # ONLINE STATUS
-
     @database_sync_to_async
     def get_assigned_annotators(self):
         return set(Batch.objects.get(id=self.batch_id).project.annotators)
@@ -263,6 +327,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def group_send_user_connected(self):
         self.scope["room_state"]["n_online"] += 1
         msg = f"{self.user.username} is now connected."
+        log.debug(msg)
         await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 
@@ -282,6 +347,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.scope["room_state"]["online_users"].discard(self.user)
 
         msg = f"{self.user.username} has disconnected."
+        log.debug(msg)
         await self.group_send_chat_message(username="system", message=msg)
         n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
 

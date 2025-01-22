@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import HttpResponse
@@ -14,6 +16,9 @@ from projects.models import Project
 from projects.models import ProjectUser
 
 User = get_user_model()
+
+
+log = logging.getLogger(__name__)
 
 
 def project_list_view(request):
@@ -61,6 +66,7 @@ def project_detail_view(request, project_id):
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)
+        log.debug(f"Providing the following context to the Annotator: {context}")
         return render(request, "projects/project_detail_annotator.html", context)
 
     elif project_user.role == ProjectUser.Role.EXPERT:
@@ -89,6 +95,7 @@ def project_detail_view(request, project_id):
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
 
+        log.debug(f"Providing the following context to the Expert: {context}")
         return render(request, "projects/project_detail_expert.html", context)
     else:
         msg = f"Unkown User Role {project_user.role}"

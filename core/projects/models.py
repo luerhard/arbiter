@@ -105,3 +105,7 @@ class Batch(models.Model):
             user=user,
             is_annotated=True,
         ).count()
+
+    def set_phase(self, phase):
+        self.phase = phase
+        self.save()

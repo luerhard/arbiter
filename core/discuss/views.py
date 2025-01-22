@@ -1,4 +1,3 @@
-from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -35,10 +34,6 @@ def overview(request):
         context["projects"][project] = batches
 
     return render(request, "discuss/overview.html", context)
-
-
-def done(request):  # noqa: ARG001
-    return HttpResponse("ALL DONE.")
 
 
 def chat_simple(request, batch_id):
