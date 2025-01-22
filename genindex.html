@@ -120,6 +120,8 @@
         <li><a href="api/annotation.html#module-annotation.views">module</a>
 </li>
       </ul></li>
+      <li><a href="api/discuss.html#discuss.models.AnnotationEndReason">AnnotationEndReason (class in discuss.models)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.annotations">annotations (data.models.ExampleAssignment attribute)</a>
@@ -180,13 +182,9 @@
 </li>
       <li><a href="api/discuss.html#discuss.views.chat_simple">chat_simple() (in module discuss.views)</a>
 </li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer">ChatConsumer (class in discuss.consumers)</a>
-</li>
       <li><a href="api/data.html#data.models.ExampleAssignment.check_for_disagreement">check_for_disagreement() (data.models.ExampleAssignment method)</a>
 </li>
       <li><a href="api/data.html#data.models.Label.color">color (data.models.Label attribute)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.connect">connect() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.content">content (data.models.Example attribute)</a>
 </li>
@@ -201,10 +199,6 @@
         <li><a href="api/core.html#module-core.views">module</a>
 </li>
       </ul></li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.create_chat_message">create_chat_message() (discuss.consumers.ChatConsumer static method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.create_n_online_message">create_n_online_message() (discuss.consumers.ChatConsumer static method)</a>
-</li>
       <li><a href="api/users.html#users.models.UserManager.create_superuser">create_superuser() (users.models.UserManager method)</a>
 </li>
       <li><a href="api/users.html#users.models.UserManager.create_user">create_user() (users.models.UserManager method)</a>
@@ -232,15 +226,6 @@
 </li>
       <li><a href="api/projects.html#projects.models.Project.description">description (projects.models.Project attribute)</a>
 </li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.disconnect">disconnect() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li>
-    discuss.consumers
-
-      <ul>
-        <li><a href="api/discuss.html#module-discuss.consumers">module</a>
-</li>
-      </ul></li>
       <li>
     discuss.models
 
@@ -267,7 +252,7 @@
         <li><a href="api/projects.html#projects.models.Batch.Phase.DISCUSSION">(projects.models.Batch.Phase attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/discuss.html#discuss.views.done">done() (in module discuss.views)</a>
+      <li><a href="api/discuss.html#discuss.models.AnnotationEndReason.DISCUSSION_END">DISCUSSION_END (discuss.models.AnnotationEndReason attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -290,8 +275,6 @@
       <li><a href="api/data.html#data.models.Example.DoesNotExist">Example.DoesNotExist</a>
 </li>
       <li><a href="api/data.html#data.models.Example.MultipleObjectsReturned">Example.MultipleObjectsReturned</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.example_annotations">example_annotations() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.example_id">example_id (data.models.ExampleAssignment attribute)</a>
 
@@ -339,10 +322,6 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_assigned_annotators">get_assigned_annotators() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_example">get_example() (discuss.consumers.ChatConsumer method)</a>
-</li>
       <li><a href="api/discuss.html#discuss.models.Message.get_next_by_created_at">get_next_by_created_at() (discuss.models.Message method)</a>
 
       <ul>
@@ -353,22 +332,20 @@
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.get_next_by_last_updated">get_next_by_last_updated() (data.models.ExampleAssignment method)</a>
 </li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_or_create_room">get_or_create_room() (discuss.consumers.ChatConsumer method)</a>
-</li>
       <li><a href="api/data.html#data.models.Annotation.get_phase_display">get_phase_display() (data.models.Annotation method)</a>
 
       <ul>
         <li><a href="api/projects.html#projects.models.Batch.get_phase_display">(projects.models.Batch method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.models.Message.get_previous_by_created_at">get_previous_by_created_at() (discuss.models.Message method)</a>
 
       <ul>
         <li><a href="api/discuss.html#discuss.models.Room.get_previous_by_created_at">(discuss.models.Room method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.get_previous_by_date_joined">get_previous_by_date_joined() (users.models.User method)</a>
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.get_previous_by_last_updated">get_previous_by_last_updated() (data.models.ExampleAssignment method)</a>
@@ -376,20 +353,6 @@
       <li><a href="api/projects.html#projects.models.ProjectUser.get_role_display">get_role_display() (projects.models.ProjectUser method)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.get_user_annotations">get_user_annotations() (data.models.Example method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_chat_message">group_send_chat_message() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_current_example">group_send_current_example() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_done">group_send_done() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_next_example">group_send_next_example() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_user_connected">group_send_user_connected() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_user_disconnected">group_send_user_disconnected() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_user_done">group_send_user_done() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/users.html#users.models.User.groups">groups (users.models.User attribute)</a>
 </li>
@@ -519,8 +482,6 @@
 </li>
         <li><a href="api/data.html#module-data.models">data.models</a>
 </li>
-        <li><a href="api/discuss.html#module-discuss.consumers">discuss.consumers</a>
-</li>
         <li><a href="api/discuss.html#module-discuss.models">discuss.models</a>
 </li>
         <li><a href="api/discuss.html#module-discuss.views">discuss.views</a>
@@ -549,6 +510,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.next">next() (data.models.ExampleAssignment method)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.models.AnnotationEndReason.NO_EXAMPLES">NO_EXAMPLES (discuss.models.AnnotationEndReason attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -664,8 +627,6 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.receive">receive() (discuss.consumers.ChatConsumer method)</a>
-</li>
       <li><a href="api/users.html#users.models.User.REQUIRED_FIELDS">REQUIRED_FIELDS (users.models.User attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.models.ProjectUser.role">role (projects.models.ProjectUser attribute)</a>
@@ -690,26 +651,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.save">save() (data.models.ExampleAssignment method)</a>
 </li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_annotation">save_annotation() (discuss.consumers.ChatConsumer method)</a>
+      <li><a href="api/data.html#data.models.Annotation.sentence">sentence (data.models.Annotation property)</a>
 </li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_message_to_db">save_message_to_db() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_chat_message">send_chat_message() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_current_example">send_current_example() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_done">send_done() (discuss.consumers.ChatConsumer method)</a>
+      <li><a href="api/projects.html#projects.models.Batch.set_phase">set_phase() (projects.models.Batch method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_next_example">send_next_example() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_user_connected">send_user_connected() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_user_disconnected">send_user_disconnected() (discuss.consumers.ChatConsumer method)</a>
-</li>
-      <li><a href="api/data.html#data.models.Annotation.sentence">sentence (data.models.Annotation property)</a>
-</li>
       <li><a href="api/data.html#data.models.Example.set_user_annotations">set_user_annotations() (data.models.Example method)</a>
 
       <ul>

@@ -183,7 +183,6 @@
 <li class="toctree-l1"><a class="reference internal" href="discuss.html">Discussion</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html#module-discuss.views">Views</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.overview"><code class="docutils literal notranslate"><span class="pre">overview()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.done"><code class="docutils literal notranslate"><span class="pre">done()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.chat_simple"><code class="docutils literal notranslate"><span class="pre">chat_simple()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.discuss_batch"><code class="docutils literal notranslate"><span class="pre">discuss_batch()</span></code></a></li>
 </ul>
@@ -216,38 +215,14 @@
 <li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.models.Message.room_id"><code class="docutils literal notranslate"><span class="pre">Message.room_id</span></code></a></li>
 </ul>
 </li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="discuss.html#module-discuss.consumers">Websocket Consumer</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer"><code class="docutils literal notranslate"><span class="pre">ChatConsumer</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.connect"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.connect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.disconnect"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.disconnect()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.receive"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.receive()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_done"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_done()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_done"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_done()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.get_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.get_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.example_annotations"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.example_annotations()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.save_annotation"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.save_annotation()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_current_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_current_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_current_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_current_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_next_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_next_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_next_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_next_example()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_user_done"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_user_done()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.get_or_create_room"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.get_or_create_room()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.create_chat_message"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.create_chat_message()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_chat_message"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_chat_message()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_chat_message"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_chat_message()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.save_message_to_db"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.save_message_to_db()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.get_assigned_annotators"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.get_assigned_annotators()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.create_n_online_message"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.create_n_online_message()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_user_connected"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_user_connected()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_user_connected"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_user_connected()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_user_disconnected"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_user_disconnected()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.send_user_disconnected"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.send_user_disconnected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.models.AnnotationEndReason"><code class="docutils literal notranslate"><span class="pre">AnnotationEndReason</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.models.AnnotationEndReason.DISCUSSION_END"><code class="docutils literal notranslate"><span class="pre">AnnotationEndReason.DISCUSSION_END</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.models.AnnotationEndReason.NO_EXAMPLES"><code class="docutils literal notranslate"><span class="pre">AnnotationEndReason.NO_EXAMPLES</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="discuss.html#websocket-consumer">Websocket Consumer</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="projects.html">Projects</a><ul>
@@ -310,6 +285,7 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.phase"><code class="docutils literal notranslate"><span class="pre">Batch.phase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.labels"><code class="docutils literal notranslate"><span class="pre">Batch.labels</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.already_annotated_count"><code class="docutils literal notranslate"><span class="pre">Batch.already_annotated_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.set_phase"><code class="docutils literal notranslate"><span class="pre">Batch.set_phase()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Batch.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Batch.MultipleObjectsReturned</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.examples"><code class="docutils literal notranslate"><span class="pre">Batch.examples</span></code></a></li>
