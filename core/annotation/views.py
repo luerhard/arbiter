@@ -11,6 +11,7 @@ from projects.models import Batch
 
 
 def update_pbar(user, batch):
+    """helper function to calculate current progress"""
     done = batch.examples.filter(
         assignments__user=user,
         assignments__is_annotated=1,
@@ -21,6 +22,7 @@ def update_pbar(user, batch):
 
 
 def create_context(request, assignment):
+    """helper function to create context needed in multiple views"""
     example = assignment.example
 
     previous_annotations = (
@@ -55,6 +57,7 @@ def create_context(request, assignment):
 
 
 def prev_sentence(request, assignment_id):
+    """view is displayed when user clicks on <-"""
     context = {}
     assignment = ExampleAssignment.objects.get(id=assignment_id).previous()
     context.update(create_context(request, assignment))
@@ -72,6 +75,7 @@ def prev_sentence(request, assignment_id):
 
 
 def next_sentence(request, assignment_id):
+    """view is displayed when user clicks on ->"""
     context = {}
     assignment = ExampleAssignment.objects.get(id=assignment_id).next()
     context.update(create_context(request, assignment))
@@ -88,15 +92,12 @@ def next_sentence(request, assignment_id):
     return HttpResponse(response)
 
 
-# Create your views here.
 def annotate_batch(
     request,
     batch_id,
     assignment_id: int = None,
 ):
-    """This is some text - wow"""
     batch = Batch.objects.get(id=batch_id)
-    project = batch.project
 
     if assignment_id:
         assignment = ExampleAssignment.objects.get(id=assignment_id)
@@ -108,14 +109,7 @@ def annotate_batch(
         )
 
     context = create_context(request, assignment)
-
-    response = render(request, "annotation/batch.html", context)
-    if request.htmx:
-        response["Hx-Replace-Url"] = reverse(
-            "annotate-batch",
-            kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
-        )
-    return response
+    return render(request, "annotation/batch.html", context)
 
 
 def edit(request, assignment_id):
