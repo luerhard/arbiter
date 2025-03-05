@@ -3,7 +3,6 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
-from django.urls import reverse
 
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
