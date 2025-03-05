@@ -90,7 +90,7 @@ class Batch(models.Model):
         choices=Phase,
         db_index=True,
     )
-    codebook_version = models.ForeignKey('codebooks.CodebookVersion', on_delete=models.SET_NULL)
+    codebook_version = models.ForeignKey("codebooks.CodebookVersion", on_delete=models.SET_NULL)
 
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"

@@ -5,17 +5,19 @@ Each CodebookVersion has various fields, such as Description Model,
 which are modular. To allow for future integration with a front end and
 UX each of those fields has a codename which acts similarly to html ids.
 """
+
 from django.db import models
 
 
 class Codebook(models.Model):
     name = models.CharField(max_length=15)
     # As the schema gets integrated into the core app this will change
-    project = models.ForeignKey('projects.Project', null=True, on_delete=models.SET_NULL)
+    project = models.ForeignKey("projects.Project", null=True, on_delete=models.SET_NULL)
 
 
 class CodebookVersion(models.Model):
     """This model represents a specific version of a Codebook."""
+
     version = models.CharField("Version", max_length=10)
     date = models.DateField("Addition Date")
     codebook = models.ForeignKey(Codebook, on_delete=models.CASCADE)
@@ -24,7 +26,9 @@ class CodebookVersion(models.Model):
 
 class CodebookFieldModel(models.Model):
     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE)
-    codename = models.CharField(max_length=32, unique=True, blank=True, null=True)  # Can be also named index
+    codename = models.CharField(
+        max_length=32, unique=True, blank=True, null=True
+    )  # Can be also named index
     order_index = models.PositiveIntegerField(...)
 
 
