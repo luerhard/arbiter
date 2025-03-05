@@ -13,6 +13,16 @@ from data.models import ExampleAssignment
 from projects.models import Batch
 
 
+def update_pbar(user, batch):
+    done = batch.examples.filter(
+        assignments__user=user,
+        assignments__is_annotated=1,
+    ).count()
+    total = batch.examples.count()
+    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
+    return progress
+
+
 def create_context(request, assignment):
     example = assignment.example
 
@@ -26,13 +36,7 @@ def create_context(request, assignment):
     sub_context["has_prev"] = True if assignment.previous() else False
     sub_context["example"] = assignment.example
     sub_context["batch"] = example.batch
-
-    done = example.batch.examples.filter(
-        assignments__user=request.user,
-        assignments__is_annotated=1,
-    ).count()
-    total = example.batch.examples.count()
-    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
+    sub_context["progress"] = update_pbar(request.user, example.batch)
 
     labels = []
     for label in example.labels.all():
@@ -141,6 +145,15 @@ def edit(request, assignment_id):
         "has_next": True if assignment.next() else False,
         "saved": True,
         "assignment": assignment,
+        "progress": update_pbar(request.user, batch),
     }
 
-    return render(request, "annotation/batch.html#nav-block", context)
+    partials = [
+        "annotation/batch.html#nav-block",
+        "annotation/batch.html#pbar",
+    ]
+    response = ""
+    for partial in partials:
+        response += render_to_string(partial, context)
+
+    return HttpResponse(response)
