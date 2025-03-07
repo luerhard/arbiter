@@ -1,6 +1,11 @@
 from django.contrib import admin
-from .models import Codebook, CodebookVersion
-from .models import CodebookFieldModel, DescriptionField, DefinitionField, ExampleField
+
+from .models import Codebook
+from .models import CodebookFieldModel
+from .models import CodebookVersion
+from .models import DefinitionField
+from .models import DescriptionField
+from .models import ExampleField
 
 
 class CodebookVersionInline(admin.StackedInline):
@@ -11,18 +16,17 @@ class CodebookVersionInline(admin.StackedInline):
 
 @admin.register(Codebook)
 class CodebookAdmin(admin.ModelAdmin):
-    list_display = ("name", "project", "get_latest_version", "get_latest_date",)
+    list_display = ("name", "project", "get_latest_version", "get_latest_date")
     inlines = (CodebookVersionInline,)
 
     def get_latest_version(self, obj):
         return obj.codebookversion_set.latest("date").version
-    
+
     def get_latest_date(self, obj):
         return obj.codebookversion_set.latest("date").date
 
     get_latest_version.short_description = "Latest Version"
     get_latest_date.short_description = "Date"
-
 
 
 class CodebookFieldModelInline(admin.TabularInline):
@@ -47,13 +51,18 @@ class ExampleFieldInline(admin.TabularInline):
 
 
 class CodebookVersionAdmin(admin.ModelAdmin):
-    list_display = ("get_codebook_name", "get_codebook_project", "version", "date",)
+    list_display = ("get_codebook_name", "get_codebook_project", "version", "date")
     ordering = ("date",)
-    inline = (CodebookFieldModelInline, DescriptionFieldInline, DefinitionFieldInline, ExampleFieldInline,)
+    inline = (
+        CodebookFieldModelInline,
+        DescriptionFieldInline,
+        DefinitionFieldInline,
+        ExampleFieldInline,
+    )
 
     def get_codebook_name(self, obj):
         return obj.codebook.name
-    
+
     def get_codebook_project(self, obj):
         return obj.codebook.project
 
@@ -66,5 +75,6 @@ admin.site.register(CodebookVersion, CodebookVersionAdmin)
 
 class CodebookFieldAdmin(admin.ModelAdmin):
     pass
+
 
 admin.site.register(CodebookFieldModel, CodebookFieldAdmin)
