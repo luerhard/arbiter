@@ -4,11 +4,27 @@ from django.shortcuts import render
 from django.shortcuts import reverse
 
 from data.models import Example
+from data.models import ExampleAssignment
 from projects.models import Batch
 from projects.models import Project
 from projects.models import ProjectUser
 
 # Create your views here.
+
+
+def update_pbar(request, batch_id):
+    query = ExampleAssignment.objects.filter(
+        example__batch=batch_id,
+        example__has_disagreement=True,
+        user=request.user,
+    )
+    context = {}
+    context["batch_id"] = batch_id
+    context["done"] = query.filter(is_discussed=True).count()
+    context["total"] = query.count()
+    context["progress"] = context["done"] / context["total"] * 100
+
+    return render(request, "discuss/room.html#pbar", context)
 
 
 def overview(request):

@@ -89,7 +89,10 @@ class ExampleAssignment(models.Model):
         phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
     ):
         phase = getattr(Annotation.Phase, phase)
-        self.is_annotated = 1
+        if phase == Annotation.Phase.ANNOTATION:
+            self.is_annotated = True
+        elif phase == Annotation.Phase.DISCUSSION:
+            self.is_discussed = True
 
         # delete previous annotations if any
         Annotation.objects.filter(phase=phase, assignment=self).delete()

@@ -1,5 +1,20 @@
 {% extends "base.html" %}
 {% load static %}
+{% load partials %}
+{% partialdef pbar %}
+<div class="progress mb-4"
+     id="pbar"
+     hx-swap-oob="true"
+     hx-get="{% url 'update-pbar' batch_id=batch_id %}"
+     hx-trigger="refreshPbar"
+     role="progressbar"
+     aria-label="Example with label"
+     aria-valuenow="{{ done }}"
+     aria-valuemin="1"
+     aria-valuemax="100">
+    <div class="progress-bar" style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+</div>
+{% endpartialdef %}
 {% block content %}
     <div class="container py-3">
         <div class="card">
@@ -8,6 +23,9 @@
                 <div class="d-flex">
                     N Online:
                     <div id="n-online-status"></div>
+                </div>
+                <div class="row">
+                    <div class="col">{% partial pbar %}</div>
                 </div>
                 <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                     <div class="row align-items-center">
@@ -80,6 +98,9 @@
                 console.log("unlock save button");
                 lib.discuss.unlockSaveDone();
             }
+
+            htmx.trigger("#pbar", "refreshPbar");
+
             document.querySelectorAll('.btn-custom-color').forEach(button => {
                 const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
                 const textColor = lib.funcs.inferTextColorByContrast(color)
