@@ -10,9 +10,12 @@ from django.db import models
 
 
 class Codebook(models.Model):
-    name = models.CharField(max_length=15)
+    name = models.CharField(max_length=100)
     # As the schema gets integrated into the core app this will change
     project = models.ForeignKey("projects.Project", null=True, on_delete=models.SET_NULL)
+
+    def __str__(self):
+        return f"{self.name} - {self.project}"
 
 
 class CodebookVersion(models.Model):
@@ -23,13 +26,16 @@ class CodebookVersion(models.Model):
     codebook = models.ForeignKey(Codebook, on_delete=models.CASCADE)
     codebook_description = models.TextField()
 
+    def __str__(self):
+        return f"{self.codebook.name} - {self.codebook.project} - {self.version}"
+
 
 class CodebookFieldModel(models.Model):
     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE)
     codename = models.CharField(
         max_length=32, unique=True, blank=True, null=True
     )  # Can be also named index
-    order_index = models.PositiveIntegerField(...)
+    order_index = models.PositiveIntegerField(unique=True)
 
 
 class DescriptionField(CodebookFieldModel):
@@ -43,6 +49,6 @@ class DefinitionField(CodebookFieldModel):
 
 
 class ExampleField(CodebookFieldModel):
-    definition_field = models.ForeignKey(DefinitionField, on_delete=models.SET_NULL)
+    definition_field = models.ForeignKey(DefinitionField, on_delete=models.SET_NULL, null=True)
     example = models.CharField(max_length=300)
     comment = models.TextField(blank=True, null=True)
