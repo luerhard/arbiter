@@ -105,7 +105,7 @@
             button.style.setProperty("--text-color", textColor);
         });
 
-        document.addEventListener("htmx:afterOnLoad", function() {
+        document.addEventListener("htmx:load", function() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(function(checkbox) {
                 const hotkey = checkbox.getAttribute('data-hotkey'); // Get custom hotkey from data attribute
