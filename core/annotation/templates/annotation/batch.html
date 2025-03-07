@@ -79,19 +79,29 @@
 {% block content %}
     <div class="container mt-5">
         <div class="row">
-            <div class="card">
-                <div class="card-body">
-                    <div class="col">
-                        <h2 class="card-title text-center pb-5">Annotate Sentence</h2>
-                        {% partial pbar %}
-                        <div class="card">{% partial sentence %}</div>
-                    </div>
-                    <div class="row">
-                        <div class="col">{% partial labels %}</div>
-                    </div>
-                    <div class="container text-center">
-                        <div id="buttons" class="mt-5 btn-group" role="group">
-                            <div id="buttons">{% partial nav-block %}</div>
+            <div class="col">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col">
+                                <h2 class="card-title text-center pb-5">Annotate Sentence</h2>
+                                {% partial pbar %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">
+                                <div class="card">{% partial sentence %}</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col">{% partial labels %}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col text-center">
+                                <div id="buttons" class="mt-5 btn-group" role="group">
+                                    <div id="buttons">{% partial nav-block %}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
