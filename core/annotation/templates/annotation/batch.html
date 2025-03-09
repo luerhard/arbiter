@@ -6,7 +6,7 @@
     Annotate Sentence
 {% endblock title %}
 {% partialdef pbar %}
-<div class="progress mb-4"
+<div class="progress bg-secondary mb-4"
      id="pbar"
      hx-swap-oob="true"
      role="progressbar"
@@ -14,7 +14,9 @@
      aria-valuenow="{{ progress.current }}"
      aria-valuemin="1"
      aria-valuemax="100">
-    <div class="progress-bar" style="width: {{ progress.current }}%">{{ progress.done }} / {{ progress.total }}</div>
+    <div class="progress-bar bg-primary overflow-visible w-{{ progress.current }} px-2">
+        {{ progress.done }} / {{ progress.total }}
+    </div>
 </div>
 {% endpartialdef %}
 {% partialdef sentence %}

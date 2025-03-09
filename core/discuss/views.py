@@ -12,7 +12,7 @@ from projects.models import ProjectUser
 # Create your views here.
 
 
-def update_pbar(request, batch_id):
+def get_progress(request, batch_id):
     query = ExampleAssignment.objects.filter(
         example__batch=batch_id,
         example__has_disagreement=True,
@@ -22,7 +22,10 @@ def update_pbar(request, batch_id):
     context["batch_id"] = batch_id
     context["done"] = query.filter(is_discussed=True).count()
     context["total"] = query.count()
-    context["progress"] = context["done"] / context["total"] * 100
+    try:
+        context["progress"] = int(context["done"] / context["total"] * 100)
+    except ZeroDivisionError:
+        context["progress"] = 100
 
     return render(request, "discuss/room.html#pbar", context)
 

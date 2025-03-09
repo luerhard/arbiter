@@ -2,7 +2,7 @@
 {% load static %}
 {% load partials %}
 {% partialdef pbar %}
-<div class="progress mb-4"
+<div class="progress bg-secondary mb-4"
      id="pbar"
      hx-swap-oob="true"
      hx-get="{% url 'update-pbar' batch_id=batch_id %}"
@@ -12,7 +12,7 @@
      aria-valuenow="{{ done }}"
      aria-valuemin="1"
      aria-valuemax="100">
-    <div class="progress-bar" style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+    <div class="progress-bar bg-primary overflow-visible px-2 w-{{ progress }}">{{ done }} / {{ total }}</div>
 </div>
 {% endpartialdef %}
 {% block content %}

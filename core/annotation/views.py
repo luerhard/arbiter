@@ -9,15 +9,19 @@ from data.models import ExampleAssignment
 from projects.models import Batch
 
 
-def update_pbar(user, batch):
+def get_progress(user, batch):
     """helper function to calculate current progress"""
     done = batch.examples.filter(
         assignments__user=user,
         assignments__is_annotated=1,
     ).count()
     total = batch.examples.count()
-    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
-    return progress
+    try:
+        current = int(done / total * 100)
+    except ZeroDivisionError:
+        current = 100
+
+    return {"done": done, "total": total, "current": current}
 
 
 def create_context(request, assignment):
@@ -30,11 +34,11 @@ def create_context(request, assignment):
 
     sub_context = {}
     sub_context["assignment"] = assignment
-    sub_context["has_next"] = True if assignment.next() else False
-    sub_context["has_prev"] = True if assignment.previous() else False
+    sub_context["has_next"] = bool(assignment.next())
+    sub_context["has_prev"] = bool(assignment.previous())
     sub_context["example"] = assignment.example
     sub_context["batch"] = example.batch
-    sub_context["progress"] = update_pbar(request.user, example.batch)
+    sub_context["progress"] = get_progress(request.user, example.batch)
 
     labels = []
     for label in example.labels.all():
@@ -131,11 +135,11 @@ def edit(request, assignment_id):
     assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
     context = {
-        "has_prev": True if assignment.previous() else False,
-        "has_next": True if assignment.next() else False,
+        "has_prev": bool(assignment.previous()),
+        "has_next": bool(assignment.next()),
         "saved": True,
         "assignment": assignment,
-        "progress": update_pbar(request.user, batch),
+        "progress": get_progress(request.user, batch),
     }
 
     partials = [
