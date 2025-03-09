@@ -1,56 +1,44 @@
-from typing import Literal
-
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
+from django.template.loader import render_to_string
 
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
 
 
-# Create your views here.
-def annotate_batch(
-    request,
-    batch_id,
-    assignment_id: int = None,
-    cursor: Literal["next", "prev"] | None = None,
-):
-    """This is some text - wow"""
-    batch = Batch.objects.get(id=batch_id)
-    project = batch.project
-
-    if assignment_id:
-        assignment = ExampleAssignment.objects.get(id=assignment_id)
-    else:
-        assignment = (
-            ExampleAssignment.objects.filter(user=request.user, example__batch=batch)
-            .order_by("order")
-            .first()
-        )
-
-    if cursor == "next":
-        assignment = assignment.next()
-    elif cursor == "prev":
-        assignment = assignment.previous()
-
-    has_next = True if assignment.next() else False
-    has_prev = True if assignment.previous() else False
-    example = assignment.example
-    labels = project.labels.all()
-
-    # Progress Bar
+def get_progress(user, batch):
+    """helper function to calculate current progress"""
     done = batch.examples.filter(
-        assignments__user=request.user,
+        assignments__user=user,
         assignments__is_annotated=1,
     ).count()
     total = batch.examples.count()
-    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
+    try:
+        current = int(done / total * 100)
+    except ZeroDivisionError:
+        current = 100
+
+    return {"done": done, "total": total, "current": current}
+
+
+def create_context(request, assignment):
+    """helper function to create context needed in multiple views"""
+    example = assignment.example
 
     previous_annotations = (
         assignment.annotations.filter(phase="ANNOTATION").select_related("label").all()
     )
+
+    sub_context = {}
+    sub_context["assignment"] = assignment
+    sub_context["has_next"] = bool(assignment.next())
+    sub_context["has_prev"] = bool(assignment.previous())
+    sub_context["example"] = assignment.example
+    sub_context["batch"] = example.batch
+    sub_context["progress"] = get_progress(request.user, example.batch)
 
     labels = []
     for label in example.labels.all():
@@ -63,30 +51,68 @@ def annotate_batch(
         else:
             new["is_set"] = False
         labels.append(new)
-
-    context = {
-        "project_id": project.id,
-        "batch": batch,
-        "example": example,
-        "labels": labels,
-        "assignment": assignment,
-        "progress": progress,
-        "has_next": has_next,
-        "has_prev": has_prev,
-    }
+    sub_context["labels"] = labels
 
     form = MultiLabelForm(assignment=assignment)
-    context["label_form"] = form
+    sub_context["label_form"] = form
 
-    if request.htmx:
-        response = render(request, "annotation/partials/annotation.html", context)
-        response["Hx-Replace-Url"] = reverse(
-            "annotate-batch",
-            kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
-        )
-        return response
+    return sub_context
+
+
+def prev_sentence(request, assignment_id):
+    """view is displayed when user clicks on <-"""
+    context = {}
+    assignment = ExampleAssignment.objects.get(id=assignment_id).previous()
+    context.update(create_context(request, assignment))
+    response = ""
+    partials = [
+        "annotation/batch.html#sentence",
+        "annotation/batch.html#nav-block",
+        "annotation/batch.html#labels",
+        "annotation/batch.html#pbar",
+    ]
+    for partial in partials:
+        response += render_to_string(partial, context)
+
+    return HttpResponse(response)
+
+
+def next_sentence(request, assignment_id):
+    """view is displayed when user clicks on ->"""
+    context = {}
+    assignment = ExampleAssignment.objects.get(id=assignment_id).next()
+    context.update(create_context(request, assignment))
+    response = ""
+    partials = [
+        "annotation/batch.html#sentence",
+        "annotation/batch.html#nav-block",
+        "annotation/batch.html#labels",
+        "annotation/batch.html#pbar",
+    ]
+    for partial in partials:
+        response += render_to_string(partial, context)
+
+    return HttpResponse(response)
+
+
+def annotate_batch(
+    request,
+    batch_id,
+    assignment_id: int = None,
+):
+    batch = Batch.objects.get(id=batch_id)
+
+    if assignment_id:
+        assignment = ExampleAssignment.objects.get(id=assignment_id)
     else:
-        return render(request, "annotation/batch.html", context)
+        assignment = (
+            ExampleAssignment.objects.filter(user=request.user, example__batch=batch)
+            .order_by("order")
+            .first()
+        )
+
+    context = create_context(request, assignment)
+    return render(request, "annotation/batch.html", context)
 
 
 def edit(request, assignment_id):
@@ -108,15 +134,20 @@ def edit(request, assignment_id):
     submitted_labels = [int(i) for i in request.POST.getlist("labels") if i.strip()]
     assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
-    # Progress Bar
-    done = batch.examples.filter(
-        assignments__user=request.user,
-        assignments__is_annotated=1,
-    ).count()
-    total = batch.examples.count()
-    progress = {"done": done, "total": total, "current": (done / total * 100) if total > 0 else 0}
     context = {
-        "progress": progress,
+        "has_prev": bool(assignment.previous()),
+        "has_next": bool(assignment.next()),
         "saved": True,
+        "assignment": assignment,
+        "progress": get_progress(request.user, batch),
     }
-    return render(request, "annotation/partials/edit.html", context)
+
+    partials = [
+        "annotation/batch.html#nav-block",
+        "annotation/batch.html#pbar",
+    ]
+    response = ""
+    for partial in partials:
+        response += render_to_string(partial, context)
+
+    return HttpResponse(response)

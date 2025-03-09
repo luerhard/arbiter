@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_htmx",
     "colorfield",
+    "template_partials",
     "core",
     "users",
     "data",
