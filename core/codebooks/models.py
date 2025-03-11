@@ -30,17 +30,6 @@ class CodebookVersion(models.Model):
         return f"{self.codebook.name} - {self.codebook.project} - {self.version}"
 
 
-# class CodebookFieldModel(models.Model):
-#     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
-#     codename = models.CharField(
-#         max_length=32, unique=True, blank=True, null=True
-#     )  # Can be also named index
-#     order_index = models.PositiveIntegerField(unique=True)
-
-#     class Meta:
-#         abstract = True
-
-
 class DescriptionField(models.Model):
     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
     codename = models.CharField(
