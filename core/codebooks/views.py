@@ -1,12 +1,11 @@
-import asyncio
 import logging
-from django.http import HttpResponse
-from django.http import Http404
-from django.views import View
+
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import Http404
+from django.http import HttpResponse
+from django.views import View
 
 from projects.models import ProjectUser
-
 
 log = logging.getLogger(__name__)
 log.debug("------Reload-------")
@@ -21,7 +20,9 @@ class CodebookVersionView(View):
 
             # Attempt to get the CodebookVersion for the specified project
             if codebookversion:
-                codebookv = project_user.project.codebook_set.get(codebookversion__version=codebookversion)
+                codebookv = project_user.project.codebook_set.get(
+                    codebookversion__version=codebookversion
+                )
             else:
                 codebookv = project_user.project.codebook_set.latest("codebookversion__date")
 

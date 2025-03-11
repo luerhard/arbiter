@@ -65,7 +65,7 @@ LOGGING = {
             "class": "logging.FileHandler",
             "filename": "codebooks/codebooks.log",
             "formatter": "verbose",
-        }
+        },
     },
     "formatters": {
         "verbose": {
