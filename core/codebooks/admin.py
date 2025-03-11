@@ -61,13 +61,3 @@ class CodebookVersionAdmin(admin.ModelAdmin):
 
     get_codebook_name.short_description = "Name"
     get_codebook_project.short_description = "Project"
-
-
-@admin.register(DescriptionField)
-class DescriptionFieldAdmin(admin.ModelAdmin):
-    list_display = ("codename",)
-
-    # def get_codebook_name(self, obj):
-        # return obj.codebook.name
-
-    # get_codebook_name.short_description = "Codename"
