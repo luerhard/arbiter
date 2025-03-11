@@ -1,7 +1,6 @@
 from django.contrib import admin
 
 from .models import Codebook
-from .models import CodebookFieldModel
 from .models import CodebookVersion
 from .models import DefinitionField
 from .models import DescriptionField
@@ -29,12 +28,6 @@ class CodebookAdmin(admin.ModelAdmin):
     get_latest_date.short_description = "Date"
 
 
-class CodebookFieldModelInline(admin.TabularInline):
-    model = CodebookFieldModel
-    min_num = 1
-    extra = 3
-
-
 class DescriptionFieldInline(admin.TabularInline):
     model = DescriptionField
     extra = 1
@@ -50,11 +43,11 @@ class ExampleFieldInline(admin.TabularInline):
     extra = 1
 
 
+@admin.register(CodebookVersion)
 class CodebookVersionAdmin(admin.ModelAdmin):
     list_display = ("get_codebook_name", "get_codebook_project", "version", "date")
     ordering = ("date",)
-    inline = (
-        CodebookFieldModelInline,
+    inlines = (
         DescriptionFieldInline,
         DefinitionFieldInline,
         ExampleFieldInline,
@@ -70,11 +63,11 @@ class CodebookVersionAdmin(admin.ModelAdmin):
     get_codebook_project.short_description = "Project"
 
 
-admin.site.register(CodebookVersion, CodebookVersionAdmin)
+@admin.register(DescriptionField)
+class DescriptionFieldAdmin(admin.ModelAdmin):
+    list_display = ("codename",)
 
+    # def get_codebook_name(self, obj):
+        # return obj.codebook.name
 
-class CodebookFieldAdmin(admin.ModelAdmin):
-    pass
-
-
-admin.site.register(CodebookFieldModel, CodebookFieldAdmin)
+    # get_codebook_name.short_description = "Codename"

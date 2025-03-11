@@ -30,25 +30,43 @@ class CodebookVersion(models.Model):
         return f"{self.codebook.name} - {self.codebook.project} - {self.version}"
 
 
-class CodebookFieldModel(models.Model):
-    codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE)
+# class CodebookFieldModel(models.Model):
+#     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
+#     codename = models.CharField(
+#         max_length=32, unique=True, blank=True, null=True
+#     )  # Can be also named index
+#     order_index = models.PositiveIntegerField(unique=True)
+
+#     class Meta:
+#         abstract = True
+
+
+class DescriptionField(models.Model):
+    codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
     codename = models.CharField(
         max_length=32, unique=True, blank=True, null=True
     )  # Can be also named index
     order_index = models.PositiveIntegerField(unique=True)
-
-
-class DescriptionField(CodebookFieldModel):
     codebook_description = models.TextField()
 
 
-class DefinitionField(CodebookFieldModel):
+class DefinitionField(models.Model):
+    codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
+    codename = models.CharField(
+        max_length=32, unique=True, blank=True, null=True
+    )  # Can be also named index
+    order_index = models.PositiveIntegerField(unique=True)
     term = models.CharField(max_length=31)
     short_description = models.CharField(max_length=1000)
     long_description = models.TextField()
 
 
-class ExampleField(CodebookFieldModel):
+class ExampleField(models.Model):
+    codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
+    codename = models.CharField(
+        max_length=32, unique=True, blank=True, null=True
+    )  # Can be also named index
+    order_index = models.PositiveIntegerField(unique=True)
     definition_field = models.ForeignKey(DefinitionField, on_delete=models.SET_NULL, null=True)
     example = models.CharField(max_length=300)
     comment = models.TextField(blank=True, null=True)
