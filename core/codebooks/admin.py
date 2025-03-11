@@ -28,19 +28,19 @@ class CodebookAdmin(admin.ModelAdmin):
     get_latest_date.short_description = "Date"
 
 
-class DescriptionFieldInline(admin.TabularInline):
+class DescriptionFieldInline(admin.StackedInline):
     model = DescriptionField
-    extra = 1
+    extra = 0
 
 
-class DefinitionFieldInline(admin.TabularInline):
+class DefinitionFieldInline(admin.StackedInline):
     model = DefinitionField
-    extra = 1
+    extra = 0
 
 
-class ExampleFieldInline(admin.TabularInline):
+class ExampleFieldInline(admin.StackedInline):
     model = ExampleField
-    extra = 1
+    extra = 0
 
 
 @admin.register(CodebookVersion)

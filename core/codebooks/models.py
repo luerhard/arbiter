@@ -35,8 +35,12 @@ class DescriptionField(models.Model):
     codename = models.CharField(
         max_length=32, unique=True, blank=True, null=True
     )  # Can be also named index
-    order_index = models.PositiveIntegerField(unique=True)
+    order_index = models.PositiveIntegerField(unique=True, blank=False)
     codebook_description = models.TextField()
+
+
+    def __str__(self):
+        return f"{self.codename if self.codename else ""} Description Field"
 
 
 class DefinitionField(models.Model):
@@ -44,10 +48,14 @@ class DefinitionField(models.Model):
     codename = models.CharField(
         max_length=32, unique=True, blank=True, null=True
     )  # Can be also named index
-    order_index = models.PositiveIntegerField(unique=True)
+    order_index = models.PositiveIntegerField(unique=True, blank=False)
     term = models.CharField(max_length=31)
     short_description = models.CharField(max_length=1000)
-    long_description = models.TextField()
+    long_description = models.TextField(blank=True)
+
+
+    def __str__(self):
+        return f"{self.codename if self.codename else ""} Definition Field"
 
 
 class ExampleField(models.Model):
@@ -55,7 +63,12 @@ class ExampleField(models.Model):
     codename = models.CharField(
         max_length=32, unique=True, blank=True, null=True
     )  # Can be also named index
-    order_index = models.PositiveIntegerField(unique=True)
+    order_index = models.PositiveIntegerField(unique=True, blank=False)
     definition_field = models.ForeignKey(DefinitionField, on_delete=models.SET_NULL, null=True)
-    example = models.CharField(max_length=300)
+    preamble = models.TextField(blank=True, null=True)
+    example = models.CharField(max_length=1000)
     comment = models.TextField(blank=True, null=True)
+
+
+    def __str__(self):
+        return f"{self.codename if self.codename else ""} Example Field"
