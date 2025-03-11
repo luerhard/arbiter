@@ -38,9 +38,8 @@ class DescriptionField(models.Model):
     order_index = models.PositiveIntegerField(unique=True, blank=False)
     codebook_description = models.TextField()
 
-
     def __str__(self):
-        return f"{self.codename if self.codename else ""} Description Field"
+        return f"{self.codename if self.codename else ''} Description Field"
 
 
 class DefinitionField(models.Model):
@@ -53,9 +52,8 @@ class DefinitionField(models.Model):
     short_description = models.CharField(max_length=1000)
     long_description = models.TextField(blank=True)
 
-
     def __str__(self):
-        return f"{self.codename if self.codename else ""} Definition Field"
+        return f"{self.codename if self.codename else ''} Definition Field"
 
 
 class ExampleField(models.Model):
@@ -69,6 +67,5 @@ class ExampleField(models.Model):
     example = models.CharField(max_length=1000)
     comment = models.TextField(blank=True, null=True)
 
-
     def __str__(self):
-        return f"{self.codename if self.codename else ""} Example Field"
+        return f"{self.codename if self.codename else ''} Example Field"
