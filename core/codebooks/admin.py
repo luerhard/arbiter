@@ -68,6 +68,6 @@ class DescriptionFieldAdmin(admin.ModelAdmin):
     list_display = ("codename",)
 
     # def get_codebook_name(self, obj):
-        # return obj.codebook.name
+    # return obj.codebook.name
 
     # get_codebook_name.short_description = "Codename"
