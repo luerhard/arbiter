@@ -36,7 +36,7 @@ class CodebookVersionView(View):
             "codebook_name": codebook.name,
             "version_name": codebookv.version_name,
             "date": codebookv.date,
-            "fields": codebook_fields
+            "fields": codebook_fields,
         }
         log.debug(f"{codebook_fields.first() = }")
         log.debug(f"{dir(codebook_fields.first()) = }")

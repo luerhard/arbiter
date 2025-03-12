@@ -31,9 +31,7 @@ class CodebookVersion(models.Model):
 
 class CodebookField(models.Model):
     codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
-    codename = models.CharField(
-        max_length=32, unique=True, blank=True, null=True
-    )
+    codename = models.CharField(max_length=32, unique=True, blank=True, null=True)
     order_index = models.PositiveIntegerField(unique=True, blank=False)
 
 
