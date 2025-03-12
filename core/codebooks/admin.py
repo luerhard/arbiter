@@ -15,16 +15,16 @@ class CodebookVersionInline(admin.StackedInline):
 
 @admin.register(Codebook)
 class CodebookAdmin(admin.ModelAdmin):
-    list_display = ("name", "project", "get_latest_version", "get_latest_date")
+    list_display = ("get_latest_version", "name", "project", "get_latest_date")
     inlines = (CodebookVersionInline,)
 
     def get_latest_version(self, obj):
-        return obj.codebookversion_set.latest("date").version
+        return obj.codebookversion_set.latest("date").version_name
 
     def get_latest_date(self, obj):
         return obj.codebookversion_set.latest("date").date
 
-    get_latest_version.short_description = "Latest Version"
+    get_latest_version.short_description = "Latest Version Name"
     get_latest_date.short_description = "Date"
 
 
@@ -45,7 +45,7 @@ class ExampleFieldInline(admin.StackedInline):
 
 @admin.register(CodebookVersion)
 class CodebookVersionAdmin(admin.ModelAdmin):
-    list_display = ("get_codebook_name", "get_codebook_project", "version", "date")
+    list_display = ("version_name", "get_codebook_name", "get_codebook_project", "date")
     ordering = ("date",)
     inlines = (
         DescriptionFieldInline,

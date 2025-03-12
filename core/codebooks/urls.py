@@ -4,7 +4,7 @@ from codebooks.views import CodebookVersionView
 
 urlpatterns = [
     path(
-        "<int:project_id>/<str:codebookversion>",
+        "<int:project_id>/<str:version_name>",
         CodebookVersionView.as_view(),
         name="codebook-version",
     ),
