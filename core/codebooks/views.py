@@ -30,14 +30,22 @@ class CodebookVersionView(View):
             log.debug(f"Object does not exist. {request.path}")
             raise Http404("Page not found.")
 
-        codebook_fields = codebookv.codebookfield_set.order_by("order_index")
+        codebook_fields = []
+        for field in codebookv.codebookfield_set.order_by("order_index"):
+            if hasattr(field, "definitionfield"):
+                codebook_fields.append((field.definitionfield,"definitionfield",))
+            elif hasattr(field, "examplefield"):
+                codebook_fields.append((field.examplefield,"examplefield",))
+            elif hasattr(field, "descriptionfield"):
+                codebook_fields.append((field.descriptionfield,"descriptionfield",))
+
         context = {
             "project_name": project_user.project.name,
             "codebook_name": codebook.name,
             "version_name": codebookv.version_name,
+            "codebook_description": codebookv.codebook_description,
             "date": codebookv.date,
             "fields": codebook_fields,
         }
-        log.debug(f"{codebook_fields.first() = }")
-        log.debug(f"{dir(codebook_fields.first()) = }")
+
         return render(request, "codebooks/codebook-view.html", context)
