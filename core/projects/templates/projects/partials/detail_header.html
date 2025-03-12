@@ -12,5 +12,6 @@
             {% for user in experts %}<li class="list-group-item border-0 p-0 text-muted">{{ user.username }}</li>{% endfor %}
         </ul>
     </div>
-    <a class="btn btn-primary text-nowrap" href="{% url 'codebook-version' project.pk %}">Go to Codebook</a>
+    <a class="btn btn-primary text-nowrap"
+       href="{% url 'codebook-version' project.pk %}">Go to Codebook</a>
 </div>

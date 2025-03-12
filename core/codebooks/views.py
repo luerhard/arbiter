@@ -33,11 +33,11 @@ class CodebookVersionView(View):
         codebook_fields = []
         for field in codebookv.codebookfield_set.order_by("order_index"):
             if hasattr(field, "definitionfield"):
-                codebook_fields.append((field.definitionfield,"definitionfield",))
+                codebook_fields.append((field.definitionfield, "definitionfield"))
             elif hasattr(field, "examplefield"):
-                codebook_fields.append((field.examplefield,"examplefield",))
+                codebook_fields.append((field.examplefield, "examplefield"))
             elif hasattr(field, "descriptionfield"):
-                codebook_fields.append((field.descriptionfield,"descriptionfield",))
+                codebook_fields.append((field.descriptionfield, "descriptionfield"))
 
         context = {
             "project_name": project_user.project.name,
