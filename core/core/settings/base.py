@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_htmx",
     "colorfield",
+    "nested_admin",
     "template_partials",
     "core",
     "users",
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
     "annotation",
     "discuss",
     "expert",
+    "codebooks",
 ]
 
 MIDDLEWARE = [

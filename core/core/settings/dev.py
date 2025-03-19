@@ -53,12 +53,17 @@ LOGGING = {
         },
         "file_discuss": {
             "class": "logging.FileHandler",
-            "filename": "discuss.log",
+            "filename": "discuss/discuss.log",
             "formatter": "verbose",
         },
         "file_projects": {
             "class": "logging.FileHandler",
-            "filename": "projects.log",
+            "filename": "projects/projects.log",
+            "formatter": "verbose",
+        },
+        "file_codebooks": {
+            "class": "logging.FileHandler",
+            "filename": "codebooks/codebooks.log",
             "formatter": "verbose",
         },
     },
@@ -79,5 +84,6 @@ LOGGING = {
         },
         "discuss": {"level": "DEBUG", "handlers": ["file_discuss"]},
         "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
+        "codebooks": {"level": "DEBUG", "handlers": ["file_codebooks"]},
     },
 }
