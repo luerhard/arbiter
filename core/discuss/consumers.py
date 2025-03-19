@@ -87,7 +87,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.discussion_ended = True
         log.debug(f"Notifying the group that annotation ended for the following reason {reason}.")
         if reason == AnnotationEndReason.DISCUSSION_END:
-            message = "Everything was annotated. In one minute the chat will close and you will be sent to the projects page. Thank You!"
+            message = (
+                "Everything was annotated. In one minute the chat will close and you will "
+                "be sent to the projects page. Thank You!"
+            )
             await self.group_send_chat_message(username="system", message=message)
         elif reason == AnnotationEndReason.NO_EXAMPLES:
             ...
@@ -104,7 +107,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Notify the connected clients in group that annotation ended."""
         await self.send(
             text_data=json.dumps(
-                {"done": "/projects", "reason": event["reason"]}, ensure_ascii=False
+                {"done": "/projects", "reason": event["reason"]},
+                ensure_ascii=False,
             ),
         )
 
@@ -124,7 +128,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # For now the only assumption will be that there
             # is no disagreement and the examples are PRESENT
             log.warning(
-                "Failed to get example. Examples with disagreements queryset count is zero."
+                "Failed to get example. Examples with disagreements queryset count is zero.",
             )
             if not self.discussion_ended:
                 # batch = next(iter(Batch.objects.filter(batch_number=self.batch_id-1)))
@@ -165,7 +169,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def save_annotation(self, label_ids):
         example = self.get_example(self.scope["room_state"]["page"])
         if not example:
-            log.error(f"Couldn't get example for {self.scope["room_state"]["page"] = }")
+            log.error(f"Couldn't get example for {self.scope["room_state"]["page"] =}")
             return
         example.set_user_annotations(user=self.user, label_ids=label_ids, phase="DISCUSSION")
 
@@ -304,7 +308,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         """Save a message from a user to the database.
 
         Parameters:
-        -------
+        -----------
         username: [str] The origin username of the message.
         message: [str] The message to be saved.
         """
