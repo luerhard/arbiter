@@ -61,27 +61,29 @@ class ExampleAssignment(models.Model):
     is_discussed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
-    def previous(self):
-        return (
-            ExampleAssignment.objects.filter(
-                example__batch=self.example.batch,
-                user=self.user,
-                order__lt=self.order,
-            )
-            .order_by("-order")
-            .first()
+    def previous(self, skip_annotated: bool = False):
+        query = ExampleAssignment.objects.filter(
+            example__batch=self.example.batch,
+            user=self.user,
+            order__lt=self.order,
         )
 
-    def next(self):
-        return (
-            ExampleAssignment.objects.filter(
-                example__batch=self.example.batch,
-                user=self.user,
-                order__gt=self.order,
-            )
-            .order_by("order")
-            .first()
+        if skip_annotated:
+            query = query.filter(is_annotated=False)
+
+        return query.order_by("-order").first()
+
+    def next(self, skip_annotated: bool = False):
+        query = ExampleAssignment.objects.filter(
+            example__batch=self.example.batch,
+            user=self.user,
+            order__gt=self.order,
         )
+
+        if skip_annotated:
+            query = query.filter(is_annotated=False)
+
+        return query.order_by("order").first()
 
     def set_user_annotations(
         self,

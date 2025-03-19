@@ -24,7 +24,7 @@ def get_progress(user, batch):
     return {"done": done, "total": total, "current": current}
 
 
-def create_context(request, assignment):
+def create_context(request, assignment, skip_annotated: bool = False):
     """helper function to create context needed in multiple views"""
     example = assignment.example
 
@@ -34,8 +34,8 @@ def create_context(request, assignment):
 
     sub_context = {}
     sub_context["assignment"] = assignment
-    sub_context["has_next"] = bool(assignment.next())
-    sub_context["has_prev"] = bool(assignment.previous())
+    sub_context["has_next"] = bool(assignment.next(skip_annotated=skip_annotated))
+    sub_context["has_prev"] = bool(assignment.previous(skip_annotated=skip_annotated))
     sub_context["example"] = assignment.example
     sub_context["batch"] = example.batch
     sub_context["progress"] = get_progress(request.user, example.batch)
@@ -61,9 +61,16 @@ def create_context(request, assignment):
 
 def prev_sentence(request, assignment_id):
     """view is displayed when user clicks on <-"""
+    filter = request.GET.get("filter", "none")
+    if filter == "unfinished":
+        skip_annotated = True
+    else:
+        skip_annotated = False
     context = {}
-    assignment = ExampleAssignment.objects.get(id=assignment_id).previous()
-    context.update(create_context(request, assignment))
+    assignment = ExampleAssignment.objects.get(id=assignment_id).previous(
+        skip_annotated=skip_annotated,
+    )
+    context.update(create_context(request, assignment, skip_annotated=skip_annotated))
     response = ""
     partials = [
         "annotation/batch.html#sentence",
@@ -80,8 +87,13 @@ def prev_sentence(request, assignment_id):
 def next_sentence(request, assignment_id):
     """view is displayed when user clicks on ->"""
     context = {}
-    assignment = ExampleAssignment.objects.get(id=assignment_id).next()
-    context.update(create_context(request, assignment))
+    filter = request.GET.get("filter", "none")
+    if filter == "unfinished":
+        skip_annotated = True
+    else:
+        skip_annotated = False
+    assignment = ExampleAssignment.objects.get(id=assignment_id).next(skip_annotated=skip_annotated)
+    context.update(create_context(request, assignment, skip_annotated=skip_annotated))
     response = ""
     partials = [
         "annotation/batch.html#sentence",

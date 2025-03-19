@@ -14,9 +14,8 @@
      aria-valuenow="{{ progress.current }}"
      aria-valuemin="1"
      aria-valuemax="100">
-    <div class="progress-bar bg-primary overflow-visible w-{{ progress.current }} px-2">
-        {{ progress.done }} / {{ progress.total }}
-    </div>
+    <div class="progress-bar bg-primary overflow-visible px-2"
+         style="width: {{ progress.current }}%">{{ progress.done }} / {{ progress.total }}</div>
 </div>
 {% endpartialdef %}
 {% partialdef sentence %}
@@ -57,6 +56,7 @@
                 class="btn btn-outline-primary"
                 hx-swap-oob="true"
                 hx-get="{% url 'annotate-prev' assignment_id=assignment.id %}"
+                hx-include="#filterState"
                 hx-trigger="click,keydown[keyCode==37] from:window">
             <i class="bi bi-arrow-left"></i>
         </button>
@@ -71,6 +71,7 @@
         <button id="next-btn"
                 hx-swap-oob="true"
                 hx-get="{% url 'annotate-next' assignment_id=assignment.id %}"
+                hx-include="#filterState"
                 class="btn btn-outline-primary"
                 hx-trigger="click,keydown[keyCode==39] from:body">
             <i class="bi bi-arrow-right"></i>
@@ -79,51 +80,103 @@
 </div>
 {% endpartialdef %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="row">
-            <div class="col">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col">
-                                <h2 class="card-title text-center pb-5">Annotate Sentence</h2>
-                                {% partial pbar %}
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="card">{% partial sentence %}</div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">{% partial labels %}</div>
-                        </div>
-                        <div class="row">
-                            <div class="col text-center">
-                                <div id="buttons" class="mt-5 btn-group" role="group">
-                                    <div id="buttons">{% partial nav-block %}</div>
-                                </div>
-                            </div>
+    <!--top navigation-->
+    <div class="row mt-3 mb-3 justify-content-start">
+        <div class="col">
+            <input type="hidden" name="filter" id="filterState" value="none">
+            <button id="unfinished-toggle"
+                    tabindex="-1"
+                    class="btn btn-sm btn-outline-primary"
+                    onclick="toggleFilter()">Only unfinished</button>
+            <button class="btn btn-sm btn-outline-primary"
+                    id="codebook-toggle"
+                    tabindex="-1"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#codebook-col"
+                    onclick="toggleCodebook()">Show Codebook</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="row">
+                <div class="col mt-3">{% partial pbar %}</div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="card shadow-sm">{% partial sentence %}</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col">{% partial labels %}</div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col text-center">
+                        <div id="buttons" class="mt-5 btn-group" role="group">
+                            <div id="buttons">{% partial nav-block %}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div class="col-5 collapse" id="codebook-col">The Codebook can go here.</div>
     </div>
     <script>
+        // set state of button and hidden variable for filter variable
+        function toggleFilter() {
+            const btn = document.getElementById("unfinished-toggle");
+            const filterInput = document.getElementById("filterState");
+            if (filterInput.value === "none") {
+                filterInput.value = "unfinished";
+                btn.classList.remove("btn-outline-primary");
+                btn.classList.add("btn-primary");
+            } else {
+                filterInput.value = "none";
+                btn.classList.remove("btn-primary");
+                btn.classList.add("btn-outline-primary");
+            }
+        };
+
+        // auto-maximize contrast for font in colored buttons
         document.querySelectorAll('.btn-custom-color').forEach(button => {
             const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
             const textColor = lib.funcs.inferTextColorByContrast(color)
             button.style.setProperty("--text-color", textColor);
         });
 
+        // show state of codebook expansion on the button
+        document.addEventListener("DOMContentLoaded", function() {
+            const codebookToggle = document.getElementById("codebook-toggle");
+            const codebookCol = document.getElementById("codebook-col");
+
+            codebookCol.addEventListener("shown.bs.collapse", function() {
+                codebookToggle.classList.remove("btn-outline-primary");
+                codebookToggle.classList.add("btn-primary");
+            });
+
+            codebookCol.addEventListener("hidden.bs.collapse", function() {
+                codebookToggle.classList.remove("btn-primary");
+                codebookToggle.classList.add("btn-outline-primary");
+            });
+        });
+
+        // disable enter button (should only ever toggle "Saved")
+        // necessary to not toggle the filter / codebook buttons when they were clicked previously
+        document.querySelectorAll('button').forEach(function(button) {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+
         document.addEventListener("htmx:load", function() {
             const checkboxes = document.querySelectorAll('input[type="checkbox"]');
             checkboxes.forEach(function(checkbox) {
-                const hotkey = checkbox.getAttribute('data-hotkey'); // Get custom hotkey from data attribute
+                // Get custom hotkey from data attribute
+                const hotkey = checkbox.getAttribute('data-hotkey');
                 if (hotkey) {
                     Mousetrap.bind(hotkey, function() {
-                        checkbox.checked = !checkbox.checked; // Toggle the checkbox on key press
+                        // Toggle the checkbox on key press
+                        checkbox.checked = !checkbox.checked;
                     });
                 }
             });
