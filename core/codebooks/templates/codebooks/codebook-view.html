@@ -46,7 +46,9 @@
                         <div class="text-justify mb-4" style="text-indent: 25px">{{ description.codebook_description }}</div>
                     {% endfor %}
                     {% for definition in codebookv.definitions.all %}
-                        <div class="h5 fw-bold">{{ field.identifier }}</div>
+                        <div class="h5">
+                            <span class="fw-bold">{{ definition.title }}</span>: #{{ definition.identifier }}
+                        </div>
                         <div class="text-justify" style="text-indent: 25px">{{ definition.short_description }}</div>
                         <div class="text-justify" style="text-indent: 25px">{{ definition.long_description }}</div>
                         {% for example in definition.examples.all %}
