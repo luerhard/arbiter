@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "widget_tweaks",
     "django_htmx",
     "colorfield",
+    "nested_admin",
     "core",
     "users",
     "data",

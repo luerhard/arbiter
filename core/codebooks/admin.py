@@ -1,4 +1,5 @@
 from django.contrib import admin
+import nested_admin
 
 from .models import Codebook
 from .models import CodebookVersion
@@ -19,38 +20,39 @@ class CodebookAdmin(admin.ModelAdmin):
     inlines = (CodebookVersionInline,)
 
     def get_latest_version(self, obj):
-        return obj.codebookversion_set.latest("date").version_name
+        return obj.versions.order_by("date")[0].version_name
 
     def get_latest_date(self, obj):
-        return obj.codebookversion_set.latest("date").date
+        return obj.versions.order_by("date")[0].date
 
     get_latest_version.short_description = "Latest Version Name"
     get_latest_date.short_description = "Date"
 
 
-class DescriptionFieldInline(admin.StackedInline):
+class DescriptionFieldInline(nested_admin.NestedStackedInline):
     model = DescriptionField
     extra = 0
 
 
-class DefinitionFieldInline(admin.StackedInline):
+class ExampleFieldInline(nested_admin.NestedStackedInline):
+    model = ExampleField
+    sortable_field_name = "order_index"
+    extra = 0
+
+
+class DefinitionFieldInline(nested_admin.NestedStackedInline):
     model = DefinitionField
     extra = 0
-
-
-class ExampleFieldInline(admin.StackedInline):
-    model = ExampleField
-    extra = 0
+    inlines = [ExampleFieldInline]
 
 
 @admin.register(CodebookVersion)
-class CodebookVersionAdmin(admin.ModelAdmin):
+class CodebookVersionAdmin(nested_admin.NestedModelAdmin):
     list_display = ("version_name", "get_codebook_name", "get_codebook_project", "date")
     ordering = ("date",)
     inlines = (
         DescriptionFieldInline,
         DefinitionFieldInline,
-        ExampleFieldInline,
     )
 
     def get_codebook_name(self, obj):
