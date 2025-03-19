@@ -15,7 +15,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div>
+                                <div class="col">
                                     <dl>
                                         <div class="d-flex justify-content-between">
                                             <dt class="fw-bold text-nowrap">Project</dt>
@@ -43,23 +43,44 @@
                 </div>
                 <div class="card-body">
                     {% for description in codebookv.descriptions.all %}
-                        <div class="text-justify mb-4" style="text-indent: 25px">{{ description.codebook_description }}</div>
+                        <div class="text-justify my-2">{{ description.codebook_description | safe }}</div>
                     {% endfor %}
                     {% for definition in codebookv.definitions.all %}
-                        <div class="h5">
-                            <span class="fw-bold">{{ definition.title }}</span>: #{{ definition.identifier }}
+                        <div class="card border-0 p-2">
+                            <div class="card-body">
+                                <h5 class="card-header">
+                                    {{ definition.title }}<span class="text-muted">&nbsp;#{{ definition.identifier }}</span>
+                                </h5>
+                                <div class="text-justify my-2">{{ definition.short_description | safe }}</div>
+                                <div class="text-justify my-2">{{ definition.long_description | safe }}</div>
+                                {% if definition.examples %}
+                                    <ul class="list-group p-4">
+                                        {% for example in definition.examples.all %}
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col fw-bold h6">
+                                                        Example {{ example.order_index }}: <span class="text-muted">#{{ definition.identifier }}:{{ example.identifier }}</span>
+                                                    </div>
+                                                </div>
+                                                {% if example.preamble %}
+                                                    <div class="row small">
+                                                        <div class="col text-justify">{{ example.preamble }}</div>
+                                                    </div>
+                                                {% endif %}
+                                                <div class="row my-3">
+                                                    <div class="col fw-bold">{{ example.example }}</div>
+                                                </div>
+                                                {% if example.comment %}
+                                                    <div class="row">
+                                                        <div class="col small">{{ example.comment }}</div>
+                                                    </div>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
                         </div>
-                        <div class="text-justify" style="text-indent: 25px">{{ definition.short_description }}</div>
-                        <div class="text-justify" style="text-indent: 25px">{{ definition.long_description }}</div>
-                        {% for example in definition.examples.all %}
-                            <div class="text-justify" style="text-indent: 25px">{{ example.preamble }}</div>
-                            <ul>
-                                <li>
-                                    <em>{{ example.example }}</em>
-                                </li>
-                            </ul>
-                            <div class="text-justify">{{ example.comment }}</div>
-                        {% endfor %}
                     {% endfor %}
                 </div>
             </div>
