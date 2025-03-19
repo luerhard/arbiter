@@ -6,8 +6,8 @@
                 <div class="card-header border-bottom-0">
                     <div class="d-flex justify-content-center">
                         <h2 class="fw-bold">
-                            {{ codebook_name }}
-                            <small class="text-muted">{{ version_name }}</small>
+                            {{ codebook.name }}
+                            <small class="text-muted">{{ codebookv.version_name }}</small>
                         </h2>
                     </div>
                 </div>
@@ -20,19 +20,19 @@
                                         <div class="d-flex justify-content-between">
                                             <dt class="fw-bold text-nowrap">Project</dt>
                                             <dd>
-                                                {{ project_name }}
+                                                {{ project.name }}
                                             </dd>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <dt class="fw-bold text-nowrap">Date</dt>
                                             <dd>
-                                                {{ date }}
+                                                {{ codebookv.date }}
                                             </dd>
                                         </div>
                                         <div class="d-flex justify-content-between">
                                             <dt class="fw-bold text-nowrap">Description</dt>
                                             <dd style="width: 50rem;">
-                                                {{ codebook_description }}
+                                                {{ codebookv.codebook_description }}
                                             </dd>
                                         </div>
                                     </dl>
@@ -42,22 +42,22 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    {% for field, type in fields %}
-                        {% if type == "definitionfield" %}
-                            <div class="h5 fw-bold">{{ field.term }}</div>
-                            <div class="text-justify" style="text-indent: 25px">{{ field.short_description }}</div>
-                            <div class="text-justify" style="text-indent: 25px">{{ field.long_description }}</div>
-                        {% elif type == "examplefield" %}
-                            <div class="text-justify" style="text-indent: 25px">{{ field.preamble }}</div>
+                    {% for description in codebookv.descriptions.all %}
+                        <div class="text-justify mb-4" style="text-indent: 25px">{{ description.codebook_description }}</div>
+                    {% endfor %}
+                    {% for definition in codebookv.definitions.all %}
+                        <div class="h5 fw-bold">{{ field.identifier }}</div>
+                        <div class="text-justify" style="text-indent: 25px">{{ definition.short_description }}</div>
+                        <div class="text-justify" style="text-indent: 25px">{{ definition.long_description }}</div>
+                        {% for example in definition.examples.all %}
+                            <div class="text-justify" style="text-indent: 25px">{{ example.preamble }}</div>
                             <ul>
                                 <li>
-                                    <em>{{ field.example }}</em>
+                                    <em>{{ example.example }}</em>
                                 </li>
                             </ul>
-                            <div class="text-justify">{{ field.comment }}</div>
-                        {% elif type == "descriptionfield" %}
-                            <div class="text-justify mb-4" style="text-indent: 25px">{{ field.codebook_description }}</div>
-                        {% endif %}
+                            <div class="text-justify">{{ example.comment }}</div>
+                        {% endfor %}
                     {% endfor %}
                 </div>
             </div>

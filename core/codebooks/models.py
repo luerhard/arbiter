@@ -11,7 +11,11 @@ from django.db import models
 
 class Codebook(models.Model):
     name = models.CharField(max_length=100)
-    project = models.ForeignKey("projects.Project", null=True, on_delete=models.SET_NULL)
+    project = models.ForeignKey(
+        "projects.Project",
+        related_name="codebooks",
+        on_delete=models.CASCADE,
+    )
 
     def __str__(self):
         return f"{self.name} - {self.project}"
@@ -22,40 +26,76 @@ class CodebookVersion(models.Model):
 
     version_name = models.CharField("Version Name", max_length=10)
     date = models.DateTimeField("Addition Date")
-    codebook = models.ForeignKey(Codebook, on_delete=models.CASCADE)
+    codebook = models.ForeignKey(Codebook, related_name="versions", on_delete=models.CASCADE)
     codebook_description = models.TextField()
 
     def __str__(self):
         return f"{self.codebook.name} - {self.codebook.project} - {self.version_name}"
 
 
-class CodebookField(models.Model):
-    codebook_version = models.ForeignKey(CodebookVersion, on_delete=models.CASCADE, null=False)
-    codename = models.CharField(max_length=32, unique=True, blank=True, null=True)
-    order_index = models.PositiveIntegerField(unique=True, blank=False)
-
-
-class DescriptionField(CodebookField):
+class DescriptionField(models.Model):
+    codebook_version = models.ForeignKey(
+        CodebookVersion,
+        related_name="descriptions",
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(max_length=32, blank=True, null=True)
+    order_index = models.PositiveIntegerField(blank=False)
     codebook_description = models.TextField()
 
+    class Meta:
+        ordering = ["order_index"]
+        unique_together = [
+            ("codebook_version", "title"),
+            ("codebook_version", "order_index"),
+        ]
+
     def __str__(self):
-        return f"{self.codename if self.codename else ''} Description Field"
+        return f"{self.title or ''} Description Field"
 
 
-class DefinitionField(CodebookField):
-    term = models.CharField(max_length=31)
+class DefinitionField(models.Model):
+    codebook_version = models.ForeignKey(
+        CodebookVersion,
+        related_name="definitions",
+        on_delete=models.CASCADE,
+    )
+    title = models.CharField(max_length=32, blank=True, null=True)
+    identifier = models.CharField(max_length=31, blank=True, null=True)
+    order_index = models.PositiveIntegerField(blank=False)
     short_description = models.CharField(max_length=1000)
     long_description = models.TextField(blank=True)
 
+    class Meta:
+        ordering = ["order_index"]
+        unique_together = [
+            ("codebook_version", "title"),
+            ("codebook_version", "identifier"),
+            ("codebook_version", "order_index"),
+        ]
+
     def __str__(self):
-        return f"{self.codename if self.codename else ''} Definition Field"
+        return f"{self.title or ''} Definition Field"
 
 
-class ExampleField(CodebookField):
-    definition_field = models.ForeignKey(DefinitionField, on_delete=models.SET_NULL, null=True)
+class ExampleField(models.Model):
+    definition_field = models.ForeignKey(
+        DefinitionField,
+        related_name="examples",
+        on_delete=models.CASCADE,
+    )
+    identifier = models.CharField(max_length=32, blank=False)
+    order_index = models.PositiveIntegerField(blank=True, null=True)
     preamble = models.TextField(blank=True, null=True)
     example = models.CharField(max_length=1000)
     comment = models.TextField(blank=True, null=True)
 
+    class Meta:
+        ordering = ["order_index"]
+        unique_together = [
+            ("definition_field", "identifier"),
+            ("definition_field", "order_index"),
+        ]
+
     def __str__(self):
-        return f"{self.codename if self.codename else ''} Example Field"
+        return f"{self.identifier or ''} Example Field"

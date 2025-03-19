@@ -1,51 +1,47 @@
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views import View
 
-from projects.models import ProjectUser
+from .models import CodebookVersion
+from projects.models import Project
 
 log = logging.getLogger(__name__)
 log.debug("------Reload-------")
 
 
 class CodebookVersionView(View):
-    def get(self, request, project_id, version_name=None, *args, **kwargs):
+    def get(self, request, project_id, version_name=None, *args, **kwargs):  # noqa: ARG002
         log.debug(f"Request: {request}")
-        try:
-            # Check if the requesting user is tied to the specified project
-            project_user = ProjectUser.objects.get(user=request.user, project__id=project_id)
-            # Attempt to get the codebook associated with the project
-            codebook = project_user.project.codebook_set.get()
-            # Get the RelatedManager for codebookversions
-            codebookversions = codebook.codebookversion_set
-            # Attempt to get the CodebookVersion for the specified project
-            if version_name:
-                codebookv = codebookversions.get(version_name=version_name)
-            else:
-                codebookv = codebookversions.latest("date")
-        except ObjectDoesNotExist as e:
-            log.debug(f"Object does not exist. {request.path}")
-            raise Http404("Page not found.")
 
-        codebook_fields = []
-        for field in codebookv.codebookfield_set.order_by("order_index"):
-            if hasattr(field, "definitionfield"):
-                codebook_fields.append((field.definitionfield, "definitionfield"))
-            elif hasattr(field, "examplefield"):
-                codebook_fields.append((field.examplefield, "examplefield"))
-            elif hasattr(field, "descriptionfield"):
-                codebook_fields.append((field.descriptionfield, "descriptionfield"))
+        project = get_object_or_404(Project, id=project_id)
+
+        if version_name:
+            codebookv = (
+                get_object_or_404(
+                    CodebookVersion, codebook__project=project, version_name=version_name,
+                )
+                .prefetch_related("definitions", "definitions_examples")
+                .prefetch_related("descriptions")
+            )
+        else:
+            try:
+                codebookv = (
+                    CodebookVersion.objects.filter(codebook__project=project)
+                    .order_by("date")
+                    .prefetch_related("definitions__examples")
+                    .prefetch_related("descriptions")[0]
+                )
+            except IndexError:
+                msg = "No codebooks exist."
+                raise Http404(msg)  # noqa: B904
 
         context = {
-            "project_name": project_user.project.name,
-            "codebook_name": codebook.name,
-            "version_name": codebookv.version_name,
-            "codebook_description": codebookv.codebook_description,
-            "date": codebookv.date,
-            "fields": codebook_fields,
+            "project": project,
+            "codebook": codebookv.codebook,
+            "codebookv": codebookv,
         }
 
         return render(request, "codebooks/codebook-view.html", context)
