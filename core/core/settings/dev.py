@@ -53,17 +53,17 @@ LOGGING = {
         },
         "file_discuss": {
             "class": "logging.FileHandler",
-            "filename": "discuss/discuss.log",
+            "filename": BASE_DIR.parent / "discuss.log",
             "formatter": "verbose",
         },
         "file_projects": {
             "class": "logging.FileHandler",
-            "filename": "projects/projects.log",
+            "filename": BASE_DIR.parent / "projects.log",
             "formatter": "verbose",
         },
         "file_codebooks": {
             "class": "logging.FileHandler",
-            "filename": "codebooks/codebooks.log",
+            "filename": BASE_DIR.parent / "codebooks.log",
             "formatter": "verbose",
         },
     },
