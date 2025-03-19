@@ -20,10 +20,10 @@ class CodebookAdmin(admin.ModelAdmin):
     inlines = (CodebookVersionInline,)
 
     def get_latest_version(self, obj):
-        return obj.codebookversion_set.latest("date").version_name
+        return obj.versions.order_by("date")[0].version_name
 
     def get_latest_date(self, obj):
-        return obj.codebookversion_set.latest("date").date
+        return obj.versions.order_by("date")[0].date
 
     get_latest_version.short_description = "Latest Version Name"
     get_latest_date.short_description = "Date"
