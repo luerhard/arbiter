@@ -21,7 +21,9 @@ class CodebookVersionView(View):
         if version_name:
             codebookv = (
                 get_object_or_404(
-                    CodebookVersion, codebook__project=project, version_name=version_name,
+                    CodebookVersion,
+                    codebook__project=project,
+                    version_name=version_name,
                 )
                 .prefetch_related("definitions", "definitions_examples")
                 .prefetch_related("descriptions")

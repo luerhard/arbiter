@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,62 +16,126 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Codebook",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=100)),
-                ("project", models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to="projects.project")),
+                (
+                    "project",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="projects.project",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name="CodebookVersion",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("version_name", models.CharField(max_length=10, verbose_name="Version Name")),
                 ("date", models.DateTimeField(verbose_name="Addition Date")),
                 ("codebook_description", models.TextField()),
-                ("codebook", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebook")),
+                (
+                    "codebook",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebook"
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name="DefinitionField",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("title", models.CharField(blank=True, max_length=32, null=True)),
                 ("identifier", models.CharField(blank=True, max_length=31, null=True)),
                 ("order_index", models.PositiveIntegerField()),
                 ("short_description", models.CharField(max_length=1000)),
                 ("long_description", models.TextField(blank=True)),
-                ("codebook_version", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebookversion")),
+                (
+                    "codebook_version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebookversion"
+                    ),
+                ),
             ],
             options={
-                "unique_together": {("codebook_version", "identifier"), ("codebook_version", "order_index"), ("codebook_version", "title")},
+                "unique_together": {
+                    ("codebook_version", "identifier"),
+                    ("codebook_version", "order_index"),
+                    ("codebook_version", "title"),
+                },
             },
         ),
         migrations.CreateModel(
             name="DescriptionField",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("title", models.CharField(blank=True, max_length=32, null=True)),
                 ("order_index", models.PositiveIntegerField()),
                 ("codebook_description", models.TextField()),
-                ("codebook_version", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebookversion")),
+                (
+                    "codebook_version",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="codebooks.codebookversion"
+                    ),
+                ),
             ],
             options={
-                "unique_together": {("codebook_version", "order_index"), ("codebook_version", "title")},
+                "unique_together": {
+                    ("codebook_version", "order_index"),
+                    ("codebook_version", "title"),
+                },
             },
         ),
         migrations.CreateModel(
             name="ExampleField",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("identifier", models.CharField(max_length=32)),
                 ("order_index", models.PositiveIntegerField(blank=True, null=True)),
                 ("preamble", models.TextField(blank=True, null=True)),
                 ("example", models.CharField(max_length=1000)),
                 ("comment", models.TextField(blank=True, null=True)),
-                ("definition_field", models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to="codebooks.definitionfield")),
+                (
+                    "definition_field",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="codebooks.definitionfield",
+                    ),
+                ),
             ],
             options={
-                "unique_together": {("definition_field", "identifier"), ("definition_field", "order_index")},
+                "unique_together": {
+                    ("definition_field", "identifier"),
+                    ("definition_field", "order_index"),
+                },
             },
         ),
     ]

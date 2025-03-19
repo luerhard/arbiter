@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("codebooks", "0001_initial"),
         ("projects", "0007_batch_codebook_version"),
@@ -28,26 +27,46 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="codebook",
             name="project",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="codebooks", to="projects.project"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="codebooks",
+                to="projects.project",
+            ),
         ),
         migrations.AlterField(
             model_name="codebookversion",
             name="codebook",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="versions", to="codebooks.codebook"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="versions",
+                to="codebooks.codebook",
+            ),
         ),
         migrations.AlterField(
             model_name="definitionfield",
             name="codebook_version",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="definitions", to="codebooks.codebookversion"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="definitions",
+                to="codebooks.codebookversion",
+            ),
         ),
         migrations.AlterField(
             model_name="descriptionfield",
             name="codebook_version",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="descriptions", to="codebooks.codebookversion"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="descriptions",
+                to="codebooks.codebookversion",
+            ),
         ),
         migrations.AlterField(
             model_name="examplefield",
             name="definition_field",
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="examples", to="codebooks.definitionfield"),
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="examples",
+                to="codebooks.definitionfield",
+            ),
         ),
     ]

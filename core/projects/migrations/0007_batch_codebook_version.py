@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("codebooks", "0001_initial"),
         ("projects", "0006_alter_projectuser_unique_together_and_more"),
@@ -16,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="batch",
             name="codebook_version",
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to="codebooks.codebookversion"),
+            field=models.ForeignKey(
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                to="codebooks.codebookversion",
+            ),
         ),
     ]
