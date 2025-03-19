@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "django_htmx",
     "colorfield",
     "nested_admin",
+    "template_partials",
     "core",
     "users",
     "data",
