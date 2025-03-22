@@ -33,28 +33,28 @@ class CodebookVersion(models.Model):
         return f"{self.codebook.name} - {self.codebook.project} - {self.version_name}"
 
 
-class DescriptionField(models.Model):
+class Description(models.Model):
     codebook_version = models.ForeignKey(
         CodebookVersion,
         related_name="descriptions",
         on_delete=models.CASCADE,
     )
     title = models.CharField(max_length=32, blank=True, null=True)
-    order_index = models.PositiveIntegerField(blank=False)
+    order = models.PositiveIntegerField(blank=False)
     codebook_description = models.TextField()
 
     class Meta:
-        ordering = ["order_index"]
+        ordering = ["order"]
         unique_together = [
             ("codebook_version", "title"),
-            ("codebook_version", "order_index"),
+            ("codebook_version", "order"),
         ]
 
     def __str__(self):
         return f"{self.title or ''} Description Field"
 
 
-class DefinitionField(models.Model):
+class Definition(models.Model):
     codebook_version = models.ForeignKey(
         CodebookVersion,
         related_name="definitions",
@@ -62,39 +62,39 @@ class DefinitionField(models.Model):
     )
     title = models.CharField(max_length=32, blank=True, null=True)
     identifier = models.CharField(max_length=31, blank=True, null=True)
-    order_index = models.PositiveIntegerField(blank=False)
+    order = models.PositiveIntegerField(blank=False)
     short_description = models.CharField(max_length=1000)
     long_description = models.TextField(blank=True)
 
     class Meta:
-        ordering = ["order_index"]
+        ordering = ["order"]
         unique_together = [
             ("codebook_version", "title"),
             ("codebook_version", "identifier"),
-            ("codebook_version", "order_index"),
+            ("codebook_version", "order"),
         ]
 
     def __str__(self):
         return f"{self.title or ''} Definition Field"
 
 
-class ExampleField(models.Model):
-    definition_field = models.ForeignKey(
-        DefinitionField,
+class Example(models.Model):
+    definition = models.ForeignKey(
+        Definition,
         related_name="examples",
         on_delete=models.CASCADE,
     )
     identifier = models.CharField(max_length=32, blank=False)
-    order_index = models.PositiveIntegerField(blank=True, null=True)
+    order = models.PositiveIntegerField(blank=True, null=True)
     preamble = models.TextField(blank=True, null=True)
     example = models.CharField(max_length=1000)
     comment = models.TextField(blank=True, null=True)
 
     class Meta:
-        ordering = ["order_index"]
+        ordering = ["order"]
         unique_together = [
-            ("definition_field", "identifier"),
-            ("definition_field", "order_index"),
+            ("definition", "identifier"),
+            ("definition", "order"),
         ]
 
     def __str__(self):

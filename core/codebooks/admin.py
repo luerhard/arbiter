@@ -3,9 +3,9 @@ import nested_admin
 
 from .models import Codebook
 from .models import CodebookVersion
-from .models import DefinitionField
-from .models import DescriptionField
-from .models import ExampleField
+from .models import Definition
+from .models import Description
+from .models import Example
 
 
 class CodebookVersionInline(admin.StackedInline):
@@ -29,21 +29,21 @@ class CodebookAdmin(admin.ModelAdmin):
     get_latest_date.short_description = "Date"
 
 
-class DescriptionFieldInline(nested_admin.NestedStackedInline):
-    model = DescriptionField
+class DescriptionInline(nested_admin.NestedStackedInline):
+    model = Description
     extra = 0
 
 
-class ExampleFieldInline(nested_admin.NestedStackedInline):
-    model = ExampleField
+class ExampleInline(nested_admin.NestedStackedInline):
+    model = Example
     sortable_field_name = "order_index"
     extra = 0
 
 
-class DefinitionFieldInline(nested_admin.NestedStackedInline):
-    model = DefinitionField
+class DefinitionInline(nested_admin.NestedStackedInline):
+    model = Definition
     extra = 0
-    inlines = [ExampleFieldInline]
+    inlines = [ExampleInline]
 
 
 @admin.register(CodebookVersion)
@@ -51,8 +51,8 @@ class CodebookVersionAdmin(nested_admin.NestedModelAdmin):
     list_display = ("version_name", "get_codebook_name", "get_codebook_project", "date")
     ordering = ("date",)
     inlines = (
-        DescriptionFieldInline,
-        DefinitionFieldInline,
+        DescriptionInline,
+        DefinitionInline,
     )
 
     def get_codebook_name(self, obj):
