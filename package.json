@@ -36,6 +36,7 @@
     "bootstrap-icons": "^1.11.3",
     "htmx-ext-ws": "^2.0.1",
     "htmx.org": "^2.0.2",
-    "mousetrap": "^1.6.5"
+    "mousetrap": "^1.6.5",
+    "sortablejs": "^1.15.6"
   }
 }

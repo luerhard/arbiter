@@ -1,0 +1,18 @@
+<form hx-post="{% url 'codebook-sort-examples' %}"
+      hx-trigger="end"
+      hx-swap="outerHTML">
+    <input type="hidden" name="definition_id" value="{{ definition.pk }}">
+    <div class="sortable list-group">
+        {% for example in definition.examples.all %}
+            <li class="list-group-item">
+                <input type="hidden" name="example_order" value="{{ example.pk }}">
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">#{{ definition.identifier }}:{{ example.identifier }}</span>
+                    <i class="bi bi-arrows-move h6 handle"></i>
+                </div>
+                <div class="d-flex justify-content-start fw-bold h6">Example {{ example.order }}:&nbsp;{{ example.example }}</div>
+                {% if example.comment %}<div class="d-flex small">{{ example.comment }}</div>{% endif %}
+            </li>
+        {% endfor %}
+    </div>
+</form>

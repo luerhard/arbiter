@@ -94,7 +94,6 @@ class Example(models.Model):
         ordering = ["order"]
         unique_together = [
             ("definition", "identifier"),
-            ("definition", "order"),
         ]
 
     def __str__(self):

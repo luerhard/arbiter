@@ -4,10 +4,10 @@ import "./htmx.js";
 import "htmx-ext-ws";
 // boostrap-icons
 import "bootstrap-icons/font/bootstrap-icons.scss";
-import * as bootstrap from 'bootstrap';
+import * as bootstrap from "bootstrap";
 // Mouse hotkeys
-import * as mousetrap from 'mousetrap';
-// Place any custom JS here
+// import * as mousetrap from 'mousetrap';
+// javascript sortables (for codebook)
 
 import * as funcs from "./functions";
 import * as discuss from "./discuss";
@@ -22,6 +22,12 @@ htmx.logger = function (elt, event, data) {
 }
 
 htmx.logAll();
+
+//htmx + sortablejs integration
+htmx.onLoad(function(content) {
+    var sortables = content.querySelectorAll(".sortable");
+    funcs.sortableInit(sortables);
+})
 
 function createToast(message) {
     // Clone the template
