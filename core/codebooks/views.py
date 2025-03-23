@@ -1,11 +1,14 @@
 import logging
 
+from django.contrib import messages
+from django.db.models import Max
 from django.http import Http404
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views import View
+from django_htmx.http import HttpResponseClientRefresh
 
+from .forms import ExampleForm
 from .models import CodebookVersion
 from .models import Definition
 from .models import Example
@@ -68,8 +71,36 @@ def sort_examples(request):
         ex.order = i
         to_save.append(ex)
     Example.objects.bulk_update(to_save, fields=["order"])
-    print(f"LIST : {example_order=}")
     context = {}
     definition = Definition.objects.filter(pk=definition_id).prefetch_related("examples").get()
     context["definition"] = definition
     return render(request, "codebooks/partials/edit_example_list.html", context)
+
+
+class AddExample(View):
+    def post(self, request, definition_id):  # noqa: ARG002
+        definition = get_object_or_404(Definition, id=definition_id)
+        form = ExampleForm(self.request.POST)
+        if form.is_valid():
+            example = form.save(commit=False)
+            example.definition = definition
+            max_order = definition.examples.aggregate(Max("order")).get("order__max", 0)
+            example.order = max_order + 1
+            example.save()
+            messages.success(request, "Example added")
+            return HttpResponseClientRefresh()
+        else:
+            messages.error(request, "Error occurred. Is identifier unique?")
+
+    def get(self, request, definition_id):
+        form = ExampleForm(initial={"definition": definition_id})
+        return render(request, "codebooks/partials/add-example-modal.html", {"form": form})
+
+    def delete(self, request, definition_id, example_id):
+        example = Example.objects.get(id=example_id)
+        example.delete()
+        messages.success(request, "")
+        context = {}
+        definition = Definition.objects.filter(pk=definition_id).prefetch_related("examples").get()
+        context["definition"] = definition
+        return render(request, "codebooks/partials/edit_example_list.html", context)

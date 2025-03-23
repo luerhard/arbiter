@@ -1,4 +1,6 @@
+{% load widget_tweaks %}
 <form hx-post="{% url 'codebook-sort-examples' %}"
+      id="example_list_{{ definition.pk }}"
       hx-trigger="end"
       hx-swap="outerHTML">
     <input type="hidden" name="definition_id" value="{{ definition.pk }}">
@@ -8,7 +10,12 @@
                 <input type="hidden" name="example_order" value="{{ example.pk }}">
                 <div class="d-flex justify-content-between">
                     <span class="text-muted">#{{ definition.identifier }}:{{ example.identifier }}</span>
-                    <i class="bi bi-arrows-move h6 handle"></i>
+                    <div class="px-2">
+                        <a hx-delete="{% url 'codebook-delete-example' definition_id=definition.id example_id=example.id %}"
+                           hx-target="#example_list_{{ definition.pk }}"
+                           hx-confirm="Are you sure?"><i class="bi bi-x-circle h6 px-3"></i></a>
+                        <i class="bi bi-arrows-move h6 handle"></i>
+                    </div>
                 </div>
                 <div class="d-flex justify-content-start fw-bold h6">Example {{ example.order }}:&nbsp;{{ example.example }}</div>
                 {% if example.comment %}<div class="d-flex small">{{ example.comment }}</div>{% endif %}
