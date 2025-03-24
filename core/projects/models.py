@@ -94,6 +94,16 @@ class Batch(models.Model):
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
 
+    def save(self, **kwargs):
+        if self._state.adding is True:
+            max_batch_number = (
+                Batch.objects.filter(project=self.project)
+                .aggregate(models.Max("batch_number"))
+                .get("batch_number__max", 0)
+            )
+            self.batch_number = (max_batch_number or 0) + 1
+        super().save(**kwargs)
+
     @property
     def labels(self):
         return self.project.labels
