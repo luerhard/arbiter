@@ -54,7 +54,12 @@ class Codebook(models.Model):
         tag_old = f"batch_{old}"
         tag_new = f"batch_{new}"
         diff = self.repo.git.diff(
-            "--unified=99999", "--word-diff", tag_old, tag_new, "--", self.file.name,
+            "--unified=99999",
+            "--word-diff",
+            tag_old,
+            tag_new,
+            "--",
+            self.file.name,
         )
         # if files differ
         if len(diff) > 0:
