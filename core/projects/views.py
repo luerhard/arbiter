@@ -39,6 +39,7 @@ def project_detail_view(request, project_id):
 
     context = {}
     context["project"] = project
+    context["codebook"] = project.codebook.get()
 
     # get assigned users
     context["annotators"] = all_project_users.filter(
@@ -66,7 +67,6 @@ def project_detail_view(request, project_id):
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)
-        context["view_type"] = "annotator"
         log.debug(f"Providing the following context to the Annotator: {context}")
         return render(request, "projects/project-detail-annotator.html", context)
 
@@ -96,7 +96,6 @@ def project_detail_view(request, project_id):
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
 
-        context["view_type"] = "expert"
         log.debug(f"Providing the following context to the Expert: {context}")
         return render(request, "projects/project-detail-expert.html", context)
     else:

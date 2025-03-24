@@ -126,10 +126,10 @@ def annotate_batch(
     context = create_context(request, assignment)
 
     # TODO: CHANGE
-    codebook = None
+    codebook = batch.project.codebook.get()
     context["codebook"] = codebook
 
-    return render(request, "annotation/batch.html", context)
+    return render(request, "annotation/index.html", context)
 
 
 def edit(request, assignment_id):

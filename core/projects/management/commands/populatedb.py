@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from codebook.models import Codebook
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
@@ -36,6 +37,21 @@ class Command(BaseCommand):
         )
         Label.objects.create(project=project1, name="Anti-Elitism", hotkey="1")
         Label.objects.create(project=project1, name="People-Centrism", hotkey="2")
+        codebook = Codebook.objects.create(project=project1)
+
+        codebook_content = """
+= Introduction
+
+== Anti-Elitism
+
+This is how anti-elitism works.
+
+== People-Centrism
+
+This is when to annotate People-Centrism
+"""
+
+        codebook.save(content=codebook_content)
 
         for u in annotators:
             ProjectUser.objects.create(project=project1, user=u, role=ProjectUser.Role.ANNOTATOR)
