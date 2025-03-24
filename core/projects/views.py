@@ -67,7 +67,6 @@ def project_detail_view(request, project_id):
             }
             context["batches"].append(batch_data)
         context["view_type"] = "annotator"
-        context["codebook"] = project.codebook.get().get_version()
         log.debug(f"Providing the following context to the Annotator: {context}")
         return render(request, "projects/project-detail-annotator.html", context)
 
@@ -98,7 +97,6 @@ def project_detail_view(request, project_id):
             context["batches"].append(batch_data)
 
         context["view_type"] = "expert"
-        context["codebook"] = project.codebook.get().get_version()
         log.debug(f"Providing the following context to the Expert: {context}")
         return render(request, "projects/project-detail-expert.html", context)
     else:

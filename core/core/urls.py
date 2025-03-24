@@ -29,7 +29,6 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("annotation/", include("annotation.urls")),
     path("discuss/", include("discuss.urls")),
-    path("codebooks/", include("codebooks.urls")),
 ]
 
 # Additional settings for development

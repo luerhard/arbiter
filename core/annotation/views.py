@@ -1,4 +1,3 @@
-from codebooks.models import CodebookVersion
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
@@ -126,13 +125,8 @@ def annotate_batch(
 
     context = create_context(request, assignment)
 
-    codebook = (
-        CodebookVersion.objects.filter(codebook__project=batch.project)
-        .order_by("date")
-        .prefetch_related("definitions__examples")
-        .prefetch_related("descriptions")
-        .first()
-    )
+    # TODO: CHANGE
+    codebook = None
     context["codebook"] = codebook
 
     return render(request, "annotation/batch.html", context)
