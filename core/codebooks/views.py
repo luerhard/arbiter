@@ -9,6 +9,9 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.template.context_processors import csrf
 from django.views import View
+from django.views.generic.edit import DeleteView
+from django.views.generic.edit import FormView
+from django.views.generic.edit import UpdateView
 from django_htmx.http import HttpResponseClientRefresh
 
 from .forms import ExampleForm
@@ -80,49 +83,52 @@ def sort_examples(request):
     return render(request, "codebooks/partials/edit_example_list.html", context)
 
 
-class AddExample(View):
-    def post(self, request, definition_id):  # noqa: ARG002
+class AddExample(FormView):
+    template_name = "codebooks/partials/add-example-modal.html"
+    form_class = ExampleForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["action"] = "add"
+        kwargs["pk"] = self.kwargs.get("definition_id")
+        return kwargs
+
+    def form_valid(self, form):  # noqa: ARG002
+        definition_id = form.pk
         definition = get_object_or_404(Definition, id=definition_id)
-        form = ExampleForm(definition, self.request.POST)
 
-        if form.is_valid():
-            if form.cleaned_data["example_id"] is None:
-                example = form.save(commit=False)
-                example.definition = definition
-                max_order = definition.examples.aggregate(Max("order")).get("order__max", 0)
-                example.order = max_order + 1
-                example.save()
-                messages.success(request, "Example added")
-                return HttpResponseClientRefresh()
-            else:
-                example = Example.objects.get(id=form.cleaned_data["example_id"])
-                form = ExampleForm(definition, self.request.POST, instance=example)
-                if form.is_valid():
-                    form.instance = example
-                    form.save()
-                    messages.success(request, "Example modified")
-                    return HttpResponseClientRefresh()
+        example = form.save(commit=False)
+        example.definition = definition
+        max_order = definition.examples.aggregate(Max("order")).get("order__max", 0)
+        example.order = max_order + 1
+        example.save()
+        messages.success(self.request, "Example added")
+        return HttpResponseClientRefresh()
 
-        messages.error(request, "Error occurred. Is identifier unique?")
-        context = {}
-        context.update(csrf(request))
-        form_html = render_crispy_form(form)
-        return HttpResponse(form_html)
 
-    def get(self, request, definition_id, example_id: int | None = None):
-        definition = get_object_or_404(Definition, id=definition_id)
-        if example_id:
-            example = get_object_or_404(Example, id=example_id)
-            form = ExampleForm(definition, instance=example, initial={"example_id": example.id})
-        else:
-            form = ExampleForm(definition)
-        return render(request, "codebooks/partials/add-example-modal.html", {"form": form})
+class UpdateExample(UpdateView):
+    template_name = "codebooks/partials/add-example-modal.html"
+    form_class = ExampleForm
+    model = Example
+    pk_url_kwarg = "example_id"
 
-    def delete(self, request, definition_id, example_id):
-        example = Example.objects.get(id=example_id)
-        example.delete()
-        messages.success(request, "")
-        context = {}
-        definition = Definition.objects.filter(pk=definition_id).prefetch_related("examples").get()
-        context["definition"] = definition
-        return render(request, "codebooks/partials/edit_example_list.html", context)
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["action"] = "update"
+        kwargs["pk"] = self.kwargs.get("example_id")
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseClientRefresh()
+
+
+class DeleteExample(DeleteView):
+    model = Example
+    pk_url_kwarg = "example_id"
+
+    def delete(self, request, *args, **kwargs):  # noqa: ARG002
+        self.obj = self.get_object()
+        self.obj.delete()
+        messages.success(request, "Example deleted.")
+        return HttpResponseClientRefresh()

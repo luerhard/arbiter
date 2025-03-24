@@ -13,15 +13,20 @@ urlpatterns = [
 ]
 
 htmx_patterns = [
-    path("edit/sort_examples", views.sort_examples, name="codebook-sort-examples"),
+    path("edit/sort-examples", views.sort_examples, name="codebook-sort-examples"),
     path(
-        "edit/add_example/<int:definition_id>",
+        "edit/add-example/<int:definition_id>",
         views.AddExample.as_view(),
         name="codebook-add-example",
     ),
     path(
-        "edit/add_example/<int:definition_id>/<int:example_id>",
-        views.AddExample.as_view(),
+        "edit/update-example/<int:example_id>",
+        views.UpdateExample.as_view(),
+        name="codebook-update-example",
+    ),
+    path(
+        "edit/delete-example/<int:example_id>",
+        views.DeleteExample.as_view(),
         name="codebook-delete-example",
     ),
 ]

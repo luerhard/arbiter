@@ -12,7 +12,7 @@
                     <span class="text-muted">#{{ definition.identifier }}:{{ example.identifier }}</span>
                     <div class="px-2">
                         <i class="bi bi-arrows-move h5 handle" role="button"></i>
-                        <button hx-get="{% url 'codebook-delete-example' definition_id=definition.id example_id=example.id %}"
+                        <button hx-get="{% url 'codebook-update-example' example_id=example.id %}"
                                 hx-target="#add-example"
                                 hx-trigger="click"
                                 data-bs-toggle="modal"
@@ -20,7 +20,7 @@
                                 class="btn">
                             <i class="bi bi-pencil h5"></i>
                         </button>
-                        <a hx-delete="{% url 'codebook-delete-example' definition_id=definition.id example_id=example.id %}"
+                        <a hx-delete="{% url 'codebook-delete-example' example_id=example.id %}"
                            hx-target="#example_list_{{ definition.pk }}"
                            hx-confirm="Are you sure?"
                            role="button"><i class="bi bi-x-circle h5"></i></a>
