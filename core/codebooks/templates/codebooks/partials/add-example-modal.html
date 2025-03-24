@@ -1,8 +1,14 @@
 {% load crispy_forms_tags %}
-<div class="modal-dialog modal-dialog-centered">
+<div class="modal-dialog modal-dialog-centered" id="add-example">
     <div class="modal-content">
         <div class="modal-header">
-            <h5 class="modal-title">Add Example</h5>
+            <h5 class="modal-title">
+                {% if 'example_id' in form.initial.keys %}
+                    Edit Example
+                {% else %}
+                    Add Example
+                {% endif %}
+            </h5>
         </div>
         <div class="modal-body">{% crispy form %}</div>
         <div class="modal-footer">
