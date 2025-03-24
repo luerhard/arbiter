@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("codebooks", "0002_alter_definitionfield_options_and_more"),
     ]
@@ -56,7 +55,11 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name="definition",
-            unique_together={("codebook_version", "identifier"), ("codebook_version", "order"), ("codebook_version", "title")},
+            unique_together={
+                ("codebook_version", "identifier"),
+                ("codebook_version", "order"),
+                ("codebook_version", "title"),
+            },
         ),
         migrations.AlterUniqueTogether(
             name="description",

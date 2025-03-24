@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("codebooks", "0003_rename_definitionfield_definition_and_more"),
     ]

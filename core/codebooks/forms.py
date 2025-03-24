@@ -15,7 +15,8 @@ class ExampleForm(forms.ModelForm):
         self.helper.form_id = "add-example-form"
         self.helper.attrs = {
             "hx-post": reverse_lazy(
-                "codebook-add-example", kwargs={"definition_id": self.definition.pk},
+                "codebook-add-example",
+                kwargs={"definition_id": self.definition.pk},
             ),
             "hx-target": "#add-example-form",
         }
