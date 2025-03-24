@@ -45,7 +45,7 @@ class CodebookVersionView(View):
                     .prefetch_related("definitions__examples")
                     .prefetch_related("descriptions")[0]
                 )
-            except IndexError:
+            except CodebookVersion.DoesNotExist:
                 msg = "No codebooks exist."
                 raise Http404(msg)  # noqa: B904
 
@@ -55,12 +55,21 @@ class CodebookVersionView(View):
             "codebookv": codebookv,
         }
 
-        return render(request, "codebooks/codebook-view.html", context)
+        return render(request, "codebooks/view.html", context)
 
 
 def edit(request, codebook_id):
+    try:
+        codebook = (
+            CodebookVersion.objects.filter(id=codebook_id)
+            .prefetch_related("codebook", "codebook__project")
+            .get()
+        )
+    except CodebookVersion.DoesNotExist:
+        msg = "CodebookVersion not found."
+        raise Http404(msg)  # noqa: B904
+
     context = {}
-    codebook = get_object_or_404(CodebookVersion, id=codebook_id)
     context["codebook"] = codebook
     return render(request, "codebooks/edit.html", context)
 
@@ -77,11 +86,11 @@ def sort_examples(request):
     context = {}
     definition = Definition.objects.filter(pk=definition_id).prefetch_related("examples").get()
     context["definition"] = definition
-    return render(request, "codebooks/partials/edit_example_list.html", context)
+    return render(request, "codebooks/partials/edit-example-list.html", context)
 
 
 class AddExample(FormView):
-    template_name = "codebooks/partials/add-example-modal.html"
+    template_name = "codebooks/partials/edit-example-add-modal.html"
     form_class = ExampleForm
 
     def get_form_kwargs(self):
@@ -104,7 +113,7 @@ class AddExample(FormView):
 
 
 class UpdateExample(UpdateView):
-    template_name = "codebooks/partials/add-example-modal.html"
+    template_name = "codebooks/partials/edit-example-add-modal.html"
     form_class = ExampleForm
     model = Example
     pk_url_kwarg = "example_id"

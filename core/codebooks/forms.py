@@ -8,9 +8,6 @@ from .models import Example
 
 
 class ExampleForm(forms.ModelForm):
-    definition_id = forms.IntegerField(widget=forms.HiddenInput(), initial=None, required=False)
-    example_id = forms.IntegerField(widget=forms.HiddenInput(), initial=None, required=False)
-
     def __init__(self, pk, action="add", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
