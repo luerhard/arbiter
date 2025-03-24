@@ -255,7 +255,7 @@
 <li><p><strong>labels</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.Label" title="data.models.Label"><code class="xref py py-class docutils literal notranslate"><span class="pre">Label</span></code></a>) – All labels of this project (related name of <a class="reference internal" href="data.html#data.models.Label.project" title="data.models.Label.project"><code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code></a>)</p></li>
 <li><p><strong>project_users</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#projects.models.ProjectUser" title="projects.models.ProjectUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectUser</span></code></a>) – All project users of this project (related name of <a class="reference internal" href="#projects.models.ProjectUser.project" title="projects.models.ProjectUser.project"><code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code></a>)</p></li>
 <li><p><strong>batches</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – All batches of this project (related name of <a class="reference internal" href="#projects.models.Batch.project" title="projects.models.Batch.project"><code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code></a>)</p></li>
-<li><p><strong>codebooks</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code>) – All codebooks of this project (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code>)</p></li>
+<li><p><strong>codebook</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code>) – All codebook of this project (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -310,6 +310,11 @@
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experts</span></span><a class="headerlink" href="#projects.models.Project.experts" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.models.Project.current_codebook">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_codebook</span></span><a class="headerlink" href="#projects.models.Project.current_codebook" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py exception">
 <dt class="sig sig-object py" id="projects.models.Project.DoesNotExist">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#projects.models.Project.DoesNotExist" title="Link to this definition"></a></dt>
@@ -328,10 +333,10 @@
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="projects.models.Project.codebooks">
-<span class="sig-name descname"><span class="pre">codebooks</span></span><a class="headerlink" href="#projects.models.Project.codebooks" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="projects.models.Project.codebook">
+<span class="sig-name descname"><span class="pre">codebook</span></span><a class="headerlink" href="#projects.models.Project.codebook" title="Link to this definition"></a></dt>
 <dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code></p>
-<p>All codebooks of this project (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code>)</p>
+<p>All codebook of this project (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">project</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">
