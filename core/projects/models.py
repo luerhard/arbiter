@@ -135,4 +135,7 @@ class Batch(models.Model):
 
     def set_phase(self, phase):
         self.phase = phase
+        if self.phase == Batch.Phase.ANNOTATION:
+            codebook = self.project.codebook.get()
+            codebook.tag_version(self.batch_number)
         self.save()

@@ -109,7 +109,8 @@ def change_batch_phase(request, batch_id):
     if request.method == "POST":
         form = BatchPhaseForm(request.POST, instance=batch)
         if form.is_valid():
-            form.save()
+            new = form.save(commit=False)
+            batch.set_phase(new.phase)
             phase = batch.get_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
             return HttpResponse(status=204)
