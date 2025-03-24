@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -17,19 +16,45 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Room",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
             name="Message",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("user", models.CharField(max_length=64)),
                 ("message", models.TextField()),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("example", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="messages", to="data.example")),
-                ("room", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="messages", to="discuss.room")),
+                (
+                    "example",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="data.example",
+                    ),
+                ),
+                (
+                    "room",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="messages",
+                        to="discuss.room",
+                    ),
+                ),
             ],
         ),
     ]

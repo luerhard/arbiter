@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -19,9 +18,30 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Codebook",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("git_dir", models.FilePathField(allow_files=False, allow_folders=True, path=pathlib.PurePosixPath("/mnt/hdd/git/AnnotationTool/core/core/media/codebooks"))),
-                ("project", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="codebook", to="projects.project")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "git_dir",
+                    models.FilePathField(
+                        allow_files=False,
+                        allow_folders=True,
+                        path=pathlib.PurePosixPath(
+                            "/mnt/hdd/git/AnnotationTool/core/core/media/codebooks"
+                        ),
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="codebook",
+                        to="projects.project",
+                    ),
+                ),
             ],
         ),
     ]

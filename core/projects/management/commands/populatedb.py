@@ -1,9 +1,6 @@
-from pathlib import Path
-
 from codebook.models import Codebook
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
 from django.core.management.base import BaseCommand
 import pandas as pd
 

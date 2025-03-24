@@ -8,7 +8,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -20,10 +19,22 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Example",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("content", models.TextField()),
                 ("has_disagreement", models.BooleanField(default=False)),
-                ("batch", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="examples", to="projects.batch")),
+                (
+                    "batch",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="examples",
+                        to="projects.batch",
+                    ),
+                ),
             ],
             options={
                 "ordering": ["pk"],
@@ -32,37 +43,103 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="ExampleAssignment",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("order", models.PositiveIntegerField(db_index=True)),
                 ("is_annotated", models.BooleanField(default=False)),
                 ("is_discussed", models.BooleanField(default=False)),
                 ("last_updated", models.DateTimeField(auto_now=True)),
-                ("example", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="assignments", to="data.example")),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="assignments", to=settings.AUTH_USER_MODEL)),
+                (
+                    "example",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assignments",
+                        to="data.example",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="assignments",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name="Label",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=100)),
-                ("color", colorfield.fields.ColorField(default="#2c3e50", image_field=None, max_length=7, samples=None)),
+                (
+                    "color",
+                    colorfield.fields.ColorField(
+                        default="#2c3e50", image_field=None, max_length=7, samples=None
+                    ),
+                ),
                 ("hotkey", models.CharField(blank=True, max_length=1, null=True)),
-                ("project", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="labels", to="projects.project")),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="labels",
+                        to="projects.project",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name="Annotation",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("phase", models.CharField(choices=[("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision")], db_index=True, max_length=1)),
-                ("assignment", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="annotations", to="data.exampleassignment")),
-                ("label", models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name="label", to="data.label")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "phase",
+                    models.CharField(
+                        choices=[("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision")],
+                        db_index=True,
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "assignment",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="annotations",
+                        to="data.exampleassignment",
+                    ),
+                ),
+                (
+                    "label",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="label",
+                        to="data.label",
+                    ),
+                ),
             ],
         ),
         migrations.AddConstraint(
             model_name="label",
-            constraint=models.UniqueConstraint(fields=("project", "name"), name="unique_label_name"),
+            constraint=models.UniqueConstraint(
+                fields=("project", "name"), name="unique_label_name"
+            ),
         ),
         migrations.AddConstraint(
             model_name="label",

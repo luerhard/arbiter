@@ -7,7 +7,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -18,7 +17,12 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Project",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("name", models.CharField(max_length=100)),
                 ("description", models.TextField()),
             ],
@@ -26,28 +30,80 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="Batch",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
                 ("batch_number", models.SmallIntegerField()),
-                ("phase", models.CharField(choices=[("S", "Setup"), ("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision"), ("F", "Finalized")], db_index=True, default="S", max_length=1)),
-                ("project", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="batches", to="projects.project")),
+                (
+                    "phase",
+                    models.CharField(
+                        choices=[
+                            ("S", "Setup"),
+                            ("A", "Annotation"),
+                            ("D", "Discussion"),
+                            ("E", "ExpertDecision"),
+                            ("F", "Finalized"),
+                        ],
+                        db_index=True,
+                        default="S",
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="batches",
+                        to="projects.project",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
             name="ProjectUser",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("role", models.CharField(choices=[("A", "Annotator"), ("E", "Expert")], default="A", max_length=1)),
-                ("project", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="project_users", to="projects.project")),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[("A", "Annotator"), ("E", "Expert")], default="A", max_length=1
+                    ),
+                ),
+                (
+                    "project",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="project_users",
+                        to="projects.project",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
             model_name="project",
             name="users",
-            field=models.ManyToManyField(related_name="projects", through="projects.ProjectUser", to=settings.AUTH_USER_MODEL),
+            field=models.ManyToManyField(
+                related_name="projects", through="projects.ProjectUser", to=settings.AUTH_USER_MODEL
+            ),
         ),
         migrations.AddConstraint(
             model_name="projectuser",
-            constraint=models.UniqueConstraint(fields=("project", "user"), name="unique_project_user"),
+            constraint=models.UniqueConstraint(
+                fields=("project", "user"), name="unique_project_user"
+            ),
         ),
     ]
