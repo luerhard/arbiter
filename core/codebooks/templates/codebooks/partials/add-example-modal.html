@@ -1,14 +1,18 @@
-<form hx-post="{{ request.path }}">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add Example</h5>
-            </div>
-            <div class="modal-body">{{ form.as_p }}</div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary close-dialog">Save</button>
-            </div>
+{% load crispy_forms_tags %}
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Add Example</h5>
+        </div>
+        <div class="modal-body">{% crispy form %}</div>
+        <div class="modal-footer">
+            <button tabindex="99"
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal">Close</button>
+            <button type="submit"
+                    form="{{ form.helper.form_id }}"
+                    class="btn btn-primary close-dialog">Save</button>
         </div>
     </div>
-</form>
+</div>

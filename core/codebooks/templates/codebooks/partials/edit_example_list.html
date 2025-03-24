@@ -11,6 +11,12 @@
                 <div class="d-flex justify-content-between">
                     <span class="text-muted">#{{ definition.identifier }}:{{ example.identifier }}</span>
                     <div class="px-2">
+                        <button hx-get="{% url 'codebook-delete-example' definition_id=definition.id example_id=example.id %}"
+                                hx-target="#add-example"
+                                hx-trigger="click"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modal-container"
+                                class="btn">edit</button>
                         <a hx-delete="{% url 'codebook-delete-example' definition_id=definition.id example_id=example.id %}"
                            hx-target="#example_list_{{ definition.pk }}"
                            hx-confirm="Are you sure?"><i class="bi bi-x-circle h6 px-3"></i></a>
@@ -21,5 +27,17 @@
                 {% if example.comment %}<div class="d-flex small">{{ example.comment }}</div>{% endif %}
             </li>
         {% endfor %}
+        <li class="list-group-item">
+            <div class="d-flex justify-content-end my-2">
+                <button hx-get="{% url 'codebook-add-example' definition_id=definition.id %}"
+                        hx-target="#add-example"
+                        hx-trigger="click"
+                        data-bs-toggle="modal"
+                        data-bs-target="#modal-container"
+                        class="btn">
+                    <i class="bi bi-plus-square h4"></i>
+                </button>
+            </div>
+        </li>
     </div>
 </form>

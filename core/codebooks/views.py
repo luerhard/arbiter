@@ -1,10 +1,13 @@
 import logging
 
+from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
 from django.db.models import Max
 from django.http import Http404
+from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
+from django.template.context_processors import csrf
 from django.views import View
 from django_htmx.http import HttpResponseClientRefresh
 
@@ -80,20 +83,39 @@ def sort_examples(request):
 class AddExample(View):
     def post(self, request, definition_id):  # noqa: ARG002
         definition = get_object_or_404(Definition, id=definition_id)
-        form = ExampleForm(self.request.POST)
-        if form.is_valid():
-            example = form.save(commit=False)
-            example.definition = definition
-            max_order = definition.examples.aggregate(Max("order")).get("order__max", 0)
-            example.order = max_order + 1
-            example.save()
-            messages.success(request, "Example added")
-            return HttpResponseClientRefresh()
-        else:
-            messages.error(request, "Error occurred. Is identifier unique?")
+        form = ExampleForm(definition, self.request.POST)
 
-    def get(self, request, definition_id):
-        form = ExampleForm(initial={"definition": definition_id})
+        if form.is_valid():
+            if form.cleaned_data["example_id"] is None:
+                example = form.save(commit=False)
+                example.definition = definition
+                max_order = definition.examples.aggregate(Max("order")).get("order__max", 0)
+                example.order = max_order + 1
+                example.save()
+                messages.success(request, "Example added")
+                return HttpResponseClientRefresh()
+            else:
+                example = Example.objects.get(id=form.cleaned_data["example_id"])
+                form = ExampleForm(definition, self.request.POST, instance=example)
+                if form.is_valid():
+                    form.instance = example
+                    form.save()
+                    messages.success(request, "Example modified")
+                    return HttpResponseClientRefresh()
+
+        messages.error(request, "Error occurred. Is identifier unique?")
+        context = {}
+        context.update(csrf(request))
+        form_html = render_crispy_form(form)
+        return HttpResponse(form_html)
+
+    def get(self, request, definition_id, example_id: int | None = None):
+        definition = get_object_or_404(Definition, id=definition_id)
+        if example_id:
+            example = get_object_or_404(Example, id=example_id)
+            form = ExampleForm(definition, instance=example, initial={"example_id": example.id})
+        else:
+            form = ExampleForm(definition)
         return render(request, "codebooks/partials/add-example-modal.html", {"form": form})
 
     def delete(self, request, definition_id, example_id):

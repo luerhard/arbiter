@@ -17,7 +17,6 @@ htmx_patterns = [
     path(
         "edit/add_example/<int:definition_id>",
         views.AddExample.as_view(),
-        kwargs={"example_id": -1},
         name="codebook-add-example",
     ),
     path(
