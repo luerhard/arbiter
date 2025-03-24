@@ -1,13 +1,10 @@
 import logging
 
-from crispy_forms.utils import render_crispy_form
 from django.contrib import messages
 from django.db.models import Max
 from django.http import Http404
-from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-from django.template.context_processors import csrf
 from django.views import View
 from django.views.generic.edit import DeleteView
 from django.views.generic.edit import FormView
