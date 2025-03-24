@@ -68,6 +68,17 @@ class Project(models.Model):
             projectuser__role=ProjectUser.Role.EXPERT,
         )
 
+    @property
+    def max_batch_number(self):
+        max_batch_number = (
+            Batch.objects.filter(project=self)
+            .aggregate(models.Max("batch_number"))
+            .get("batch_number__max", 0)
+        )
+        if max_batch_number:
+            return max_batch_number
+        return 0
+
     def __str__(self):
         return self.name
 
@@ -94,14 +105,20 @@ class Batch(models.Model):
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
 
+    @property
+    def max_batch_number(self):
+        max_batch_number = (
+            Batch.objects.filter(project=self.project)
+            .aggregate(models.Max("batch_number"))
+            .get("batch_number__max", 0)
+        )
+        if max_batch_number:
+            return max_batch_number
+        return 0
+
     def save(self, **kwargs):
         if self._state.adding is True:
-            max_batch_number = (
-                Batch.objects.filter(project=self.project)
-                .aggregate(models.Max("batch_number"))
-                .get("batch_number__max", 0)
-            )
-            self.batch_number = (max_batch_number or 0) + 1
+            self.batch_number = self.max_batch_number + 1
         super().save(**kwargs)
 
     @property

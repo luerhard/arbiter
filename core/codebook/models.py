@@ -27,13 +27,43 @@ class Codebook(models.Model):
     )
 
     @property
-    def content(self):
+    def file(self):
         full_path = settings.CODEBOOKS_ROOT / self.git_dir
         codebook_file = full_path / "main.md"
-        return codebook_file.read_text()
+        return codebook_file
+
+    @property
+    def content(self):
+        return self.file.read_text()
+
+    @property
+    def repo(self):
+        full_path = settings.CODEBOOKS_ROOT / self.git_dir
+        return Repo(full_path)
 
     def get_absolute_url(self):
         return reverse("codebook-view", kwargs={"pk": self.pk})
+
+    def tag_version(self, batch_number: int):
+        tag = f"batch_{batch_number}"
+        if tag in self.repo.tags:
+            self.repo.delete_tag(tag)
+        self.repo.create_tag(tag)
+
+    def diff(self, old: int, new: int):
+        tag_old = f"batch_{old}"
+        tag_new = f"batch_{new}"
+        diff = self.repo.git.diff(
+            "--unified=99999", "--word-diff", tag_old, tag_new, "--", self.file.name,
+        )
+        # if files differ
+        if len(diff) > 0:
+            diff_lines = diff.splitlines()
+            diff = "\n".join(diff_lines[5:])
+            return diff
+        # else files are equal
+        content = self.repo.git.show(f"{tag_old}:{self.file.name}")
+        return content
 
     def save(self, content: str | None = None, commit_message: str | None = None, **kwargs):
         if self._state.adding is True:
@@ -52,10 +82,9 @@ class Codebook(models.Model):
             (full_path / "main.md").write_text("\n")
             repo.git.add("main.md")
             repo.git.commit(m="initial")
+            self.repo.create_tag("batch_0")
         else:
             # modify codebook
-            full_path = settings.CODEBOOKS_ROOT / self.git_dir
-            codebook_file = full_path / "main.md"
 
             # do nothing if no content was set.
             if not content:
@@ -65,14 +94,13 @@ class Codebook(models.Model):
 
             if not content.endswith("\n"):
                 content += "\n"
-            codebook_file.write_text(content)
+            self.file.write_text(content)
 
-            repo = Repo(full_path)
-            repo.git.add(".")
+            self.repo.git.add(".")
             if not commit_message:
                 commit_message = "updated"
             try:
-                repo.git.commit(m=commit_message)
+                self.repo.git.commit(m=commit_message)
             except GitCommandError as e:
                 if "nothing to commit, working tree clean" in str(e):
                     pass

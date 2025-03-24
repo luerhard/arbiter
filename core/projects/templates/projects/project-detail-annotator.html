@@ -30,7 +30,7 @@
                                                 </dl>
                                             </div>
                                         </td>
-                                        <td class="flex-fill align-middle">
+                                        <td class="flex-fill justify-content-end">
                                             {% if batch.batch.phase == "A" %}
                                                 <a class="btn btn-lg btn-primary"
                                                    href="{% url 'annotate-batch' batch_id=batch.batch.id %}">Start Annotation</a>
@@ -38,6 +38,8 @@
                                                 <a class="btn btn-lg btn-primary"
                                                    href="{% url 'discuss-batch' batch_id=batch.batch.pk %}">Start Discussion</a>
                                             {% endif %}
+                                            <a class="btn btn-small btn-outline-primary text-nowrap mt-2"
+                                               href="{% url 'codebook-diff' pk=codebook.pk %}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}">Open Codebook Changes</a>
                                         </div>
                                     </td>
                                 </tr>

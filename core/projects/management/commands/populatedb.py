@@ -14,7 +14,7 @@ from projects.models import Project
 from projects.models import ProjectUser
 
 
-def create_batch(project):
+def create_batch(project, codebook):
     batch = Batch.objects.create(
         project=project,
         phase=Batch.Phase.ANNOTATION,
@@ -26,6 +26,7 @@ def create_batch(project):
         for user in project.annotators:
             ExampleAssignment.objects.create(example=ex, user=user, order=i)
 
+    codebook.tag_version(batch.batch_number)
     return batch
 
 
@@ -73,11 +74,11 @@ class Command(BaseCommand):
         )
         codebook = Codebook.objects.create(project=project)
         codebook_content = (
-            settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long.md"
+            settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long_v1.md"
         ).read_text()
         codebook.save(content=codebook_content)
 
-        batch = create_batch(project)
+        batch = create_batch(project, codebook)
         label_ids = [label.id for label in project.labels.all()]
         random.seed(123)
         for example in batch.examples.all():
@@ -87,13 +88,18 @@ class Command(BaseCommand):
                 assignment.set_user_annotations(labels, "ANNOTATION")
         batch.set_phase(Batch.Phase.DISCUSSION)
 
-        batch = create_batch(project)
+        codebook_content = (
+            settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long_v2.md"
+        ).read_text()
+        codebook.save(content=codebook_content)
+        batch = create_batch(project, codebook)
+
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 assignment.set_user_annotations([label_ids[0]], "ANNOTATION")
         batch.set_phase(Batch.Phase.DISCUSSION)
 
-        batch = create_batch(project)
+        batch = create_batch(project, codebook)
 
         # too many labels project
         project = create_project(
@@ -109,5 +115,5 @@ class Command(BaseCommand):
             settings.BASE_DIR.parent / "tests/testdata/codebook_emotions_short.md"
         ).read_text()
         codebook.save(content=codebook_content)
-        batch = create_batch(project)
+        batch = create_batch(project, codebook)
         batch.set_phase(Batch.Phase.ANNOTATION)
