@@ -8,17 +8,21 @@ UX each of those fields has a codename which acts similarly to html ids.
 
 from django.db import models
 
+from core import settings
+
 
 class Codebook(models.Model):
-    name = models.CharField(max_length=100)
     project = models.ForeignKey(
         "projects.Project",
         related_name="codebook",
         on_delete=models.CASCADE,
     )
 
-    def __str__(self):
-        return f"{self.name} - {self.project}"
+    repository = models.FilePathField(
+        path=settings.CODEBOK_ROOT,
+        allow_files=False,
+        allow_folders=True,
+    )
 
     def get_version(self, version_name: str | None = None):
         if version_name:
