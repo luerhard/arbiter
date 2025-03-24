@@ -27,27 +27,11 @@ class CodebookVersionView(View):
 
         project = get_object_or_404(Project, id=project_id)
 
-        if version_name:
-            codebookv = (
-                get_object_or_404(
-                    CodebookVersion,
-                    codebook__project=project,
-                    version_name=version_name,
-                )
-                .prefetch_related("definitions", "definitions_examples")
-                .prefetch_related("descriptions")
-            )
-        else:
-            try:
-                codebookv = (
-                    CodebookVersion.objects.filter(codebook__project=project)
-                    .order_by("date")
-                    .prefetch_related("definitions__examples")
-                    .prefetch_related("descriptions")[0]
-                )
-            except CodebookVersion.DoesNotExist:
-                msg = "No codebooks exist."
-                raise Http404(msg)  # noqa: B904
+        try:
+            codebookv = project.codebook.get().get_version(version_name)
+        except CodebookVersion.DoesNotExist:
+            msg = "No codebooks exist."
+            raise Http404(msg)  # noqa: B904
 
         context = {
             "project": project,

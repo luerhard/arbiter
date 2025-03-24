@@ -68,6 +68,12 @@ class Project(models.Model):
             projectuser__role=ProjectUser.Role.EXPERT,
         )
 
+    @property
+    def current_codebook(self):
+        codebook_version = apps.get_model("codebooks.CodebookVersion")
+        codebookv = codebook_version.objects.filter(project__id=self.pk).get()
+        return codebookv
+
     def __str__(self):
         return self.name
 
@@ -91,7 +97,7 @@ class Batch(models.Model):
         db_index=True,
     )
     codebook_version = models.ForeignKey(
-        "codebooks.CodebookVersion", on_delete=models.SET_NULL, null=True
+        "codebooks.CodebookVersion", on_delete=models.SET_NULL, null=True,
     )
 
     def __str__(self) -> str:

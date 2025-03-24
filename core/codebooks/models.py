@@ -13,12 +13,31 @@ class Codebook(models.Model):
     name = models.CharField(max_length=100)
     project = models.ForeignKey(
         "projects.Project",
-        related_name="codebooks",
+        related_name="codebook",
         on_delete=models.CASCADE,
     )
 
     def __str__(self):
         return f"{self.name} - {self.project}"
+
+    def get_version(self, version_name: str | None = None):
+        if version_name:
+            codebookv = (
+                CodebookVersion.objects.filter(
+                    codebook=self,
+                    version_name=version_name,
+                )
+                .prefetch_related("definitions", "definitions__examples")
+                .prefetch_related("descriptions")
+            )
+        else:
+            codebookv = (
+                CodebookVersion.objects.filter(codebook=self)
+                .order_by("date")
+                .prefetch_related("definitions__examples")
+                .prefetch_related("descriptions")[0]
+            )
+        return codebookv
 
 
 class CodebookVersion(models.Model):

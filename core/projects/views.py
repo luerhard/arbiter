@@ -66,8 +66,10 @@ def project_detail_view(request, project_id):
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)
+        context["view_type"] = "annotator"
+        context["codebook"] = project.codebook.get().get_version()
         log.debug(f"Providing the following context to the Annotator: {context}")
-        return render(request, "projects/project_detail_annotator.html", context)
+        return render(request, "projects/project-detail-annotator.html", context)
 
     elif project_user.role == ProjectUser.Role.EXPERT:
         # view for experts
@@ -95,8 +97,10 @@ def project_detail_view(request, project_id):
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
 
+        context["view_type"] = "expert"
+        context["codebook"] = project.codebook.get().get_version()
         log.debug(f"Providing the following context to the Expert: {context}")
-        return render(request, "projects/project_detail_expert.html", context)
+        return render(request, "projects/project-detail-expert.html", context)
     else:
         msg = f"Unkown User Role {project_user.role}"
         raise Exception(msg)

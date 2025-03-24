@@ -12,6 +12,13 @@
             {% for user in experts %}<li class="list-group-item border-0 p-0 text-muted">{{ user.username }}</li>{% endfor %}
         </ul>
     </div>
-    <a class="btn btn-primary text-nowrap"
-       href="{% url 'codebook-version' project.pk %}">Go to Codebook</a>
+    <div class="card-footer">
+        {% if view_type == "annotator" %}
+            <a class="btn btn-primary text-nowrap"
+               href="{% url 'codebook-version' project.pk %}">View Codebook</a>
+        {% elif view_type == "expert" %}
+            <a class="btn btn-primary text-nowrap"
+               href="{% url 'codebook-edit' codebook_id=codebook.pk %}">Edit Codebook</a>
+        {% endif %}
+    </div>
 </div>
