@@ -311,8 +311,8 @@
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="projects.models.Project.current_codebook">
-<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">current_codebook</span></span><a class="headerlink" href="#projects.models.Project.current_codebook" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="projects.models.Project.max_batch_number">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_batch_number</span></span><a class="headerlink" href="#projects.models.Project.max_batch_number" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
@@ -369,7 +369,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="projects.models.Batch">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codebook_version</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Batch" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Batch" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">projects_batch</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -383,10 +383,7 @@
 <p>Relationship fields:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>project</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#projects.models.Project" title="projects.models.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – Project (related name: <a class="reference internal" href="#projects.models.Project.batches" title="projects.models.Project.batches"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batches</span></code></a>)</p></li>
-<li><p><strong>codebook_version</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookVersion</span></code>) – Codebook version (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p></li>
-</ul>
+<dd class="field-odd"><p><strong>project</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#projects.models.Project" title="projects.models.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – Project (related name: <a class="reference internal" href="#projects.models.Project.batches" title="projects.models.Project.batches"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batches</span></code></a>)</p>
 </dd>
 </dl>
 <p>Reverse relationships:</p>
@@ -454,11 +451,19 @@
 </ul>
 </dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="projects.models.Batch.codebook_version">
-<span class="sig-name descname"><span class="pre">codebook_version</span></span><a class="headerlink" href="#projects.models.Batch.codebook_version" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v5.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookVersion</span></code></p>
-<p>Codebook version (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.models.Batch.max_batch_number">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">max_batch_number</span></span><a class="headerlink" href="#projects.models.Batch.max_batch_number" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Batch.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Batch.save" title="Link to this definition"></a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -485,12 +490,6 @@
 <dt class="sig sig-object py" id="projects.models.Batch.MultipleObjectsReturned">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#projects.models.Batch.MultipleObjectsReturned" title="Link to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="projects.models.Batch.codebook_version_id">
-<span class="sig-name descname"><span class="pre">codebook_version_id</span></span><a class="headerlink" href="#projects.models.Batch.codebook_version_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#projects.models.Batch.codebook_version" title="projects.models.Batch.codebook_version"><code class="xref py py-class docutils literal notranslate"><span class="pre">codebook_version</span></code></a> instead.</p>
-</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Batch.examples">
