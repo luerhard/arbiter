@@ -132,19 +132,11 @@ You can configure <code class="docutils literal notranslate"><span class="pre">p
 <section id="copy-the-sqlite-test-db">
 <h3>3. Copy the sqlite Test-DB<a class="headerlink" href="#copy-the-sqlite-test-db" title="Link to this heading"></a></h3>
 <p>The test database is necessary to have some sample data in your database while developing locally.
-The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.</p>
-<p>To copy the test database to its required location, run (from the root of the repo):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>docs/db.sqlite3<span class="w"> </span>.
-</pre></div>
-</div>
-<p>In case django tells you that migrations are unapplied, run (from the root of the repo):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
-
-<span class="c1"># either</span>
-poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
-<span class="c1"># or</span>
-poetry<span class="w"> </span>shell
+To create testdata into your database, go to the root of the git repository and execute:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rm<span class="w"> </span>db.sqlite3
+<span class="nb">cd</span><span class="w"> </span>core/
 python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+python<span class="w"> </span>manage.py<span class="w"> </span>populatedb
 </pre></div>
 </div>
 </section>
@@ -156,7 +148,7 @@ python<span class="w"> </span>manage.py<span class="w"> </span>migrate
 <p>We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.</p>
 <p>Webpack is a powerful module bundler for JavaScript applications. The –watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.</p>
 <p>To run webpack, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>start
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>start
 </pre></div>
 </div>
 <p>Initially, this will create the <code class="docutils literal notranslate"><span class="pre">dist/</span></code> folder and put all necessary static files in it.
