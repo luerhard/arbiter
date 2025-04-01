@@ -39,23 +39,13 @@ npm install
 ### 3. Copy the sqlite Test-DB
 
 The test database is necessary to have some sample data in your database while developing locally.
-The file below will (more or less) be kept up-to-date with a running version that does not need to many migrations to get running.
-
-To copy the test database to its required location, run (from the root of the repo):
+To create testdata into your database, go to the root of the git repository and execute:
 
 ```bash
-cp docs/db.sqlite3 .
-```
-
-In case django tells you that migrations are unapplied, run (from the root of the repo):
-```bash
-cd core
-
-# either
-poetry run python manage.py migrate
-# or
-poetry shell
+rm db.sqlite3
+cd core/
 python manage.py migrate
+python manage.py populatedb
 ```
 
 ## Running the app locally
@@ -68,8 +58,9 @@ Webpack is a powerful module bundler for JavaScript applications. The --watch op
 
 
 To run webpack, run
+
 ```bash
-npm start
+npm run start
 ```
 
 Initially, this will create the `dist/` folder and put all necessary static files in it.
