@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "annotation",
     "discuss",
     "expert",
-    "codebooks",
+    "codebook",
 ]
 
 MIDDLEWARE = [

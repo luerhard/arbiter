@@ -69,10 +69,15 @@ class Project(models.Model):
         )
 
     @property
-    def current_codebook(self):
-        codebook_version = apps.get_model("codebooks.CodebookVersion")
-        codebookv = codebook_version.objects.filter(project__id=self.pk).get()
-        return codebookv
+    def max_batch_number(self):
+        max_batch_number = (
+            Batch.objects.filter(project=self)
+            .aggregate(models.Max("batch_number"))
+            .get("batch_number__max", 0)
+        )
+        if max_batch_number:
+            return max_batch_number
+        return 0
 
     def __str__(self):
         return self.name
@@ -96,14 +101,25 @@ class Batch(models.Model):
         choices=Phase,
         db_index=True,
     )
-    codebook_version = models.ForeignKey(
-        "codebooks.CodebookVersion",
-        on_delete=models.SET_NULL,
-        null=True,
-    )
 
     def __str__(self) -> str:
         return f"Batch {self.batch_number}"
+
+    @property
+    def max_batch_number(self):
+        max_batch_number = (
+            Batch.objects.filter(project=self.project)
+            .aggregate(models.Max("batch_number"))
+            .get("batch_number__max", 0)
+        )
+        if max_batch_number:
+            return max_batch_number
+        return 0
+
+    def save(self, **kwargs):
+        if self._state.adding is True:
+            self.batch_number = self.max_batch_number + 1
+        super().save(**kwargs)
 
     @property
     def labels(self):
@@ -119,4 +135,7 @@ class Batch(models.Model):
 
     def set_phase(self, phase):
         self.phase = phase
+        if self.phase == Batch.Phase.ANNOTATION:
+            codebook = self.project.codebook.get()
+            codebook.tag_version(self.batch_number)
         self.save()

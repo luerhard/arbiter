@@ -29,7 +29,7 @@ urlpatterns = [
     path("users/", include("users.urls")),
     path("annotation/", include("annotation.urls")),
     path("discuss/", include("discuss.urls")),
-    path("codebooks/", include("codebooks.urls")),
+    path("codebook/", include("codebook.urls")),
 ]
 
 # Additional settings for development
@@ -37,4 +37,5 @@ if settings.DEBUG:
     from django.conf.urls.static import static
 
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += [path("__debug__", include("debug_toolbar.urls"))]

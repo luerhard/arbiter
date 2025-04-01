@@ -13,12 +13,7 @@
         </ul>
     </div>
     <div class="card-footer">
-        {% if view_type == "annotator" %}
-            <a class="btn btn-primary text-nowrap"
-               href="{% url 'codebook-version' project.pk %}">View Codebook</a>
-        {% elif view_type == "expert" %}
-            <a class="btn btn-primary text-nowrap"
-               href="{% url 'codebook-edit' codebook_id=codebook.pk %}">Edit Codebook</a>
-        {% endif %}
+        <a class="btn btn-primary text-nowrap"
+           href="{% url 'codebook-view' pk=codebook.pk %}">View Codebook</a>
     </div>
 </div>

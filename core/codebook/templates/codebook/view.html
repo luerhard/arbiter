@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="row mt-3">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">Test: {{ object.pk }}</div>
+                <div class="card-body">{% include "codebook/partials/view-codebook.html" %}</div>
+            </div>
+        </div>
+    </div>
+    {% if role == "E" %}
+        <div class="d-flex mt-2">
+            <a href="{% url 'codebook-edit' pk=codebook.pk %}"
+               role="button"
+               class="btn btn-primary">Edit</a>
+        </div>
+    {% endif %}
+{% endblock content %}
