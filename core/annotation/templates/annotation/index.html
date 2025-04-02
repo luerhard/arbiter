@@ -50,33 +50,45 @@
 </form>
 {% endpartialdef %}
 {% partialdef nav-block %}
-<div id="nav-block" hx-swap-oob="true">
-    {% if has_prev %}
-        <button id="prev-btn"
-                class="btn btn-outline-primary"
-                hx-swap-oob="true"
-                hx-get="{% url 'annotate-prev' assignment_id=assignment.id %}"
-                hx-include="#filterState"
-                hx-trigger="click,keydown[keyCode==37] from:window">
-            <i class="bi bi-arrow-left"></i>
+<div id="nav-block"
+     class="d-flex justify-content-center align-items-center mt-5"
+     hx-swap-oob="true">
+    {# djlint:off H021 #}
+    <div class="d-flex justify-content-end" style="min-width: 100px;">
+        {# djlint:on #}
+        {% if has_prev %}
+            <button id="prev-btn"
+                    class="btn btn-outline-primary"
+                    hx-swap-oob="true"
+                    hx-get="{% url 'annotate-prev' assignment_id=assignment.id %}"
+                    hx-include="#filterState"
+                    hx-trigger="click,keydown[keyCode==37] from:window">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+        {% endif %}
+    </div>
+    <div class="mx-1">
+        <button type="submit"
+                id="save-btn"
+                form="label-form"
+                class="btn {% if saved or assignment.is_annotated %}btn-primary {% else %}btn-outline-primary{% endif %}">
+            Save <i class="bi bi-floppy"></i>
         </button>
-    {% endif %}
-    <button type="submit"
-            id="save-btn"
-            form="label-form"
-            class="btn {% if saved or assignment.is_annotated %}btn-primary {% else %}btn-outline-primary{% endif %}">
-        Save <i class="bi bi-floppy"></i>
-    </button>
-    {% if has_next %}
-        <button id="next-btn"
-                hx-swap-oob="true"
-                hx-get="{% url 'annotate-next' assignment_id=assignment.id %}"
-                hx-include="#filterState"
-                class="btn btn-outline-primary"
-                hx-trigger="click,keydown[keyCode==39] from:body">
-            <i class="bi bi-arrow-right"></i>
-        </button>
-    {% endif %}
+    </div>
+    {# djlint:off H021 #}
+    <div class="d-flex justify-content-start" style="min-width: 100px;">
+        {# djlint:on #}
+        {% if has_next %}
+            <button id="next-btn"
+                    hx-swap-oob="true"
+                    hx-get="{% url 'annotate-next' assignment_id=assignment.id %}"
+                    hx-include="#filterState"
+                    class="btn btn-outline-primary"
+                    hx-trigger="click,keydown[keyCode==39] from:body">
+                <i class="bi bi-arrow-right"></i>
+            </button>
+        {% endif %}
+    </div>
 </div>
 {% endpartialdef %}
 {% block content %}
@@ -108,13 +120,7 @@
                 <div class="row mt-3">
                     <div class="col">{% partial labels %}</div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col text-center">
-                        <div id="buttons" class="mt-5 btn-group" role="group">
-                            <div id="buttons">{% partial nav-block %}</div>
-                        </div>
-                    </div>
-                </div>
+                <div id="buttons">{% partial nav-block %}</div>
             </div>
         </div>
         <div class="col-5 collapse" id="codebook-col">{% include "codebook/partials/view-codebook.html" %}</div>
