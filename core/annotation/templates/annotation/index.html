@@ -29,7 +29,7 @@
       class="mt-5"
       method="post">
     {% csrf_token %}
-    <div class="d-flex btn-group" role="group">
+    <div class="label-grid" role="group">
         {% for checkbox, detail in label_form.labels|zip_lists:label_form.label_details %}
             <input type="checkbox"
                    name="labels"

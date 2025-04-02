@@ -21,7 +21,7 @@ export function updatePrevLabels(data) {
 
 
         let buttonDiv = document.createElement("div");
-        buttonDiv.className = "btn-group d-flex flex-wrap";
+        buttonDiv.className = "label-grid";
 
         labels.forEach(label => {
 
@@ -72,7 +72,7 @@ export function updateCurrentLabels(data) {
     container.appendChild(titleText);
 
     let buttonGroup = document.createElement("div");
-    buttonGroup.className = "btn-group d-flex flex-wrap";
+    buttonGroup.className = "label-grid";
     container.appendChild(buttonGroup);
     const user = data["current-user"];
     data["update-labels"][user].forEach(label => {

@@ -55,6 +55,12 @@
     cursor: not-allowed;
 }
 
+.label-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    @extend .gap-1;
+}
+
 .card-list {
     padding: 0;
     border-collapse: collapse;
