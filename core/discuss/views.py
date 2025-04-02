@@ -1,13 +1,8 @@
-from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
 
-from data.models import Example
 from data.models import ExampleAssignment
-from projects.models import Batch
-from projects.models import Project
-from projects.models import ProjectUser
 
 # Create your views here.
 
