@@ -73,10 +73,10 @@ def prev_sentence(request, assignment_id):
     context.update(create_context(request, assignment, skip_annotated=skip_annotated))
     response = ""
     partials = [
-        "annotation/batch.html#sentence",
-        "annotation/batch.html#nav-block",
-        "annotation/batch.html#labels",
-        "annotation/batch.html#pbar",
+        "annotation/index.html#sentence",
+        "annotation/index.html#nav-block",
+        "annotation/index.html#labels",
+        "annotation/index.html#pbar",
     ]
     for partial in partials:
         response += render_to_string(partial, context)
@@ -96,10 +96,10 @@ def next_sentence(request, assignment_id):
     context.update(create_context(request, assignment, skip_annotated=skip_annotated))
     response = ""
     partials = [
-        "annotation/batch.html#sentence",
-        "annotation/batch.html#nav-block",
-        "annotation/batch.html#labels",
-        "annotation/batch.html#pbar",
+        "annotation/index.html#sentence",
+        "annotation/index.html#nav-block",
+        "annotation/index.html#labels",
+        "annotation/index.html#pbar",
     ]
     for partial in partials:
         response += render_to_string(partial, context)
@@ -160,8 +160,8 @@ def edit(request, assignment_id):
     }
 
     partials = [
-        "annotation/batch.html#nav-block",
-        "annotation/batch.html#pbar",
+        "annotation/index.html#nav-block",
+        "annotation/index.html#pbar",
     ]
     response = ""
     for partial in partials:

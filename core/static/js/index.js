@@ -6,7 +6,7 @@ import "htmx-ext-ws";
 import "bootstrap-icons/font/bootstrap-icons.scss";
 import * as bootstrap from "bootstrap";
 // Mouse hotkeys
-// import * as mousetrap from 'mousetrap';
+import * as mousetrap from 'mousetrap';
 // javascript sortables (for codebook)
 
 import * as funcs from "./functions";

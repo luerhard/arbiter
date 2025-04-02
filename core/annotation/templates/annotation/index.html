@@ -135,12 +135,16 @@
             }
         };
 
-        // auto-maximize contrast for font in colored buttons
-        document.querySelectorAll('.btn-custom-color').forEach(button => {
-            const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
-            const textColor = lib.funcs.inferTextColorByContrast(color)
-            button.style.setProperty("--text-color", textColor);
-        });
+        function colorContrast() {
+            // auto-maximize contrast for font in colored buttons
+            document.querySelectorAll('.btn-custom-color').forEach(button => {
+                const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
+                const textColor = lib.funcs.inferTextColorByContrast(color)
+                button.style.setProperty("--text-color", textColor);
+            });
+
+        };
+
 
         // show state of codebook expansion on the button
         document.addEventListener("DOMContentLoaded", function() {
@@ -156,6 +160,8 @@
                 codebookToggle.classList.remove("btn-primary");
                 codebookToggle.classList.add("btn-outline-primary");
             });
+
+            colorContrast();
         });
 
         // disable enter button (should only ever toggle "Saved")
@@ -186,6 +192,7 @@
                     saveBtn.click();
                 });
             }
+            colorContrast();
         });
     </script>
 {% endblock content %}
