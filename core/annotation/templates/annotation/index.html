@@ -64,7 +64,7 @@
     <button type="submit"
             id="save-btn"
             form="label-form"
-            class="btn {% if saved %}btn-primary {% else %}btn-outline-primary{% endif %}">
+            class="btn {% if saved or assignment.is_annotated %}btn-primary {% else %}btn-outline-primary{% endif %}">
         Save <i class="bi bi-floppy"></i>
     </button>
     {% if has_next %}
