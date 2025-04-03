@@ -2,12 +2,21 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseForbidden
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
+from django.shortcuts import reverse
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import RedirectView
+from django.views.generic import View
 import pandas as pd
 
 from .forms import BatchPhaseForm
+from core.mixins import AnnotatorRequiredMixin
+from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
@@ -21,57 +30,68 @@ User = get_user_model()
 log = logging.getLogger(__name__)
 
 
-def project_list_view(request):
-    project_users = (
-        ProjectUser.objects.filter(user=request.user)
-        .prefetch_related("project")
-        .order_by("-project__pk")
-    )
-    context = {"project_users": project_users}
-    return render(request, "projects/project_list.html", context)
+class ProjectListView(ListView):
+    template_name = "projects/project_list.html"
+    model = ProjectUser
+    context_object_name = "project_users"
+
+    def get_queryset(self):
+        return (
+            ProjectUser.objects.filter(user=self.request.user)
+            .prefetch_related("project")
+            .order_by("-project__pk")
+        )
 
 
-def project_detail_view(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+class ProjectDetailView(RedirectView):
+    model = Project
 
-    all_project_users = User.objects.filter(projectuser__project=project)
-    project_user = ProjectUser.objects.get(project=project, user=request.user)
+    def get_redirect_url(self, *args, **kwargs):  # noqa: ARG002
+        project_id = kwargs.get("project_id")
+        project = get_object_or_404(Project, id=project_id)
+        project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
 
-    context = {}
-    context["project"] = project
-    context["codebook"] = project.codebook.get()
+        if project_user.role == ProjectUser.Role.ANNOTATOR:
+            return reverse("project-detail-annotator", kwargs={"project_id": project_id})
+        elif project_user.role == ProjectUser.Role.EXPERT:
+            return reverse("project-detail-expert", kwargs={"project_id": project_id})
+        else:
+            # Fallback URL if needed
+            return reverse("home")
 
-    # get assigned users
-    context["annotators"] = all_project_users.filter(
-        projectuser__project=project,
-        projectuser__role=ProjectUser.Role.ANNOTATOR,
-    )
-    context["experts"] = all_project_users.filter(
-        projectuser__project=project,
-        projectuser__role=ProjectUser.Role.EXPERT,
-    )
+    def get(self, request, project_id):
+        project_user = ProjectUser.objects.filter(project__id=project_id, user=request.user).first()
+        if project_user.role == ProjectUser.Role.ANNOTATOR:
+            return redirect("project-detail-annotator", project_id=project_id)
+        elif project_user.role == ProjectUser.Role.EXPERT:
+            return redirect("project-detail-expert", project_id=project_id)
+        else:
+            return HttpResponseForbidden("You have no role in this project.")
 
-    # get associated batches
-    batches = context["project"].batches.all()
 
-    if project_user.role == ProjectUser.Role.ANNOTATOR:
-        # view for annotators
-        context["batches"] = []
-        for batch in batches:
-            batch_data = {
-                "batch": batch,
-                "done": batch.examples.filter(
-                    assignments__user=request.user,
-                    assignments__is_annotated=1,
-                ).count(),
-                "length": batch.examples.count(),
-            }
-            context["batches"].append(batch_data)
-        log.debug(f"Providing the following context to the Annotator: {context}")
-        return render(request, "projects/project-detail-annotator.html", context)
+class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
+    pk_url_kwarg = "project_id"
+    model = Project
+    template_name = "projects/project-detail-expert.html"
 
-    elif project_user.role == ProjectUser.Role.EXPERT:
-        # view for experts
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.get_object()
+        all_project_users = User.objects.filter(projectuser__project=project)
+
+        # get assigned users
+        context["annotators"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
+        )
+        context["experts"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.EXPERT,
+        )
+        context["codebook"] = project.codebook.get()
+
+        # get associated batches
+        batches = project.batches.all()
         context["batches"] = []
         for batch in batches:
             batch_data = {
@@ -97,10 +117,45 @@ def project_detail_view(request, project_id):
             context["batches"].append(batch_data)
 
         log.debug(f"Providing the following context to the Expert: {context}")
-        return render(request, "projects/project-detail-expert.html", context)
-    else:
-        msg = f"Unkown User Role {project_user.role}"
-        raise Exception(msg)
+        return context
+
+
+class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
+    pk_url_kwarg = "project_id"
+    model = Project
+    template_name = "projects/project-detail-annotator.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.get_object()
+        all_project_users = User.objects.filter(projectuser__project=project)
+
+        # get assigned users
+        context["annotators"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
+        )
+        context["experts"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.EXPERT,
+        )
+        context["codebook"] = project.codebook.get()
+
+        # view for annotators
+        context["batches"] = []
+        batches = project.batches.all()
+        for batch in batches:
+            batch_data = {
+                "batch": batch,
+                "done": batch.examples.filter(
+                    assignments__user=self.request.user,
+                    assignments__is_annotated=1,
+                ).count(),
+                "length": batch.examples.count(),
+            }
+            context["batches"].append(batch_data)
+        log.debug(f"Providing the following context to the Annotator: {context}")
+        return context
 
 
 def change_batch_phase(request, batch_id):

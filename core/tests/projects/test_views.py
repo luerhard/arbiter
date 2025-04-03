@@ -1,20 +1,21 @@
 from django.urls import reverse
 import pytest
 
-URLS_LOGIN_REQUIRED = [("project-list", None), ("project-detail", (1,))]
+URLS_EXPERT = [("project-list", None), ("project-detail-expert", (1,))]
+URLS_ANNOTATOR = [("project-list", None), ("project-detail-annotator", (1,))]
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
-    @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
+    @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR))
     def test_login_required_not_logged_in(self, params, client):
         slug, args = params
         url = reverse(slug, args=args)
         req = client.get(url)
         assert req.status_code == 302
 
-    @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
+    @pytest.mark.parametrize("params", URLS_ANNOTATOR)
     def test_http_200_as_annotator(self, params, client):
         slug, args = params
         url = reverse(slug, args=args)
@@ -23,8 +24,7 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 200
 
-    @pytest.mark.django_db
-    @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
+    @pytest.mark.parametrize("params", URLS_EXPERT)
     def test_http_200_as_expert(self, params, client):
         slug, args = params
         url = reverse(slug, args=args)

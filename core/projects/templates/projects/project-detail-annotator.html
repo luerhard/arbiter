@@ -39,7 +39,7 @@
                                                    href="{% url 'discuss-batch' batch_id=batch.batch.pk %}">Start Discussion</a>
                                             {% endif %}
                                             <a class="btn btn-small btn-outline-primary text-nowrap mt-2"
-                                               href="{% url 'codebook-diff' pk=codebook.pk %}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}">Open Codebook Changes</a>
+                                               href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}">Open Codebook Changes</a>
                                         </div>
                                     </td>
                                 </tr>

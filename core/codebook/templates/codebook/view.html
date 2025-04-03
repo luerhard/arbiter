@@ -10,7 +10,7 @@
     </div>
     {% if role == "E" %}
         <div class="d-flex mt-2">
-            <a href="{% url 'codebook-edit' pk=codebook.pk %}"
+            <a href="{% url 'codebook-edit' codebook_id=codebook.pk %}"
                role="button"
                class="btn btn-primary">Edit</a>
         </div>

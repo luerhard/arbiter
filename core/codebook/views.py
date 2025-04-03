@@ -5,11 +5,14 @@ from django.views.generic.edit import UpdateView
 
 from .forms import CodebookForm
 from .models import Codebook
+from core.mixins import AnyRoleRequiredMixin
+from core.mixins import ExpertRequiredMixin
 from projects.models import ProjectUser
 
 
 # Create your views here.
-class CodebookView(DetailView):
+class CodebookView(AnyRoleRequiredMixin, DetailView):
+    pk_url_kwarg = "codebook_id"
     model = Codebook
     context_object_name = "codebook"
     template_name = "codebook/view.html"
@@ -22,7 +25,8 @@ class CodebookView(DetailView):
         return context
 
 
-class CodebookDiffView(DetailView):
+class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
+    pk_url_kwarg = "codebook_id"
     model = Codebook
     context_object_name = "codebook"
     template_name = "codebook/view-diff.html"
@@ -35,7 +39,8 @@ class CodebookDiffView(DetailView):
         return context
 
 
-class CodebookUpdateView(UpdateView):
+class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
+    pk_url_kwarg = "codebook_id"
     model = Codebook
     form_class = CodebookForm
     template_name = "codebook/edit.html"
