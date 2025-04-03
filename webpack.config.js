@@ -12,12 +12,13 @@ const PATHS = {
 
 module.exports = (env, argv) => {
     const isProduction = argv.mode === 'production';
+    const doWatch = argv.mode === 'watch'
 
     return {
         entry: "./core/static/js/index.js",
         mode: isProduction ? "production" : "development",
         devtool: isProduction ? false : "source-map",
-        watch: !isProduction,
+        watch: doWatch,
         output: {
             filename: "main.js",
             library: "lib",

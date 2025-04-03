@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "webpack --config webpack.config.js",
-    "django": "cd core && poetry run python manage.py runserver"
+    "django": "cd core && poetry run python manage.py runserver",
+    "watch": "webpack --config webpack.config.js --watch"
   },
   "author": "Lukas Erhard",
   "license": "MIT",
