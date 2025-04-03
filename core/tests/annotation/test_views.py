@@ -9,7 +9,7 @@ URLS_LOGIN_REQUIRED = [
 ]
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     pytestmarks = pytest.mark.django_db

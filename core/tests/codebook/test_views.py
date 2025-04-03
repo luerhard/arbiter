@@ -6,7 +6,7 @@ URLS_EXPERT = [("codebook-view", (1,)), ("codebook-diff", (1,)), ("codebook-edit
 URLS_ANNOTATOR = [("codebook-view", (1,)), ("codebook-diff", (1,))]
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR))
