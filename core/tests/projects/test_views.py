@@ -73,3 +73,17 @@ class TestViews:
         data = {"phase": "A"}
         req = client.post(url, data)
         assert req.status_code == 204
+
+    def test_redirect_project_detail_expert(self, client):
+        url = reverse("project-detail", args=(1,))
+        login = client.login(username="expert1", password="123")
+        req = client.get(url)
+        assert req.status_code == 302
+        assert req.url == reverse("project-detail-expert", args=(1,))
+
+    def test_redirect_project_detail_annotator(self, client):
+        url = reverse("project-detail", args=(1,))
+        login = client.login(username="annotator1", password="123")
+        req = client.get(url)
+        assert req.status_code == 302
+        assert req.url == reverse("project-detail-annotator", args=(1,))

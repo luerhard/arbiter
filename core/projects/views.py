@@ -6,7 +6,6 @@ from django.http import HttpResponseForbidden
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
-from django.shortcuts import render
 from django.shortcuts import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
@@ -56,17 +55,7 @@ class ProjectDetailView(RedirectView):
         elif project_user.role == ProjectUser.Role.EXPERT:
             return reverse("project-detail-expert", kwargs={"project_id": project_id})
         else:
-            # Fallback URL if needed
             return reverse("home")
-
-    def get(self, request, project_id):
-        project_user = ProjectUser.objects.filter(project__id=project_id, user=request.user).first()
-        if project_user.role == ProjectUser.Role.ANNOTATOR:
-            return redirect("project-detail-annotator", project_id=project_id)
-        elif project_user.role == ProjectUser.Role.EXPERT:
-            return redirect("project-detail-expert", project_id=project_id)
-        else:
-            return HttpResponseForbidden("You have no role in this project.")
 
 
 class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
