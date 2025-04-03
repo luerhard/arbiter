@@ -15,9 +15,11 @@ urlpatterns = [
         views.ProjectAnnotatorDetailView.as_view(),
         name="project-detail-annotator",
     ),
-    path("export/batch/<int:batch_id>", views.export_batch, name="export-batch"),
+    path("export/batch/<int:batch_id>", views.ExportBatch.as_view(), name="export-batch"),
 ]
 
-htmx_patterns = [path("edit/<int:batch_id>", views.change_batch_phase, name="change-batch-phase")]
+htmx_patterns = [
+    path("edit/<int:batch_id>", views.ChangeBatchPhase.as_view(), name="change-batch-phase"),
+]
 
 urlpatterns += htmx_patterns

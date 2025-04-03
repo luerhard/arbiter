@@ -158,10 +158,9 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         return context
 
 
-def change_batch_phase(request, batch_id):
-    batch = get_object_or_404(Batch, id=batch_id)
-
-    if request.method == "POST":
+class ChangeBatchPhase(ExpertRequiredMixin, View):
+    def post(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
+        batch = get_object_or_404(Batch, id=batch_id)
         form = BatchPhaseForm(request.POST, instance=batch)
         if form.is_valid():
             new = form.save(commit=False)
@@ -169,65 +168,65 @@ def change_batch_phase(request, batch_id):
             phase = batch.get_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
             return HttpResponse(status=204)
-    else:
-        form = BatchPhaseForm(instance=batch)
+        else:
+            msg = "invalid form"
+            raise Exception(msg)
 
-    return render(request)
 
+class ExportBatch(ExpertRequiredMixin, View):
+    def get(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
+        batch = Batch.objects.get(id=batch_id)
+        labels = batch.project.labels
+        annotators = batch.project.annotators
+        examples = batch.examples
 
-def export_batch(request, batch_id):  # noqa: ARG001
-    batch = Batch.objects.get(id=batch_id)
-    labels = batch.project.labels
-    annotators = batch.project.annotators
-    examples = batch.examples
-
-    rows = []
-    for example in examples.all():
-        row = {
-            "batch_number": batch.batch_number,
-            "text_id": example.id,
-            "text": example.content,
-        }
-        # Annotation Data
-        row["labels"] = []
-        for annotator in annotators:
-            user_annotations = example.get_user_annotations(
-                user=annotator,
-                phase="ANNOTATION",
-            ).select_related("label")
-            labels = [annotation.label.name for annotation in user_annotations]
-            user_data = {"user": annotator.username, "labels": labels}
-            row["labels"].append(user_data)
-
-        # Discussed Annotation Data
-        row["discussed_labels"] = []
-        for annotator in annotators:
-            user_annotations = example.get_user_annotations(
-                user=annotator,
-                phase="DISCUSSION",
-            ).select_related("label")
-            labels = [annotation.label.name for annotation in user_annotations]
-            user_data = {"user": annotator.username, "labels": labels}
-            row["labels"].append(user_data)
-
-        # Chat Messages
-        row["messages"] = []
-        messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
-        for message in messages_qs.all():
-            group = {
-                "user": message.user,
-                "date": message.created_at,
-                "content": message.message,
+        rows = []
+        for example in examples.all():
+            row = {
+                "batch_number": batch.batch_number,
+                "text_id": example.id,
+                "text": example.content,
             }
-            row["messages"].append(group)
-        rows.append(row)
+            # Annotation Data
+            row["labels"] = []
+            for annotator in annotators:
+                user_annotations = example.get_user_annotations(
+                    user=annotator,
+                    phase="ANNOTATION",
+                ).select_related("label")
+                labels = [annotation.label.name for annotation in user_annotations]
+                user_data = {"user": annotator.username, "labels": labels}
+                row["labels"].append(user_data)
 
-    df = pd.DataFrame(rows)
+            # Discussed Annotation Data
+            row["discussed_labels"] = []
+            for annotator in annotators:
+                user_annotations = example.get_user_annotations(
+                    user=annotator,
+                    phase="DISCUSSION",
+                ).select_related("label")
+                labels = [annotation.label.name for annotation in user_annotations]
+                user_data = {"user": annotator.username, "labels": labels}
+                row["labels"].append(user_data)
 
-    json_data = df.to_json(orient="records", lines=True)
+            # Chat Messages
+            row["messages"] = []
+            messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
+            for message in messages_qs.all():
+                group = {
+                    "user": message.user,
+                    "date": message.created_at,
+                    "content": message.message,
+                }
+                row["messages"].append(group)
+            rows.append(row)
 
-    batch = Batch.objects.get(id=batch_id)
-    response = HttpResponse(json_data, content_type="application/text")
-    response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
+        df = pd.DataFrame(rows)
 
-    return response
+        json_data = df.to_json(orient="records", lines=True)
+
+        batch = Batch.objects.get(id=batch_id)
+        response = HttpResponse(json_data, content_type="application/text")
+        response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
+
+        return response
