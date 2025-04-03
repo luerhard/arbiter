@@ -12,7 +12,7 @@ URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 # TODO: write test for download batch results
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR + URLS_ANYROLE))
