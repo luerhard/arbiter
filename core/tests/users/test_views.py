@@ -5,6 +5,7 @@ URLS_NO_LOGIN_REQUIRED = [("login", None)]
 URLS_LOGIN_REQUIRED = [("user-profile", None)]
 
 
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
@@ -14,7 +15,6 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
 
-    @pytest.mark.django_db
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
     def test_login_required_as_annotator(self, params, client):
         slug, args = params
@@ -31,7 +31,7 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 200
 
-    @pytest.mark.django_db
+    @pytest.mark.django_db()
     def test_logout_redirects_to_login(self, client):
         url = reverse("logout")
         login = client.login(username="annotator1", password="123")

@@ -4,6 +4,7 @@ import pytest
 URLS_LOGIN_REQUIRED = [("project-list", None), ("project-detail", (1,))]
 
 
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
@@ -13,7 +14,6 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
 
-    @pytest.mark.django_db
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
     def test_http_200_as_annotator(self, params, client):
         slug, args = params
@@ -23,7 +23,7 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 200
 
-    @pytest.mark.django_db
+    @pytest.mark.django_db()
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
     def test_http_200_as_expert(self, params, client):
         slug, args = params

@@ -6,6 +6,7 @@ URLS_EXPERT = [("codebook-view", (1,)), ("codebook-diff", (1,)), ("codebook-edit
 URLS_ANNOTATOR = [("codebook-view", (1,)), ("codebook-diff", (1,))]
 
 
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR))
@@ -15,7 +16,6 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
 
-    @pytest.mark.django_db
     @pytest.mark.parametrize("params", URLS_ANNOTATOR)
     def test_http_200_as_annotator(self, params, client):
         slug, args = params
@@ -25,7 +25,6 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 200
 
-    @pytest.mark.django_db
     @pytest.mark.parametrize("params", URLS_EXPERT)
     def test_http_200_as_expert(self, params, client):
         slug, args = params
