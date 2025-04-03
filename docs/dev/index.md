@@ -68,6 +68,12 @@ If you do not intend to change any CSS, SCSS or .js files, you can just kill the
 However, I would strongly recommend to just keep it running.
 It will automatically recompile all necessary files if they change.
 
+To run webpack continuously and watch for file changes, run
+
+```bash
+npm run watch
+```
+
 ### 2. Run Django Server
 
 To run the django server that actually serves the site, there are a couple of options.
@@ -93,6 +99,15 @@ poetry run python manage.py migrate
 ```
 
 This should spawn a webserver that is accessible in the browser via [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+### Run tests
+
+To run the tests, run
+
+```bash
+cd core
+poetry run pytest
+```
 
 ## Development Server
 
