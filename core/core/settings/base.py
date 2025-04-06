@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     "django_htmx",
+    'markdownify.apps.MarkdownifyConfig',
     "colorfield",
     "nested_admin",
     "template_partials",
@@ -163,3 +164,41 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Django-Markdownify
+MARKDOWNIFY = {
+    "default": {
+        "WHITELIST_TAGS": [
+            'a',
+            'abbr',
+            'acronym',
+            'b',
+            'blockquote',
+            'em',
+            'h1',
+            'h2',
+            'h3',
+            'h4',
+            'h5',
+            'h6',
+            'i',
+            'li',
+            'ol',
+            'p',
+            'strong',
+            'ul',
+            'del',
+            'text'
+        ],
+        "WHITELIST_ATTRS": [
+            'href',
+            'src',
+            'alt',
+            'class',
+        ],
+        "MARKDOWN_EXTENSIONS": [
+            'codebook.markdown_extensions.git_diff_del',
+            'codebook.markdown_extensions.git_diff_insertion',
+        ]
+    }
+}

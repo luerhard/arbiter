@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
@@ -7,6 +8,7 @@ from .forms import CodebookForm
 from .models import Codebook
 from projects.models import ProjectUser
 
+log = logging.getLogger(__name__)
 
 # Create your views here.
 class CodebookView(DetailView):

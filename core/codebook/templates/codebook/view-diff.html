@@ -5,7 +5,8 @@
             <div class="card">
                 <div class="card-header">Test: {{ object.pk }}</div>
                 <div class="card-body">
-                    <pre>{{content}}</pre>
+                    {% load markdownify %}
+                    {{ content|markdownify }}
                 </div>
             </div>
         </div>

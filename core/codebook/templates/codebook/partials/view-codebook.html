@@ -1,1 +1,2 @@
-<pre>{{ codebook.content }}</pre>
+{% load markdownify %}
+<div>{{ codebook.content|markdownify }}</div>
