@@ -1,3 +1,4 @@
+{% load markdownify %}
 {% extends "base.html" %}
 {% block content %}
     <div class="row mt-3">
@@ -5,7 +6,6 @@
             <div class="card">
                 <div class="card-header">Test: {{ object.pk }}</div>
                 <div class="card-body">
-                    {% load markdownify %}
                     {{ content|markdownify }}
                 </div>
             </div>
