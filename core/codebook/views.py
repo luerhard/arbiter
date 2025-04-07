@@ -1,5 +1,4 @@
 import logging
-import re
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect

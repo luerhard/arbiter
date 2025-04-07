@@ -1,10 +1,12 @@
+import re
+
 from markdown.extensions import Extension
 from markdown.preprocessors import Preprocessor
-import re
 
 
 class PreprocessDiffs(Preprocessor):
     """Make sure that Git Diff syntax does not collide with normal MD syntax."""
+
     FIX_PATTERN_START = r"\{\+((?:\-|\d*\.|\>|\#*) ?)(.*?)\+\}"
     FIX_PATTERN_WRAP = r"\{\+(\*\*|\*|\_\_|\_|\`)(.*?)(\*\*|\*|\_\_|\_|\`)\+\}"
 
