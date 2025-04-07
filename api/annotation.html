@@ -51,10 +51,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-annotation.views">Views</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.create_context"><code class="docutils literal notranslate"><span class="pre">create_context()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotation.views.prev_sentence"><code class="docutils literal notranslate"><span class="pre">prev_sentence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotation.views.next_sentence"><code class="docutils literal notranslate"><span class="pre">next_sentence()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotation.views.annotate_batch"><code class="docutils literal notranslate"><span class="pre">annotate_batch()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotation.views.edit"><code class="docutils literal notranslate"><span class="pre">edit()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.PrevSentence"><code class="docutils literal notranslate"><span class="pre">PrevSentence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.NextSentence"><code class="docutils literal notranslate"><span class="pre">NextSentence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.AnnotateView"><code class="docutils literal notranslate"><span class="pre">AnnotateView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.EditAssignment"><code class="docutils literal notranslate"><span class="pre">EditAssignment</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -110,27 +110,69 @@
 <dd><p>helper function to create context needed in multiple views</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="annotation.views.prev_sentence">
-<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">prev_sentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.prev_sentence" title="Link to this definition"></a></dt>
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.PrevSentence">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">PrevSentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.PrevSentence" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.PrevSentence.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.PrevSentence.get" title="Link to this definition"></a></dt>
 <dd><p>view is displayed when user clicks on &lt;-</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="annotation.views.next_sentence">
-<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">next_sentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.next_sentence" title="Link to this definition"></a></dt>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.NextSentence">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">NextSentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.NextSentence" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.NextSentence.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.NextSentence.get" title="Link to this definition"></a></dt>
 <dd><p>view is displayed when user clicks on -&gt;</p>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="annotation.views.annotate_batch">
-<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">annotate_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.annotate_batch" title="Link to this definition"></a></dt>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.AnnotateView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">AnnotateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.AnnotateView" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="annotation.views.AnnotateView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'annotation/index.html'</span></em><a class="headerlink" href="#annotation.views.AnnotateView.template_name" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="annotation.views.edit">
-<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">edit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.edit" title="Link to this definition"></a></dt>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="annotation.views.AnnotateView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#annotation.views.AnnotateView.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.AnnotateView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.AnnotateView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.AnnotateView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><span class="pre">int</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.AnnotateView.get" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.EditAssignment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">EditAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.EditAssignment" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.EditAssignment.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.EditAssignment.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.EditAssignment.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.EditAssignment.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
 
 </section>
 </section>

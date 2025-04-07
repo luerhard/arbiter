@@ -90,10 +90,26 @@
 <li class="toctree-l2"><a class="reference internal" href="annotation.html#module-annotation.views">Views</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.create_context"><code class="docutils literal notranslate"><span class="pre">create_context()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.prev_sentence"><code class="docutils literal notranslate"><span class="pre">prev_sentence()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.next_sentence"><code class="docutils literal notranslate"><span class="pre">next_sentence()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.annotate_batch"><code class="docutils literal notranslate"><span class="pre">annotate_batch()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.edit"><code class="docutils literal notranslate"><span class="pre">edit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.PrevSentence"><code class="docutils literal notranslate"><span class="pre">PrevSentence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.PrevSentence.get"><code class="docutils literal notranslate"><span class="pre">PrevSentence.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.NextSentence"><code class="docutils literal notranslate"><span class="pre">NextSentence</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.NextSentence.get"><code class="docutils literal notranslate"><span class="pre">NextSentence.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.AnnotateView"><code class="docutils literal notranslate"><span class="pre">AnnotateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotateView.template_name"><code class="docutils literal notranslate"><span class="pre">AnnotateView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotateView.model"><code class="docutils literal notranslate"><span class="pre">AnnotateView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotateView.get_context_data"><code class="docutils literal notranslate"><span class="pre">AnnotateView.get_context_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotateView.get"><code class="docutils literal notranslate"><span class="pre">AnnotateView.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.EditAssignment"><code class="docutils literal notranslate"><span class="pre">EditAssignment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.EditAssignment.get"><code class="docutils literal notranslate"><span class="pre">EditAssignment.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.EditAssignment.post"><code class="docutils literal notranslate"><span class="pre">EditAssignment.post()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -186,8 +202,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="discuss.html">Discussion</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html#module-discuss.views">Views</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.chat_simple"><code class="docutils literal notranslate"><span class="pre">chat_simple()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.GetProgress"><code class="docutils literal notranslate"><span class="pre">GetProgress</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.views.GetProgress.get"><code class="docutils literal notranslate"><span class="pre">GetProgress.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.views.DiscussView"><code class="docutils literal notranslate"><span class="pre">DiscussView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.views.DiscussView.post"><code class="docutils literal notranslate"><span class="pre">DiscussView.post()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.views.DiscussView.get"><code class="docutils literal notranslate"><span class="pre">DiscussView.get()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html#module-discuss.models">Models</a><ul>
@@ -230,10 +253,40 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="projects.html">Projects</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="projects.html#module-projects.views">Views</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.project_list_view"><code class="docutils literal notranslate"><span class="pre">project_list_view()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.project_detail_view"><code class="docutils literal notranslate"><span class="pre">project_detail_view()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.change_batch_phase"><code class="docutils literal notranslate"><span class="pre">change_batch_phase()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.export_batch"><code class="docutils literal notranslate"><span class="pre">export_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ProjectListView"><code class="docutils literal notranslate"><span class="pre">ProjectListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.template_name"><code class="docutils literal notranslate"><span class="pre">ProjectListView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.model"><code class="docutils literal notranslate"><span class="pre">ProjectListView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.context_object_name"><code class="docutils literal notranslate"><span class="pre">ProjectListView.context_object_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">ProjectListView.get_queryset()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ProjectDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectDetailView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectDetailView.model"><code class="docutils literal notranslate"><span class="pre">ProjectDetailView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectDetailView.get_redirect_url"><code class="docutils literal notranslate"><span class="pre">ProjectDetailView.get_redirect_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ProjectExpertDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectExpertDetailView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectExpertDetailView.model"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectExpertDetailView.template_name"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectExpertDetailView.get_context_data"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView.get_context_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ProjectAnnotatorDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectAnnotatorDetailView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectAnnotatorDetailView.model"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectAnnotatorDetailView.template_name"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectAnnotatorDetailView.get_context_data"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView.get_context_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ChangeBatchPhase"><code class="docutils literal notranslate"><span class="pre">ChangeBatchPhase</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ChangeBatchPhase.post"><code class="docutils literal notranslate"><span class="pre">ChangeBatchPhase.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ExportBatch"><code class="docutils literal notranslate"><span class="pre">ExportBatch</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ExportBatch.get"><code class="docutils literal notranslate"><span class="pre">ExportBatch.get()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="projects.html#module-projects.models">Models</a><ul>
@@ -324,9 +377,6 @@
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.USERNAME_FIELD"><code class="docutils literal notranslate"><span class="pre">User.USERNAME_FIELD</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.REQUIRED_FIELDS"><code class="docutils literal notranslate"><span class="pre">User.REQUIRED_FIELDS</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.objects"><code class="docutils literal notranslate"><span class="pre">User.objects</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.is_annotator"><code class="docutils literal notranslate"><span class="pre">User.is_annotator</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.is_expert"><code class="docutils literal notranslate"><span class="pre">User.is_expert</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.is_admin"><code class="docutils literal notranslate"><span class="pre">User.is_admin</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.assigned_projects"><code class="docutils literal notranslate"><span class="pre">User.assigned_projects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.discuss_batches"><code class="docutils literal notranslate"><span class="pre">User.discuss_batches</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">User.DoesNotExist</span></code></a></li>

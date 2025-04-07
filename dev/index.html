@@ -55,6 +55,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#running-the-app-locally">Running the app locally</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#run-webpack">1. Run webpack</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#run-django-server">2. Run Django Server</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#run-tests">Run tests</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#development-server">Development Server</a><ul>
@@ -155,6 +156,10 @@ python<span class="w"> </span>manage.py<span class="w"> </span>populatedb
 If you do not intend to change any CSS, SCSS or .js files, you can just kill the server by <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> in the terminal.
 However, I would strongly recommend to just keep it running.
 It will automatically recompile all necessary files if they change.</p>
+<p>To run webpack continuously and watch for file changes, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>watch
+</pre></div>
+</div>
 </section>
 <section id="run-django-server">
 <h3>2. Run Django Server<a class="headerlink" href="#run-django-server" title="Link to this heading"></a></h3>
@@ -174,6 +179,14 @@ poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> 
 </pre></div>
 </div>
 <p>This should spawn a webserver that is accessible in the browser via <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
+</section>
+<section id="run-tests">
+<h3>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h3>
+<p>To run the tests, run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
+poetry<span class="w"> </span>run<span class="w"> </span>pytest
+</pre></div>
+</div>
 </section>
 </section>
 <section id="development-server">

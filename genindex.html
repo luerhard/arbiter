@@ -89,6 +89,7 @@
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
  
 </div>
@@ -97,7 +98,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Batch.already_annotated_count">already_annotated_count() (projects.models.Batch method)</a>
 </li>
-      <li><a href="api/annotation.html#annotation.views.annotate_batch">annotate_batch() (in module annotation.views)</a>
+      <li><a href="api/annotation.html#annotation.views.AnnotateView">AnnotateView (class in annotation.views)</a>
 </li>
       <li><a href="api/data.html#data.models.Annotation">Annotation (class in data.models)</a>
 </li>
@@ -178,9 +179,7 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/projects.html#projects.views.change_batch_phase">change_batch_phase() (in module projects.views)</a>
-</li>
-      <li><a href="api/discuss.html#discuss.views.chat_simple">chat_simple() (in module discuss.views)</a>
+      <li><a href="api/projects.html#projects.views.ChangeBatchPhase">ChangeBatchPhase (class in projects.views)</a>
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.check_for_disagreement">check_for_disagreement() (data.models.ExampleAssignment method)</a>
 </li>
@@ -189,6 +188,8 @@
       <li><a href="api/data.html#data.models.Label.color">color (data.models.Label attribute)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.content">content (data.models.Example attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectListView.context_object_name">context_object_name (projects.views.ProjectListView attribute)</a>
 </li>
       <li><a href="api/core.html#core.views.core">core() (in module core.views)</a>
 </li>
@@ -256,13 +257,15 @@
       </ul></li>
       <li><a href="api/discuss.html#discuss.models.AnnotationEndReason.DISCUSSION_END">DISCUSSION_END (discuss.models.AnnotationEndReason attribute)</a>
 </li>
+      <li><a href="api/discuss.html#discuss.views.DiscussView">DiscussView (class in discuss.views)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/annotation.html#annotation.views.edit">edit() (in module annotation.views)</a>
+      <li><a href="api/annotation.html#annotation.views.EditAssignment">EditAssignment (class in annotation.views)</a>
 </li>
       <li><a href="api/users.html#users.models.User.email">email (users.models.User attribute)</a>
 </li>
@@ -304,7 +307,7 @@
       </ul></li>
       <li><a href="api/projects.html#projects.models.Project.experts">experts (projects.models.Project property)</a>
 </li>
-      <li><a href="api/projects.html#projects.views.export_batch">export_batch() (in module projects.views)</a>
+      <li><a href="api/projects.html#projects.views.ExportBatch">ExportBatch (class in projects.views)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -324,6 +327,30 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/annotation.html#annotation.views.AnnotateView.get">get() (annotation.views.AnnotateView method)</a>
+
+      <ul>
+        <li><a href="api/annotation.html#annotation.views.EditAssignment.get">(annotation.views.EditAssignment method)</a>
+</li>
+        <li><a href="api/annotation.html#annotation.views.NextSentence.get">(annotation.views.NextSentence method)</a>
+</li>
+        <li><a href="api/annotation.html#annotation.views.PrevSentence.get">(annotation.views.PrevSentence method)</a>
+</li>
+        <li><a href="api/discuss.html#discuss.views.DiscussView.get">(discuss.views.DiscussView method)</a>
+</li>
+        <li><a href="api/discuss.html#discuss.views.GetProgress.get">(discuss.views.GetProgress method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ExportBatch.get">(projects.views.ExportBatch method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/annotation.html#annotation.views.AnnotateView.get_context_data">get_context_data() (annotation.views.AnnotateView method)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.get_context_data">(projects.views.ProjectAnnotatorDetailView method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.get_context_data">(projects.views.ProjectExpertDetailView method)</a>
+</li>
+      </ul></li>
       <li><a href="api/discuss.html#discuss.models.Message.get_next_by_created_at">get_next_by_created_at() (discuss.models.Message method)</a>
 
       <ul>
@@ -332,6 +359,8 @@
       </ul></li>
       <li><a href="api/users.html#users.models.User.get_next_by_date_joined">get_next_by_date_joined() (users.models.User method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.get_next_by_last_updated">get_next_by_last_updated() (data.models.ExampleAssignment method)</a>
 </li>
       <li><a href="api/data.html#data.models.Annotation.get_phase_display">get_phase_display() (data.models.Annotation method)</a>
@@ -346,21 +375,21 @@
         <li><a href="api/discuss.html#discuss.models.Room.get_previous_by_created_at">(discuss.models.Room method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.get_previous_by_date_joined">get_previous_by_date_joined() (users.models.User method)</a>
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.get_previous_by_last_updated">get_previous_by_last_updated() (data.models.ExampleAssignment method)</a>
 </li>
       <li><a href="api/annotation.html#annotation.views.get_progress">get_progress() (in module annotation.views)</a>
-
-      <ul>
-        <li><a href="api/discuss.html#discuss.views.get_progress">(in module discuss.views)</a>
 </li>
-      </ul></li>
+      <li><a href="api/projects.html#projects.views.ProjectListView.get_queryset">get_queryset() (projects.views.ProjectListView method)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectDetailView.get_redirect_url">get_redirect_url() (projects.views.ProjectDetailView method)</a>
+</li>
       <li><a href="api/projects.html#projects.models.ProjectUser.get_role_display">get_role_display() (projects.models.ProjectUser method)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.get_user_annotations">get_user_annotations() (data.models.Example method)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.views.GetProgress">GetProgress (class in discuss.views)</a>
 </li>
       <li><a href="api/users.html#users.models.User.groups">groups (users.models.User attribute)</a>
 </li>
@@ -408,15 +437,9 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.is_active">is_active (users.models.User attribute)</a>
 </li>
-      <li><a href="api/users.html#users.models.User.is_admin">is_admin (users.models.User property)</a>
-</li>
       <li><a href="api/data.html#data.models.ExampleAssignment.is_annotated">is_annotated (data.models.ExampleAssignment attribute)</a>
 </li>
-      <li><a href="api/users.html#users.models.User.is_annotator">is_annotator (users.models.User property)</a>
-</li>
       <li><a href="api/data.html#data.models.ExampleAssignment.is_discussed">is_discussed (data.models.ExampleAssignment attribute)</a>
-</li>
-      <li><a href="api/users.html#users.models.User.is_expert">is_expert (users.models.User property)</a>
 </li>
       <li><a href="api/users.html#users.models.User.is_staff">is_staff (users.models.User attribute)</a>
 </li>
@@ -486,6 +509,20 @@
         <li><a href="api/discuss.html#discuss.models.Room.messages">(discuss.models.Room attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/annotation.html#annotation.views.AnnotateView.model">model (annotation.views.AnnotateView attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.model">(projects.views.ProjectAnnotatorDetailView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectDetailView.model">(projects.views.ProjectDetailView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.model">(projects.views.ProjectExpertDetailView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectListView.model">(projects.views.ProjectListView attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     module
 
@@ -525,7 +562,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.next">next() (data.models.ExampleAssignment method)</a>
 </li>
-      <li><a href="api/annotation.html#annotation.views.next_sentence">next_sentence() (in module annotation.views)</a>
+      <li><a href="api/annotation.html#annotation.views.NextSentence">NextSentence (class in annotation.views)</a>
 </li>
       <li><a href="api/discuss.html#discuss.models.AnnotationEndReason.NO_EXAMPLES">NO_EXAMPLES (discuss.models.AnnotationEndReason attribute)</a>
 </li>
@@ -575,9 +612,23 @@
         <li><a href="api/projects.html#projects.models.Batch.phase">(projects.models.Batch attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/annotation.html#annotation.views.prev_sentence">prev_sentence() (in module annotation.views)</a>
+      <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.pk_url_kwarg">pk_url_kwarg (projects.views.ProjectAnnotatorDetailView attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.pk_url_kwarg">(projects.views.ProjectExpertDetailView attribute)</a>
 </li>
+      </ul></li>
+      <li><a href="api/annotation.html#annotation.views.EditAssignment.post">post() (annotation.views.EditAssignment method)</a>
+
+      <ul>
+        <li><a href="api/discuss.html#discuss.views.DiscussView.post">(discuss.views.DiscussView method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ChangeBatchPhase.post">(projects.views.ChangeBatchPhase method)</a>
+</li>
+      </ul></li>
       <li><a href="api/data.html#data.models.ExampleAssignment.previous">previous() (data.models.ExampleAssignment method)</a>
+</li>
+      <li><a href="api/annotation.html#annotation.views.PrevSentence">PrevSentence (class in annotation.views)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Project">Project (class in projects.models)</a>
 </li>
@@ -595,8 +646,8 @@
 </li>
       <li><a href="api/projects.html#projects.models.Project.MultipleObjectsReturned">Project.MultipleObjectsReturned</a>
 </li>
-      <li><a href="api/projects.html#projects.views.project_detail_view">project_detail_view() (in module projects.views)</a>
-</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.Label.project_id">project_id (data.models.Label attribute)</a>
 
       <ul>
@@ -605,11 +656,15 @@
         <li><a href="api/projects.html#projects.models.ProjectUser.project_id">(projects.models.ProjectUser attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/projects.html#projects.views.project_list_view">project_list_view() (in module projects.views)</a>
-</li>
       <li><a href="api/projects.html#projects.models.Project.project_users">project_users (projects.models.Project attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView">ProjectAnnotatorDetailView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectDetailView">ProjectDetailView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectExpertDetailView">ProjectExpertDetailView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectListView">ProjectListView (class in projects.views)</a>
 </li>
       <li><a href="api/users.html#users.models.User.projects">projects (users.models.User attribute)</a>
 </li>
@@ -685,6 +740,22 @@
       </ul></li>
       <li><a href="api/projects.html#projects.models.Batch.Phase.SETUP">SETUP (projects.models.Batch.Phase attribute)</a>
 </li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/annotation.html#annotation.views.AnnotateView.template_name">template_name (annotation.views.AnnotateView attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.template_name">(projects.views.ProjectAnnotatorDetailView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.template_name">(projects.views.ProjectExpertDetailView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectListView.template_name">(projects.views.ProjectListView attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
