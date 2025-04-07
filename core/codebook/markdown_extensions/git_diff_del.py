@@ -7,7 +7,6 @@ from markdown.inlinepatterns import InlineProcessor
 class DelInlineProcessor(InlineProcessor):
     def handleMatch(self, m, data):
         el = etree.Element("del")
-        el.set("class", "text-danger bg-danger-subtle rounded")
         el.text = m.group(1)
         return el, m.start(0), m.end(0)
 
