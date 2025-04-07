@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -40,6 +41,7 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
         batch_old = self.request.GET.get("batch_old", 0)
         batch_new = self.request.GET.get("batch_new", self.object.project.max_batch_number)
         context["content"] = self.object.diff(batch_old, batch_new)
+        log.debug(f"{context['content'] = }")
         return context
 
 
