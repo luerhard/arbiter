@@ -109,7 +109,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col">
+        <div class="col" id="annotation">
             <div class="row">
                 <div class="col mt-3">{% partial pbar %}</div>
             </div>
@@ -123,7 +123,18 @@
                 <div id="buttons">{% partial nav-block %}</div>
             </div>
         </div>
-        <div class="col-5 collapse" id="codebook-col">{% include "codebook/partials/view-codebook.html" %}</div>
+        <div class="col-5 collapse overflow-y-auto mt-1" id="codebook-col" style="max-height: 80vh;">
+            <div class="position-relative">
+                <input type="checkbox" class="btn-check" id="codebook-pos-checkbox" autocomplete="off">
+                <label class="btn btn-sm btn position-absolute top-0 end-0 m-2 z-3" for="codebook-pos-checkbox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-down-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M7.364 12.5a.5.5 0 0 0 .5.5H14.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 14.5 0h-10A1.5 1.5 0 0 0 3 1.5v6.636a.5.5 0 1 0 1 0V1.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H7.864a.5.5 0 0 0-.5.5"/>
+                        <path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H1.707l8.147-8.146a.5.5 0 0 0-.708-.708L1 14.293V10.5a.5.5 0 0 0-1 0z"/>
+                      </svg>
+                    </label>
+                {% include "codebook/partials/view-codebook.html" %}
+            </div>
+        </div>
     </div>
     <script>
         // set state of button and hidden variable for filter variable
@@ -156,6 +167,8 @@
         document.addEventListener("DOMContentLoaded", function() {
             const codebookToggle = document.getElementById("codebook-toggle");
             const codebookCol = document.getElementById("codebook-col");
+            const checkbox = document.getElementById("codebook-pos-checkbox");
+            const annotation = document.getElementById("annotation");
 
             codebookCol.addEventListener("shown.bs.collapse", function() {
                 codebookToggle.classList.remove("btn-outline-primary");
@@ -165,6 +178,18 @@
             codebookCol.addEventListener("hidden.bs.collapse", function() {
                 codebookToggle.classList.remove("btn-primary");
                 codebookToggle.classList.add("btn-outline-primary");
+            });
+
+            checkbox.addEventListener("change", function() {
+                codebookCol.classList.toggle("row");
+                codebookCol.classList.toggle("col-5");
+                annotation.classList.toggle("row");
+                annotation.classList.toggle("col");
+                if (checkbox.checked) {
+                    codebookCol.style.maxHeight = "50vh";
+                } else {
+                    codebookCol.style.maxHeight = "80vh";
+                };
             });
 
             colorContrast();
