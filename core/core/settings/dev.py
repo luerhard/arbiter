@@ -67,9 +67,9 @@ LOGGING = {
             "filename": BASE_DIR.parent / "projects.log",
             "formatter": "verbose",
         },
-        "file_codebooks": {
+        "file_codebook": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR.parent / "codebooks.log",
+            "filename": BASE_DIR.parent / "codebook.log",
             "formatter": "verbose",
         },
     },
@@ -90,6 +90,6 @@ LOGGING = {
         },
         "discuss": {"level": "DEBUG", "handlers": ["file_discuss"]},
         "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
-        "codebooks": {"level": "DEBUG", "handlers": ["file_codebooks"]},
+        "codebook": {"level": "DEBUG", "handlers": ["file_codebook"]},
     },
 }
