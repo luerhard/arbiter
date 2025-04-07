@@ -4,10 +4,16 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import reverse
+from django.views.generic import DetailView
+from django.views.generic import ListView
+from django.views.generic import RedirectView
+from django.views.generic import View
 import pandas as pd
 
 from .forms import BatchPhaseForm
+from core.mixins import AnnotatorRequiredMixin
+from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
@@ -21,57 +27,58 @@ User = get_user_model()
 log = logging.getLogger(__name__)
 
 
-def project_list_view(request):
-    project_users = (
-        ProjectUser.objects.filter(user=request.user)
-        .prefetch_related("project")
-        .order_by("-project__pk")
-    )
-    context = {"project_users": project_users}
-    return render(request, "projects/project_list.html", context)
+class ProjectListView(ListView):
+    template_name = "projects/project_list.html"
+    model = ProjectUser
+    context_object_name = "project_users"
+
+    def get_queryset(self):
+        return (
+            ProjectUser.objects.filter(user=self.request.user)
+            .prefetch_related("project")
+            .order_by("-project__pk")
+        )
 
 
-def project_detail_view(request, project_id):
-    project = get_object_or_404(Project, id=project_id)
+class ProjectDetailView(RedirectView):
+    model = Project
 
-    all_project_users = User.objects.filter(projectuser__project=project)
-    project_user = ProjectUser.objects.get(project=project, user=request.user)
+    def get_redirect_url(self, *args, **kwargs):  # noqa: ARG002
+        project_id = kwargs.get("project_id")
+        project = get_object_or_404(Project, id=project_id)
+        project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
 
-    context = {}
-    context["project"] = project
-    context["codebook"] = project.codebook.get()
+        if project_user.role == ProjectUser.Role.ANNOTATOR:
+            return reverse("project-detail-annotator", kwargs={"project_id": project_id})
+        elif project_user.role == ProjectUser.Role.EXPERT:
+            return reverse("project-detail-expert", kwargs={"project_id": project_id})
+        else:
+            return reverse("home")
 
-    # get assigned users
-    context["annotators"] = all_project_users.filter(
-        projectuser__project=project,
-        projectuser__role=ProjectUser.Role.ANNOTATOR,
-    )
-    context["experts"] = all_project_users.filter(
-        projectuser__project=project,
-        projectuser__role=ProjectUser.Role.EXPERT,
-    )
 
-    # get associated batches
-    batches = context["project"].batches.all()
+class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
+    pk_url_kwarg = "project_id"
+    model = Project
+    template_name = "projects/project-detail-expert.html"
 
-    if project_user.role == ProjectUser.Role.ANNOTATOR:
-        # view for annotators
-        context["batches"] = []
-        for batch in batches:
-            batch_data = {
-                "batch": batch,
-                "done": batch.examples.filter(
-                    assignments__user=request.user,
-                    assignments__is_annotated=1,
-                ).count(),
-                "length": batch.examples.count(),
-            }
-            context["batches"].append(batch_data)
-        log.debug(f"Providing the following context to the Annotator: {context}")
-        return render(request, "projects/project-detail-annotator.html", context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.get_object()
+        all_project_users = User.objects.filter(projectuser__project=project)
 
-    elif project_user.role == ProjectUser.Role.EXPERT:
-        # view for experts
+        # get assigned users
+        context["annotators"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
+        )
+        context["experts"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.EXPERT,
+        )
+        context["codebook"] = project.codebook.get()
+
+        # get associated batches
+        batches = project.batches.all()
         context["batches"] = []
         for batch in batches:
             batch_data = {
@@ -97,16 +104,50 @@ def project_detail_view(request, project_id):
             context["batches"].append(batch_data)
 
         log.debug(f"Providing the following context to the Expert: {context}")
-        return render(request, "projects/project-detail-expert.html", context)
-    else:
-        msg = f"Unkown User Role {project_user.role}"
-        raise Exception(msg)
+        return context
 
 
-def change_batch_phase(request, batch_id):
-    batch = get_object_or_404(Batch, id=batch_id)
+class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
+    pk_url_kwarg = "project_id"
+    model = Project
+    template_name = "projects/project-detail-annotator.html"
 
-    if request.method == "POST":
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.get_object()
+        all_project_users = User.objects.filter(projectuser__project=project)
+
+        # get assigned users
+        context["annotators"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.ANNOTATOR,
+        )
+        context["experts"] = all_project_users.filter(
+            projectuser__project=project,
+            projectuser__role=ProjectUser.Role.EXPERT,
+        )
+        context["codebook"] = project.codebook.get()
+
+        # view for annotators
+        context["batches"] = []
+        batches = project.batches.all()
+        for batch in batches:
+            batch_data = {
+                "batch": batch,
+                "done": batch.examples.filter(
+                    assignments__user=self.request.user,
+                    assignments__is_annotated=1,
+                ).count(),
+                "length": batch.examples.count(),
+            }
+            context["batches"].append(batch_data)
+        log.debug(f"Providing the following context to the Annotator: {context}")
+        return context
+
+
+class ChangeBatchPhase(ExpertRequiredMixin, View):
+    def post(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
+        batch = get_object_or_404(Batch, id=batch_id)
         form = BatchPhaseForm(request.POST, instance=batch)
         if form.is_valid():
             new = form.save(commit=False)
@@ -114,65 +155,65 @@ def change_batch_phase(request, batch_id):
             phase = batch.get_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
             return HttpResponse(status=204)
-    else:
-        form = BatchPhaseForm(instance=batch)
+        else:
+            msg = "invalid form"
+            raise Exception(msg)
 
-    return render(request)
 
+class ExportBatch(ExpertRequiredMixin, View):
+    def get(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
+        batch = Batch.objects.get(id=batch_id)
+        labels = batch.project.labels
+        annotators = batch.project.annotators
+        examples = batch.examples
 
-def export_batch(request, batch_id):  # noqa: ARG001
-    batch = Batch.objects.get(id=batch_id)
-    labels = batch.project.labels
-    annotators = batch.project.annotators
-    examples = batch.examples
-
-    rows = []
-    for example in examples.all():
-        row = {
-            "batch_number": batch.batch_number,
-            "text_id": example.id,
-            "text": example.content,
-        }
-        # Annotation Data
-        row["labels"] = []
-        for annotator in annotators:
-            user_annotations = example.get_user_annotations(
-                user=annotator,
-                phase="ANNOTATION",
-            ).select_related("label")
-            labels = [annotation.label.name for annotation in user_annotations]
-            user_data = {"user": annotator.username, "labels": labels}
-            row["labels"].append(user_data)
-
-        # Discussed Annotation Data
-        row["discussed_labels"] = []
-        for annotator in annotators:
-            user_annotations = example.get_user_annotations(
-                user=annotator,
-                phase="DISCUSSION",
-            ).select_related("label")
-            labels = [annotation.label.name for annotation in user_annotations]
-            user_data = {"user": annotator.username, "labels": labels}
-            row["labels"].append(user_data)
-
-        # Chat Messages
-        row["messages"] = []
-        messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
-        for message in messages_qs.all():
-            group = {
-                "user": message.user,
-                "date": message.created_at,
-                "content": message.message,
+        rows = []
+        for example in examples.all():
+            row = {
+                "batch_number": batch.batch_number,
+                "text_id": example.id,
+                "text": example.content,
             }
-            row["messages"].append(group)
-        rows.append(row)
+            # Annotation Data
+            row["labels"] = []
+            for annotator in annotators:
+                user_annotations = example.get_user_annotations(
+                    user=annotator,
+                    phase="ANNOTATION",
+                ).select_related("label")
+                labels = [annotation.label.name for annotation in user_annotations]
+                user_data = {"user": annotator.username, "labels": labels}
+                row["labels"].append(user_data)
 
-    df = pd.DataFrame(rows)
+            # Discussed Annotation Data
+            row["discussed_labels"] = []
+            for annotator in annotators:
+                user_annotations = example.get_user_annotations(
+                    user=annotator,
+                    phase="DISCUSSION",
+                ).select_related("label")
+                labels = [annotation.label.name for annotation in user_annotations]
+                user_data = {"user": annotator.username, "labels": labels}
+                row["labels"].append(user_data)
 
-    json_data = df.to_json(orient="records", lines=True)
+            # Chat Messages
+            row["messages"] = []
+            messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
+            for message in messages_qs.all():
+                group = {
+                    "user": message.user,
+                    "date": message.created_at,
+                    "content": message.message,
+                }
+                row["messages"].append(group)
+            rows.append(row)
 
-    batch = Batch.objects.get(id=batch_id)
-    response = HttpResponse(json_data, content_type="application/text")
-    response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
+        df = pd.DataFrame(rows)
 
-    return response
+        json_data = df.to_json(orient="records", lines=True)
+
+        batch = Batch.objects.get(id=batch_id)
+        response = HttpResponse(json_data, content_type="application/text")
+        response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
+
+        return response

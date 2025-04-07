@@ -7,6 +7,7 @@ class MultiLabelForm(forms.Form):
     def __init__(self, *args, assignment, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.assignment = assignment
         self.example = assignment.example
         self.user = assignment.user
         annotation_labels = {

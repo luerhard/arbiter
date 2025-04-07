@@ -33,20 +33,8 @@ class User(AbstractUser):
     objects = UserManager()
 
     @property
-    def is_annotator(self):
-        return "Annotator" in [g.name for g in self.groups.all()]
-
-    @property
-    def is_expert(self):
-        return "Expert" in [g.name for g in self.groups.all()]
-
-    @property
-    def is_admin(self):
-        return "Admin" in [g.name for g in self.groups.all()]
-
-    @property
     def assigned_projects(self):
-        projectusermodel = apps.get_model("core.ProjectUser")
+        projectusermodel = apps.get_model("projects.ProjectUser")
         all_assigned_projects = projectusermodel.objects.prefetch_related("project").filter(
             user_id=self.pk,
         )
@@ -58,7 +46,7 @@ class User(AbstractUser):
     @property
     def discuss_batches(self):
         # TODO: optimize!
-        projectusermodel = apps.get_model("core.ProjectUser")
+        projectusermodel = apps.get_model("projects.ProjectUser")
         all_projects = (
             projectusermodel.objects.prefetch_related("project")
             .prefetch_related("project__batches")
