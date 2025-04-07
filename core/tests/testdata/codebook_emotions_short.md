@@ -1,27 +1,27 @@
-= A short introduction
+# A short introduction
 
 This is a short codebook but with many labels.
 
-== Anger
+## Anger
 something about anger
 
-== Fear
+## Fear
 something about fear
 
-== Hate
+## Hate
 something about hate
 
-== Disgust
+## Disgust
 something about disgust
 
-== Joy
+## Joy
 something about joy
 
-== Ecstasy
+## Ecstasy
 something about ecstasy
 
-== Sadness
+## Sadness
 something about sadness
 
-== Surprise
+## Surprise
 something about surprise
