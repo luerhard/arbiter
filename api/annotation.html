@@ -52,6 +52,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.create_context"><code class="docutils literal notranslate"><span class="pre">create_context()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.PrevSentence"><code class="docutils literal notranslate"><span class="pre">PrevSentence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.ReloadSentence"><code class="docutils literal notranslate"><span class="pre">ReloadSentence</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.NextSentence"><code class="docutils literal notranslate"><span class="pre">NextSentence</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.AnnotateView"><code class="docutils literal notranslate"><span class="pre">AnnotateView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.EditAssignment"><code class="docutils literal notranslate"><span class="pre">EditAssignment</span></code></a></li>
@@ -115,8 +116,19 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">PrevSentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.PrevSentence" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="annotation.views.PrevSentence.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.PrevSentence.get" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.PrevSentence.get" title="Link to this definition"></a></dt>
 <dd><p>view is displayed when user clicks on &lt;-</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.ReloadSentence">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">ReloadSentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.ReloadSentence" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.ReloadSentence.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.ReloadSentence.get" title="Link to this definition"></a></dt>
+<dd><p>view is displayed when user clicks on -&gt;</p>
 </dd></dl>
 
 </dd></dl>
@@ -126,7 +138,7 @@
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">NextSentence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.NextSentence" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="annotation.views.NextSentence.get">
-<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.NextSentence.get" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.NextSentence.get" title="Link to this definition"></a></dt>
 <dd><p>view is displayed when user clicks on -&gt;</p>
 </dd></dl>
 
