@@ -7,8 +7,9 @@ urlpatterns = [
 ]
 
 htmx_patterns = [
-    path("next/<int:assignment_id>", views.NextSentence.as_view(), name="annotate-next"),
-    path("prev/<int:assignment_id>", views.PrevSentence.as_view(), name="annotate-prev"),
+    path("next/", views.NextSentence.as_view(), name="annotate-next"),
+    path("reload/", views.ReloadSentence.as_view(), name="annotate-reload"),
+    path("prev/", views.PrevSentence.as_view(), name="annotate-prev"),
     path("example/edit/<int:assignment_id>", views.EditAssignment.as_view(), name="annotate-edit"),
 ]
 

@@ -6,7 +6,11 @@ from projects.models import ProjectUser
 class RoleRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         project_id = kwargs.get("project_id")
-        assignment_id = kwargs.get("assignment_id")
+        assignment_id = (
+            kwargs.get("assignment_id")
+            or request.GET.get("assignment_id")
+            or request.POST.get("assignment_id")
+        )
         batch_id = kwargs.get("batch_id")
         codebook_id = kwargs.get("codebook_id")
 
