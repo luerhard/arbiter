@@ -112,8 +112,7 @@
                     id="codebook-toggle"
                     tabindex="-1"
                     data-bs-toggle="collapse"
-                    data-bs-target="#codebook-col"
-                    onclick="toggleCodebook()">Show Codebook</button>
+                    data-bs-target="#codebook-col">Show Codebook</button>
         </div>
     </div>
     <div class="row">
@@ -143,10 +142,10 @@
                     {% comment %} Codebook Diff Button {% endcomment %}
                     <input type="checkbox"
                            class="btn-check"
-                           id="codebook-diff"
+                           id="codebook-diff-check"
                            autocomplete="off">
                     <label class="btn btn-sm btn-outline-secondary"
-                           for="codebook-diff"
+                           for="codebook-diff-check"
                            title="Show Differences">
                         <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
                              width="16"
@@ -165,7 +164,9 @@
                            autocomplete="off">
                     <label class="btn btn-sm btn-outline-secondary"
                            for="codebook-pos"
-                           title="Toggle Position Info">
+                           title="Toggle Position Info"
+                           data-bs-toggle="collapse"
+                           data-bs-target="#codebook-view,#codebook-diff-view">
                         <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
                              width="16"
                              height="16"
@@ -177,11 +178,14 @@
                         </svg>
                     </label>
                 </div>
-                {% include "codebook/partials/view-codebook.html" %}
+                <div id="codebook-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div id="codebook-diff-view" hidden>{% include "codebook/partials/view-diff-codebook.html" %}</div>
             </div>
         </div>
     </div>
     <script>
+        const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
         // set state of button and hidden variable for filter variable
         function toggleFilter() {
             const btn = document.getElementById("unfinished-toggle");
@@ -214,7 +218,9 @@
             const codebookCol = document.getElementById("codebook-col");
             const codebook_pos = document.getElementById("codebook-pos");
             const annotation = document.getElementById("annotation");
-            const codebook_diff = document.getElementById("codebook-diff");
+            const codebook_diff_check = document.getElementById("codebook-diff-check");
+            const codebook_view = document.getElementById("codebook-view");
+            const codebook_diff_view = document.getElementById("codebook-diff-view");
 
             codebookCol.addEventListener("shown.bs.collapse", function() {
                 codebookToggle.classList.remove("btn-outline-primary");
@@ -231,15 +237,16 @@
                 codebookCol.classList.toggle("col-5");
                 annotation.classList.toggle("row");
                 annotation.classList.toggle("col");
-                if (codebookPos.checked) {
+                if (codebook_pos.checked) {
                     codebookCol.style.maxHeight = "50vh";
                 } else {
                     codebookCol.style.maxHeight = "80vh";
                 };
             });
 
-            codebook_diff.addEventListener("change", function() {
-
+            codebook_diff_check.addEventListener("change", function() {
+                codebook_diff_view.hidden = !codebook_diff_view.hidden
+                codebook_view.hidden = !codebook_view.hidden
             });
 
             colorContrast();

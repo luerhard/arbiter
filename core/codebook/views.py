@@ -14,7 +14,6 @@ from projects.models import ProjectUser
 log = logging.getLogger(__name__)
 
 
-# Create your views here.
 class CodebookView(AnyRoleRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
     model = Codebook
@@ -26,6 +25,7 @@ class CodebookView(AnyRoleRequiredMixin, DetailView):
         user = self.request.user
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
         context["role"] = project_user.role
+        context["content"] = context["codebook"].content
         return context
 
 
@@ -39,8 +39,7 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
         context = super().get_context_data(*args, **kwargs)
         batch_old = self.request.GET.get("batch_old", 0)
         batch_new = self.request.GET.get("batch_new", self.object.project.max_batch_number)
-        context["content"] = self.object.diff(batch_old, batch_new)
-        log.debug(f"{context['content'] = }")
+        context["content_diff"] = self.object.diff(batch_old, batch_new)
         return context
 
 

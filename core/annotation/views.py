@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -9,6 +11,9 @@ from core.mixins import AnnotatorRequiredMixin
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
+
+
+log = logging.getLogger(__name__)
 
 
 def get_progress(user, batch):
@@ -193,7 +198,9 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
         # TODO: CHANGE
         codebook = batch.project.codebook.get()
-        context["codebook"] = codebook
+        context["content"] = codebook.content
+        context["content_diff"] = codebook.diff(batch_id-1, batch_id)
+        # context["content_diff"] = codebook.diff(1, 2)
 
         return render(request, "annotation/index.html", context)
 

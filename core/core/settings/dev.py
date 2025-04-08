@@ -48,6 +48,8 @@ MIDDLEWARE += [
 
 STATICFILES_DIRS = [BASE_DIR.parent.parent / "dist", BASE_DIR.parent / "static"]
 
+LOG_DIR = BASE_DIR.parent / "logs"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -59,17 +61,22 @@ LOGGING = {
         },
         "file_discuss": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR.parent / "discuss.log",
+            "filename": LOG_DIR / "discuss.log",
             "formatter": "verbose",
         },
         "file_projects": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR.parent / "projects.log",
+            "filename": LOG_DIR / "projects.log",
             "formatter": "verbose",
         },
         "file_codebook": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR.parent / "codebook.log",
+            "filename": LOG_DIR / "codebook.log",
+            "formatter": "verbose",
+        },
+        "file_annotation": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "annotation.log",
             "formatter": "verbose",
         },
     },
@@ -91,5 +98,6 @@ LOGGING = {
         "discuss": {"level": "DEBUG", "handlers": ["file_discuss"]},
         "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
         "codebook": {"level": "DEBUG", "handlers": ["file_codebook"]},
+        "annotation": {"level": "DEBUG", "handlers": ["file_annotation"]},
     },
 }
