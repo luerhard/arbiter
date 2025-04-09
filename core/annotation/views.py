@@ -199,7 +199,6 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         codebook = batch.project.codebook.get()
         context["content"] = codebook.content
         context["content_diff"] = codebook.diff(batch_id - 1, batch_id)
-        # context["content_diff"] = codebook.diff(1, 2)
 
         return render(request, "annotation/index.html", context)
 
