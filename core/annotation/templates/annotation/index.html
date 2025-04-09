@@ -177,10 +177,6 @@
                         </svg>
                     </label>
                 </div>
-                <div class="codebook-view" id="codebook-view">{% include "codebook/partials/view-codebook.html" %}</div>
-                <div class="codebook-view" id="codebook-diff-view" hidden>
-                    {% include "codebook/partials/view-diff-codebook.html" %}
-                </div>
                 <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
                 <div class="codebook-view" id="codebook-diff-view" hidden>
                     {% include "codebook/partials/view-diff-codebook.html" %}
@@ -243,7 +239,7 @@
                 annotation.classList.toggle("row");
                 annotation.classList.toggle("col");
                 if (codebook_pos.checked) {
-                    codebook_col.style.maxHeight = "50vh";
+                    codebook_col.style.maxHeight = "45vh";
                 } else {
                     codebook_col.style.maxHeight = "80vh";
                 };
