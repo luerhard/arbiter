@@ -133,7 +133,8 @@
         {% comment %} Codebook View and Control {% endcomment %}
         <div class="col-5 collapse overflow-y-auto mt-1"
              id="codebook-col"
-             style="max-height: 80vh">
+             style="max-height: 80vh"
+             aria-expanded="false">
             <div class="position-relative">
                 {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
                 <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
@@ -160,13 +161,11 @@
                     {% comment %} Codebook Position Button {% endcomment %}
                     <input type="checkbox"
                            class="btn-check"
-                           id="codebook-pos"
+                           id="codebook-pos-check"
                            autocomplete="off">
                     <label class="btn btn-sm btn-outline-secondary"
-                           for="codebook-pos"
-                           title="Toggle Position Info"
-                           data-bs-toggle="collapse"
-                           data-bs-target="#codebook-view,#codebook-diff-view">
+                           for="codebook-pos-check"
+                           title="Toggle Position">
                         <svg xmlns="[http://www.w3.org/2000/svg](http://www.w3.org/2000/svg)"
                              width="16"
                              height="16"
@@ -178,10 +177,15 @@
                         </svg>
                     </label>
                 </div>
+<<<<<<< Updated upstream
                 <div class="codebook-view" id="codebook-view">{% include "codebook/partials/view-codebook.html" %}</div>
                 <div class="codebook-view" id="codebook-diff-view" hidden>
                     {% include "codebook/partials/view-diff-codebook.html" %}
                 </div>
+=======
+                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div class="codebook-view" id="codebook-diff-view" hidden>{% include "codebook/partials/view-diff-codebook.html" %}</div>
+>>>>>>> Stashed changes
             </div>
         </div>
     </div>
@@ -216,39 +220,39 @@
 
         // show state of codebook expansion on the button
         document.addEventListener("DOMContentLoaded", function() {
-            const codebookToggle = document.getElementById("codebook-toggle");
-            const codebookCol = document.getElementById("codebook-col");
-            const codebook_pos = document.getElementById("codebook-pos");
+            const codebook_toggle = document.getElementById("codebook-toggle");
+            const codebook_col = document.getElementById("codebook-col");
+            const codebook_pos = document.getElementById("codebook-pos-check");
             const annotation = document.getElementById("annotation");
             const codebook_diff_check = document.getElementById("codebook-diff-check");
-            const codebook_view = document.getElementById("codebook-view");
+            const codebook_orig_view = document.getElementById("codebook-orig-view");
             const codebook_diff_view = document.getElementById("codebook-diff-view");
 
-            codebookCol.addEventListener("shown.bs.collapse", function() {
-                codebookToggle.classList.remove("btn-outline-primary");
-                codebookToggle.classList.add("btn-primary");
+            codebook_col.addEventListener("shown.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-outline-primary");
+                codebook_toggle.classList.add("btn-primary");
             });
 
-            codebookCol.addEventListener("hidden.bs.collapse", function() {
-                codebookToggle.classList.remove("btn-primary");
-                codebookToggle.classList.add("btn-outline-primary");
+            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-primary");
+                codebook_toggle.classList.add("btn-outline-primary");
             });
 
             codebook_pos.addEventListener("change", function() {
-                codebookCol.classList.toggle("row");
-                codebookCol.classList.toggle("col-5");
+                codebook_col.classList.toggle("row");
+                codebook_col.classList.toggle("col-5");
                 annotation.classList.toggle("row");
                 annotation.classList.toggle("col");
                 if (codebook_pos.checked) {
-                    codebookCol.style.maxHeight = "50vh";
+                    codebook_col.style.maxHeight = "50vh";
                 } else {
-                    codebookCol.style.maxHeight = "80vh";
+                    codebook_col.style.maxHeight = "80vh";
                 };
             });
 
             codebook_diff_check.addEventListener("change", function() {
                 codebook_diff_view.hidden = !codebook_diff_view.hidden
-                codebook_view.hidden = !codebook_view.hidden
+                codebook_orig_view.hidden = !codebook_orig_view.hidden
             });
 
             colorContrast();
