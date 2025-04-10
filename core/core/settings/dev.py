@@ -49,6 +49,7 @@ MIDDLEWARE += [
 STATICFILES_DIRS = [BASE_DIR.parent.parent / "dist", BASE_DIR.parent / "static"]
 
 LOG_DIR = BASE_DIR.parent.parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
 
 LOGGING = {
     "version": 1,
