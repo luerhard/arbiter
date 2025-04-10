@@ -112,8 +112,7 @@
                     id="codebook-toggle"
                     tabindex="-1"
                     data-bs-toggle="collapse"
-                    data-bs-target="#codebook-col"
-                    onclick="toggleCodebook()">Show Codebook</button>
+                    data-bs-target="#codebook-col">Show Codebook</button>
         </div>
     </div>
     <div class="row">
@@ -131,31 +130,47 @@
                 <div id="buttons">{% partial nav-block %}</div>
             </div>
         </div>
+        {% comment %} Codebook View and Control {% endcomment %}
         <div class="col-5 collapse overflow-y-auto mt-1"
              id="codebook-col"
-             style="max-height: 80vh">
+             style="max-height: 80vh"
+             aria-expanded="false">
             <div class="position-relative">
-                <input type="checkbox"
-                       class="btn-check"
-                       id="codebook-pos-checkbox"
-                       autocomplete="off">
-                <label class="btn btn-sm btn position-absolute top-0 end-0 m-2 z-3"
-                       for="codebook-pos-checkbox">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="16"
-                         height="16"
-                         fill="currentColor"
-                         class="bi bi-box-arrow-down-left"
-                         viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M7.364 12.5a.5.5 0 0 0 .5.5H14.5a1.5 1.5 0 0 0 1.5-1.5v-10A1.5 1.5 0 0 0 14.5 0h-10A1.5 1.5 0 0 0 3 1.5v6.636a.5.5 0 1 0 1 0V1.5a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 .5.5v10a.5.5 0 0 1-.5.5H7.864a.5.5 0 0 0-.5.5" />
-                        <path fill-rule="evenodd" d="M0 15.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1H1.707l8.147-8.146a.5.5 0 0 0-.708-.708L1 14.293V10.5a.5.5 0 0 0-1 0z" />
-                    </svg>
-                </label>
-                {% include "codebook/partials/view-codebook.html" %}
+                {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
+                <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
+                     role="group"
+                     aria-label="Diff and Position Control Buttons">
+                    {% comment %} Codebook Diff Button {% endcomment %}
+                    <input type="checkbox"
+                           class="btn-check"
+                           id="codebook-diff-check"
+                           autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-diff-check"
+                           title="Show Differences">
+                        <i class="bi bi-file-earmark-diff"></i>
+                    </label>
+                    {% comment %} Codebook Position Button {% endcomment %}
+                    <input type="checkbox"
+                           class="btn-check"
+                           id="codebook-pos-check"
+                           autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-pos-check"
+                           title="Toggle Position">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </label>
+                </div>
+                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div class="codebook-view" id="codebook-diff-view" hidden>
+                    {% include "codebook/partials/view-diff-codebook.html" %}
+                </div>
             </div>
         </div>
     </div>
     <script>
+        const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
         // set state of button and hidden variable for filter variable
         function toggleFilter() {
             const btn = document.getElementById("unfinished-toggle");
@@ -184,31 +199,39 @@
 
         // show state of codebook expansion on the button
         document.addEventListener("DOMContentLoaded", function() {
-            const codebookToggle = document.getElementById("codebook-toggle");
-            const codebookCol = document.getElementById("codebook-col");
-            const checkbox = document.getElementById("codebook-pos-checkbox");
+            const codebook_toggle = document.getElementById("codebook-toggle");
+            const codebook_col = document.getElementById("codebook-col");
+            const codebook_pos = document.getElementById("codebook-pos-check");
             const annotation = document.getElementById("annotation");
+            const codebook_diff_check = document.getElementById("codebook-diff-check");
+            const codebook_orig_view = document.getElementById("codebook-orig-view");
+            const codebook_diff_view = document.getElementById("codebook-diff-view");
 
-            codebookCol.addEventListener("shown.bs.collapse", function() {
-                codebookToggle.classList.remove("btn-outline-primary");
-                codebookToggle.classList.add("btn-primary");
+            codebook_col.addEventListener("shown.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-outline-primary");
+                codebook_toggle.classList.add("btn-primary");
             });
 
-            codebookCol.addEventListener("hidden.bs.collapse", function() {
-                codebookToggle.classList.remove("btn-primary");
-                codebookToggle.classList.add("btn-outline-primary");
+            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-primary");
+                codebook_toggle.classList.add("btn-outline-primary");
             });
 
-            checkbox.addEventListener("change", function() {
-                codebookCol.classList.toggle("row");
-                codebookCol.classList.toggle("col-5");
+            codebook_pos.addEventListener("change", function() {
+                codebook_col.classList.toggle("row");
+                codebook_col.classList.toggle("col-5");
                 annotation.classList.toggle("row");
                 annotation.classList.toggle("col");
-                if (checkbox.checked) {
-                    codebookCol.style.maxHeight = "50vh";
+                if (codebook_pos.checked) {
+                    codebook_col.style.maxHeight = "45vh";
                 } else {
-                    codebookCol.style.maxHeight = "80vh";
+                    codebook_col.style.maxHeight = "80vh";
                 };
+            });
+
+            codebook_diff_check.addEventListener("change", function() {
+                codebook_diff_view.hidden = !codebook_diff_view.hidden
+                codebook_orig_view.hidden = !codebook_orig_view.hidden
             });
 
             colorContrast();

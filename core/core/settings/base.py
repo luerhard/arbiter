@@ -194,11 +194,11 @@ MARKDOWNIFY = {
             "href",
             "src",
             "alt",
-            "class",
         ],
         "MARKDOWN_EXTENSIONS": [
+            "codebook.markdown_extensions.git_diff_preprocess",
             "codebook.markdown_extensions.git_diff_del",
             "codebook.markdown_extensions.git_diff_insertion",
         ],
-    }
+    },
 }
