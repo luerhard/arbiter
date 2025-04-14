@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}
+    Resolve Disagreement
+{% endblock title %}
+{% block content %}
+
+<div class="container my-4">
+    <h2 class="text-center">Resolve Disagreement</h2>
+    <div class="row">
+    <!-- Codebook Section -->
+    <div class="col-md-6">
+        <div class="card smaller-card">
+            <div class="card-header">Test: {{ object.pk }}</div>
+            <div class="card-body">{% include "codebook/partials/view-codebook.html" %}</div>
+        </div>
+    </div>
+        <!-- Chat History Section -->
+        <div class="col-md-6">
+            <div class="p-3 border rounded border-primary">
+                <h4 class="mb-3">Chat History</h4>
+                <div id="messages" class="chat-message-container" style="max-height: 300px; overflow-y: auto;">
+                    {% for message in chat_messages %}
+                        <div class="d-flex {% if message.user == request.user.username %}flex-row-reverse{% else %}flex-row{% endif %}">
+                            <div class="message {% if message.user == request.user.username %}self-message{% else %}other-message{% endif %}">
+                                <strong>{{ message.user }}:</strong> {{ message.message }}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p>No chat history available.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Labels Section -->
+    <div class="row mt-4">
+        <!-- Previous Labels -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Labels Before Discussion</div>
+                <div class="card-body">
+                    {% for label in prev_labels %}
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-primary me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: {{ label.user.username }}</span>
+                        </div>
+                    {% empty %}
+                        <p>No labels assigned before the discussion.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Post Discussion Labels -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Labels After Discussion</div>
+                <div class="card-body">
+                    {% for label in post_labels %}
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-success me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: {{ label.user.username }}</span>
+                        </div>
+                    {% empty %}
+                        <p>No labels assigned after the discussion.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Resolution Section -->
+    <div>
+        <h4>Resolve Disagreement</h4>
+        <p class="text-muted">Apply the correct label to each sentence.</p>
+            {% csrf_token %}
+           
+            <div class="mb-3">
+                <label for="sentence" class="form-label">Correct Label</label>
+                <select id="sentence" name="sentence" class="form-select" onchange="updateSelectedLabel()">
+                  
+                </select>                
+            </div>
+           
+            <div class="mb-3">
+                <label for="change-note" class="form-label">Why is <span id="selected-label">None</span> correct?</label>
+                <textarea id="change-note" name="change_note" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="sentence" class="form-label">Relevant Codebook part</label>
+                <select id="codebook-snippet" name="sentence" class="form-select" onchange="updateSelectedDefinition()">
+                   
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="definition-correction" class="form-label">Definition correction</label>
+                <textarea id="definition-correction" name="definition_correction" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
+            </div>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="add-to-codebook" name="add_to_codebook">
+                <label class="form-check-label" for="add-to-codebook">
+                    Add this example to the codebook
+                </label>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function updateSelectedLabel() {
+        const selectedLabel = document.getElementById('sentence').value;
+        document.getElementById('selected-label').innerText = selectedLabel;
+    }
+    function updateSelectedDefinition() {
+        const selectedDefinition = document.getElementById('codebook-snippet').value;
+        document.getElementById('definition-correction').value = selectedDefinition;
+    }
+</script>
+{% endblock content %}
