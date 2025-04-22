@@ -1,18 +1,15 @@
 # Create your views here.
 
-from django.http import Http404
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from core.mixins import ExpertRequiredMixin
-from projects.models import Project
-from data.models import Example
-from codebook.forms import CodebookForm
+from projects.models import Project, Batch
 from codebook.models import Codebook
 from projects.models import ProjectUser
 from django.views.generic.detail import DetailView
-from data.models import ExampleAssignment
-from discuss.models import Message, Room
-from data.models import Annotation
+from discuss.models import Message
+from data.models import Annotation 
+from data.models import Example
 
 def overview(request):
     projects_with_disagreements = Project.objects.filter(
@@ -35,22 +32,54 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         user = self.request.user
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
         context["role"] = project_user.role
+        
+        codebook = self.object 
+        context["Definition_AE"] = codebook.get_definition_section("Anti-Elitism")
+        context["Example_AE"] = codebook.get_example_section("Anti-Elitism")
+        context["Definition_PC"] = codebook.get_definition_section("People-Centrism")
+        context["Example_PC"] = codebook.get_example_section("People-Centrism")
 
-        batch_id = self.kwargs.get("batch_id")  # Ensure batch_id is passed in the URL
-        room = get_object_or_404(Room, pk=batch_id)
-        messages = Message.objects.filter(room=room).order_by("created_at")
-        context["chat_messages"] = messages
+           # Get the current example with a disagreement
+        current_example_id = self.kwargs.get("example_id")
+        if current_example_id:
+            current_example = get_object_or_404(Example, pk=current_example_id)
+        else:
+            current_example = Example.objects.filter(has_disagreement=True).first()
 
+        # Get all examples with disagreements
+        all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
+
+        # Determine the previous and next examples
+        previous_example = (
+            all_examples.filter(id__lt=current_example.id).order_by("-id").first()
+        )
+        next_example = (
+            all_examples.filter(id__gt=current_example.id).order_by("id").first()
+        )
+
+        # Add the current, previous, and next examples to the context
+        context["sentence"] = current_example
+        context["previous_example"] = previous_example
+        context["next_example"] = next_example
+        context["all_examples"] = all_examples
+
+        # Get annotations and messages
         annotations_before_discussion = Annotation.objects.filter(
-            assignment__example__batch_id=batch_id,
+            assignment__example=current_example,
             phase=Annotation.Phase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
-            assignment__example__batch_id=batch_id,
+            assignment__example=current_example,
             phase=Annotation.Phase.DISCUSSION,
         )
+        messages = Message.objects.filter(
+            example=current_example
+        ).exclude(user="system").order_by("created_at")
+
         context["prev_labels"] = annotations_before_discussion
         context["post_labels"] = annotations_after_discussion
+        context["chat_messages"] = messages
+        context["labels"] = self.object.project.labels.all()
 
         return context
 
@@ -90,53 +119,3 @@ def resolve_Disagreements(request):
         "codebook": codebook,
     }
     return render(request, "expert/dialogue.html", context)
-
-
-
-# def resolve_Disagreements(request, project_id, version_name=None):
-#     # Fetch the project
-#     project = get_object_or_404(Project, id=project_id)
-
-#     # Fetch the codebook version
-#     if version_name:
-#         codebookv = (
-#             get_object_or_404(
-#                 CodebookVersion,
-#                 codebook__project=project,
-#                 version_name=version_name,
-#             )
-#             .prefetch_related("definitions", "definitions_examples")
-#             .prefetch_related("descriptions")
-#         )
-#     else:
-#         try:
-#             codebookv = (
-#                 CodebookVersion.objects.filter(codebook__project=project)
-#                 .order_by("date")
-#                 .prefetch_related("definitions__examples")
-#                 .prefetch_related("descriptions")[0]
-#             )
-#         except IndexError:
-#             raise Http404("No codebooks exist.")
-
-#     # Mock disagreements data
-#     disagreements = [
-#         {
-#             "id": 1,
-#             "sentence": "I feel like something bad is going to happen.",
-#             "labels": ["fear", "anger"],
-#             "participants": ["Annotator1", "Annotator2"],
-#         },
-#     ]
-
-#     context = {
-#         "disagreements": disagreements,
-#         "codebook": codebookv.codebook,
-#         "codebookv": codebookv,
-#     }
-#     return render(request, "expert/resolve_Disagreements.html", context)
-
-
-
-
-

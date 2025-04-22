@@ -1,34 +1,58 @@
 {% extends "base.html" %}
+{% load markdownify %}
 {% block title %}
     Resolve Disagreement
 {% endblock title %}
 {% block content %}
 
-<div class="container my-4">
+<div class="container mt-4">
     <h2 class="text-center">Resolve Disagreement</h2>
     <div class="row">
-    <!-- Codebook Section -->
-    <div class="col-md-6">
+        <!-- Sentence  -->
+        <div class="text-center">
+            <div class="card smaller-card">
+                <div class="card-header">Sentence</div>
+            <div class="card-body">
+                    <p class="fw-bold">{{ sentence}}</p>
+                </div>
+            </div>
+        </div>
+
+    <!-- Codebook Section  -->
+    <div class="col-md-6 mt-4">
         <div class="card smaller-card">
-            <div class="card-header">Test: {{ object.pk }}</div>
-            <div class="card-body">{% include "codebook/partials/view-codebook.html" %}</div>
+            <div class="card-header">Section: Anti-Elitism</div>
+            <div class="card-body">
+                <textarea id="antiElitismContent" class="form-control" rows="10" readonly>{{ Example_AE}}</textarea>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="toggleEdit('antiElitismContent', this)">Edit</button>
         </div>
     </div>
+    <div class="col-md-6 mt-4">
+        <div class="card smaller-card">
+            <div class="card-header">Section: People-Centrism</div>
+            <div class="card-body">
+                <textarea id="peopleCentrismContent" class="form-control" rows="10" readonly>{{ Example_PC}}</textarea>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="toggleEdit('peopleCentrismContent', this)">Edit</button>
+        </div>
+    </div>
+    
         <!-- Chat History Section -->
-        <div class="col-md-6">
-            <div class="p-3 border rounded border-primary">
-                <h4 class="mb-3">Chat History</h4>
-                <div id="messages" class="chat-message-container" style="max-height: 300px; overflow-y: auto;">
+        <div class="text-center mt-4">
+            <div class="card small-card">
+                <div class="card-header">Chat History</div>
+                <div class="card-body">
                     {% for message in chat_messages %}
-                        <div class="d-flex {% if message.user == request.user.username %}flex-row-reverse{% else %}flex-row{% endif %}">
-                            <div class="message {% if message.user == request.user.username %}self-message{% else %}other-message{% endif %}">
+                        <div class="d-flex {% if message.user == 'annotator2' %}flex-row-reverse{% else %}flex-row{% endif %}">
+                            <div class="message {% if message.user == 'annotator2' %}self-message{% else %}other-message{% endif %}">
                                 <strong>{{ message.user }}:</strong> {{ message.message }}
                             </div>
                         </div>
                     {% empty %}
                         <p>No chat history available.</p>
                     {% endfor %}
-                </div>
+            </div>
             </div>
         </div>
         <!-- Labels Section -->
@@ -40,8 +64,9 @@
                 <div class="card-body">
                     {% for label in prev_labels %}
                         <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-primary me-2">{{ label.label }}</span>
-                            <span class="text-muted">Assigned by: {{ label.user.username }}</span>
+                            <span class="badge bg-success me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: </span>
+                            <span class="fw-bold">{{ label.assignment.user }}</span>
                         </div>
                     {% empty %}
                         <p>No labels assigned before the discussion.</p>
@@ -57,8 +82,9 @@
                 <div class="card-body">
                     {% for label in post_labels %}
                         <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-success me-2">{{ label.label }}</span>
-                            <span class="text-muted">Assigned by: {{ label.user.username }}</span>
+                            <span class="badge bg-info me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: </span>
+                            <span class="fw-bold">{{ label.assignment.user }}</span>
                         </div>
                     {% empty %}
                         <p>No labels assigned after the discussion.</p>
@@ -71,20 +97,36 @@
 
 
     <!-- Resolution Section -->
-    <div>
+    <div class="mt-4">
         <h4>Resolve Disagreement</h4>
-        <p class="text-muted">Apply the correct label to each sentence.</p>
+        <p class="text-muted">Label correction</p>
             {% csrf_token %}
            
+            
             <div class="mb-3">
-                <label for="sentence" class="form-label">Correct Label</label>
-                <select id="sentence" name="sentence" class="form-select" onchange="updateSelectedLabel()">
-                  
-                </select>                
+                <label class="form-label">Correct Label</label>
+                <ul class="list-group">
+                    {% for label in labels %}
+                    <li class="list-group-item">
+                        <div class="form-check">
+                            <input class="form-check-input me-1" 
+                                   type="checkbox" 
+                                   value="{{ label.name }}" 
+                                   id="label_checkbox_{{ forloop.counter }}" 
+                                   name="selected_labels"
+                                   onchange="updateLabelAppearance(this)">
+                            <label class="form-check-label" id="label_{{ forloop.counter }}">
+                                <span class="badge bg-primary me-2">{{ label.name }}</span>
+                            </label>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
+            
            
             <div class="mb-3">
-                <label for="change-note" class="form-label">Why is <span id="selected-label">None</span> correct?</label>
+                <label for="change-note" class="form-label">Why is this ideal?</label>
                 <textarea id="change-note" name="change_note" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
             </div>
             <div class="mb-3">
@@ -104,10 +146,30 @@
                     Add this example to the codebook
                 </label>
             </div>
-            
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
-    </div>
+         <!-- Navigation and Save Buttons -->
+<div class="d-flex justify-content-between align-items-center mt-4">
+    <!-- Previous Button -->
+    {% if previous_example %}
+        <a href="{% url 'expert-dialogue' codebook.pk previous_example.id %}" class="btn btn-outline-secondary">
+            Previous
+        </a>
+    {% else %}
+        <button class="btn btn-outline-secondary" disabled>Previous</button>
+    {% endif %}
+
+    <!-- Save Button -->
+    <button class="btn btn-primary">Mock Save</button>
+
+    <!-- Next Button -->
+    {% if next_example %}
+        <a href="{% url 'expert-dialogue' codebook.pk next_example.id %}" class="btn btn-outline-secondary">
+            Next
+        </a>
+    {% else %}
+        <button class="btn btn-outline-secondary" disabled>Next</button>
+    {% endif %}
+</div>
+    
 </div>
 
 <script>
@@ -119,5 +181,30 @@
         const selectedDefinition = document.getElementById('codebook-snippet').value;
         document.getElementById('definition-correction').value = selectedDefinition;
     }
+    function toggleEdit(textareaId, button) {
+        const textarea = document.getElementById(textareaId);
+
+        if (textarea.readOnly) {
+            // Enable editing
+            textarea.readOnly = false;
+            textarea.classList.add('editable');
+            button.textContent = 'Save';
+        } else {
+            // Disable editing
+            textarea.readOnly = true;
+            textarea.classList.remove('editable');
+            button.textContent = 'Edit';
+        }
+    }
+    function updateLabelAppearance(checkbox) {
+    const labelId = checkbox.id.replace('checkbox', '');
+    const labelElement = document.getElementById(`label_${labelId.split('_')[2]}`);
+    
+    if (checkbox.checked) {
+        labelElement.innerHTML = `<span class="badge bg-success me-2">${labelElement.textContent}</span>`;
+    } else {
+        labelElement.innerHTML = `<span class="badge bg-primary me-2">${labelElement.textContent}</span>`;
+    }
+}
 </script>
 {% endblock content %}
