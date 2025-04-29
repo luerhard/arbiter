@@ -1,14 +1,12 @@
 import logging
-import shutil
 import re
+import shutil
 
 from django.db import models
 from django.urls import reverse
 from git import GitCommandError
 from git import Repo
-from markdown import Markdown
-from xml.etree.ElementTree import Element
-from codebook.markdown_extensions.section_collector import SectionExtension
+
 from core import settings
 
 # Create your models here.
@@ -74,34 +72,34 @@ class Codebook(models.Model):
         return content
 
     def get_definition_section(self, section_name: str) -> str:
-        pattern = rf"## {re.escape(section_name)}\n(.*?)(?=\n## |\Z)"  
+        pattern = rf"## {re.escape(section_name)}\n(.*?)(?=\n## |\Z)"
         match = re.search(pattern, self.content, re.DOTALL)
         if match:
-            return match.group(1).strip()  
-        return "No matching section found."  
-    
+            return match.group(1).strip()
+        return "No matching section found."
+
     def get_example_section(self, section_name: str) -> str:
         pattern = rf"## {re.escape(section_name)}\n.*?\n### Examples\n(.*?)(?=\n##| ?=\n### |\Z)"
         match = re.search(pattern, self.content, re.DOTALL)
         if match:
-            return match.group(1).strip()  
-        return "No matching section found."  
+            return match.group(1).strip()
+        return "No matching section found."
 
     # def get_definition_section(self, section_name: str) -> str:
     #     md = Markdown(extensions=[SectionExtension(section_name)])
     #     html = md.convert(self.content)
-        
+
     #     if not md.section_content:
     #         return "No matching section found"
-            
+
     #     raw_text = []
     #     for elem in md.section_content:
     #         if isinstance(elem, Element):
-                
+
     #             elem_text = ''.join(elem.itertext()).strip()
     #             if elem_text:
     #                 raw_text.append(elem_text)
-        
+
     #     return '\n\n'.join(raw_text) if raw_text else ""
 
     def save(self, content: str | None = None, commit_message: str | None = None, **kwargs):
