@@ -32,24 +32,22 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         user = self.request.user
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
         context["role"] = project_user.role
-        
-        codebook = self.object 
+        codebook = self.object
+        context["complete_codebook"] = codebook.content
         context["Definition_AE"] = codebook.get_definition_section("Anti-Elitism")
         context["Example_AE"] = codebook.get_example_section("Anti-Elitism")
         context["Definition_PC"] = codebook.get_definition_section("People-Centrism")
         context["Example_PC"] = codebook.get_example_section("People-Centrism")
-
-           # Get the current example with a disagreement
+        context["ease_scale"] = range(1, 8)
         current_example_id = self.kwargs.get("example_id")
         if current_example_id:
             current_example = get_object_or_404(Example, pk=current_example_id)
         else:
             current_example = Example.objects.filter(has_disagreement=True).first()
 
-        # Get all examples with disagreements
+      
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
 
-        # Determine the previous and next examples
         previous_example = (
             all_examples.filter(id__lt=current_example.id).order_by("-id").first()
         )
@@ -57,13 +55,11 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             all_examples.filter(id__gt=current_example.id).order_by("id").first()
         )
 
-        # Add the current, previous, and next examples to the context
         context["sentence"] = current_example
         context["previous_example"] = previous_example
         context["next_example"] = next_example
         context["all_examples"] = all_examples
 
-        # Get annotations and messages
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
             phase=Annotation.Phase.ANNOTATION,
