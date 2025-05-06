@@ -1,6 +1,7 @@
 # Create your views here.
 
 from codebook.models import Codebook
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
@@ -8,7 +9,7 @@ from django.views.generic.detail import DetailView
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
-from django.http import Http404
+
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
@@ -66,9 +67,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         return context
 
 
-
-
-
 def resolve_Disagreements(request, task_id=0):
     tasks = [
         {
@@ -79,11 +77,14 @@ def resolve_Disagreements(request, task_id=0):
                 {"user": "annotator2", "message": "I think XOXOXO"},
                 {"user": "annotator1", "message": "sounds good"},
             ],
-            "sentence":"Sentece des problems"
+            "sentence": "Sentece des problems",
         },
         {
             "codebook": "##Joy: \n A feeling of great pleasure and happiness.\n  \n##Excitement: A feeling of enthusiasm and eagerness.",
-            "labels": [{"label":"Joy", "user":"annoator1"}, {"label":"Excitement","user":"annoator2"},],
+            "labels": [
+                {"label": "Joy", "user": "annoator1"},
+                {"label": "Excitement", "user": "annoator2"},
+            ],
             "chat_messages": [
                 {"user": "annotator1", "message": "This is amazing!"},
                 {"user": "annotator2", "message": "I agree, it's exciting!"},
