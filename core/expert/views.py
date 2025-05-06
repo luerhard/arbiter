@@ -10,16 +10,7 @@ from django.views.generic.detail import DetailView
 from discuss.models import Message
 from data.models import Annotation 
 from data.models import Example
-
-def overview(request):
-    projects_with_disagreements = Project.objects.filter(
-        batches__examples__has_disagreement=True
-    ).distinct()
-
-    context = {
-        "projects": "projects_with_disagreements",
-    }
-    return render(request,"expert/display_disagreemets_overview.html", context)
+from django.http import Http404
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
@@ -81,37 +72,37 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
 
 
-def resolve_Disagreements(request):
-    disagreements = [
+
+
+def resolve_Disagreements(request, task_id=0):
+    tasks = [
         {
-            "id": 1,
-            "sentence": "I feel like something bad is going to happen.",
-            "labels": ["fear", "anger"],
-            "participants": ["Annotator1", "Annotator2"],
+            "codebook": "##Admiration: \n Finding something impressive or worthy of respect.\n  \n##Pride: A feeling of pleasure or satisfaction inspired by something or someone deemed impressive or worthy of respect.",
+            "labels": ["Admiration", "Pride"],
+            "chat_messages": [
+                {"user": "annotator1", "message": "I think blabla"},
+                {"user": "annotator2", "message": "I think XOXOXO"},
+                {"user": "annotator1", "message": "sounds good"},
+            ],
+            "sentence":"Sentece des problems"
+        },
+        {
+            "codebook": "##Joy: \n A feeling of great pleasure and happiness.\n  \n##Excitement: A feeling of enthusiasm and eagerness.",
+            "labels": [{"label":"Joy", "user":"annoator1"}, {"label":"Excitement","user":"annoator2"},],
+            "chat_messages": [
+                {"user": "annotator1", "message": "This is amazing!"},
+                {"user": "annotator2", "message": "I agree, it's exciting!"},
+            ],
         },
     ]
-    codebook = [
-    
-    { "name":"fear",
-    "definition":"Fear represents an emotional state caused by the anticipation or awareness of danger.", 
-    "examples": [
-            "I heard footsteps behind me in the dark alley.",
-            "The doctor told me I might need surgery.",
-        ],
-    },
-    
-    {
-    "name": "anger",
-    "definition": "Anger represents an intense emotional response to a perceived provocation or injustice.",
-    "examples": [
-            "Why did you take my book without asking?",
-            "The unfair decision made me want to scream.",
-        ],
-    }
-    ]
+    if task_id < 0 or task_id >= len(tasks):
+        raise Http404("Task not found")
+    previous_task_id = task_id - 1 if task_id > 0 else None
+    next_task_id = task_id + 1 if task_id < len(tasks) - 1 else None
 
     context = {
-        "disagreements": disagreements,
-        "codebook": codebook,
+        "task": tasks[task_id],
+        "previous_task_id": previous_task_id,
+        "next_task_id": next_task_id,
     }
-    return render(request, "expert/dialogue.html", context)
+    return render(request, "expert/dialogue_UI-Test.html", context)

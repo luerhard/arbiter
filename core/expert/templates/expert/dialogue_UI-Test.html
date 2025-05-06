@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+{% load markdownify %}
+{% load crispy_forms_tags %}
+{% block title %}
+    Resolve Disagreement
+{% endblock title %}
+{% block content %}
+
+<div class="container mt-4">
+    <h2 class="text-center">Resolve Disagreement</h2>
+    <div class="row">
+        <!-- Sentence Section -->
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-header">Sentence</div>
+                <div class="card-body">
+                    <p class="text-muted">{{ task.sentence }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Codebook Section -->
+        <div class="col-md-6 mt-4">
+            <div class="card">
+                <div class="card-header">Edit Codebook</div>
+                <div class="card-body">
+                    <form method="post" id="codebook-form">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap;" readonly>{{ task.codebook }}</textarea>
+                        </div>
+                        <button type="button" id="edit-save-button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!-- Codebook Content & Resolution -->
+        <div class="col-md-6 mt-4">
+            <!-- Previous Labels -->
+            <div class="card mb-4">
+                <div class="card-header">Labels Before Discussion</div>
+                <div class="card-body">
+                    {% for label in task.labels %}
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-success me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: </span>
+                            <span class="fw-bold">{{ label.user }}</span>
+                        </div>
+                    {% empty %}
+                        <p>No labels assigned before the discussion.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+           <!-- Chat History Section -->
+           <div class="card mt-4">
+            <div class="card-header">Chat History</div>
+            <div class="card-body">
+                {% for message in task.chat_messages %}
+                <div class="d-flex {% if message.user == 'annotator2' %}flex-row-reverse{% else %}flex-row{% endif %}">
+                    <div class="message {% if message.user == 'annotator2' %}self-message{% else %}other-message{% endif %}">
+                        <strong>{{ message.user }}:</strong> {{ message.message }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    
+
+
+            <!-- Post Discussion Labels -->
+            <div class="card mt-4">
+                <div class="card-header">Labels After Discussion</div>
+                <div class="card-body">
+                    {% for label in task.labels %}
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-info me-2">{{ label.label }}</span>
+                            <span class="text-muted">Assigned by: </span>
+                            <span class="fw-bold">{{ label.user }}</span>
+                        </div>
+                    {% empty %}
+                        <p>No labels assigned after the discussion.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+        
+            <!-- Resolution Section -->
+            <div class="mt-4">
+                <h4>Resolve Disagreement</h4>
+                <p class="text-muted">Label correction</p>
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label class="form-label">Correct Label</label>
+                    <ul class="list-group">
+                        {% for label in task.labels %}
+                            <li class="list-group-item">
+                                <div class="form-check">
+                                    <input class="form-check-input me-1" 
+                                           type="checkbox" 
+                                           value="{{ label.label }}" 
+                                           id="label_checkbox_{{ forloop.counter }}" 
+                                           name="selected_labels"
+                                           onchange="updateLabelAppearance(this)">
+                                    <label class="form-check-label" id="label_{{ forloop.counter }}">
+                                        <span class="badge bg-primary me-2">{{ label.label }}</span>
+                                    </label>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="mb-3">
+                    <label for="definition-correction" class="form-label">Definition correction</label>
+                    <textarea id="definition-correction" name="definition_correction" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
+                </div>
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="add-to-codebook" name="add_to_codebook">
+                    <label class="form-check-label" for="add-to-codebook">
+                        Add this example to the codebook
+                    </label>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        {% if previous_task_id is not None %}
+            <a href="{% url 'expert-dialogue' previous_task_id %}" class="btn btn-outline-secondary">
+                Previous
+            </a>
+        {% else %}
+            <button class="btn btn-outline-secondary" disabled>Previous</button>
+        {% endif %}
+        <button class="btn btn-primary" onclick="saveToJson()">Save</button>
+        {% if next_task_id is not None %}
+            <a href="{% url 'expert-dialogue' next_task_id %}" class="btn btn-outline-secondary">
+                Next
+            </a>
+        {% else %}
+            <button class="btn btn-outline-secondary" disabled>Next</button>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    function updateSelectedLabel() {
+        const selectedLabel = document.getElementById('sentence').value;
+        document.getElementById('selected-label').innerText = selectedLabel;
+    }
+    function updateSelectedDefinition() {
+        const selectedDefinition = document.getElementById('codebook-snippet').value;
+        document.getElementById('definition-correction').value = selectedDefinition;
+    }
+    function toggleEdit() {
+        const textarea = document.getElementById('codebook-content');
+        const button = document.getElementById('edit-save-button');
+
+        if (textarea.readOnly) {
+            // Enable editing
+            textarea.readOnly = false;
+            button.textContent = 'Save Changes';
+            textarea.classList.add('editable');
+        } else {
+            // Save changes and disable editing
+            textarea.readOnly = true;
+            button.textContent = 'Edit';
+            textarea.classList.remove('editable');
+
+            // Optionally, submit the form here if needed
+            // document.getElementById('codebook-form').submit();
+        }
+    }
+    function updateLabelAppearance(checkbox) {
+        const labelId = checkbox.id.replace('checkbox', '');
+        const labelElement = document.getElementById(`label_${labelId.split('_')[2]}`);
+        
+        if (checkbox.checked) {
+            labelElement.innerHTML = `<span class="badge bg-success me-2">${labelElement.textContent}</span>`;
+        } else {
+            labelElement.innerHTML = `<span class="badge bg-primary me-2">${labelElement.textContent}</span>`;
+        }
+    }
+
+    function saveToJson() {
+        const codebookContent = document.getElementById('codebook-content').value;
+        const selectedLabels = [];
+        document.querySelectorAll('input[name="selected_labels"]:checked').forEach((checkbox) => {
+            selectedLabels.push(checkbox.value);
+        });
+        const definitionCorrection = document.getElementById('definition-correction').value;
+        const data = {
+            codebook: codebookContent,
+            selected_labels: selectedLabels,
+            definition_correction: definitionCorrection,
+        };
+
+        const jsonString = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'codebook_data.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+</script>
+{% endblock content %}
