@@ -1,14 +1,12 @@
 # Create your views here.
 
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404
-from core.mixins import ExpertRequiredMixin
-from projects.models import Project, Batch
 from codebook.models import Codebook
-from projects.models import ProjectUser
+from django.shortcuts import get_object_or_404
+from django.shortcuts import render
 from django.views.generic.detail import DetailView
-from discuss.models import Message
-from data.models import Annotation 
+
+from core.mixins import ExpertRequiredMixin
+from data.models import Annotation
 from data.models import Example
 from django.http import Http404
 
@@ -17,7 +15,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     model = Codebook
     context_object_name = "codebook"
     template_name = "expert/dialogue.html"
-   
+
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
@@ -36,15 +34,10 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         else:
             current_example = Example.objects.filter(has_disagreement=True).first()
 
-      
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
 
-        previous_example = (
-            all_examples.filter(id__lt=current_example.id).order_by("-id").first()
-        )
-        next_example = (
-            all_examples.filter(id__gt=current_example.id).order_by("id").first()
-        )
+        previous_example = all_examples.filter(id__lt=current_example.id).order_by("-id").first()
+        next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
 
         context["sentence"] = current_example
         context["previous_example"] = previous_example
@@ -59,9 +52,11 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             assignment__example=current_example,
             phase=Annotation.Phase.DISCUSSION,
         )
-        messages = Message.objects.filter(
-            example=current_example
-        ).exclude(user="system").order_by("created_at")
+        messages = (
+            Message.objects.filter(example=current_example)
+            .exclude(user="system")
+            .order_by("created_at")
+        )
 
         context["prev_labels"] = annotations_before_discussion
         context["post_labels"] = annotations_after_discussion
