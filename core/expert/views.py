@@ -71,25 +71,64 @@ def resolve_Disagreements(request, task_id=0):
     tasks = [
         {
             "codebook": "##Admiration: \n Finding something impressive or worthy of respect.\n  \n##Pride: A feeling of pleasure or satisfaction inspired by something or someone deemed impressive or worthy of respect.",
-            "labels": ["Admiration", "Pride"],
+            "labels": [
+                {"label": "Admiration", "user": "annoator1"},
+                {"label": "Pride", "user": "annoator2"},],
             "chat_messages": [
-                {"user": "annotator1", "message": "I think blabla"},
-                {"user": "annotator2", "message": "I think XOXOXO"},
-                {"user": "annotator1", "message": "sounds good"},
+                {"user": "annotator1", "message": "I think this is a good example of admiration."},
+                {"user": "annotator2", "message": "I think it is more about pride."},
             ],
-            "sentence": "Sentece des problems",
+            "sentence": "Watching my daughter graduate at the top of her class filled me with an incredible sense of joy and accomplishment.",
         },
         {
-            "codebook": "##Joy: \n A feeling of great pleasure and happiness.\n  \n##Excitement: A feeling of enthusiasm and eagerness.",
+            "codebook": "##Sadness: \n Emotional pain, sorrow.\n  \n##Grief: Intense sorrow.",
             "labels": [
-                {"label": "Joy", "user": "annoator1"},
-                {"label": "Excitement", "user": "annoator2"},
+                {"label": "Sadness", "user": "annoator1"},
+                {"label": "Grief", "user": "annoator2"},
             ],
             "chat_messages": [
-                {"user": "annotator1", "message": "This is amazing!"},
-                {"user": "annotator2", "message": "I agree, it's exciting!"},
+                {"user": "annotator1", "message": "This is a clear example of sadness."},
+                {"user": "annotator2", "message": "I see it as grief."},
+                {"user": "annotator1", "message": "I think the context suggests a deeper emotional pain."},
+                {"user": "annotator2", "message": "True, but grief is a more specific term."},
             ],
         },
+        {
+    "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Disappointment: \n Sadness or displeasure.",
+    "labels": [
+        {"label": "Sadness", "user": "annotator1"},
+        {"label": "Disappointment", "user": "annotator2"}
+    ],
+    "chat_messages": [
+        {"user": "annotator1", "message": "I think this is a good example of sadness."},
+        {"user": "annotator2", "message": "I think it is more about disappointment."}
+    ],
+    "sentence": "When the promotion didn’t come through, she felt a deep ache that lingered for days."
+},{
+    "codebook": "##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n##Desire: A strong longing to obtain or experience something personally meaningful or fulfilling.",
+    "labels": [
+        {"label": "Curiosity", "user": "annotator1"},
+        {"label": "Desire", "user": "annotator2"}
+    ],
+    "chat_messages": [
+        {"user": "annotator1", "message": "I think this is a good example of curiosity."},
+        {"user": "annotator2", "message": "I think it is more about desire."},
+    ],
+    "sentence": "She couldn’t stop thinking about what might be inside the mysterious, locked box."
+},
+{
+    "codebook": "##Annoyance: \n A mild feeling of irritation or displeasure caused by trivial or repetitive disturbances.\n\n##Disgust: A strong feeling of revulsion or disapproval triggered by something deeply unpleasant or offensive.\n\n##Anger: TBD.",
+    "labels": [
+        {"label": "Annoyance", "user": "annotator1"},
+        {"label": "Disgust", "user": "annotator2"}
+    ],
+    "chat_messages": [
+        {"user": "annotator1", "message": "I think this is a mild case of annoyance."},
+        {"user": "annotator2", "message": "It seems more like disgust to me."}
+    ],
+    "sentence": "How dare they cut me off like that! I can't stand people who drive recklessly!"
+}
+
     ]
     if task_id < 0 or task_id >= len(tasks):
         raise Http404("Task not found")
