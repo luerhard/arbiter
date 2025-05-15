@@ -143,3 +143,16 @@
 #save-btn {
     width: 8rem;
 }
+
+// Codebook view
+.codebook-view del {
+    @extend .text-danger;
+    @extend .bg-danger-subtle;
+    @extend .rounded;
+}
+
+.codebook-view text {
+    @extend .text-success-emphasis;
+    @extend .bg-success-subtle;
+    @extend .rounded;
+}

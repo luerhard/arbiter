@@ -7,7 +7,6 @@ from markdown.inlinepatterns import InlineProcessor
 class InsertionInlineProcessor(InlineProcessor):
     def handleMatch(self, m, data):
         el = etree.Element("text")
-        el.set("class", "text-success-emphasis bg-success-subtle rounded")
         el.text = m.group(1)
         return el, m.start(0), m.end(0)
 
