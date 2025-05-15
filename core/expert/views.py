@@ -80,16 +80,27 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Pride"},
             ],
             "chat_messages": [
-                {"user": "annotator1", "message": "According to the codebook, admiration is about finding something impressive. I think this fits because the statement highlights an impressive achievement."},
-                {"user": "annotator2", "message": "But pride is also about satisfaction in something impressive, as per the codebook. The focus here seems to be on the personal satisfaction of the parent."},
-                {"user": "annotator1", "message": "True, but the emphasis on 'incredible sense of joy and accomplishment' leans more towards admiration for the daughter's achievement."},
-                {"user": "annotator2", "message": "I see your point, but the personal connection makes it feel more like pride. Admiration might be more detached."},
+                {
+                    "user": "annotator1",
+                    "message": "According to the codebook, admiration is about finding something impressive. I think this fits because the statement highlights an impressive achievement.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "But pride is also about satisfaction in something impressive, as per the codebook. The focus here seems to be on the personal satisfaction of the parent.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "True, but the emphasis on 'incredible sense of joy and accomplishment' leans more towards admiration for the daughter's achievement.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "I see your point, but the personal connection makes it feel more like pride. Admiration might be more detached.",
+                },
             ],
             "sentence": "Watching my daughter graduate at the top of her class filled me with an incredible sense of joy and accomplishment.",
         },
         {
             "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Grief: \n Intense sorrow.\n\n##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
-       
             "labels": [
                 {"label": "Sadness", "user": "annotator1"},
                 {"label": "Grief", "user": "annotator2"},
@@ -112,21 +123,32 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Remorse"},
             ],
             "chat_messages": [
-                {"user": "annotator1", "message": "The codebook defines sadness as emotional pain, which seems to fit here. The statement doesn't explicitly suggest the intensity of grief."},
-                {"user": "annotator2", "message": "But grief is defined as intense sorrow. The lingering ache described here feels deeper than just sadness."},
-                {"user": "annotator1", "message": "I think the intensity is subjective. The phrase 'deep ache' could still fall under sadness without reaching the level of grief."},
-                {"user": "annotator2", "message": "Fair, but the context of disappointment and lingering pain suggests a more profound emotional impact, which aligns with grief."},
+                {
+                    "user": "annotator1",
+                    "message": "The codebook defines sadness as emotional pain, which seems to fit here. The statement doesn't explicitly suggest the intensity of grief.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "But grief is defined as intense sorrow. The lingering ache described here feels deeper than just sadness.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "I think the intensity is subjective. The phrase 'deep ache' could still fall under sadness without reaching the level of grief.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "Fair, but the context of disappointment and lingering pain suggests a more profound emotional impact, which aligns with grief.",
+                },
             ],
             "sentence": "After losing her beloved pet, she felt a heavy emptiness that lingered for weeks.",
         },
         {
-    "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Disappointment: \n Sadness or displeasure.\n\n##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
-        
-    "labels": [
-        {"label": "Sadness", "user": "annotator1"},
-        {"label": "Disappointment", "user": "annotator2"}
-    ],
-    "all_labels": [
+            "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Disappointment: \n Sadness or displeasure.\n\n##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
+            "labels": [
+                {"label": "Sadness", "user": "annotator1"},
+                {"label": "Disappointment", "user": "annotator2"},
+            ],
+            "all_labels": [
                 {"label": "Disapproval"},
                 {"label": "Disgust"},
                 {"label": "Disappointment"},
@@ -135,7 +157,7 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Fear"},
                 {"label": "Gratitude"},
                 {"label": "Joy"},
-                 {"label": "Sadness"},
+                {"label": "Sadness"},
                 {"label": "Grief"},
                 {"label": "Love"},
                 {"label": "Nervousness"},
@@ -144,26 +166,45 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Relief"},
                 {"label": "Remorse"},
             ],
-    "chat_messages": [
-        {"user": "annotator1", "message": "The codebook defines sadness as emotional pain. The lingering ache described here feels like a general emotional pain rather than a specific reaction to unmet expectations."},
-        {"user": "annotator2", "message": "But disappointment is explicitly tied to unmet expectations, as per the codebook. The statement mentions the promotion not coming through, which directly points to disappointment."},
-        {"user": "annotator1", "message": "I see your point, but sadness can also encompass the emotional pain caused by unmet expectations. The 'deep ache' seems to describe a broader emotional state rather than just disappointment."},
-        {"user": "annotator2", "message": "I disagree. The context of the promotion being the trigger makes it more specific to disappointment. Sadness feels too general for this scenario."},
-        {"user": "annotator1", "message": "But the intensity of the emotional pain described here—'deep ache that lingered for days'—goes beyond the fleeting nature of disappointment. It aligns more with sadness as a prolonged emotional state."},
-        {"user": "annotator2", "message": "I think the lingering aspect could still fit disappointment, especially when the unmet expectation is significant. The emotional pain described here seems tied to the specific event of the promotion being denied."},
-        {"user": "annotator1", "message": "Fair point, but I still feel the emotional depth described here leans more towards sadness. Disappointment might be a part of it, but sadness captures the overall feeling better."}
-    ],
-    "sentence": "When the promotion didn’t come through, she felt a deep ache that lingered for days."
-    },
+            "chat_messages": [
+                {
+                    "user": "annotator1",
+                    "message": "The codebook defines sadness as emotional pain. The lingering ache described here feels like a general emotional pain rather than a specific reaction to unmet expectations.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "But disappointment is explicitly tied to unmet expectations, as per the codebook. The statement mentions the promotion not coming through, which directly points to disappointment.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "I see your point, but sadness can also encompass the emotional pain caused by unmet expectations. The 'deep ache' seems to describe a broader emotional state rather than just disappointment.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "I disagree. The context of the promotion being the trigger makes it more specific to disappointment. Sadness feels too general for this scenario.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "But the intensity of the emotional pain described here—'deep ache that lingered for days'—goes beyond the fleeting nature of disappointment. It aligns more with sadness as a prolonged emotional state.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "I think the lingering aspect could still fit disappointment, especially when the unmet expectation is significant. The emotional pain described here seems tied to the specific event of the promotion being denied.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "Fair point, but I still feel the emotional depth described here leans more towards sadness. Disappointment might be a part of it, but sadness captures the overall feeling better.",
+                },
+            ],
+            "sentence": "When the promotion didn’t come through, she felt a deep ache that lingered for days.",
+        },
         {
-              "codebook": "##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
-      
+            "codebook": "##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
             "labels": [
                 {"label": "Curiosity", "user": "annotator1"},
                 {"label": "Desire", "user": "annotator2"},
             ],
             "all_labels": [
-                 
                 {"label": "Disapproval"},
                 {"label": "Disgust"},
                 {"label": "Embarrassment"},
@@ -180,12 +221,23 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Relief"},
                 {"label": "Remorse"},
             ],
-            
             "chat_messages": [
-                {"user": "annotator1", "message": "The codebook describes curiosity as a longing to uncover information. The statement about the locked box fits this perfectly."},
-                {"user": "annotator2", "message": "But desire is about wanting to experience something personally meaningful. The focus on 'couldn’t stop thinking' suggests a deeper personal longing."},
-                {"user": "annotator1", "message": "I disagree. The locked box represents a mystery, which aligns more with curiosity. Desire would imply wanting to possess or experience the box itself."},
-                {"user": "annotator2", "message": "I see your point, but the intensity of the longing here feels more personal, which could lean towards desire."},
+                {
+                    "user": "annotator1",
+                    "message": "The codebook describes curiosity as a longing to uncover information. The statement about the locked box fits this perfectly.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "But desire is about wanting to experience something personally meaningful. The focus on 'couldn’t stop thinking' suggests a deeper personal longing.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "I disagree. The locked box represents a mystery, which aligns more with curiosity. Desire would imply wanting to possess or experience the box itself.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "I see your point, but the intensity of the longing here feels more personal, which could lean towards desire.",
+                },
             ],
             "sentence": "She couldn’t stop thinking about what might be inside the mysterious, locked box.",
         },
@@ -200,10 +252,22 @@ def resolve_Disagreements(request, task_id=0):
                 {"label": "Disgust"},
             ],
             "chat_messages": [
-                {"user": "annotator1", "message": "The codebook defines annoyance as mild irritation. The statement about being cut off seems to fit this category."},
-                {"user": "annotator2", "message": "But disgust is about strong disapproval. The phrase 'I can't stand' suggests a stronger reaction than mere annoyance."},
-                {"user": "annotator1", "message": "I think the reaction is exaggerated for emphasis. The core feeling still seems to be mild irritation, which aligns with annoyance."},
-                {"user": "annotator2", "message": "Perhaps, but the repeated mention of reckless driving could indicate a deeper, more visceral reaction, which aligns with disgust."},
+                {
+                    "user": "annotator1",
+                    "message": "The codebook defines annoyance as mild irritation. The statement about being cut off seems to fit this category.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "But disgust is about strong disapproval. The phrase 'I can't stand' suggests a stronger reaction than mere annoyance.",
+                },
+                {
+                    "user": "annotator1",
+                    "message": "I think the reaction is exaggerated for emphasis. The core feeling still seems to be mild irritation, which aligns with annoyance.",
+                },
+                {
+                    "user": "annotator2",
+                    "message": "Perhaps, but the repeated mention of reckless driving could indicate a deeper, more visceral reaction, which aligns with disgust.",
+                },
             ],
             "sentence": "How dare they cut me off like that! I can't stand people who drive recklessly!",
         },
@@ -215,7 +279,7 @@ def resolve_Disagreements(request, task_id=0):
 
     context = {
         "task": tasks[task_id],
-        "tasks":tasks,
+        "tasks": tasks,
         "task_id": task_id,
         "previous_task_id": previous_task_id,
         "next_task_id": next_task_id,
