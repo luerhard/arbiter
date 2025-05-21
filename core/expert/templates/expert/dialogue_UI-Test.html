@@ -294,7 +294,11 @@ function showMockToast(message, extraClasses="bg-success text-white") {
     function saveToJson() {
         const codebookContent = document.getElementById('codebook-content').value;
         const selectedLabels = [];
-        const taskId = {{ task_id }};
+        const taskId = {
+            {
+                task_id
+            }
+        };
         document.querySelectorAll('input[name="selected_labels"]:checked').forEach((checkbox) => {
             selectedLabels.push(checkbox.value);
         });
