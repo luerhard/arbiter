@@ -138,31 +138,38 @@
         </div>
         <!-- Navigation Buttons -->
     <div class="d-flex justify-content-between align-items-center mt-4">
-        {% if previous_task_id is not None %}
-            <a href="{% url 'expert-dialogue' previous_task_id %}" class="btn btn-outline-secondary">
-                Previous
-            </a>
+          {% if previous_task_id is not None %}
+            <a href="{% url 'expert-dialogue' previous_task_id %}"
+               class="btn btn-outline-primary">Previous</a>
         {% else %}
             <button class="btn btn-outline-secondary" disabled>Previous</button>
         {% endif %}
-        <button class="btn btn-primary" onclick="saveToJson()">Save</button>
         {% if next_task_id is not None %}
-            <a href="{% url 'expert-dialogue' next_task_id %}" class="btn btn-outline-secondary">
-                Next
-            </a>
+            <a href="{% url 'expert-dialogue' next_task_id %}"
+               class="btn btn-outline-primary" onclick="saveToJson()">Save & Next</a>
         {% else %}
-            <button class="btn btn-outline-secondary" disabled>Next</button>
+            <button class="btn btn-outline-secondary"  disabled>Finish</button>
         {% endif %}
     </div>
+    
         </div>
        
     </div>
 
     
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    
+   
+    function showToast() {
+    const toastElement = document.getElementById('toasta');
+    if (toastElement) {
+        var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
+        toastInstance.show();
+    }
+}
+
+
     function updateSelectedLabel() {
         const selectedLabel = document.getElementById('sentence').value;
         document.getElementById('selected-label').innerText = selectedLabel;
@@ -218,6 +225,7 @@
     const cancelButton = document.getElementById('cancel-button');
     const buttonsDiv = document.getElementById('div-save-undo');
     const rationaleDiv = document.getElementById('rationale-div');
+    const toast = document.getElementById('toast');
     if(!textarea.readOnly){
             textarea.readOnly = true;
             textarea.classList.toggle('editable');
@@ -227,7 +235,13 @@
             buttonsDiv.classList.toggle('flex-row');
             buttonsDiv.classList.add('flex-column');
             rationaleDiv.classList.add('d-none');
+            
         }
+        const toastElement = document.getElementById('toasta');
+    if (toastElement) {
+        var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
+        toastInstance.show();
+    }
 }
 
     function updateLabelAppearance(checkbox) {
