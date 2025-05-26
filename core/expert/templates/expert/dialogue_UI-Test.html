@@ -270,7 +270,10 @@
     }
 
     function saveToJson(event) {
+         if (event) event.preventDefault();
           showToast('Disagreement resovelment saved', 'bg-success text-white');
+          const nextUrl = event.currentTarget.getAttribute('href');
+          setTimeout(() => {
         const codebookContent = document.getElementById('codebook-content').value;
         const selectedLabels = [];
         document.querySelectorAll('input[name="selected_labels"]:checked').forEach((checkbox) => {
@@ -295,7 +298,10 @@
         a.download = 'codebook_data.json';
         a.click();
         URL.revokeObjectURL(url);
-       
+       window.location.href = nextUrl;
+    }, 1500);
+
+    return false; 
     }
 </script>
 {% endblock content %}
