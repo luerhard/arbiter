@@ -34,18 +34,21 @@
             <div class="col-md-6 mt-4">
                 <!-- Previous Labels -->
                 <div class="card mb-4">
-                    <div class="card-header">Labels Before Discussion</div>
-                    <div class="card-body">
-                        {% for label in task.labels %}
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-success me-2">{{ label.label }}</span>
-                                <span class="text-muted">Assigned by:</span>
-                                <span class="fw-bold">{{ label.user }}</span>
-                            </div>
-                        {% empty %}
-                            <p>No labels assigned before the discussion.</p>
-                        {% endfor %}
-                    </div>
+                   <div class="card-header">Labels Before Discussion</div>
+<div class="card-body">
+   
+    {% for label in task.labels %}
+    <div class="align-items-center">
+        <label class="btn btn-primary my-1" style="cursor: default;">
+            {{ label.label }}
+        </label>
+                <span class="text-muted">assigned by:</span>
+                <span class="fw-bold">{{ label.user }}</span>
+        </div>
+    {% empty %}
+        <p>No labels assigned before the discussion.</p>
+    {% endfor %}
+</div>
                 </div>
                 <!-- Chat History Section -->
                 <div class="card mt-4">
@@ -65,11 +68,13 @@
                     <div class="card-header">Labels After Discussion</div>
                     <div class="card-body">
                         {% for label in task.labels %}
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-info me-2">{{ label.label }}</span>
-                                <span class="text-muted">Assigned by:</span>
-                                <span class="fw-bold">{{ label.user }}</span>
-                            </div>
+                           <div class="align-items-center">
+        <label class="btn btn-primary my-1 " style="cursor: default;">
+            {{ label.label }}
+        </label>
+                <span class="text-muted">assigned by:</span>
+                <span class="fw-bold">{{ label.user }}</span>
+        </div>
                         {% empty %}
                             <p>No labels assigned after the discussion.</p>
                         {% endfor %}
@@ -80,23 +85,21 @@
                     <div class="card-header">Select Labels for Sentence</div>
                     {% csrf_token %}
                     <div class="card-body">
-                        <ul class="list-group">
+                         <div class="row justify-content-start">
                             {% for label in task.all_labels %}
-                                <li class="list-group-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input me-1"
-                                               type="checkbox"
-                                               value="{{ label.label }}"
+                               
+                                    <div class="form-check col d-flex">
+                                        <input type="checkbox" class="btn-check btn-check-color " autocomplete="off"
                                                id="label_checkbox_{{ forloop.counter }}"
                                                name="selected_labels"
                                                onchange="updateLabelAppearance(this)">
-                                        <label class="form-check-label" id="label_{{ forloop.counter }}">
-                                            <span class="badge bg-primary me-2">{{ label.label }}</span>
+                                        <label class="btn btn-custom-color flex" for="label_checkbox_{{ forloop.counter }}"  id="label_{{ forloop.counter }}">
+                                            {{ label.label }}
                                         </label>
                                     </div>
-                                </li>
+                                
                             {% endfor %}
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -169,15 +172,6 @@
     }
 }
 
-
-    function updateSelectedLabel() {
-        const selectedLabel = document.getElementById('sentence').value;
-        document.getElementById('selected-label').innerText = selectedLabel;
-    }
-    function updateSelectedDefinition() {
-        const selectedDefinition = document.getElementById('codebook-snippet').value;
-        document.getElementById('definition-correction').value = selectedDefinition;
-    }
     function toggleEdit() {
         const textarea = document.getElementById('codebook-content');
         const editButton = document.getElementById('edit-save-button');
@@ -235,23 +229,33 @@
             buttonsDiv.classList.toggle('flex-row');
             buttonsDiv.classList.add('flex-column');
             rationaleDiv.classList.add('d-none');
-            
+            showToast('Changes Saved');
         }
-        const toastElement = document.getElementById('toasta');
+}
+
+    function showToast (text){
+          const toastElement = document.getElementById('toasta');
+          toastElement.value = text;
     if (toastElement) {
+        const toastBody = toastElement.querySelector('[data-toast-body]');
+        if (toastBody) {
+            toastBody.textContent = text; 
+        }
         var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
         toastInstance.show();
     }
-}
+    };
 
     function updateLabelAppearance(checkbox) {
         const labelId = checkbox.id.replace('checkbox', '');
         const labelElement = document.getElementById(`label_${labelId.split('_')[2]}`);
         
         if (checkbox.checked) {
-            labelElement.innerHTML = `<span class="badge bg-success me-2">${labelElement.textContent}</span>`;
+            labelElement.classList.toggle("btn-custom-color");
+            labelElement.classList.add("btn-primary");
         } else {
-            labelElement.innerHTML = `<span class="badge bg-primary me-2">${labelElement.textContent}</span>`;
+            labelElement.classList.toggle("btn-primary");
+            labelElement.classList.add("btn-custom-color");
         }
     }
 
