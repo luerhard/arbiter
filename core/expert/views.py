@@ -92,28 +92,47 @@ class Usability_test ( DetailView):
                 "sentence": "Watching my daughter graduate at the top of her class filled me with an incredible sense of joy and accomplishment.",
             },
             {
-                "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Grief: \n Intense sorrow.\n\n##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
+               "codebook": "##Anger: \n A strong feeling of displeasure or hostility.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n ##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n ##Disappointment: \n Sadness or displeasure.\n\n\
+##Disapproval: \n Having or expressing an unfavorable opinion.\n\n\
+##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n\
+##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n\
+##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n\
+##Fear: \n Being afraid or worried.\n\n\
+##Gratitude: \n A feeling of thankfulness and appreciation.\n\n\
+##Grief: \n Intense sorrow.\n\n\
+##Joy: \n A feeling of pleasure and happiness.\n\n\
+##Love: \n A strong positive emotion of regard and affection.\n\n\
+##Nervousness: \n Apprehension, worry, anxiety.\n\n\
+##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n\
+##Realization: \n Becoming aware of something.\n\n\
+##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n\
+##Remorse: \n Regret or guilty feeling.\n\n\
+##Sadness: \n Emotional pain, sorrow.",
         
                 "labels": [
                     {"label": "Sadness", "user": "annotator1"},
                     {"label": "Grief", "user": "annotator2"},
                 ],
                 "all_labels": [
-                    {"label": "Sadness"},
-                    {"label": "Grief"},
-                    {"label": "Disapproval"},
-                    {"label": "Disgust"},
-                    {"label": "Embarrassment"},
-                    {"label": "Excitement"},
-                    {"label": "Fear"},
-                    {"label": "Gratitude"},
-                    {"label": "Joy"},
-                    {"label": "Love"},
-                    {"label": "Nervousness"},
-                    {"label": "Optimism"},
-                    {"label": "Realization"},
-                    {"label": "Relief"},
-                    {"label": "Remorse"},
+                    {"label": "Anger"},
+                    {"label": "Curiosity"},
+{"label": "Desire"},
+{"label": "Disappointment"},
+{"label": "Disapproval"},
+{"label": "Disgust"},
+{"label": "Embarrassment"},
+{"label": "Excitement"},
+{"label": "Fear"},
+{"label": "Gratitude"},
+{"label": "Grief"},
+{"label": "Joy"},
+{"label": "Love"},
+{"label": "Nervousness"},
+{"label": "Optimism"},
+{"label": "Realization"},
+{"label": "Relief"},
+{"label": "Remorse"},
+{"label": "Sadness"},
                 ],
                 "chat_messages": [
                     {"user": "annotator1", "message": "The codebook defines sadness as emotional pain, which seems to fit here. The statement doesn't explicitly suggest the intensity of grief."},
@@ -124,29 +143,46 @@ class Usability_test ( DetailView):
                 "sentence": "After losing her beloved pet, she felt a heavy emptiness that lingered for weeks.",
             },
             {
-        "codebook": "##Sadness: \n Emotional pain, sorrow.\n\n##Disappointment: \n Sadness or displeasure.\n\n##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
+        "codebook": "##Anger: \n A strong feeling of displeasure or hostility.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n ##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n ##Disappointment: \n Sadness or displeasure.\n\n\
+##Disapproval: \n Having or expressing an unfavorable opinion.\n\n\
+##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n\
+##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n\
+##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n\
+##Fear: \n Being afraid or worried.\n\n\
+##Gratitude: \n A feeling of thankfulness and appreciation.\n\n\
+##Joy: \n A feeling of pleasure and happiness.\n\n\
+##Love: \n A strong positive emotion of regard and affection.\n\n\
+##Nervousness: \n Apprehension, worry, anxiety.\n\n\
+##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n\
+##Realization: \n Becoming aware of something.\n\n\
+##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n\
+##Remorse: \n Regret or guilty feeling.\n\n\
+##Sadness: \n Emotional pain, sorrow.",
             
         "labels": [
             {"label": "Sadness", "user": "annotator1"},
             {"label": "Disappointment", "user": "annotator2"}
         ],
         "all_labels": [
+                {"label": "Anger"},
+                    {"label": "Curiosity"},
+                    {"label": "Desire"},
+                    {"label": "Disappointment"},
                     {"label": "Disapproval"},
                     {"label": "Disgust"},
-                    {"label": "Disappointment"},
                     {"label": "Embarrassment"},
                     {"label": "Excitement"},
                     {"label": "Fear"},
                     {"label": "Gratitude"},
-                    {"label": "Joy"},
-                    {"label": "Sadness"},
                     {"label": "Grief"},
+                    {"label": "Joy"},
                     {"label": "Love"},
                     {"label": "Nervousness"},
                     {"label": "Optimism"},
                     {"label": "Realization"},
                     {"label": "Relief"},
                     {"label": "Remorse"},
+                    {"label": "Sadness"},
                 ],
         "chat_messages": [
             {"user": "annotator1", "message": "The codebook defines sadness as emotional pain. The lingering ache described here feels like a general emotional pain rather than a specific reaction to unmet expectations."},
@@ -160,29 +196,47 @@ class Usability_test ( DetailView):
         "sentence": "When the promotion didn’t come through, she felt a deep ache that lingered for days."
         },
             {
-                "codebook": "##Disapproval: \n Having or expressing an unfavorable opinion.\n\n##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n##Fear: \n Being afraid or worried.\n\n##Gratitude: \n A feeling of thankfulness and appreciation.\n\n##Joy: \n A feeling of pleasure and happiness.\n\n##Love: \n A strong positive emotion of regard and affection.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n##Nervousness: \n Apprehension, worry, anxiety.\n\n##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n##Realization: \n Becoming aware of something.\n\n##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n##Remorse: \n Regret or guilty feeling.",
+                "codebook": "##Anger: \n A strong feeling of displeasure or hostility.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n\
+##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n ##Disappointment: \n Sadness or displeasure.\n\n\
+##Disapproval: \n Having or expressing an unfavorable opinion.\n\n\
+##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n\
+##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n\
+##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n\
+##Fear: \n Being afraid or worried.\n\n\
+##Gratitude: \n A feeling of thankfulness and appreciation.\n\n\
+##Joy: \n A feeling of pleasure and happiness.\n\n\
+##Love: \n A strong positive emotion of regard and affection.\n\n\
+##Nervousness: \n Apprehension, worry, anxiety.\n\n\
+##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n\
+##Realization: \n Becoming aware of something.\n\n\
+##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n\
+##Remorse: \n Regret or guilty feeling. \n\n\
+##Sadness: \n Emotional pain, sorrow.",
         
                 "labels": [
                     {"label": "Curiosity", "user": "annotator1"},
                     {"label": "Desire", "user": "annotator2"},
                 ],
                 "all_labels": [
-                    
-                    {"label": "Disapproval"},
-                    {"label": "Disgust"},
-                    {"label": "Embarrassment"},
-                    {"label": "Excitement"},
-                    {"label": "Fear"},
-                    {"label": "Gratitude"},
-                    {"label": "Joy"},
-                    {"label": "Love"},
+                    {"label": "Anger"},
                     {"label": "Curiosity"},
-                    {"label": "Desire"},
-                    {"label": "Nervousness"},
-                    {"label": "Optimism"},
-                    {"label": "Realization"},
-                    {"label": "Relief"},
-                    {"label": "Remorse"},
+{"label": "Desire"},
+{"label": "Disappointment"},
+{"label": "Disapproval"},
+{"label": "Disgust"},
+{"label": "Embarrassment"},
+{"label": "Excitement"},
+{"label": "Fear"},
+{"label": "Gratitude"},
+{"label": "Grief"},
+{"label": "Joy"},
+{"label": "Love"},
+{"label": "Nervousness"},
+{"label": "Optimism"},
+{"label": "Realization"},
+{"label": "Relief"},
+{"label": "Remorse"},
+{"label": "Sadness"},
                 ],
                 
                 "chat_messages": [
@@ -194,23 +248,52 @@ class Usability_test ( DetailView):
                 "sentence": "She couldn’t stop thinking about what might be inside the mysterious, locked box.",
             },
             {
-                "codebook": "##Annoyance: \n A mild feeling of irritation or displeasure caused by trivial or repetitive disturbances.\n\n##Disgust: A strong feeling of revulsion or disapproval triggered by something deeply unpleasant or offensive.",
-                "labels": [
-                    {"label": "Annoyance", "user": "annotator1"},
-                    {"label": "Disgust", "user": "annotator2"},
-                ],
-                "all_labels": [
-                    {"label": "Annoyance"},
-                    {"label": "Disgust"},
-                ],
-                "chat_messages": [
-                    {"user": "annotator1", "message": "The codebook defines annoyance as mild irritation. The statement about being cut off seems to fit this category."},
-                    {"user": "annotator2", "message": "But disgust is about strong disapproval. The phrase 'I can't stand' suggests a stronger reaction than mere annoyance."},
-                    {"user": "annotator1", "message": "I think the reaction is exaggerated for emphasis. The core feeling still seems to be mild irritation, which aligns with annoyance."},
-                    {"user": "annotator2", "message": "Perhaps, but the repeated mention of reckless driving could indicate a deeper, more visceral reaction, which aligns with disgust."},
-                ],
-                "sentence": "How dare they cut me off like that! I can't stand people who drive recklessly!",
-            },
+    "codebook": "##Anger: \n A strong feeling of displeasure or hostility.\n\n##Curiosity: \n A strong longing to gain knowledge or uncover information about something.\n\n\
+##Desire: \n A strong longing to obtain or experience something personally meaningful or fulfilling.\n\n ##Disappointment: \n Sadness or displeasure.\n\n\
+##Disapproval: \n Having or expressing an unfavorable opinion.\n\n\
+##Disgust: \n Revulsion or strong disapproval aroused by something unpleasant or offensive.\n\n\
+##Embarrassment: \n Self-consciousness, shame, or awkwardness.\n\n\
+##Excitement: \n Feeling of great enthusiasm and eagerness.\n\n\
+##Fear: \n Being afraid or worried.\n\n\
+##Gratitude: \n A feeling of thankfulness and appreciation.\n\n\
+##Joy: \n A feeling of pleasure and happiness.\n\n\
+##Love: \n A strong positive emotion of regard and affection.\n\n\
+##Nervousness: \n Apprehension, worry, anxiety.\n\n\
+##Optimism: \n Hopefulness and confidence about the future or the success of something.\n\n\
+##Realization: \n Becoming aware of something.\n\n\
+##Relief: \n Reassurance and relaxation following release from anxiety or distress.\n\n\
+##Remorse: \n Regret or guilty feeling. \n\n\
+##Sadness: \n Emotional pain, sorrow.",
+    "labels": [
+        {"label": "Anger", "user": "annotator1"},
+    ],
+    "all_labels": [
+        {"label": "Anger"},
+        {"label": "Curiosity"},
+{"label": "Desire"},
+{"label": "Disappointment"},
+{"label": "Disapproval"},
+{"label": "Disgust"},
+{"label": "Embarrassment"},
+{"label": "Excitement"},
+{"label": "Fear"},
+{"label": "Gratitude"},
+{"label": "Grief"},
+{"label": "Joy"},
+{"label": "Love"},
+{"label": "Nervousness"},
+{"label": "Optimism"},
+{"label": "Realization"},
+{"label": "Relief"},
+{"label": "Remorse"},
+{"label": "Sadness"},
+    ],
+    "chat_messages": [
+        {"user": "annotator1", "message": "I labeled this as anger because the color red symbolizes anger and aggression in many contexts."},
+        {"user": "annotator2", "message": "I disagree, I don't think the color alone is enough to indicate anger."},
+    ],
+    "sentence": "The red car sped past everyone at the intersection.",
+},
         ]
     
     def get (self,request, task_id =0,*args, **kwargs ):
