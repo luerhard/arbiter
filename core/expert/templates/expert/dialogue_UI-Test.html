@@ -93,7 +93,7 @@
                                                id="label_checkbox_{{ forloop.counter }}"
                                                name="selected_labels"
                                                onchange="updateLabelAppearance(this)">
-                                        <label class="btn btn-custom-color flex" for="label_checkbox_{{ forloop.counter }}"  id="label_{{ forloop.counter }}">
+                                        <label class="btn btn-custom-color flex-fill" for="label_checkbox_{{ forloop.counter }}"  id="label_{{ forloop.counter }}">
                                             {{ label.label }}
                                         </label>
                                     </div>
@@ -149,7 +149,7 @@
         {% endif %}
         {% if next_task_id is not None %}
             <a href="{% url 'expert-dialogue' next_task_id %}"
-               class="btn btn-outline-primary" onclick="saveToJson()">Save & Next</a>
+               class="btn btn-outline-primary" onclick="return saveToJson(event)">Save & Next</a>
         {% else %}
             <button class="btn btn-outline-secondary"  disabled>Finish</button>
         {% endif %}
@@ -191,6 +191,7 @@
             textarea.style.cursor = "text";
         }
     }
+
     function toggleUndo(){
         const textarea = document.getElementById('codebook-content');
         const editButton = document.getElementById('edit-save-button');
@@ -220,7 +221,9 @@
     const buttonsDiv = document.getElementById('div-save-undo');
     const rationaleDiv = document.getElementById('rationale-div');
     const toast = document.getElementById('toast');
+    const rationaleTextarea = document.getElementById('definition-correction');
     if(!textarea.readOnly){
+        if (rationaleTextarea.value.length >0){
             textarea.readOnly = true;
             textarea.classList.toggle('editable');
             editButton.classList.toggle('d-none');
@@ -229,14 +232,21 @@
             buttonsDiv.classList.toggle('flex-row');
             buttonsDiv.classList.add('flex-column');
             rationaleDiv.classList.add('d-none');
-            showToast('Changes Saved');
+                showToast('New Codebook Saved', 'bg-success text-white');
+            }else{
+                showToast('Please add a rationale','bg-danger text-white');
+            }
         }
 }
 
-    function showToast (text){
-          const toastElement = document.getElementById('toasta');
+    function showToast (text ,tags = ""){
+          const toastElement = document.getElementById('toast');
           toastElement.value = text;
     if (toastElement) {
+          toastElement.className = "toast align-items-center border-0";
+        if (tags) {
+            toastElement.className += " " + tags;
+        }
         const toastBody = toastElement.querySelector('[data-toast-body]');
         if (toastBody) {
             toastBody.textContent = text; 
@@ -259,12 +269,17 @@
         }
     }
 
-    function saveToJson() {
+    function saveToJson(event) {
+          showToast('Disagreement resovelment saved', 'bg-success text-white');
         const codebookContent = document.getElementById('codebook-content').value;
         const selectedLabels = [];
         document.querySelectorAll('input[name="selected_labels"]:checked').forEach((checkbox) => {
-            selectedLabels.push(checkbox.value);
-        });
+    const labelEl = document.querySelector(`label[for="${checkbox.id}"]`);
+    if (labelEl) {
+        selectedLabels.push(labelEl.textContent.trim());
+    }
+});
+
         const definitionCorrection = document.getElementById('definition-correction').value;
         const data = {
             codebook: codebookContent,
@@ -280,6 +295,7 @@
         a.download = 'codebook_data.json';
         a.click();
         URL.revokeObjectURL(url);
+       
     }
 </script>
 {% endblock content %}
