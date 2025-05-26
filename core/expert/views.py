@@ -226,7 +226,8 @@ class Usability_test ( DetailView):
             "task_id": task_id,
             "previous_task_id": previous_task_id,
             "next_task_id": next_task_id,
-            "progress_actual": task_id*100/len(self.tasks)
+            "progress_actual": (task_id+1)*100/len(self.tasks),
+            "task_display_number": task_id+1,
         }
         messages.success(request, "Saved.")
         return render(request, "expert/dialogue_UI-Test.html", context)
