@@ -1,18 +1,16 @@
 # Create your views here.
 
 from codebook.models import Codebook
+from django.contrib import messages
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
-from django.contrib import messages
+
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
-from django.http import HttpResponse
-from django.template.loader import render_to_string
-from django.shortcuts import redirect
-from django.views import View
+
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
@@ -70,8 +68,8 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         return context
 
 
-#def resolve_Disagreements(request, task_id=0):
-class Usability_test ( DetailView):
+# def resolve_Disagreements(request, task_id=0):
+class Usability_test(DetailView):
     tasks = [
             {
                 "codebook": "##Admiration: \n Finding something impressive or worthy of respect.\n  \n##Pride: A feeling of pleasure or satisfaction inspired by something or someone deemed impressive or worthy of respect.",
@@ -305,7 +303,7 @@ class Usability_test ( DetailView):
 
         context = {
             "task": self.tasks[task_id],
-            "tasks":self.tasks,
+            "tasks": self.tasks,
             "task_id": task_id,
             "previous_task_id": previous_task_id,
             "next_task_id": next_task_id,
@@ -314,7 +312,7 @@ class Usability_test ( DetailView):
         }
         messages.success(request, "Saved.")
         return render(request, "expert/dialogue_UI-Test.html", context)
-    
+
     # def post (self,request,  task_id):
     #     #post_data = request.POST.dict()
     #     messages.success(request, "Saved.")
