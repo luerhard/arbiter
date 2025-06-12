@@ -111,7 +111,7 @@
                     <form method="post" id="codebook-form">
                         {% csrf_token %}
                         <div class="form-group">
-                            <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap; cursor: default;"  readonly>{{ codebook }}</textarea>
+                            <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap; cursor: default;"  readonly>{{ codebook.content }}</textarea>
                         </div>
 
                     <div id="rationale-div" class="my-3 d-none">
