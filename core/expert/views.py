@@ -28,13 +28,16 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         codebook = self.object
         project = codebook.project
         context["codebook"] = codebook
+        batch_id =self.kwargs.get("batch_id")
+        context["batch_id"]= batch_id
+
         #kann alles raus.
         context["progress_actual"] = 10
         context["porgress_task"] =1
         context["disagreements_count"] = 3
         current_example_id = self.kwargs.get("example_id")
         if current_example_id:
-            current_example = get_object_or_404(Example, pk=current_example_id)
+            current_example = get_object_or_404(Example, pk=current_example_id, batch =batch_id)
         else:
             current_example = Example.objects.filter(has_disagreement=True).first()
 
