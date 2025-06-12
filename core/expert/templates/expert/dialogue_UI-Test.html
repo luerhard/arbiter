@@ -112,7 +112,7 @@
                         {% csrf_token %}
                         <div class="form-group">
                              <!-- Gerenderte Ansicht -->
-    <div id="codebook-rendered">
+    <div id="codebook-rendered" class="overflow-auto" style="max-height: 645px;">
         {% load markdownify %}
         {{ codebook.content|markdownify }}
     </div>

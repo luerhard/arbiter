@@ -26,6 +26,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         # project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
         # context["role"] = project_user.role
         codebook = self.object
+        project = codebook.project
         context["codebook"] = codebook
         #kann alles raus.
         context["progress_actual"] = 10

@@ -70,7 +70,7 @@ class Codebook(models.Model):
         # else files are equal
         content = self.repo.git.show(f"{tag_old}:{self.file.name}")
         return content
-
+    #checken obs raus muss!
     def get_definition_section(self, section_name: str) -> str:
         pattern = rf"## {re.escape(section_name)}\n(.*?)(?=\n## |\Z)"
         match = re.search(pattern, self.content, re.DOTALL)
