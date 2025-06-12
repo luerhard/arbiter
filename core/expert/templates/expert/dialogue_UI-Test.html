@@ -14,7 +14,7 @@
      aria-valuemin="1"
      aria-valuemax="100">
     <div class="progress-bar bg-primary overflow-visible px-2"
-         style="width: {{progress_actual}}%">{{ task_display_number}} / {{ tasks| length }}</div>
+         style="width: {{progress_actual}}%">{{ porgress_task}} / {{ disagreements_count}}</div>
 </div>
 <div class="container mt-4">
     <h2 class="text-center">Resolve Disagreement</h2>
@@ -24,7 +24,7 @@
             <div class="card">
                 <div class="card-header">Text/Sentence</div>
                 <div class="card-body">
-                    <p class="text-muted">{{ task.sentence }}</p>
+                    <p class="text-muted"></p>
                 </div>
             </div>
         </div>
@@ -37,13 +37,13 @@
                    <div class="card-header">Labels Before Discussion</div>
 <div class="card-body">
    
-    {% for label in task.labels %}
+    {% for label in prev_labels %}
     <div class="align-items-center">
         <label class="btn btn-primary my-1" style="cursor: default;">
             {{ label.label }}
         </label>
                 <span class="text-muted">assigned by:</span>
-                <span class="fw-bold">{{ label.user }}</span>
+                <span class="fw-bold">{{ label.assignment.user }}</span>
         </div>
     {% empty %}
         <p>No labels assigned before the discussion.</p>
@@ -54,7 +54,7 @@
                 <div class="card mt-4">
                     <div class="card-header">Chat History</div>
                     <div class="card-body">
-                        {% for message in task.chat_messages %}
+                        {% for message in chat_messages %}
                             <div class="d-flex {% if message.user == 'annotator2' %}flex-row-reverse{% else %}flex-row{% endif %}">
                                 <div class="message {% if message.user == 'annotator2' %}self-message{% else %}other-message{% endif %}">
                                     <strong>{{ message.user }}:</strong> {{ message.message }}
@@ -67,13 +67,13 @@
                 <div class="card mt-4">
                     <div class="card-header">Labels After Discussion</div>
                     <div class="card-body">
-                        {% for label in task.labels %}
+                        {% for label in post_labels %}
                            <div class="align-items-center">
         <label class="btn btn-primary my-1 " style="cursor: default;">
             {{ label.label }}
         </label>
                 <span class="text-muted">assigned by:</span>
-                <span class="fw-bold">{{ label.user }}</span>
+                <span class="fw-bold">{{ label.assignment.user }}</span>
         </div>
                         {% empty %}
                             <p>No labels assigned after the discussion.</p>
@@ -86,7 +86,7 @@
                     {% csrf_token %}
                     <div class="card-body">
                          <div class="row justify-content-start">
-                            {% for label in task.all_labels %}
+                            {% for label in labels %}
                                
                                     <div class="form-check col d-flex">
                                         <input type="checkbox" class="btn-check btn-check-color " autocomplete="off"
@@ -94,7 +94,7 @@
                                                name="selected_labels"
                                                onchange="updateLabelAppearance(this)">
                                         <label class="btn btn-custom-color flex-fill" for="label_checkbox_{{ forloop.counter }}"  id="label_{{ forloop.counter }}">
-                                            {{ label.label }}
+                                            {{ label.name }}
                                         </label>
                                     </div>
                                 
@@ -111,7 +111,7 @@
                     <form method="post" id="codebook-form">
                         {% csrf_token %}
                         <div class="form-group">
-                            <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap; cursor: default;"  readonly>{{ task.codebook }}</textarea>
+                            <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap; cursor: default;"  readonly>{{ codebook }}</textarea>
                         </div>
 
                     <div id="rationale-div" class="my-3 d-none">
@@ -141,14 +141,14 @@
         </div>
         <!-- Navigation Buttons -->
     <div class="d-flex justify-content-between align-items-center mt-4">
-          {% if previous_task_id is not None %}
-            <a href="{% url 'expert-dialogue' previous_task_id %}"
+          {% if previous_example is not None %}
+            <a href="{% url 'expert-dialogue' codebook.pk previous_example.id  %}"
                class="btn btn-outline-primary">Previous</a>
         {% else %}
             <button class="btn btn-outline-secondary" disabled>Previous</button>
         {% endif %}
-        {% if next_task_id is not None %}
-            <a href="{% url 'expert-dialogue' next_task_id %}"
+        {% if next_example is not None %}
+            <a href="{% url 'expert-dialogue' codebook.pk next_example.id %}"
                class="btn btn-outline-primary" onclick="return saveToJson(event)">Save & Next</a>
         {% else %}
             <button class="btn btn-outline-primary"  onclick="finishSaveToJson()">Finish</button>

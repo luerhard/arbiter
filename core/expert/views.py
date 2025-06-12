@@ -10,26 +10,27 @@ from django.views.generic.detail import DetailView
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
-
+from discuss.models import Message
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
     model = Codebook
     context_object_name = "codebook"
-    template_name = "expert/dialogue.html"
+    template_name = "expert/dialogue_UI-Test.html"
 
     def get_context_data(self, *args, **kwargs):
+        #progressbar ändern.
+        
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
-        project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
-        context["role"] = project_user.role
+        # project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
+        # context["role"] = project_user.role
         codebook = self.object
-        context["complete_codebook"] = codebook.content
-        context["Definition_AE"] = codebook.get_definition_section("Anti-Elitism")
-        context["Example_AE"] = codebook.get_example_section("Anti-Elitism")
-        context["Definition_PC"] = codebook.get_definition_section("People-Centrism")
-        context["Example_PC"] = codebook.get_example_section("People-Centrism")
-        context["ease_scale"] = range(1, 8)
+        context["codebook"] = codebook.content
+        #kann alles raus.
+        context["progress_actual"] = 10
+        context["porgress_task"] =1
+        context["disagreements_count"] = 3
         current_example_id = self.kwargs.get("example_id")
         if current_example_id:
             current_example = get_object_or_404(Example, pk=current_example_id)
@@ -37,10 +38,11 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             current_example = Example.objects.filter(has_disagreement=True).first()
 
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
-
+        
         previous_example = all_examples.filter(id__lt=current_example.id).order_by("-id").first()
         next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
-
+        
+       
         context["sentence"] = current_example
         context["previous_example"] = previous_example
         context["next_example"] = next_example
