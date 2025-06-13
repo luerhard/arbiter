@@ -112,10 +112,9 @@
                         {% csrf_token %}
                         <div class="form-group">
                              <!-- Gerenderte Ansicht -->
-    <div id="codebook-rendered" class="overflow-auto" style="max-height: 645px;">
-        {% load markdownify %}
-        {{ codebook.content|markdownify }}
-    </div>
+    <div hx-get="{% url 'codebook-partial' codebook.pk %}" hx-trigger="load" hx-target="#codebook-rendered" hx-swap="outerHTML">
+                        {% include "expert/partials/codebook_rendered.html" %}
+                    </div>
     <!-- Editierbare Textarea, anfangs versteckt -->
     <textarea id="codebook-content"
               name="content"
@@ -136,9 +135,13 @@
                                     class="btn btn-secondary mt-3  d-none "
                                     onclick="toggleUndo()">Cancel</button>
                         <button type="button"
-                                    id="save-button"
-                                    class="btn btn-primary mt-3 justify-content-end d-none"
-                                    onclick="toggleSave(this)">Save</button>
+                            id="save-button"
+                            class="btn btn-primary mt-3 justify-content-end d-none"
+                            hx-post="{% url 'codebook-update' codebook.pk %}"
+                            hx-include="#codebook-content,#definition-correction"
+                            hx-target="#codebook-rendered"
+                            hx-swap="outerHTML"
+                            onclick="toggleSave(this)">Save</button>
 
 
                     </form>
@@ -284,6 +287,7 @@
             labelElement.classList.add("btn-custom-color");
         }
     }
+
 function finishSaveToJson(){
      showToast('Thanks for participating!', 'bg-success text-white');
      const codebookContent = document.getElementById('codebook-content').value;

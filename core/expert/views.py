@@ -6,11 +6,28 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
-
+from django.views.generic import View
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
+from codebook.forms import CodebookForm
+
+class CodebookPartialView(View):
+    def get(self, request, pk):
+        codebook = get_object_or_404(Codebook, pk=pk)
+        return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
+
+class CodebookUpdateView(View):
+    def post(self, request, pk):
+        codebook = get_object_or_404(Codebook, pk=pk)
+        content = request.POST.get("content", "")
+        rationale = request.POST.get("definition_correction", "")
+        if content:
+            codebook.content = content
+            codebook.save()
+        # Optional: rationale speichern/loggen
+        return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
