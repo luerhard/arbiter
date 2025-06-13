@@ -24,8 +24,7 @@ class CodebookUpdateView(View):
         content = request.POST.get("content", "")
         rationale = request.POST.get("definition_correction", "")
         if content:
-            codebook.content = content
-            codebook.save()
+           codebook.save(content=content, commit_message="edited.")
         # Optional: rationale speichern/loggen
         return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
