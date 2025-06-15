@@ -5,19 +5,15 @@
     Resolve Disagreement
 {% endblock title %}
 {% block content %}
-<div class="progress bg-secondary my-4"
-     id="pbar"
-     hx-swap-oob="true"
-     role="progressbar"
-     aria-label="Example with label"
-     aria-valuenow="{{ progress_actual }}"
-     aria-valuemin="1"
-     aria-valuemax="100">
-    <div class="progress-bar bg-primary overflow-visible px-2"
-         style="width: {{progress_actual}}%">{{ porgress_task}} / {{ disagreements_count}}</div>
-</div>
+
+
 <div class="container mt-4">
-    <h2 class="text-center">Resolve Disagreement</h2>
+<div class="d-flex align-items-center justify-content-center my-4">
+    <span class="badge bg-primary text-white fs-2 fw-bold me-3">
+        {{ disagreements_remaining }}
+    </span>
+    <h2 class="mb-0">Remaining Disagreements</h2>
+</div>
     <div class="row">
         <!-- Sentence Section -->
         <div class="col-md-12 mt-4">
@@ -154,20 +150,15 @@
         </div>
         </div>
         <!-- Navigation Buttons -->
-    <div class="d-flex justify-content-between align-items-center mt-4">
-          {% if previous_example is not None %}
-            <a href="{% url 'expert-dialogue' codebook.pk batch_id previous_example.id  %}"
-               class="btn btn-outline-primary">Previous</a>
-        {% else %}
-            <button class="btn btn-outline-secondary" disabled>Previous</button>
-        {% endif %}
-        {% if next_example is not None %}
-            <a href="{% url 'expert-dialogue' codebook.pk batch_id next_example.id %}"
-               class="btn btn-outline-primary" onclick="return saveToJson(event)">Save & Next</a>
-        {% else %}
-            <button class="btn btn-outline-primary"  onclick="finishSaveToJson()">Finish</button>
-        {% endif %}
-    </div>
+    <div class="d-flex justify-content-center align-items-center mt-4">
+    {% if next_example is not None %}
+        <a href="{% url 'expert-dialogue' codebook.pk batch_id next_example.id %}"
+           class="btn btn-outline-primary btn-lg px-5"
+           onclick="return saveToJson(event)">Save & Next</a>
+    {% else %}
+        <button class="btn btn-outline-primary btn-lg px-5" onclick="finishSaveToJson()">Finish</button>
+    {% endif %}
+</div>
     
         </div>
        

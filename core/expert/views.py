@@ -81,7 +81,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             .exclude(user="system")
             .order_by("created_at")
         )
-
+        context["disagreements_remaining"] = 3
         context["prev_labels"] = annotations_before_discussion
         context["post_labels"] = annotations_after_discussion
         context["chat_messages"] = messages
