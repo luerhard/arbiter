@@ -3,15 +3,38 @@
 from codebook.models import Codebook
 from django.contrib import messages
 from django.http import Http404
-from django.shortcuts import get_object_or_404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.detail import DetailView
 from django.views.generic import View
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
-from codebook.forms import CodebookForm
+from data.models import Example, ExampleAssignment
+from django.http import HttpResponseBadRequest
+from django.db import models
+
+def save_resolution_labels(request, codebook_id, batch_id, example_id):
+    if request.method == "POST":
+        user = request.user
+        example = get_object_or_404(Example, pk=example_id, batch=batch_id)
+        assignment = ExampleAssignment.objects.filter(example=example, user=user).first()
+        if not assignment:
+            # Erstelle ein neues Assignment, setze ggf. den order sinnvoll
+            max_order = ExampleAssignment.objects.filter(
+                user=user,
+                example__batch=example.batch
+            ).aggregate(models.Max("order"))["order__max"] or 0
+            assignment = ExampleAssignment.objects.create(
+                example=example,
+                user=user,
+                order=max_order + 1
+            )
+        label_ids = [int(i) for i in request.POST.getlist("selected_labels") if i.strip()]
+        assignment.set_user_annotations(label_ids=label_ids, phase="DISCUSSION")
+        # Weiterleitung oder Response
+        return redirect(request.path)
+    return redirect('expert-dialogue', codebook_id, batch_id, example_id)
 
 class CodebookPartialView(View):
     def get(self, request, pk):
@@ -46,11 +69,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context["codebook"] = codebook
         batch_id =self.kwargs.get("batch_id")
         context["batch_id"]= batch_id
-
-        #kann alles raus.
-        context["progress_actual"] = 10
-        context["porgress_task"] =1
-        context["disagreements_count"] = 3
+       
         current_example_id = self.kwargs.get("example_id")
         if current_example_id:
             current_example = get_object_or_404(Example, pk=current_example_id, batch =batch_id)
@@ -61,8 +80,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         
         previous_example = all_examples.filter(id__lt=current_example.id).order_by("-id").first()
         next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
-        
-       
+
         context["sentence"] = current_example
         context["previous_example"] = previous_example
         context["next_example"] = next_example

@@ -77,27 +77,35 @@
                     </div>
                 </div>
                 <!-- Resolution Section -->
-                <div class=" card mt-4">
-                    <div class="card-header">Select Labels for Sentence</div>
-                    {% csrf_token %}
-                    <div class="card-body">
-                         <div class="row justify-content-start">
-                            {% for label in labels %}
-                               
-                                    <div class="form-check col d-flex">
-                                        <input type="checkbox" class="btn-check btn-check-color " autocomplete="off"
-                                               id="label_checkbox_{{ forloop.counter }}"
-                                               name="selected_labels"
-                                               onchange="updateLabelAppearance(this)">
-                                        <label class="btn btn-custom-color flex-fill" for="label_checkbox_{{ forloop.counter }}"  id="label_{{ forloop.counter }}">
-                                            {{ label.name }}
-                                        </label>
-                                    </div>
-                                
-                            {% endfor %}
-                        </div>
+                <div class="card mt-4">
+    <div class="card-header">Select Labels for Sentence</div>
+    <form method="post" action="{% url 'expert-label-save' codebook.pk batch_id sentence.id %}">
+        {% csrf_token %}
+        <div class="card-body">
+            <div class="row justify-content-start">
+                {% for label in labels %}
+                    <div class="form-check col d-flex">
+                        <input type="checkbox" class="btn-check btn-check-color"
+                               autocomplete="off"
+                               id="label_checkbox_{{ forloop.counter }}"
+                               name="selected_labels"
+                               value="{{ label.id }}"
+                               {% if label.is_selected %}checked{% endif %}
+                                onchange="updateLabelAppearance(this)">
+                        <label class="btn btn-custom-color flex-fill"
+                               for="label_checkbox_{{ forloop.counter }}"
+                               id="label_{{ forloop.counter }}">
+                            {{ label.name }}
+                        </label>
                     </div>
-                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="d-flex justify-content-center align-items-center mt-4">
+            <button type="submit" class="btn btn-outline-primary btn-lg px-5">Save & Next</button>
+        </div>
+    </form>
+</div>
             </div>
                  <!-- Codebook Section -->
         <div class="col-md-6 mt-4">
@@ -267,6 +275,18 @@
     };
 
     function updateLabelAppearance(checkbox) {
+    const labelId = checkbox.id.replace('label_checkbox_', '');
+    const labelElement = document.getElementById(`label_${labelId}`);
+    if (checkbox.checked) {
+        labelElement.classList.remove("btn-custom-color");
+        labelElement.classList.add("btn-primary");
+    } else {
+        labelElement.classList.remove("btn-primary");
+        labelElement.classList.add("btn-custom-color");
+    }
+}
+
+    {% comment %} function updateLabelAppearance(checkbox) {
         const labelId = checkbox.id.replace('checkbox', '');
         const labelElement = document.getElementById(`label_${labelId.split('_')[2]}`);
         
@@ -277,7 +297,7 @@
             labelElement.classList.toggle("btn-primary");
             labelElement.classList.add("btn-custom-color");
         }
-    }
+    } {% endcomment %}
 
 function finishSaveToJson(){
      showToast('Thanks for participating!', 'bg-success text-white');
