@@ -13,6 +13,7 @@ from discuss.models import Message
 from data.models import Example, ExampleAssignment
 from django.http import HttpResponseBadRequest
 from django.db import models
+import json
 
 def save_resolution_labels(request, codebook_id, batch_id, example_id):
     if request.method == "POST":
@@ -46,8 +47,43 @@ class CodebookUpdateView(View):
         codebook = get_object_or_404(Codebook, pk=pk)
         content = request.POST.get("content", "")
         rationale = request.POST.get("definition_correction", "")
+        sentence = request.POST.get("sentence", "")
+        example_id = request.POST.get("example_id", "")
+        batch_id = request.POST.get("batch_id", "")
+        current_example = get_object_or_404(Example, pk=example_id, batch =batch_id)
+
+        annotations_before_discussion = Annotation.objects.filter(
+            assignment__example=current_example,
+            phase=Annotation.Phase.ANNOTATION,
+        )
+        annotations_after_discussion = Annotation.objects.filter(
+            assignment__example=current_example,
+            phase=Annotation.Phase.DISCUSSION,
+        )
+        messages = (
+            Message.objects.filter(example=current_example)
+            .exclude(user="system")
+            .order_by("created_at")
+        )
+        chat_history_list = [f"{msg.user}: {msg.message}" for msg in messages]
+        chat_history_str = "\n".join(chat_history_list)  
+
+        labels_before_str = ""
+        for ann in annotations_before_discussion:
+            labels_before_str += f"{ann.label} (assigned by: {ann.assignment.user})\n"
+
+        labels_after_list = [f"{ann.label} (assigned by: {ann.assignment.user})" for ann in annotations_after_discussion]
+        labels_after_str = "\n".join(labels_after_list)
+        commit_info = {
+    "rationale": rationale,
+    "sentence": sentence,
+    "labels_before": labels_before_str,
+    "labels_after": labels_after_str,
+    "chat_history": chat_history_str,
+}
+        commit_message = json.dumps(commit_info, ensure_ascii=False)
         if content:
-           codebook.save(content=content, commit_message="edited.")
+           codebook.save(content=content, commit_message=commit_message)
         # Optional: rationale speichern/loggen
         return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
@@ -58,7 +94,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     template_name = "expert/dialogue_UI-Test.html"
 
     def get_context_data(self, *args, **kwargs):
-        #progressbar ändern.
+        
         
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
@@ -80,7 +116,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         
         previous_example = all_examples.filter(id__lt=current_example.id).order_by("-id").first()
         next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
-
+        context["example_id"] = current_example_id
         context["sentence"] = current_example
         context["previous_example"] = previous_example
         context["next_example"] = next_example
