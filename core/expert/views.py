@@ -21,7 +21,6 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         example = get_object_or_404(Example, pk=example_id, batch=batch_id)
         assignment = ExampleAssignment.objects.filter(example=example, user=user).first()
         if not assignment:
-            # Erstelle ein neues Assignment, setze ggf. den order sinnvoll
             max_order = ExampleAssignment.objects.filter(
                 user=user,
                 example__batch=example.batch
@@ -33,8 +32,16 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
             )
         label_ids = [int(i) for i in request.POST.getlist("selected_labels") if i.strip()]
         assignment.set_user_annotations(label_ids=label_ids, phase="DISCUSSION")
-        # Weiterleitung oder Response
-        return redirect(request.path)
+
+        # Nächstes Example suchen
+        all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
+        next_example = all_examples.filter(id__gt=example.id).order_by("id").first()
+
+        if next_example:
+            return redirect('expert-dialogue', codebook_id, batch_id, next_example.id)
+        else:
+            # Optional: auf eine Abschlussseite oder zurück zum aktuellen Example
+            return redirect('expert-dialogue', codebook_id, batch_id, example.id)
     return redirect('expert-dialogue', codebook_id, batch_id, example_id)
 
 class CodebookPartialView(View):

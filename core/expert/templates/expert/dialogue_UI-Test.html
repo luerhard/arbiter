@@ -79,7 +79,7 @@
                 <!-- Resolution Section -->
                 <div class="card mt-4">
     <div class="card-header">Select Labels for Sentence</div>
-    <form method="post" action="{% url 'expert-label-save' codebook.pk batch_id sentence.id %}">
+    <form id="labels-form" method="post" action="{% url 'expert-label-save' codebook.pk batch_id sentence.id %}">
         {% csrf_token %}
         <div class="card-body">
             <div class="row justify-content-start">
@@ -101,9 +101,9 @@
                 {% endfor %}
             </div>
         </div>
-        <div class="d-flex justify-content-center align-items-center mt-4">
+        {% comment %} <div class="d-flex justify-content-center align-items-center mt-4">
             <button type="submit" class="btn btn-outline-primary btn-lg px-5">Save & Next</button>
-        </div>
+        </div> {% endcomment %}
     </form>
 </div>
             </div>
@@ -163,10 +163,12 @@
         </div>
         <!-- Navigation Buttons -->
     <div class="d-flex justify-content-center align-items-center mt-4">
-    {% if next_example is not None %}
-        <a href="{% url 'expert-dialogue' codebook.pk batch_id next_example.id %}"
-           class="btn btn-outline-primary btn-lg px-5"
-           onclick="return saveToJson(event)">Save & Next</a>
+      {% if next_example is not None %}
+        <button type="submit"
+                class="btn btn-outline-primary btn-lg px-5"
+                form="labels-form">
+            Save & Next
+        </button>
     {% else %}
         <button class="btn btn-outline-primary btn-lg px-5" onclick="finishSaveToJson()">Finish</button>
     {% endif %}
