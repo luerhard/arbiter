@@ -14,6 +14,8 @@ from data.models import Example, ExampleAssignment
 from django.http import HttpResponseBadRequest
 from django.db import models
 import json
+from django.http import JsonResponse
+from django.urls import reverse
 
 def save_resolution_labels(request, codebook_id, batch_id, example_id):
     if request.method == "POST":
@@ -37,12 +39,19 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
         next_example = all_examples.filter(id__gt=example.id).order_by("id").first()
 
-        if next_example:
-            return redirect('expert-dialogue', codebook_id, batch_id, next_example.id)
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'next_url': reverse('expert-dialogue', args=[codebook_id, batch_id, next_example.id])
+            })
         else:
-            # Optional: auf eine Abschlussseite oder zurück zum aktuellen Example
-            return redirect('expert-dialogue', codebook_id, batch_id, example.id)
-    return redirect('expert-dialogue', codebook_id, batch_id, example_id)
+            return redirect('expert-dialogue', codebook_id, batch_id, next_example.id)
+    
+    # Fehlerfall für AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'success': False}, status=400)
+    else:
+        return redirect('expert-dialogue', codebook_id, batch_id, example_id)
 
 class CodebookPartialView(View):
     def get(self, request, pk):
@@ -91,7 +100,10 @@ class CodebookUpdateView(View):
         commit_message = json.dumps(commit_info, ensure_ascii=False)
         if content:
            codebook.save(content=content, commit_message=commit_message)
-        # Optional: rationale speichern/loggen
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+
         return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
