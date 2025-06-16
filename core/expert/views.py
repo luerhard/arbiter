@@ -17,6 +17,7 @@ import json
 from django.http import JsonResponse
 from django.urls import reverse
 
+
 def save_resolution_labels(request, codebook_id, batch_id, example_id):
     if request.method == "POST":
         user = request.user
@@ -51,10 +52,12 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
     else:
         return redirect('expert-dialogue', codebook_id, batch_id, example_id)
 
+
 class CodebookPartialView(View):
     def get(self, request, pk):
         codebook = get_object_or_404(Codebook, pk=pk)
         return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
+
 
 class CodebookUpdateView(View):
     def post(self, request, pk):
@@ -104,6 +107,7 @@ class CodebookUpdateView(View):
 
         return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
+
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
     model = Codebook
@@ -112,9 +116,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        user = self.request.user
-        # project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
-        # context["role"] = project_user.role
         codebook = self.object
         project = codebook.project
         context["codebook"] = codebook
@@ -161,9 +162,21 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     example__batch__project_id=project.id,
 ).exclude(user="system").order_by("created_at")
         
-        examples_with_disagreement = Example.objects.filter(batch_id=batch_id, has_disagreement=True, ).count
-        examples_with_expert_decision = Example.objects.filter(batch_id=batch_id, has_disagreement=True).count
-        context["disagreements_remaining"] = 3
+        examples_with_disagreement = Example.objects.filter(
+    batch__project_id=project.id,
+    batch_id=batch_id,
+    has_disagreement_after_discussion=True
+)
+        examples_with_expert_decision = Example.objects.filter(
+    batch__project_id=project.id,
+    batch_id=batch_id,
+    has_disagreement_after_discussion=True,
+    has_expert_decision=True
+)
+        examples_with_disagreement_count = examples_with_disagreement.count()
+        examples_with_expert_decision_count = examples_with_expert_decision.count()
+        disagreements_remaining = examples_with_disagreement_count - examples_with_expert_decision_count
+        context["disagreements_remaining"] = disagreements_remaining
         context["prev_labels"] = annotations_before_discussion
         context["post_labels"] = annotations_after_discussion
         context["chat_messages"] = messages

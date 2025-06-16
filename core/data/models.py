@@ -95,7 +95,10 @@ class ExampleAssignment(models.Model):
             self.is_annotated = True
         elif phase == Annotation.Phase.DISCUSSION:
             self.is_discussed = True
-
+        elif phase ==   Annotation.Phase.EXPERT:
+            self.example.has_expert_decision = True
+            self.example.save()
+    
         # delete previous annotations if any
         Annotation.objects.filter(phase=phase, assignment=self).delete()
 
@@ -111,6 +114,8 @@ class ExampleAssignment(models.Model):
         # check for disagreement during annotation phase
         if phase == Annotation.Phase.ANNOTATION:
             self.check_for_disagreement()
+        elif phase == Annotation.Phase.DISCUSSION:
+            self.check_for_disagreement_after_discussion()
 
     def check_for_disagreement(self):
         # Get annotations for anntation phase
@@ -135,6 +140,25 @@ class ExampleAssignment(models.Model):
 
         self.example.save()
 
+    def check_for_disagreement_after_discussion(self):
+        assignments = ExampleAssignment.objects.filter(
+        example=self.example,
+        is_annotated=True,
+        annotations__phase=Annotation.Phase.DISCUSSION,
+    ).prefetch_related("annotations__label", "user")
+        # group by user
+        user_annotations = defaultdict(set)
+        for assignment in assignments:
+            for annotation in assignment.annotations.all():
+                user_annotations[assignment.user.id].add(annotation.label.id)
+
+        unique_annotations = {frozenset(labels) for labels in user_annotations.values()}
+
+        if len(unique_annotations) > 1:
+            self.example.has_disagreement_after_discussion = True
+            
+        self.example.save()
+
     def save(self, *args, **kwargs):
         # auto set order for the first time
         if self.order is None:
@@ -153,7 +177,8 @@ class Example(models.Model):
     batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
     has_disagreement = models.BooleanField(default=False)
-
+    has_disagreement_after_discussion = models.BooleanField(default=False)
+    has_expert_decision = models.BooleanField(default=False)
     class Meta:
         ordering = ["pk"]
 
@@ -186,8 +211,12 @@ class Example(models.Model):
                 phase=phase,
             )
         else:
-            msg = "NOT IMPLMEEEEMENTEd"
-            raise NotImplementedError(msg)
+            return Annotation.objects.filter(
+                assignment__example=self,
+                assignment__user=user,
+                assignment__has_expert_decision =1,
+                phase=phase,
+            )
 
     def set_user_annotations(
         self,
