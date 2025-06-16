@@ -123,17 +123,15 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
        
         current_example_id = self.kwargs.get("example_id")
         if current_example_id:
-            current_example = get_object_or_404(Example, pk=current_example_id, batch =batch_id)
+            current_example = get_object_or_404(Example, pk=current_example_id, batch__project_id=project.id)
         else:
             current_example = Example.objects.filter(has_disagreement=True).first()
 
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
         
-        previous_example = all_examples.filter(id__lt=current_example.id).order_by("-id").first()
         next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
         context["example_id"] = current_example_id
         context["sentence"] = current_example
-        context["previous_example"] = previous_example
         context["next_example"] = next_example
         context["all_examples"] = all_examples
 

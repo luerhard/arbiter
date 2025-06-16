@@ -101,9 +101,6 @@
                 {% endfor %}
             </div>
         </div>
-        {% comment %} <div class="d-flex justify-content-center align-items-center mt-4">
-            <button type="submit" class="btn btn-outline-primary btn-lg px-5">Save & Next</button>
-        </div> {% endcomment %}
     </form>
 </div>
             </div>
@@ -115,11 +112,9 @@
                     <form method="post" id="codebook-form" action="{% url 'codebook-update' codebook.pk %}">
     {% csrf_token %}
     <div class="form-group">
-        <!-- Gerenderte Ansicht -->
         <div id="codebook-rendered">
             {% include "expert/partials/codebook_rendered.html" %}
         </div>
-        <!-- Editierbare Textarea, anfangs versteckt -->
         <textarea id="codebook-content"
                   name="content"
                   class="form-control"
@@ -225,31 +220,40 @@
 async function submitBothForms() {
     const codebookForm = document.getElementById('codebook-form');
     const labelsForm = document.getElementById('labels-form');
+    const codebookTextarea = document.getElementById('codebook-content');
+    const rationaleTextarea = document.getElementById('definition-correction');
 
    
-    const res = await fetch(codebookForm.action, {
-        method: codebookForm.method,
-        headers: { "X-Requested-With": "XMLHttpRequest" }, // CSRF-Token ggf. ergänzen!
-        body: new FormData(codebookForm),
-    });
+    const isEdit = !codebookTextarea.readOnly && codebookTextarea.style.display !== 'none';
+    const rationaleEmpty = !rationaleTextarea.value.trim();
 
-    if (!res.ok) {
-        const err = new Error(`Codebook-Update fehlgeschlagen! Status: ${res.status}`);
-        const isJSON = res.headers.get("content-type") === "application/json";
-        err.body = await (isJSON ? res.json() : res.text());
-        alert(err.body);
-        throw err;
+    if (isEdit) {
+        if (rationaleEmpty) {
+            showToast('Please add a rationale','bg-danger text-white');
+            return;
+        }
+        
+        const res = await fetch(codebookForm.action, {
+            method: codebookForm.method,
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            body: new FormData(codebookForm),
+        });
+
+        if (!res.ok) {
+            showToast("Codebook-Update failed!",'bg-danger text-white');
+            return;
+        }
+
+        showToast('Disagreement resovelment saved', 'bg-success text-white');
+        setTimeout(() => {
+            labelsForm.submit();
+        }, 2000);
+    } else {
+        showToast('Disagreement resovelment saved', 'bg-success text-white');
+        setTimeout(() => {
+            labelsForm.submit();
+        }, 4000);
     }
-       showToast("Codebook gespeichert! Weiterleitung ...");
-
-    // Nach 2 Sekunden das Labels-Form absenden
-    setTimeout(() => {
-        labelsForm.submit();
-    }, 2000); // 2000 ms = 2 Sekunden
-}
-
-
-    labelsForm.submit();
 }
     
     function toggleEdit() {
@@ -278,15 +282,12 @@ async function submitBothForms() {
     const buttonsDiv = document.getElementById('div-save-undo');
     const rationaleDiv = document.getElementById('rationale-div');
 
-    // Nur wenn im Edit-Modus
+    
     if (!textarea.readOnly) {
-        // Setze den Inhalt zurück (optional)
         textarea.value = "{{ codebook.content|escapejs }}";
         textarea.readOnly = true;
         textarea.style.cursor = "default";
         textarea.style.display = 'none';
-
-        // Zeige das gerenderte Codebook wieder an
         if (rendered) {
             rendered.style.display = 'block';
         }
@@ -369,7 +370,7 @@ function finishSaveToJson(){
         URL.revokeObjectURL(url);
 }
 
-    function saveToJson(event) {
+    {% comment %} function saveToJson(event) {
          if (event) event.preventDefault();
           showToast('Disagreement resovelment saved', 'bg-success text-white');
           const nextUrl = event.currentTarget.getAttribute('href');
@@ -402,6 +403,6 @@ function finishSaveToJson(){
     }, 1500);
 
     return false; 
-    }
+    } {% endcomment %}
 </script>
 {% endblock content %}
