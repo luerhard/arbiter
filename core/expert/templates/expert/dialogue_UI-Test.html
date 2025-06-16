@@ -112,47 +112,47 @@
             <div class="card">
                 <div class="card-header">Codebook</div>
                 <div class="card-body">
-                    <form method="post" id="codebook-form">
-                        {% csrf_token %}
-                        <div class="form-group">
-                             <!-- Gerenderte Ansicht -->
-    <div hx-get="{% url 'codebook-partial' codebook.pk %}" hx-trigger="load" hx-target="#codebook-rendered" hx-swap="outerHTML">
-                        {% include "expert/partials/codebook_rendered.html" %}
-                    </div>
-    <!-- Editierbare Textarea, anfangs versteckt -->
-    <textarea id="codebook-content"
-              name="content"
-              class="form-control"
-              rows="20"
-              style="white-space: pre-wrap; cursor: default; display: none;"
-    >{{ codebook.content }}</textarea>
-                        </div>
+                    <form method="post" id="codebook-form" action="{% url 'codebook-update' codebook.pk %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <!-- Gerenderte Ansicht -->
+        <div id="codebook-rendered">
+            {% include "expert/partials/codebook_rendered.html" %}
+        </div>
+        <!-- Editierbare Textarea, anfangs versteckt -->
+        <textarea id="codebook-content"
+                  name="content"
+                  class="form-control"
+                  rows="20"
+                  style="white-space: pre-wrap; cursor: default; display: none;"
+        >{{ codebook.content }}</textarea>
+    </div>
 
-                    <div id="rationale-div" class="my-3 d-none">
-                    <label for="definition-correction" class="form-label">Rationale</label>
-                    <textarea id="definition-correction" name="definition_correction" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..." ></textarea>
-                    </div>
-                    
-                <div class=" d-flex flex-column justify-content-between" id="div-save-undo">
-                        <button type="button" id="edit-save-button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit</button>
-                        <button type="button"
-                                    id="cancel-button"
-                                    class="btn btn-secondary mt-3  d-none "
-                                    onclick="toggleUndo()">Cancel</button>
-                        <button type="button"
-                            id="save-button"
-                            class="btn btn-primary mt-3 justify-content-end d-none"
-                            hx-post="{% url 'codebook-update' codebook.pk %}"
-                             hx-include="#codebook-content,#definition-correction,[name=sentence],[name=example_id],[name=batch_id],"
-                            hx-target="#codebook-rendered"
-                            hx-swap="outerHTML"
-                            onclick="toggleSave(this)">Save</button>
-                        <input type="hidden" name="sentence" value="{{ sentence.content }}">
-                        <input type="hidden" name="example_id" value="{{ example_id}}">
-                        <input type="hidden" name="batch_id" value="{{ batch_id}}">
+    <div id="rationale-div" class="my-3 d-none">
+        <label for="definition-correction" class="form-label">Rationale</label>
+        <textarea id="definition-correction" name="definition_correction" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
+    </div>
 
-
-                    </form>
+    <div class="d-flex flex-column justify-content-between" id="div-save-undo">
+        <button type="button" id="edit-save-button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit</button>
+        <button type="button"
+                id="cancel-button"
+                class="btn btn-secondary btn-lg mt-3 d-none"
+                onclick="toggleUndo()">Cancel</button>
+        <input type="hidden" name="sentence" value="{{ sentence.content }}">
+        <input type="hidden" name="example_id" value="{{ example_id }}">
+        <input type="hidden" name="batch_id" value="{{ batch_id }}">
+        <div id="selected-labels-container" style="display: none;">
+            {% for label in labels %}
+                <input type="hidden" 
+                       name="selected_labels" 
+                       value="{{ label.id }}"
+                       disabled="disabled"
+                       data-label-id="{{ label.id }}">
+            {% endfor %}
+        </div>
+    </div>
+</form>
                      </div>
                 </div>
                
@@ -164,9 +164,7 @@
         <!-- Navigation Buttons -->
     <div class="d-flex justify-content-center align-items-center mt-4">
       {% if next_example is not None %}
-       <button id="save-next-btn" class="btn btn-outline-primary btn-lg px-5">
-        Save & Next
-    </button>
+       <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="submitBothForms()">Save & Next</button>
     {% else %}
         <button class="btn btn-outline-primary btn-lg px-5" onclick="finishSaveToJson()">Finish</button>
     {% endif %}
@@ -181,10 +179,10 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 
-    document.getElementById('save-next-btn').addEventListener('click', async function() {
-    const saveButton = document.getElementById('save-button');
+     {% comment %} document.getElementById('save-next-btn').addEventListener('click', async function() {
     
-    // Promise für HTMX-Abschluss erstellen
+    
+    
     const codebookPromise = new Promise((resolve) => {
         const handler = (event) => {
             saveButton.removeEventListener('htmx:afterRequest', handler);
@@ -206,16 +204,13 @@
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRFToken': '{{ csrf_token }}'
             }
-        });
-        
+        }); 
         const labelsResult = await labelsResponse.json();
-        
         // Auf beide Requests warten
         const [codebookSuccess, labelsSuccess] = await Promise.all([
             codebookPromise,
             Promise.resolve(labelsResult.success)
         ]);
-        
         if (codebookSuccess && labelsSuccess) {
             window.location.href = labelsResult.next_url;
         } else {
@@ -225,15 +220,43 @@
         console.error('Error:', error);
         alert('Network error!');
     }
-});
+}); {% endcomment %}
 
+async function submitBothForms() {
+    const codebookForm = document.getElementById('codebook-form');
+    const labelsForm = document.getElementById('labels-form');
+
+   
+    const res = await fetch(codebookForm.action, {
+        method: codebookForm.method,
+        headers: { "X-Requested-With": "XMLHttpRequest" }, // CSRF-Token ggf. ergänzen!
+        body: new FormData(codebookForm),
+    });
+
+    if (!res.ok) {
+        const err = new Error(`Codebook-Update fehlgeschlagen! Status: ${res.status}`);
+        const isJSON = res.headers.get("content-type") === "application/json";
+        err.body = await (isJSON ? res.json() : res.text());
+        alert(err.body);
+        throw err;
+    }
+       showToast("Codebook gespeichert! Weiterleitung ...");
+
+    // Nach 2 Sekunden das Labels-Form absenden
+    setTimeout(() => {
+        labelsForm.submit();
+    }, 2000); // 2000 ms = 2 Sekunden
+}
+
+
+    labelsForm.submit();
+}
+    
     function toggleEdit() {
         const rendered = document.getElementById('codebook-rendered');
         const textarea = document.getElementById('codebook-content');
         const editButton = document.getElementById('edit-save-button');
-        const saveButton = document.getElementById('save-button');
         const cancelButton = document.getElementById('cancel-button');
-        const buttonsDiv = document.getElementById('div-save-undo');
         const rationaleDiv = document.getElementById('rationale-div')
         if (textarea.style.display === 'none') {
         rendered.style.display = 'none';
@@ -242,10 +265,7 @@
         textarea.style.cursor = 'text';
 
         editButton.classList.add('d-none');
-        saveButton.classList.remove('d-none');
         cancelButton.classList.remove('d-none');
-        buttonsDiv.classList.remove('flex-column');
-        buttonsDiv.classList.add('flex-row');
         rationaleDiv.classList.remove('d-none');
     }
     }
@@ -254,56 +274,28 @@
     const rendered = document.getElementById('codebook-rendered');
     const textarea = document.getElementById('codebook-content');
     const editButton = document.getElementById('edit-save-button');
-    const saveButton = document.getElementById('save-button');
     const cancelButton = document.getElementById('cancel-button');
     const buttonsDiv = document.getElementById('div-save-undo');
     const rationaleDiv = document.getElementById('rationale-div');
 
     // Nur wenn im Edit-Modus
     if (!textarea.readOnly) {
-        textarea.value = "{{ task.codebook|escapejs }}";
+        // Setze den Inhalt zurück (optional)
+        textarea.value = "{{ codebook.content|escapejs }}";
         textarea.readOnly = true;
         textarea.style.cursor = "default";
         textarea.style.display = 'none';
-        rendered.style.display = 'block';
+
+        // Zeige das gerenderte Codebook wieder an
+        if (rendered) {
+            rendered.style.display = 'block';
+        }
 
         editButton.classList.remove('d-none');
-        saveButton.classList.add('d-none');
         cancelButton.classList.add('d-none');
         buttonsDiv.classList.remove('flex-row');
         buttonsDiv.classList.add('flex-column');
         rationaleDiv.classList.add('d-none');
-    }
-}
-
-    function toggleSave(btn) {
-    const rendered = document.getElementById('codebook-rendered');
-    const textarea = document.getElementById('codebook-content');
-    const editButton = document.getElementById('edit-save-button');
-    const saveButton = document.getElementById('save-button');
-    const cancelButton = document.getElementById('cancel-button');
-    const buttonsDiv = document.getElementById('div-save-undo');
-    const rationaleDiv = document.getElementById('rationale-div');
-    const rationaleTextarea = document.getElementById('definition-correction');
-
-    if (!textarea.readOnly) {
-        if (rationaleTextarea.value.length > 0) {
-            textarea.readOnly = true;
-            textarea.style.cursor = "default";
-            textarea.style.display = 'none';
-            rendered.style.display = 'block';
-
-            editButton.classList.remove('d-none');
-            saveButton.classList.add('d-none');
-            cancelButton.classList.add('d-none');
-            buttonsDiv.classList.remove('flex-row');
-            buttonsDiv.classList.add('flex-column');
-            rationaleDiv.classList.add('d-none');
-            showToast('New Codebook Saved', 'bg-success text-white');
-            // Optional: Du könntest hier das gerenderte Codebook per AJAX neu laden, wenn du möchtest.
-        } else {
-            showToast('Please add a rationale', 'bg-danger text-white');
-        }
     }
 }
 

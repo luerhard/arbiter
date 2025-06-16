@@ -33,9 +33,8 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
                 order=max_order + 1
             )
         label_ids = [int(i) for i in request.POST.getlist("selected_labels") if i.strip()]
-        assignment.set_user_annotations(label_ids=label_ids, phase="DISCUSSION")
+        assignment.set_user_annotations(label_ids=label_ids, phase="EXPERT")
 
-        # Nächstes Example suchen
         all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
         next_example = all_examples.filter(id__gt=example.id).order_by("id").first()
 
@@ -47,7 +46,6 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         else:
             return redirect('expert-dialogue', codebook_id, batch_id, next_example.id)
     
-    # Fehlerfall für AJAX
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({'success': False}, status=400)
     else:
@@ -67,7 +65,7 @@ class CodebookUpdateView(View):
         example_id = request.POST.get("example_id", "")
         batch_id = request.POST.get("batch_id", "")
         current_example = get_object_or_404(Example, pk=example_id, batch =batch_id)
-
+        
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
             phase=Annotation.Phase.ANNOTATION,
@@ -113,8 +111,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     template_name = "expert/dialogue_UI-Test.html"
 
     def get_context_data(self, *args, **kwargs):
-        
-        
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         # project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
@@ -154,6 +150,8 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             .exclude(user="system")
             .order_by("created_at")
         )
+        examples_with_disagreement = Example.objects.filter(batch_id=batch_id, has_disagreement=True, ).count
+        examples_with_expert_decision = Example.objects.filter(batch_id=batch_id, has_disagreement=True).count
         context["disagreements_remaining"] = 3
         context["prev_labels"] = annotations_before_discussion
         context["post_labels"] = annotations_after_discussion
