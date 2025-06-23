@@ -95,10 +95,10 @@ class ExampleAssignment(models.Model):
             self.is_annotated = True
         elif phase == Annotation.Phase.DISCUSSION:
             self.is_discussed = True
-        elif phase ==   Annotation.Phase.EXPERT:
+        elif phase == Annotation.Phase.EXPERT:
             self.example.has_expert_decision = True
             self.example.save()
-    
+
         # delete previous annotations if any
         Annotation.objects.filter(phase=phase, assignment=self).delete()
 
@@ -142,10 +142,10 @@ class ExampleAssignment(models.Model):
 
     def check_for_disagreement_after_discussion(self):
         assignments = ExampleAssignment.objects.filter(
-        example=self.example,
-        is_annotated=True,
-        annotations__phase=Annotation.Phase.DISCUSSION,
-    ).prefetch_related("annotations__label", "user")
+            example=self.example,
+            is_annotated=True,
+            annotations__phase=Annotation.Phase.DISCUSSION,
+        ).prefetch_related("annotations__label", "user")
         # group by user
         user_annotations = defaultdict(set)
         for assignment in assignments:
@@ -156,7 +156,7 @@ class ExampleAssignment(models.Model):
 
         if len(unique_annotations) > 1:
             self.example.has_disagreement_after_discussion = True
-            
+
         self.example.save()
 
     def save(self, *args, **kwargs):
@@ -179,6 +179,7 @@ class Example(models.Model):
     has_disagreement = models.BooleanField(default=False)
     has_disagreement_after_discussion = models.BooleanField(default=False)
     has_expert_decision = models.BooleanField(default=False)
+
     class Meta:
         ordering = ["pk"]
 
@@ -214,7 +215,7 @@ class Example(models.Model):
             return Annotation.objects.filter(
                 assignment__example=self,
                 assignment__user=user,
-                assignment__has_expert_decision =1,
+                assignment__has_expert_decision=1,
                 phase=phase,
             )
 

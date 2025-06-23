@@ -1,5 +1,4 @@
 import logging
-import re
 import shutil
 
 from django.db import models
@@ -70,7 +69,6 @@ class Codebook(models.Model):
         # else files are equal
         content = self.repo.git.show(f"{tag_old}:{self.file.name}")
         return content
-   
 
     def save(self, content: str | None = None, commit_message: str | None = None, **kwargs):
         if self._state.adding is True:
