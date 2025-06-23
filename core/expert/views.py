@@ -1,21 +1,16 @@
 # Create your views here.
 
 from codebook.models import Codebook
-from django.contrib import messages
-from django.http import Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.generic.detail import DetailView
 from django.views.generic import View
 from core.mixins import ExpertRequiredMixin
-from data.models import Annotation
-from data.models import Example
 from discuss.models import Message
-from data.models import Example, ExampleAssignment
-from django.http import HttpResponseBadRequest
+from data.models import Example, ExampleAssignment,Annotation
 from django.db import models
 import json
 from django.http import JsonResponse
-from django.urls import reverse
+from django.core.exceptions import PermissionDenied
 
 
 def save_resolution_labels(request, codebook_id, batch_id, example_id):
@@ -23,6 +18,8 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         user = request.user
         example = get_object_or_404(Example, pk=example_id, batch=batch_id)
         assignment = ExampleAssignment.objects.filter(example=example, user=user).first()
+        codebook = get_object_or_404(Codebook, pk=codebook_id)
+        project = codebook.project
         if not assignment:
             max_order = ExampleAssignment.objects.filter(
                 user=user,
@@ -36,22 +33,20 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         label_ids = [int(i) for i in request.POST.getlist("selected_labels") if i.strip()]
         assignment.set_user_annotations(label_ids=label_ids, phase="EXPERT")
 
-        all_examples = Example.objects.filter(has_disagreement=True).order_by("id")
+        all_examples = Example.objects.filter(
+            has_disagreement=True,
+            has_disagreement_after_discussion=True,
+            has_expert_decision=False,
+            batch_id=batch_id,
+            batch__project_id=project.id
+        ).order_by("id")
         next_example = all_examples.filter(id__gt=example.id).order_by("id").first()
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'next_url': reverse('expert-dialogue', args=[codebook_id, batch_id, next_example.id])
-            })
-        else:
+        if next_example:
             return redirect('expert-dialogue', codebook_id, batch_id, next_example.id)
-    
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'success': False}, status=400)
-    else:
-        return redirect('expert-dialogue', codebook_id, batch_id, example_id)
+        else:
+            return redirect("/")
 
+        
 
 class CodebookPartialView(View):
     def get(self, request, pk):
@@ -67,8 +62,13 @@ class CodebookUpdateView(View):
         sentence = request.POST.get("sentence", "")
         example_id = request.POST.get("example_id", "")
         batch_id = request.POST.get("batch_id", "")
+        selected_labels_ids = request.POST.get("selected_labels")
         current_example = get_object_or_404(Example, pk=example_id, batch =batch_id)
+        project = codebook.project
         
+        label_id_array = [int(i) for i in selected_labels_ids.split(",") if i.strip()]
+        selected_labels = project.labels.filter(id__in=label_id_array)
+        selected_label_names = [label.name for label in selected_labels]
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
             phase=Annotation.Phase.ANNOTATION,
@@ -83,7 +83,7 @@ class CodebookUpdateView(View):
             .order_by("created_at")
         )
         chat_history_list = [f"{msg.user}: {msg.message}" for msg in messages]
-        chat_history_str = "\n".join(chat_history_list)  
+        chat_history_str = "\n".join(chat_history_list)
 
         labels_before_str = ""
         for ann in annotations_before_discussion:
@@ -97,11 +97,12 @@ class CodebookUpdateView(View):
     "labels_before": labels_before_str,
     "labels_after": labels_after_str,
     "chat_history": chat_history_str,
+    "selected_labels_ids": selected_label_names,
 }
         commit_message = json.dumps(commit_info, ensure_ascii=False)
         if content:
            codebook.save(content=content, commit_message=commit_message)
-        
+
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True})
 
@@ -112,7 +113,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
     model = Codebook
     context_object_name = "codebook"
-    template_name = "expert/dialogue_UI-Test.html"
+    template_name = "expert/dialogue.html"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -121,23 +122,26 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context["codebook"] = codebook
         batch_id =self.kwargs.get("batch_id")
         context["batch_id"]= batch_id
-       
-        current_example_id = self.kwargs.get("example_id")
-        if current_example_id:
-            current_example = get_object_or_404(Example, pk=current_example_id, batch__project_id=project.id)
-        else:
-            current_example = Example.objects.filter(
-    has_disagreement=True,
-    batch_id=batch_id,
-    batch__project_id=project.id
-).first()
 
+        current_example_id = self.kwargs.get("example_id")
         all_examples = Example.objects.filter(
     has_disagreement=True,
+    has_disagreement_after_discussion=True,
+    has_expert_decision=False,
     batch_id=batch_id,
     batch__project_id=project.id
 ).order_by("id")
         
+        if not all_examples.exists():
+            raise PermissionDenied("Access denied: No examples meet the criteria.")
+        if current_example_id:
+            current_example = get_object_or_404(Example, pk=current_example_id, batch__project_id=project.id)
+            if not (current_example.has_disagreement_after_discussion and not current_example.has_expert_decision):
+                current_example = all_examples.first()
+        else:
+            current_example = all_examples.first()
+        
+
         next_example = all_examples.filter(id__gt=current_example.id).order_by("id").first()
         context["example_id"] = current_example_id
         context["sentence"] = current_example
@@ -161,11 +165,11 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     example__batch_id=batch_id,
     example__batch__project_id=project.id,
 ).exclude(user="system").order_by("created_at")
-        
+
         examples_with_disagreement = Example.objects.filter(
     batch__project_id=project.id,
     batch_id=batch_id,
-    has_disagreement_after_discussion=True
+    has_disagreement_after_discussion=True,
 )
         examples_with_expert_decision = Example.objects.filter(
     batch__project_id=project.id,
@@ -173,13 +177,15 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     has_disagreement_after_discussion=True,
     has_expert_decision=True
 )
+        prev_label_ids = [a.label.id for a in annotations_after_discussion]
         examples_with_disagreement_count = examples_with_disagreement.count()
         examples_with_expert_decision_count = examples_with_expert_decision.count()
         disagreements_remaining = examples_with_disagreement_count - examples_with_expert_decision_count
         context["disagreements_remaining"] = disagreements_remaining
-        context["prev_labels"] = annotations_before_discussion
-        context["post_labels"] = annotations_after_discussion
+        context["prev_annotations"] = annotations_before_discussion
+        context["post_annotations"] = annotations_after_discussion
         context["chat_messages"] = messages
+        context["prev_label_ids"] = prev_label_ids
         context["labels"] = self.object.project.labels.all()
 
         return context

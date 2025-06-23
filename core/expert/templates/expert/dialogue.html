@@ -5,48 +5,48 @@
     Resolve Disagreement
 {% endblock title %}
 {% block content %}
-    <div class="container mt-4">
-        <h2 class="text-center">Resolve Disagreement</h2>
-        <div class="row">
-            <!-- Codebook Section -->
-            <div class="col-md-6 mt-4">
-                <div class="card">
-                    <div class="card-header">Edit Codebook</div>
-                    <div class="card-body">
-                        <form method="post">
-                            {% csrf_token %}
-                            <div class="form-group">
-                                <label for="codebook-content" class="form-label">Codebook Content</label>
-                                <textarea id="codebook-content"
-                                          name="content"
-                                          class="form-control"
-                                          rows="20"
-                                          style="white-space: pre-wrap">{{ complete_codebook }}</textarea>
-                            </div>
-                            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-                        </form>
-                    </div>
+
+
+<div class="container mt-4">
+    <div class="d-flex align-items-center justify-content-center my-4">
+        <span class="badge bg-primary text-white fs-2 fw-bold me-3">
+        {{ disagreements_remaining }}
+        </span>
+        <h2 class="mb-0">Remaining Disagreements</h2>
+    </div>
+    <div class="row">
+        <!-- Sentence Section -->
+        <div class="col-md-12 mt-4">
+            <div class="card">
+                <div class="card-header">Text/Sentence</div>
+                <div class="card-body">
+                    <p class="text-muted">{{sentence}}</p>
                 </div>
             </div>
-            <!-- Codebook Content & Resolution -->
+        </div>
+    </div>
+    <div class="row">
+        <!-- Codebook Content & Resolution -->
             <div class="col-md-6 mt-4">
                 <!-- Previous Labels -->
                 <div class="card mb-4">
-                    <div class="card-header">Labels Before Discussion</div>
+                   <div class="card-header">Labels Before Discussion</div>
                     <div class="card-body">
-                        {% for label in prev_labels %}
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-success me-2">{{ label.label }}</span>
-                                <span class="text-muted">Assigned by:</span>
-                                <span class="fw-bold">{{ label.assignment.user }}</span>
-                            </div>
+                        {% for annotation in prev_annotations %}
+                        <div class="align-items-center">
+                            <label class="btn my-1" style="cursor: default; background-color: {{ annotation.label.color }} ; color: #fff;">
+                             {{ annotation.label }}
+                            </label>
+                            <span class="text-muted">assigned by:</span>
+                            <span class="fw-bold">{{ annotation.assignment.user }}</span>
+                        </div>
                         {% empty %}
-                            <p>No labels assigned before the discussion.</p>
+                        <p>No labels assigned before the discussion.</p>
                         {% endfor %}
-                    </div>
+                        </div>
                 </div>
                 <!-- Chat History Section -->
-                <div class="card mb-4">
+                <div class="card mt-4">
                     <div class="card-header">Chat History</div>
                     <div class="card-body">
                         {% for message in chat_messages %}
@@ -55,119 +55,220 @@
                                     <strong>{{ message.user }}:</strong> {{ message.message }}
                                 </div>
                             </div>
-                        {% empty %}
-                            <p>No chat history available.</p>
                         {% endfor %}
                     </div>
                 </div>
                 <!-- Post Discussion Labels -->
-                <div class="card">
+                <div class="card mt-4">
                     <div class="card-header">Labels After Discussion</div>
                     <div class="card-body">
-                        {% for label in post_labels %}
-                            <div class="d-flex align-items-center mb-2">
-                                <span class="badge bg-info me-2">{{ label.label }}</span>
-                                <span class="text-muted">Assigned by:</span>
-                                <span class="fw-bold">{{ label.assignment.user }}</span>
-                            </div>
+                        {% for annotation in post_annotations %}
+                        <div class="align-items-center">
+                            <label class="btn my-1" style="cursor: default; background-color: {{ annotation.label.color }} ; color: #fff;">
+                                {{ annotation.label }}
+                            </label>
+                            <span class="text-muted">assigned by:</span>
+                            <span class="fw-bold">{{ annotation.assignment.user }}</span>
+                        </div>
                         {% empty %}
                             <p>No labels assigned after the discussion.</p>
                         {% endfor %}
                     </div>
                 </div>
                 <!-- Resolution Section -->
-                <div class="mt-4">
-                    <h4>Resolve Disagreement</h4>
-                    <p class="text-muted">Label correction</p>
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">Correct Label</label>
-                        <ul class="list-group">
-                            {% for label in labels %}
-                                <li class="list-group-item">
-                                    <div class="form-check">
-                                        <input class="form-check-input me-1"
-                                               type="checkbox"
-                                               value="{{ label.name }}"
-                                               id="label_checkbox_{{ forloop.counter }}"
-                                               name="selected_labels"
-                                               onchange="updateLabelAppearance(this)">
-                                        <label class="form-check-label" id="label_{{ forloop.counter }}">
-                                            <span class="badge bg-primary me-2">{{ label.name }}</span>
-                                        </label>
+             <div class="card mt-4">
+                    <div class="card-header">Select Labels for Sentence</div>
+                    <form id="labels-form" method="post" action="{% url 'expert-label-save' codebook.pk batch_id sentence.id %}">
+                     {% csrf_token %}
+                        <div class="card-body">
+                            <div class="row justify-content-start">
+                                 {% for label in labels %}
+                                 <div class="form-check col d-flex">
+                                     <input type="checkbox" class="btn-check btn-check-color"
+                                     autocomplete="off"
+                                     id="label_checkbox_{{ forloop.counter }}"
+                                     name="selected_labels"
+                                     value="{{ label.id }}"
+                                     {% if label.id in prev_label_ids %}checked{% endif %}
+                                     onchange="colorContrast(document.getElementById('label_{{ forloop.counter }}'));"
+                                        >
+                                     <label class="btn flex-fill btn-custom-color"
+                                     for="label_checkbox_{{ forloop.counter }}"
+                                     id="label_{{ forloop.counter }}"
+                                     style="--label-color: {{ label.color }};">
+                                         {{ label.name }}
+                                     </label>
                                     </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                    <div class="mb-3">
-                        <label for="definition-correction" class="form-label">Definition correction</label>
-                        <textarea id="definition-correction"
-                                  name="definition_correction"
-                                  class="form-control"
-                                  rows="3"
-                                  placeholder="Describe why the codebook needs to be updated..."></textarea>
-                    </div>
-                    <div class="mb-3 form-check">
-                        <input type="checkbox"
-                               class="form-check-input"
-                               id="add-to-codebook"
-                               name="add_to_codebook">
-                        <label class="form-check-label" for="add-to-codebook">Add this example to the codebook</label>
-                    </div>
-                </div>
+                             {% endfor %}
+                             </div>
+                         </div>
+                     </form>
+                 </div>
+             </div>
+                 <!-- Codebook Section -->
+            <div class="col-md-6 mt-4">
+                <div class="card">
+                    <div class="card-header">Codebook</div>
+                    <div class="card-body">
+                        <form method="post" id="codebook-form" action="{% url 'codebook-update' codebook.pk %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <div id="codebook-rendered">
+                                    {% include "expert/partials/codebook_rendered.html" %}
+                                </div>
+                                <textarea id="codebook-content"
+                                name="content"
+                                class="form-control"
+                                rows="20"
+                                style="white-space: pre-wrap; cursor: default; display: none;">
+                                {{ codebook.content }}
+                                </textarea>
+                                </div>
+                                <div id="rationale-div" class="my-3 d-none">
+                                    <label for="definition-correction" class="form-label">Rationale</label>
+                                    <textarea id="definition-correction" name="definition_correction" class="form-control" rows="3" placeholder="Describe why the codebook needs to be updated..."></textarea>
+                                </div>
+                                <div class="d-flex flex-column justify-content-between" id="div-save-undo">
+                                <button type="button" id="edit-save-button" class="btn btn-primary mt-3" onclick="toggleEdit()">Edit</button>
+                                <button type="button"
+                                        id="cancel-button"
+                                        class="btn btn-secondary btn-lg mt-3 d-none"
+                                        onclick="toggleUndo()">Cancel</button>
+                                <input type="hidden" name="sentence" value="{{ sentence.content }}">
+                                <input type="hidden" name="example_id" value="{{ example_id }}">
+                                <input type="hidden" name="batch_id" value="{{ batch_id }}">
+                                <input type="hidden" name="selected_labels" id="selected-labels-hidden" value="">
+                            </div>
+                        </form>
+                     </div>
+                </div> 
             </div>
         </div>
-        <div class="d-flex justify-content-between align-items-center mt-4">
-            {% if previous_example %}
-                <a href="{% url 'expert-dialogue' codebook.pk previous_example.id %}"
-                   class="btn btn-outline-secondary">Previous</a>
-            {% else %}
-                <button class="btn btn-outline-secondary" disabled>Previous</button>
-            {% endif %}
-            <button class="btn btn-primary">Save</button>
-            {% if next_example %}
-                <a href="{% url 'expert-dialogue' codebook.pk next_example.id %}"
-                   class="btn btn-outline-secondary">Next</a>
-            {% else %}
-                <button class="btn btn-outline-secondary" disabled>Next</button>
-            {% endif %}
-        </div>
     </div>
-    <script>
-        function updateSelectedLabel() {
-            const selectedLabel = document.getElementById('sentence').value;
-            document.getElementById('selected-label').innerText = selectedLabel;
+</div>
+        <!-- Navigation Buttons -->
+<div class="d-flex justify-content-center align-items-center mt-4">
+    {% if next_example is not None %}
+    <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="submitBothForms()">Save & Next </button>
+    {% else %}
+    <button type="button" class="btn btn-outline-primary btn-lg px-5" onclick="submitBothForms()">Finish</button>
+    {% endif %}
+</div>
+</div>     
+</div>    
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+function updateSelectedLabelsHiddenInput() {
+    const checked = Array.from(document.querySelectorAll('#labels-form input[name="selected_labels"]:checked'))
+        .map(cb => cb.value);
+    document.getElementById('selected-labels-hidden').value = checked.join(',');
+}
+
+function colorContrast(labelElement) {
+        const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
+        const textColor = lib.funcs.inferTextColorByContrast(color);
+        labelElement.style.setProperty("--text-color", textColor);
+}
+
+async function submitBothForms() {
+    const codebookForm = document.getElementById('codebook-form');
+    const labelsForm = document.getElementById('labels-form');
+    const codebookTextarea = document.getElementById('codebook-content');
+    const rationaleTextarea = document.getElementById('definition-correction');
+    const isEdit = !codebookTextarea.readOnly && codebookTextarea.style.display !== 'none';
+    const rationaleEmpty = !rationaleTextarea.value.trim();
+
+    if (isEdit) {
+        if (rationaleEmpty) {
+            showToast('Please add a rationale','bg-danger text-white');
+            return;
+        }
+        updateSelectedLabelsHiddenInput();
+        const res = await fetch(codebookForm.action, {
+            method: codebookForm.method,
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            body: new FormData(codebookForm),
+        });
+
+        if (!res.ok) {
+            showToast("Codebook-Update failed!",'bg-danger text-white');
+            return;
         }
 
-        function updateSelectedDefinition() {
-            const selectedDefinition = document.getElementById('codebook-snippet').value;
-            document.getElementById('definition-correction').value = selectedDefinition;
+        showToast('Disagreement resovelment saved', 'bg-success text-white');
+        setTimeout(() => {
+            labelsForm.submit();
+        }, 2000);
+    } else {
+        showToast('Disagreement resovelment saved', 'bg-success text-white'); 
+        setTimeout(() => {
+            labelsForm.submit();
+        }, 2000);
+    }
+}
+    
+    function toggleEdit() {
+        const rendered = document.getElementById('codebook-rendered');
+        const textarea = document.getElementById('codebook-content');
+        const editButton = document.getElementById('edit-save-button');
+        const cancelButton = document.getElementById('cancel-button');
+        const rationaleDiv = document.getElementById('rationale-div')
+        if (textarea.style.display === 'none') {
+        rendered.style.display = 'none';
+        textarea.style.display = 'block';
+        textarea.removeAttribute('readonly');
+        textarea.style.cursor = 'text';
+
+        editButton.classList.add('d-none');
+        cancelButton.classList.remove('d-none');
+        rationaleDiv.classList.remove('d-none');
+    }
+    }
+
+   function toggleUndo() {
+    const rendered = document.getElementById('codebook-rendered');
+    const textarea = document.getElementById('codebook-content');
+    const editButton = document.getElementById('edit-save-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const buttonsDiv = document.getElementById('div-save-undo');
+    const rationaleDiv = document.getElementById('rationale-div');
+
+    
+    if (!textarea.readOnly) {
+        textarea.value = "{{ codebook.content|escapejs }}";
+        textarea.readOnly = true;
+        textarea.style.cursor = "default";
+        textarea.style.display = 'none';
+        if (rendered) {
+            rendered.style.display = 'block';
         }
 
-        function toggleEdit(textareaId, button) {
-            const textarea = document.getElementById(textareaId);
+        editButton.classList.remove('d-none');
+        cancelButton.classList.add('d-none');
+        buttonsDiv.classList.remove('flex-row');
+        buttonsDiv.classList.add('flex-column');
+        rationaleDiv.classList.add('d-none');
+    }
+}
 
-            if (textarea.readOnly) {
-                textarea.readOnly = false;
-                textarea.classList.add('editable');
-                button.textContent = 'Save';
-            } else {
-                textarea.readOnly = true;
-                textarea.classList.remove('editable');
-                button.textContent = 'Edit';
-            }
+    function showToast (text ,tags = ""){
+          const toastElement = document.getElementById('toast');
+          toastElement.value = text;
+    if (toastElement) {
+          toastElement.className = "toast align-items-center border-0";
+        if (tags) {
+            toastElement.className += " " + tags;
         }
-
-        function updateLabelAppearance(checkbox) {
-            const labelId = checkbox.id.replace('checkbox', '');
-            const labelElement = document.getElementById(`label_${labelId.split('_')[2]}`);
-
-            if (checkbox.checked) {
-                labelElement.innerHTML = `<span class="badge bg-success me-2">${labelElement.textContent}</span>`;
-            } else {
-                labelElement.innerHTML = `<span class="badge bg-primary me-2">${labelElement.textContent}</span>`;
-            }
+        const toastBody = toastElement.querySelector('[data-toast-body]');
+        if (toastBody) {
+            toastBody.textContent = text; 
         }
-    </script>
+        var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
+        toastInstance.show();
+    }
+    };
+
+</script>
 {% endblock content %}
