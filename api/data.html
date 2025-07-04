@@ -396,6 +396,11 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement_after_discussion">
+<span class="sig-name descname"><span class="pre">check_for_disagreement_after_discussion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement_after_discussion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.save">
 <span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.save" title="Link to this definition"></a></dt>
 <dd><p>Save the current instance. Override this in a subclass if you want to
@@ -462,7 +467,7 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data.models.Example">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_disagreement</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_disagreement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_disagreement_after_discussion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_expert_decision</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_example</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -470,6 +475,8 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v5.2)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
 <li><p><strong>content</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v5.2)"><em>TextField</em></a>) – Content</p></li>
 <li><p><strong>has_disagreement</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><em>BooleanField</em></a>) – Has disagreement</p></li>
+<li><p><strong>has_disagreement_after_discussion</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><em>BooleanField</em></a>) – Has disagreement after discussion</p></li>
+<li><p><strong>has_expert_decision</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><em>BooleanField</em></a>) – Has expert decision</p></li>
 </ul>
 </dd>
 </dl>
@@ -507,6 +514,20 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <span class="sig-name descname"><span class="pre">has_disagreement</span></span><a class="headerlink" href="#data.models.Example.has_disagreement" title="Link to this definition"></a></dt>
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
 <p>Has disagreement</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.has_disagreement_after_discussion">
+<span class="sig-name descname"><span class="pre">has_disagreement_after_discussion</span></span><a class="headerlink" href="#data.models.Example.has_disagreement_after_discussion" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
+<p>Has disagreement after discussion</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.has_expert_decision">
+<span class="sig-name descname"><span class="pre">has_expert_decision</span></span><a class="headerlink" href="#data.models.Example.has_expert_decision" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
+<p>Has expert decision</p>
 </dd></dl>
 
 <dl class="py property">
