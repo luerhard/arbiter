@@ -30,6 +30,7 @@ urlpatterns = [
     path("annotation/", include("annotation.urls")),
     path("discuss/", include("discuss.urls")),
     path("codebook/", include("codebook.urls")),
+    path("expert/", include("expert.urls")),
 ]
 
 # Additional settings for development
