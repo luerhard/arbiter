@@ -26,9 +26,9 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
     codebook = get_object_or_404(Codebook, pk=codebook_id)
     project = codebook.project
     if not assignment:
-        max_order = ExampleAssignment.objects.filter(user=user, example__batch=example.batch).aggregate(
-            models.Max("order", default=0)
-        )["order__max"]
+        max_order = ExampleAssignment.objects.filter(
+            user=user, example__batch=example.batch
+        ).aggregate(models.Max("order", default=0))["order__max"]
         assignment = ExampleAssignment.objects.create(
             example=example, user=user, order=max_order + 1
         )
