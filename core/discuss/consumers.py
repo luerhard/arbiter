@@ -81,12 +81,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.save_annotation(labels)
             await self.group_send_user_done()
 
+    @database_sync_to_async
+    def move_to_expert(self):
+        """Run when all the examples were exhausted and change the batch phase to expert decision."""
+        Batch.objects.get(id=self.batch_id).set_phase(Batch.Phase.EXPERT)
+
     @async_to_sync
     async def manage_end_annotation(self, reason):
         """Run when no more examples left in the project."""
         self.discussion_ended = True
         log.debug(f"Notifying the group that annotation ended for the following reason {reason}.")
         if reason == AnnotationEndReason.DISCUSSION_END:
+            await self.move_to_expert()
             message = (
                 "Everything was annotated. In one minute the chat will close and you will "
                 "be sent to the projects page. Thank You!"

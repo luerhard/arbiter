@@ -9,10 +9,11 @@
      hx-trigger="refreshPbar"
      role="progressbar"
      aria-label="Example with label"
-     aria-valuenow="{{ done }}"
-     aria-valuemin="1"
-     aria-valuemax="100">
-    <div class="progress-bar bg-primary overflow-visible px-2 w-{{ progress }}">{{ done }} / {{ total }}</div>
+     aria-valuenow="{{ progress }}"
+     aria-valuemin="0"
+     aria-valuemax="{{ total }}">
+    <div class="progress-bar bg-primary overflow-visible px-2"
+         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
 </div>
 {% endpartialdef %}
 {% block content %}

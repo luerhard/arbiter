@@ -31,8 +31,7 @@
                         {% for annotation in prev_annotations %}
                             <div class="align-items-center">
                                 <label class="btn my-1"
-                                       style="cursor: default;
-                                              background-color: {{ annotation.label.color }};
+                                       style="background-color: {{ annotation.label.color }};
                                               color: #fff">{{ annotation.label }}</label>
                                 <span class="text-muted">assigned by:</span>
                                 <span class="fw-bold">{{ annotation.assignment.user }}</span>
@@ -62,8 +61,7 @@
                         {% for annotation in post_annotations %}
                             <div class="align-items-center">
                                 <label class="btn my-1"
-                                       style="cursor: default;
-                                              background-color: {{ annotation.label.color }};
+                                       style="background-color: {{ annotation.label.color }};
                                               color: #fff">{{ annotation.label }}</label>
                                 <span class="text-muted">assigned by:</span>
                                 <span class="fw-bold">{{ annotation.assignment.user }}</span>
@@ -95,7 +93,8 @@
                                         <label class="btn flex-fill btn-custom-color"
                                                for="label_checkbox_{{ forloop.counter }}"
                                                id="label_{{ forloop.counter }}"
-                                               style="--label-color: {{ label.color }}">{{ label.name }}</label>
+                                               style="--label-color: {{ label.color }};
+                                                      --text-color: #FFFFFF">{{ label.name }}</label>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -114,7 +113,7 @@
                             {% csrf_token %}
                             <div class="form-group">
                                 <div id="codebook-rendered">{% include "expert/partials/codebook_rendered.html" %}</div>
-                                <textarea id="codebook-content" name="content" class="form-control" rows="20" style="white-space: pre-wrap; cursor: default; display: none;">
+                                <textarea id="codebook-content" name="content" class="form-control d-none" rows="20" style="white-space: pre-wrap;">
                                 {{ codebook.content }}
                                 </textarea>
                             </div>
@@ -152,7 +151,7 @@
 </div>
 <!-- Navigation Buttons -->
 <div class="d-flex justify-content-center align-items-center mt-4">
-    {% if next_example is not None %}
+    {% if next_example %}
         <button type="button"
                 class="btn btn-outline-primary btn-lg px-5"
                 onclick="submitBothForms()">Save & Next</button>
@@ -165,26 +164,30 @@
 </div>
 </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    const codebookForm = document.getElementById('codebook-form');
+    const labelsForm = document.getElementById('labels-form');
+    const textarea = document.getElementById('codebook-content');
+    const rationaleTextarea = document.getElementById('definition-correction');
+    const rendered = document.getElementById('codebook-rendered');
+    const editButton = document.getElementById('edit-save-button');
+    const cancelButton = document.getElementById('cancel-button');
+    const rationaleDiv = document.getElementById('rationale-div');
+
     function updateSelectedLabelsHiddenInput() {
         const checked = Array.from(document.querySelectorAll('#labels-form input[name="selected_labels"]:checked'))
             .map(cb => cb.value);
         document.getElementById('selected-labels-hidden').value = checked.join(',');
-    }
+    };
 
     function colorContrast(labelElement) {
         const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
         const textColor = lib.funcs.inferTextColorByContrast(color);
         labelElement.style.setProperty("--text-color", textColor);
-    }
+    };
 
     async function submitBothForms() {
-        const codebookForm = document.getElementById('codebook-form');
-        const labelsForm = document.getElementById('labels-form');
-        const codebookTextarea = document.getElementById('codebook-content');
-        const rationaleTextarea = document.getElementById('definition-correction');
-        const isEdit = !codebookTextarea.readOnly && codebookTextarea.style.display !== 'none';
+        const isEdit = !textarea.classList.contains('d-none');
         const rationaleEmpty = !rationaleTextarea.value.trim();
 
         if (isEdit) {
@@ -204,7 +207,7 @@
             if (!res.ok) {
                 showToast("Codebook-Update failed!", 'bg-danger text-white');
                 return;
-            }
+            };
 
             showToast('Disagreement resovelment saved', 'bg-success text-white');
             setTimeout(() => {
@@ -215,52 +218,37 @@
             setTimeout(() => {
                 labelsForm.submit();
             }, 2000);
-        }
-    }
+        };
+    };
 
     function toggleEdit() {
-        const rendered = document.getElementById('codebook-rendered');
-        const textarea = document.getElementById('codebook-content');
-        const editButton = document.getElementById('edit-save-button');
-        const cancelButton = document.getElementById('cancel-button');
-        const rationaleDiv = document.getElementById('rationale-div')
-        if (textarea.style.display === 'none') {
-            rendered.style.display = 'none';
-            textarea.style.display = 'block';
+        if (textarea.classList.contains('d-none')) {
+            rendered.classList.add('d-none')
+            textarea.classList.remove('d-none');
             textarea.removeAttribute('readonly');
-            textarea.style.cursor = 'text';
 
             editButton.classList.add('d-none');
             cancelButton.classList.remove('d-none');
             rationaleDiv.classList.remove('d-none');
-        }
-    }
+        };
+    };
 
     function toggleUndo() {
-        const rendered = document.getElementById('codebook-rendered');
-        const textarea = document.getElementById('codebook-content');
-        const editButton = document.getElementById('edit-save-button');
-        const cancelButton = document.getElementById('cancel-button');
-        const buttonsDiv = document.getElementById('div-save-undo');
-        const rationaleDiv = document.getElementById('rationale-div');
-
-
         if (!textarea.readOnly) {
             textarea.value = "{{ codebook.content|escapejs }}";
             textarea.readOnly = true;
-            textarea.style.cursor = "default";
-            textarea.style.display = 'none';
+            textarea.classList.add('d-none');
             if (rendered) {
-                rendered.style.display = 'block';
-            }
+                rendered.classList.remove('d-none');
+            };
 
             editButton.classList.remove('d-none');
             cancelButton.classList.add('d-none');
             buttonsDiv.classList.remove('flex-row');
             buttonsDiv.classList.add('flex-column');
             rationaleDiv.classList.add('d-none');
-        }
-    }
+        };
+    };
 
     function showToast(text, tags = "") {
         const toastElement = document.getElementById('toast');
@@ -269,14 +257,14 @@
             toastElement.className = "toast align-items-center border-0";
             if (tags) {
                 toastElement.className += " " + tags;
-            }
+            };
             const toastBody = toastElement.querySelector('[data-toast-body]');
             if (toastBody) {
                 toastBody.textContent = text;
-            }
+            };
             var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
             toastInstance.show();
-        }
+        };
     };
 </script>
 {% endblock content %}

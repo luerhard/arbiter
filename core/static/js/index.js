@@ -14,6 +14,8 @@ import * as discuss from "./discuss";
 
 export { funcs, discuss };
 
+window.bootstrap = bootstrap;
+
 // for debugging
 htmx.logger = function (elt, event, data) {
     if (console) {

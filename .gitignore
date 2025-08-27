@@ -61,6 +61,7 @@ local_settings.py
 db.sqlite3
 !docs/db.sqlite3
 db.sqlite3-journal
+core/codebook/migrations/0002_alter_codebook_git_dir.py
 
 # Flask stuff:
 instance/
@@ -167,4 +168,5 @@ node_modules/**
 
 # VSCode specific files
 *.code-workspace
+.vscode/
 media/

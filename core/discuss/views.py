@@ -6,8 +6,6 @@ from django.views.generic import View
 from core.mixins import AnnotatorRequiredMixin
 from data.models import ExampleAssignment
 
-# Create your views here.
-
 
 class GetProgress(AnnotatorRequiredMixin, View):
     def get(self, request, batch_id):
