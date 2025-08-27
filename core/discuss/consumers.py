@@ -101,7 +101,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         elif reason == AnnotationEndReason.NO_EXAMPLES:
             ...
         await self.group_end_annotation(reason)
-    
+
     async def group_end_annotation(self, reason):
         """Notify the connected clients in group that annotation ended."""
         await self.channel_layer.group_send(
