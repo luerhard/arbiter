@@ -12,7 +12,8 @@
      aria-valuenow="{{ progress }}"
      aria-valuemin="0"
      aria-valuemax="{{ total }}">
-    <div class="progress-bar bg-primary overflow-visible px-2" style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+    <div class="progress-bar bg-primary overflow-visible px-2"
+         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
 </div>
 {% endpartialdef %}
 {% block content %}
