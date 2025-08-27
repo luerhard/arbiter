@@ -184,5 +184,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context["post_annotations"] = annotations_after_discussion
         context["chat_messages"] = messages
         context["prev_label_ids"] = prev_label_ids
+        context["labels"] = project.labels.all()
 
         return context

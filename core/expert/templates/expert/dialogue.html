@@ -93,7 +93,7 @@
                                         <label class="btn flex-fill btn-custom-color"
                                                for="label_checkbox_{{ forloop.counter }}"
                                                id="label_{{ forloop.counter }}"
-                                               style="--label-color: {{ label.color }}">{{ label.name }}</label>
+                                               style="--label-color: {{ label.color }}; --text-color: #FFFFFF">{{ label.name }}</label>
                                     </div>
                                 {% endfor %}
                             </div>
@@ -166,10 +166,9 @@
 <script>
     const codebookForm = document.getElementById('codebook-form');
     const labelsForm = document.getElementById('labels-form');
-    const codebookTextarea = document.getElementById('codebook-content');
+    const textarea = document.getElementById('codebook-content');
     const rationaleTextarea = document.getElementById('definition-correction');
     const rendered = document.getElementById('codebook-rendered');
-    const textarea = document.getElementById('codebook-content');
     const editButton = document.getElementById('edit-save-button');
     const cancelButton = document.getElementById('cancel-button');
     const rationaleDiv = document.getElementById('rationale-div');
@@ -178,16 +177,16 @@
         const checked = Array.from(document.querySelectorAll('#labels-form input[name="selected_labels"]:checked'))
             .map(cb => cb.value);
         document.getElementById('selected-labels-hidden').value = checked.join(',');
-    }
+    };
 
     function colorContrast(labelElement) {
         const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
         const textColor = lib.funcs.inferTextColorByContrast(color);
         labelElement.style.setProperty("--text-color", textColor);
-    }
+    };
 
     async function submitBothForms() {
-        const isEdit = !codebookTextarea.readOnly && codebookTextarea.style.display !== 'none';
+        const isEdit = !textarea.classList.contains('d-none');
         const rationaleEmpty = !rationaleTextarea.value.trim();
 
         if (isEdit) {
@@ -207,7 +206,7 @@
             if (!res.ok) {
                 showToast("Codebook-Update failed!", 'bg-danger text-white');
                 return;
-            }
+            };
 
             showToast('Disagreement resovelment saved', 'bg-success text-white');
             setTimeout(() => {
@@ -218,8 +217,8 @@
             setTimeout(() => {
                 labelsForm.submit();
             }, 2000);
-        }
-    }
+        };
+    };
 
     function toggleEdit() {
         if (textarea.classList.contains('d-none')) {
@@ -230,8 +229,8 @@
             editButton.classList.add('d-none');
             cancelButton.classList.remove('d-none');
             rationaleDiv.classList.remove('d-none');
-        }
-    }
+        };
+    };
 
     function toggleUndo() {
         if (!textarea.readOnly) {
@@ -240,15 +239,15 @@
             textarea.classList.add('d-none');
             if (rendered) {
                 rendered.classList.remove('d-none');
-            }
+            };
 
             editButton.classList.remove('d-none');
             cancelButton.classList.add('d-none');
             buttonsDiv.classList.remove('flex-row');
             buttonsDiv.classList.add('flex-column');
             rationaleDiv.classList.add('d-none');
-        }
-    }
+        };
+    };
 
     function showToast(text, tags = "") {
         const toastElement = document.getElementById('toast');
@@ -257,14 +256,14 @@
             toastElement.className = "toast align-items-center border-0";
             if (tags) {
                 toastElement.className += " " + tags;
-            }
+            };
             const toastBody = toastElement.querySelector('[data-toast-body]');
             if (toastBody) {
                 toastBody.textContent = text;
-            }
+            };
             var toastInstance = bootstrap.Toast.getOrCreateInstance(toastElement);
             toastInstance.show();
-        }
+        };
     };
 </script>
 {% endblock content %}
