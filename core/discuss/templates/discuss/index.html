@@ -57,10 +57,10 @@
                                     <div class="d-flex justify-content-between mt-3">
                                         {% comment %} Show Codebook Button {% endcomment %}
                                         <button class="btn btn-sm btn-outline-primary"
-                                            id="codebook-toggle"
-                                            tabindex="-1"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#codebook-col">Show Codebook</button>
+                                                id="codebook-toggle"
+                                                tabindex="-1"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#codebook-col">Show Codebook</button>
                                         {% comment %} Save Button {% endcomment %}
                                         <input type="checkbox"
                                                class="btn-check"
@@ -85,8 +85,8 @@
                                        name="message"
                                        placeholder="Message...">
                                 <button class="btn btn-outline-primary"
-                                       type="submit"
-                                       aria-describedby="message-input">
+                                        type="submit"
+                                        aria-describedby="message-input">
                                     <i class="bi bi-send"></i>
                                 </button>
                             </form>
@@ -107,18 +107,16 @@
                      aria-label="Diff Control Button">
                     {% comment %} Codebook Diff Button {% endcomment %}
                     <input type="checkbox"
-                            class="btn-check"
-                            id="codebook-diff-check"
-                            autocomplete="off">
+                           class="btn-check"
+                           id="codebook-diff-check"
+                           autocomplete="off">
                     <label class="btn btn-sm btn-outline-secondary"
-                            for="codebook-diff-check"
-                            title="Show Differences">
+                           for="codebook-diff-check"
+                           title="Show Differences">
                         <i class="bi bi-file-earmark-diff"></i>
                     </label>
                     {% comment %} Open Codebook in a New Window {% endcomment %}
-                    <input type="button"
-                           class="btn-check"
-                           id="codebook-open">
+                    <input type="button" class="btn-check" id="codebook-open">
                     <label class="btn btn-sm btn-outline-secondary"
                            for="codebook-open"
                            title="Open in New Window">
@@ -237,7 +235,5 @@
                 lib.discuss.lockButtons();
             }
         });
-
-
     </script>
 {% endblock content %}

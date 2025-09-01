@@ -30,7 +30,7 @@ class GetProgress(AnnotatorRequiredMixin, View):
 class DiscussView(AnnotatorRequiredMixin, View):
     template_name = "annotation/index.html"
     model = Batch
-    
+
     def post(self, request, batch_id):  # noqa: ARG002
         return redirect(reverse("chat", kwargs={"batch_id": batch_id}))
 
