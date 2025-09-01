@@ -160,8 +160,8 @@
             codebook_open.addEventListener("click", function() {
                 codebook_toggle.click();
                 new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
-                timer = setInterval(function() { 
-                    if(new_window.closed) {
+                timer = setInterval(function() {
+                    if (new_window.closed) {
                         clearInterval(timer);
                         codebook_toggle.click();
                     }
