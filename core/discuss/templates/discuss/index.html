@@ -158,7 +158,8 @@
             });
 
             codebook_open.addEventListener("click", function() {
-                open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup")
+                codebook_toggle.click();
+                open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup");
             });
         });
 
