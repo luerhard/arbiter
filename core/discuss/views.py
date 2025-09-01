@@ -5,6 +5,7 @@ from django.views.generic import View
 
 from core.mixins import AnnotatorRequiredMixin
 from data.models import ExampleAssignment
+from projects.models import Batch
 
 
 class GetProgress(AnnotatorRequiredMixin, View):
@@ -27,8 +28,20 @@ class GetProgress(AnnotatorRequiredMixin, View):
 
 
 class DiscussView(AnnotatorRequiredMixin, View):
+    template_name = "annotation/index.html"
+    model = Batch
+    
     def post(self, request, batch_id):  # noqa: ARG002
         return redirect(reverse("chat", kwargs={"batch_id": batch_id}))
 
     def get(self, request, batch_id):
-        return render(request, "discuss/index.html", {"batch_id": batch_id})
+        context = {}
+        context["batch_id"] = batch_id
+
+        batch = Batch.objects.get(id=batch_id)
+
+        codebook = batch.project.codebook.get()
+        context["content"] = codebook.content
+        context["content_diff"] = codebook.diff(batch.batch_number - 1, batch.batch_number)
+
+        return render(request, "discuss/index.html", context)

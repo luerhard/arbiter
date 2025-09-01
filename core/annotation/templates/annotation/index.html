@@ -36,7 +36,6 @@
                    class="btn-check btn-check-color"
                    id="{{ checkbox.id_for_label }}"
                    value="{{ checkbox.data.value }}"
-                   autocomplete="off"
                    {% if checkbox.data.value in label_form.labels.value %}checked{% endif %}
                    data-hotkey="{{ detail.hotkey }}" />
             <label for="{{ checkbox.id_for_label }}"
@@ -116,7 +115,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col" id="annotation">
+        <div class="row" id="annotation">
             <div class="row">
                 <div class="col mt-3">{% partial pbar %}</div>
             </div>
@@ -131,9 +130,9 @@
             </div>
         </div>
         {% comment %} Codebook View and Control {% endcomment %}
-        <div class="col-5 collapse overflow-y-auto mt-1"
+        <div class="row collapse overflow-y-auto mt-1"
              id="codebook-col"
-             style="max-height: 80vh"
+             style="max-height: 45vh"
              aria-expanded="false">
             <div class="position-relative">
                 {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
@@ -143,8 +142,7 @@
                     {% comment %} Codebook Diff Button {% endcomment %}
                     <input type="checkbox"
                            class="btn-check"
-                           id="codebook-diff-check"
-                           autocomplete="off">
+                           id="codebook-diff-check">
                     <label class="btn btn-sm btn-outline-secondary"
                            for="codebook-diff-check"
                            title="Show Differences">
@@ -153,11 +151,19 @@
                     {% comment %} Codebook Position Button {% endcomment %}
                     <input type="checkbox"
                            class="btn-check"
-                           id="codebook-pos-check"
-                           autocomplete="off">
+                           id="codebook-pos-check">
                     <label class="btn btn-sm btn-outline-secondary"
                            for="codebook-pos-check"
                            title="Toggle Position">
+                        <i class="bi bi-columns"></i>
+                    </label>
+                    {% comment %} Open Codebook in a New Window {% endcomment %}
+                    <input type="button"
+                           class="btn-check"
+                           id="codebook-open">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-open"
+                           title="Open in New Window">
                         <i class="bi bi-box-arrow-up-right"></i>
                     </label>
                 </div>
@@ -188,20 +194,19 @@
 
         function colorContrast() {
             // auto-maximize contrast for font in colored buttons
-            document.querySelectorAll('.btn-custom-color').forEach(button => {
-                const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
+            document.querySelectorAll(".btn-custom-color").forEach(button => {
+                const color = getComputedStyle(button).getPropertyValue("--label-color").trim();
                 const textColor = lib.funcs.inferTextColorByContrast(color)
                 button.style.setProperty("--text-color", textColor);
             });
-
         };
-
 
         // show state of codebook expansion on the button
         document.addEventListener("DOMContentLoaded", function() {
             const codebook_toggle = document.getElementById("codebook-toggle");
             const codebook_col = document.getElementById("codebook-col");
             const codebook_pos = document.getElementById("codebook-pos-check");
+            const codebook_open = document.getElementById("codebook-open");
             const annotation = document.getElementById("annotation");
             const codebook_diff_check = document.getElementById("codebook-diff-check");
             const codebook_orig_view = document.getElementById("codebook-orig-view");
@@ -223,9 +228,9 @@
                 annotation.classList.toggle("row");
                 annotation.classList.toggle("col");
                 if (codebook_pos.checked) {
-                    codebook_col.style.maxHeight = "45vh";
-                } else {
                     codebook_col.style.maxHeight = "80vh";
+                } else {
+                    codebook_col.style.maxHeight = "45vh";
                 };
             });
 
@@ -234,24 +239,28 @@
                 codebook_orig_view.hidden = !codebook_orig_view.hidden
             });
 
+            codebook_open.addEventListener("click", function() {
+                open("/codebook/view/1", "Codebook Pop-up", "popup")
+            });
+
             colorContrast();
         });
 
         // disable enter button (should only ever toggle "Saved")
         // necessary to not toggle the filter / codebook buttons when they were clicked previously
-        document.querySelectorAll('button').forEach(function(button) {
-            button.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter') {
+        document.querySelectorAll("button").forEach(function(button) {
+            button.addEventListener("keydown", function(e) {
+                if (e.key === "Enter") {
                     e.preventDefault();
                 }
             });
         });
 
         document.addEventListener("htmx:load", function() {
-            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const checkboxes = document.querySelectorAll("input[type='checkbox']");
             checkboxes.forEach(function(checkbox) {
                 // Get custom hotkey from data attribute
-                const hotkey = checkbox.getAttribute('data-hotkey');
+                const hotkey = checkbox.getAttribute("data-hotkey");
                 if (hotkey) {
                     Mousetrap.bind(hotkey, function() {
                         // Toggle the checkbox on key press
