@@ -183,8 +183,8 @@ class ExportBatch(ExpertRequiredMixin, View):
             row["labels"] = []
             for annotator in annotators:
                 user_annotations = example.get_user_annotations(
-                    user=annotator,
                     phase="ANNOTATION",
+                    user=annotator,
                 ).select_related("label")
                 labels = [annotation.label.name for annotation in user_annotations]
                 user_data = {"user": annotator.username, "labels": labels}
@@ -194,8 +194,8 @@ class ExportBatch(ExpertRequiredMixin, View):
             row["discussed_labels"] = []
             for annotator in annotators:
                 user_annotations = example.get_user_annotations(
-                    user=annotator,
                     phase="DISCUSSION",
+                    user=annotator,
                 ).select_related("label")
                 labels = [annotation.label.name for annotation in user_annotations]
                 user_data = {"user": annotator.username, "labels": labels}

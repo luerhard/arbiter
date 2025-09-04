@@ -83,7 +83,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def move_to_expert(self):
-        """Run when all the examples were exhausted and change the batch phase to expert decision."""
+        """
+        Run when all the examples were exhausted and change the batch phase to expert decision.
+        """
         Batch.objects.get(id=self.batch_id).set_phase(Batch.Phase.EXPERT)
 
     @async_to_sync
@@ -155,7 +157,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         log.debug(f"Got example: {example}")
         for user in self.scope["room_state"]["online_users"]:
             labels = []
-            query = example.get_user_annotations(user, phase="ANNOTATION").select_related("label")
+            query = example.get_user_annotations(
+                phase="ANNOTATION",
+                user=user,
+            ).select_related("label")
             label_set = {anno.label for anno in query}
             for label in example.labels.all():
                 labels.append(

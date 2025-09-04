@@ -13,7 +13,7 @@ class MultiLabelForm(forms.Form):
         annotation_labels = {
             annotation.label
             for annotation in self.example.get_user_annotations(
-                assignment.user,
+                user=assignment.user,
                 phase="ANNOTATION",
             ).select_related("label")
         }
