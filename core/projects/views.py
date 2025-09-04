@@ -201,6 +201,13 @@ class ExportBatch(ExpertRequiredMixin, View):
                 user_data = {"user": annotator.username, "labels": labels}
                 row["discussed_labels"].append(user_data)
 
+            # Discussed Annotation Data
+            user_annotations = example.get_user_annotations(
+                phase="EXPERT",
+            ).select_related("label")
+            labels = [annotation.label.name for annotation in user_annotations]
+            row["expert_labels"] = labels
+
             # Chat Messages
             row["messages"] = []
             messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
