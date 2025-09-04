@@ -88,7 +88,6 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "disagreement": Example.objects.filter(
                     batch=batch,
                     has_disagreement=True,
-                    has_disagreement_after_discussion=True,
                     has_expert_decision=False,
                 ).count(),
                 "users": [],
