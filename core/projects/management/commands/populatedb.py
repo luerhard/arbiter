@@ -72,7 +72,7 @@ class Command(BaseCommand):
             annotators,
             experts,
         )
-        codebook = Codebook.objects.create(project=project)
+        codebook = Codebook.objects.get(project=project)
         codebook_content = (
             settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long_v1.md"
         ).read_text()
@@ -110,7 +110,7 @@ class Command(BaseCommand):
             experts,
         )
 
-        codebook = Codebook.objects.create(project=project)
+        codebook = Codebook.objects.get(project=project)
         codebook_content = (
             settings.BASE_DIR.parent / "tests/testdata/codebook_emotions_short.md"
         ).read_text()
