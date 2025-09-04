@@ -199,7 +199,7 @@ class ExportBatch(ExpertRequiredMixin, View):
                 ).select_related("label")
                 labels = [annotation.label.name for annotation in user_annotations]
                 user_data = {"user": annotator.username, "labels": labels}
-                row["labels"].append(user_data)
+                row["discussed_labels"].append(user_data)
 
             # Chat Messages
             row["messages"] = []
