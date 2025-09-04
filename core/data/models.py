@@ -194,7 +194,7 @@ class Example(models.Model):
     def labels(self):
         return self.batch.project.labels
 
-    def get_user_annotations(self, user, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"]):
+    def get_user_annotations(self, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"], user=None):
         phase = getattr(Annotation.Phase, phase)
 
         if phase == Annotation.Phase.ANNOTATION:
@@ -214,8 +214,7 @@ class Example(models.Model):
         else:
             return Annotation.objects.filter(
                 assignment__example=self,
-                assignment__user=user,
-                assignment__has_expert_decision=1,
+                assignment__example__has_expert_decision=1,
                 phase=phase,
             )
 
