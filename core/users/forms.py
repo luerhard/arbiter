@@ -1,12 +1,12 @@
 from django import forms
 from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import AdminUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as OrigUserChangeForm
-from django.contrib.auth.forms import UserCreationForm as OrigUserCreationForm
 
 User = get_user_model()
 
 
-class UserCreationForm(OrigUserCreationForm):
+class UserCreationForm(AdminUserCreationForm):
     """
     Specify the user model created while adding a user
     on the admin page.
