@@ -1,4 +1,5 @@
 # core/models.py
+from codebook.models import Codebook
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
@@ -81,6 +82,14 @@ class Project(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # need to check before saving. Is always false otherwise
+        is_new = self._state.adding is True
+        super().save(*args, **kwargs)
+        if is_new:
+            print("adding codebook")
+            Codebook.objects.get_or_create(project=self)
 
 
 class Batch(models.Model):
