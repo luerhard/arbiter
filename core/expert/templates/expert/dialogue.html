@@ -109,7 +109,7 @@
                     <div class="card-body">
                         <form method="post"
                               id="codebook-form"
-                              action="{% url 'codebook-update' codebook.pk %}">
+                              action="{% url 'codebook-edit' codebook.pk %}">
                             {% csrf_token %}
                             <div class="form-group">
                                 <div id="codebook-rendered">{% include "expert/partials/codebook_rendered.html" %}</div>
@@ -118,9 +118,9 @@
                                 </textarea>
                             </div>
                             <div id="rationale-div" class="my-3 d-none">
-                                <label for="definition-correction" class="form-label">Rationale</label>
-                                <textarea id="definition-correction"
-                                          name="definition_correction"
+                                <label for="correction-message" class="form-label">Rationale</label>
+                                <textarea id="correction-message"
+                                          name="correction_message"
                                           class="form-control"
                                           rows="3"
                                           placeholder="Describe why the codebook needs to be updated..."></textarea>
@@ -168,7 +168,7 @@
     const codebookForm = document.getElementById('codebook-form');
     const labelsForm = document.getElementById('labels-form');
     const textarea = document.getElementById('codebook-content');
-    const rationaleTextarea = document.getElementById('definition-correction');
+    const rationaleTextarea = document.getElementById('correction-message');
     const rendered = document.getElementById('codebook-rendered');
     const editButton = document.getElementById('edit-save-button');
     const cancelButton = document.getElementById('cancel-button');

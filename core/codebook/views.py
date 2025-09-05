@@ -56,5 +56,6 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         content = form.cleaned_data["content"]
-        self.object.save(content=content, commit_message="edited.")
+        commit_message = form.cleaned_data["correction_message"]
+        self.object.save(content=content, commit_message=commit_message)
         return redirect(self.object.get_absolute_url())

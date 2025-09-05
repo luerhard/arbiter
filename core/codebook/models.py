@@ -42,7 +42,7 @@ class Codebook(models.Model):
         return Repo(full_path)
 
     def get_absolute_url(self):
-        return reverse("codebook-view", kwargs={"pk": self.pk})
+        return reverse("codebook-view", kwargs={"codebook_id": self.pk})
 
     def tag_version(self, batch_number: int):
         tag = f"batch_{batch_number}"
