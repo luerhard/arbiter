@@ -1,4 +1,5 @@
 import json
+import logging
 
 from codebook.models import Codebook
 from django.core.exceptions import PermissionDenied
@@ -15,6 +16,8 @@ from data.models import Annotation
 from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
+
+log = logging.getLogger(__name__)
 
 
 def save_resolution_labels(request, codebook_id, batch_id, example_id):
@@ -47,12 +50,6 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         return redirect("expert-dialogue", codebook_id, batch_id, next_example.id)
     else:
         return redirect("/")
-
-
-class CodebookPartialView(View):
-    def get(self, request, pk):
-        codebook = get_object_or_404(Codebook, pk=pk)
-        return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
 
 
 class CodebookUpdateView(View):
@@ -110,7 +107,7 @@ class CodebookUpdateView(View):
         if request.headers.get("x-requested-with") == "XMLHttpRequest":
             return JsonResponse({"success": True})
 
-        return render(request, "expert/partials/codebook_rendered.html", {"codebook": codebook})
+        return render(request, "codebook/partials/view-codebook.html", {"codebook": codebook})
 
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):

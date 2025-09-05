@@ -112,9 +112,13 @@
                               action="{% url 'codebook-edit' codebook.pk %}">
                             {% csrf_token %}
                             <div class="form-group">
-                                <div id="codebook-rendered">{% include "expert/partials/codebook_rendered.html" %}</div>
+                                <div id="codebook-rendered"
+                                     class="overflow-auto"
+                                     style="max-height: 645px">
+                                    {% include "codebook/partials/view-codebook.html" %}
+                                </div>
                                 <textarea id="codebook-content" name="content" class="form-control d-none" rows="20" style="white-space: pre-wrap;">
-                                {{ codebook.content }}
+                                    {{ codebook.content }}
                                 </textarea>
                             </div>
                             <div id="rationale-div" class="my-3 d-none">
@@ -150,7 +154,7 @@
     </div>
 </div>
 <!-- Navigation Buttons -->
-<div class="d-flex justify-content-center align-items-center mt-4">
+<div class="d-flex justify-content-center align-items-center my-4">
     {% if next_example %}
         <button type="button"
                 class="btn btn-outline-primary btn-lg px-5"

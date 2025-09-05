@@ -80,6 +80,11 @@ LOGGING = {
             "filename": LOG_DIR / "annotation.log",
             "formatter": "verbose",
         },
+        "file_expert": {
+            "class": "logging.FileHandler",
+            "filename": LOG_DIR / "expert.log",
+            "formatter": "verbose",
+        },
     },
     "formatters": {
         "verbose": {
@@ -100,5 +105,6 @@ LOGGING = {
         "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
         "codebook": {"level": "DEBUG", "handlers": ["file_codebook"]},
         "annotation": {"level": "DEBUG", "handlers": ["file_annotation"]},
+        "expert": {"level": "DEBUG", "handlers": ["file_annotation"]},
     },
 }
