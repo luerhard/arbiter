@@ -17,7 +17,7 @@
 </div>
 {% endpartialdef %}
 {% block content %}
-    <div class="container py-3">
+    <div class="row mt-3">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -54,7 +54,14 @@
                             </div>
                             <div class="row">
                                 <div class="col">
-                                    <div class="d-flex float-end mt-3">
+                                    <div class="d-flex justify-content-between mt-3">
+                                        {% comment %} Show Codebook Button {% endcomment %}
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                id="codebook-toggle"
+                                                tabindex="-1"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#codebook-col">Show Codebook</button>
+                                        {% comment %} Save Button {% endcomment %}
                                         <input type="checkbox"
                                                class="btn-check"
                                                id="save-done"
@@ -70,19 +77,109 @@
                         <div class="col mb-2">
                             <div id="messages" class="chat-message-container"></div>
                             {% comment %} send button and htmx logic {% endcomment %}
-                            <form class="form" ws-send>
-                                <input id="message-input" autocomplete="off" name="message">
-                                <input class="btn btn-outline-primary mt-1 float-end"
-                                       value="Send"
-                                       type="submit">
+                            <form class="input-group mt-1" ws-send>
+                                <input type="text"
+                                       id="message-input"
+                                       class="form-control rounded-0 rounded-start"
+                                       autocomplete="off"
+                                       name="message"
+                                       placeholder="Message...">
+                                <button class="btn btn-outline-primary"
+                                        type="submit"
+                                        aria-describedby="message-input">
+                                    <i class="bi bi-send"></i>
+                                </button>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        {% comment %} Codebook View and Control {% endcomment %}
+        <div class="row collapse overflow-y-auto mt-5"
+             id="codebook-col"
+             style="max-height: 80vh"
+             aria-expanded="false">
+            <div class="position-relative">
+                {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
+                <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
+                     role="group"
+                     aria-label="Diff Control Button">
+                    {% comment %} Codebook Diff Button {% endcomment %}
+                    <input type="checkbox"
+                           class="btn-check"
+                           id="codebook-diff-check"
+                           autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-diff-check"
+                           title="Show Differences">
+                        <i class="bi bi-file-earmark-diff"></i>
+                    </label>
+                    {% comment %} Open Codebook in a New Window {% endcomment %}
+                    <input type="button" class="btn-check" id="codebook-open">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-open"
+                           title="Open in New Window">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </label>
+                </div>
+                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div class="codebook-view" id="codebook-diff-view" hidden>
+                    {% include "codebook/partials/view-diff-codebook.html" %}
+                </div>
+            </div>
+        </div>
     </div>
     <script>
+        const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
+        // show state of codebook expansion on the button
+        document.addEventListener("DOMContentLoaded", function() {
+            const codebook_toggle = document.getElementById("codebook-toggle");
+            const codebook_col = document.getElementById("codebook-col");
+            const codebook_open = document.getElementById("codebook-open");
+            const codebook_diff_check = document.getElementById("codebook-diff-check");
+            const codebook_orig_view = document.getElementById("codebook-orig-view");
+            const codebook_diff_view = document.getElementById("codebook-diff-view");
+
+            codebook_col.addEventListener("shown.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-outline-primary");
+                codebook_toggle.classList.add("btn-primary");
+            });
+
+            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-primary");
+                codebook_toggle.classList.add("btn-outline-primary");
+            });
+
+            codebook_diff_check.addEventListener("change", function() {
+                codebook_diff_view.hidden = !codebook_diff_view.hidden
+                codebook_orig_view.hidden = !codebook_orig_view.hidden
+            });
+
+            codebook_open.addEventListener("click", function() {
+                codebook_toggle.click();
+                new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
+                timer = setInterval(function() {
+                    if (new_window.closed) {
+                        clearInterval(timer);
+                        codebook_toggle.click();
+                    }
+                }, 500);
+            });
+        });
+
+        // disable enter button (should only ever toggle "Saved")
+        // necessary to not toggle the filter / codebook buttons when they were clicked previously
+        document.querySelectorAll('button').forEach(function(button) {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+
         function close_room(data) {
             window.location = data["done"];
         }
