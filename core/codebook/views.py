@@ -1,7 +1,5 @@
-import json
 import logging
 
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
@@ -11,9 +9,6 @@ from .forms import CodebookForm
 from .models import Codebook
 from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
-from data.models import Annotation
-from data.models import Example
-from discuss.models import Message
 from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
