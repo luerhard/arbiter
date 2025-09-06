@@ -1,7 +1,7 @@
 from django import forms
 
 
-class MultiLabelForm(forms.Form):
+class MultiLabelFormAnnotation(forms.Form):
     labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, assignment, **kwargs):
@@ -39,3 +39,10 @@ class MultiLabelForm(forms.Form):
         data = self.cleaned_data
         labels = [int(i) for i in data["labels"] if i.strip()]
         self.example.set_user_annotations(user=self.user, label_ids=labels, phase="ANNOTATION")
+
+
+class MultiLabelFormExpert(forms.Form):
+    labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
