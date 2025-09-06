@@ -1,10 +1,9 @@
 import json
 import logging
 
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
-from django.shortcuts import render
-from django.http import JsonResponse
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 
@@ -12,8 +11,8 @@ from .forms import CodebookForm
 from .models import Codebook
 from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
-from data.models import Example
 from data.models import Annotation
+from data.models import Example
 from discuss.models import Message
 from projects.models import ProjectUser
 
@@ -67,7 +66,7 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         current_example = None
         if example_id or batch_id:
             current_example = get_object_or_404(Example, pk=example_id, batch=batch_id)
-        
+
         project = codebook.project
 
         label_id_array = [int(i) for i in selected_labels_ids.split(",") if i.strip()]
