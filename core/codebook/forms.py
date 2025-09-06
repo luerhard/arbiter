@@ -7,7 +7,7 @@ from .models import Codebook
 
 class CodebookForm(forms.ModelForm):
     content = forms.CharField(widget=forms.Textarea(attrs={"rows": 32}))
-    correction_message = forms.CharField(widget=forms.Textarea(attrs={"rows": 8}))
+    rationale = forms.CharField(widget=forms.Textarea(attrs={"rows": 8}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

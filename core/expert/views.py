@@ -4,11 +4,8 @@ import logging
 from codebook.models import Codebook
 from django.core.exceptions import PermissionDenied
 from django.db import models
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
-from django.shortcuts import render
-from django.views.generic import View
 from django.views.generic.detail import DetailView
 
 from core.mixins import ExpertRequiredMixin
@@ -52,64 +49,6 @@ def save_resolution_labels(request, codebook_id, batch_id, example_id):
         return redirect("/")
 
 
-class CodebookUpdateView(View):
-    def post(self, request, pk):
-        codebook = get_object_or_404(Codebook, pk=pk)
-        content = request.POST.get("content", "")
-        rationale = request.POST.get("definition_correction", "")
-        sentence = request.POST.get("sentence", "")
-        example_id = request.POST.get("example_id", "")
-        batch_id = request.POST.get("batch_id", "")
-        selected_labels_ids = request.POST.get("selected_labels")
-        current_example = get_object_or_404(Example, pk=example_id, batch=batch_id)
-        project = codebook.project
-
-        label_id_array = [int(i) for i in selected_labels_ids.split(",") if i.strip()]
-        selected_labels = project.labels.filter(id__in=label_id_array)
-        selected_label_names = [label.name for label in selected_labels]
-        annotations_before_discussion = Annotation.objects.filter(
-            assignment__example=current_example,
-            phase=Annotation.Phase.ANNOTATION,
-        )
-        annotations_after_discussion = Annotation.objects.filter(
-            assignment__example=current_example,
-            phase=Annotation.Phase.DISCUSSION,
-        )
-        messages = (
-            Message.objects.filter(example=current_example)
-            .exclude(user="system")
-            .order_by("created_at")
-        )
-        chat_history_list = [f"{msg.user}: {msg.message}" for msg in messages]
-        chat_history_str = "\n".join(chat_history_list)
-
-        labels_before_str = ""
-        for ann in annotations_before_discussion:
-            labels_before_str += f"{ann.label} (assigned by: {ann.assignment.user})\n"
-
-        labels_after_list = [
-            f"{ann.label} (assigned by: {ann.assignment.user})"
-            for ann in annotations_after_discussion
-        ]
-        labels_after_str = "\n".join(labels_after_list)
-        commit_info = {
-            "rationale": rationale,
-            "sentence": sentence,
-            "labels_before": labels_before_str,
-            "labels_after": labels_after_str,
-            "chat_history": chat_history_str,
-            "selected_labels_ids": selected_label_names,
-        }
-        commit_message = json.dumps(commit_info, ensure_ascii=False)
-        if content:
-            codebook.save(content=content, commit_message=commit_message)
-
-        if request.headers.get("x-requested-with") == "XMLHttpRequest":
-            return JsonResponse({"success": True})
-
-        return render(request, "codebook/partials/view-codebook.html", {"codebook": codebook})
-
-
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "codebook_id"
     model = Codebook
@@ -134,6 +73,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         ).order_by("id")
 
         if not all_examples.exists():
+            # TODO: Add a nice non-programmer logic here
             raise PermissionDenied("Access denied: No examples meet the criteria.")
         if current_example_id:
             current_example = get_object_or_404(

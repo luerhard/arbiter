@@ -105,6 +105,6 @@ LOGGING = {
         "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
         "codebook": {"level": "DEBUG", "handlers": ["file_codebook"]},
         "annotation": {"level": "DEBUG", "handlers": ["file_annotation"]},
-        "expert": {"level": "DEBUG", "handlers": ["file_annotation"]},
+        "expert": {"level": "DEBUG", "handlers": ["file_expert"]},
     },
 }

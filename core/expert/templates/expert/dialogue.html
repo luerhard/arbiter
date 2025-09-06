@@ -122,9 +122,9 @@
                                 </textarea>
                             </div>
                             <div id="rationale-div" class="my-3 d-none">
-                                <label for="correction-message" class="form-label">Rationale</label>
-                                <textarea id="correction-message"
-                                          name="correction_message"
+                                <label for="rationale" class="form-label">Rationale</label>
+                                <textarea id="rationale"
+                                          name="rationale"
                                           class="form-control"
                                           rows="3"
                                           placeholder="Describe why the codebook needs to be updated..."></textarea>
@@ -172,7 +172,7 @@
     const codebookForm = document.getElementById('codebook-form');
     const labelsForm = document.getElementById('labels-form');
     const textarea = document.getElementById('codebook-content');
-    const rationaleTextarea = document.getElementById('correction-message');
+    const rationaleTextarea = document.getElementById('rationale');
     const rendered = document.getElementById('codebook-rendered');
     const editButton = document.getElementById('edit-save-button');
     const buttonsDiv = document.getElementById('div-save-undo');
