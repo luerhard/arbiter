@@ -1,7 +1,7 @@
 import logging
 
 from codebook.models import Codebook
-from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
 from django.views.generic.detail import DetailView
 
@@ -37,8 +37,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         ).order_by("id")
 
         if not all_examples.exists():
-            # TODO: Add a nice non-programmer logic here
-            raise PermissionDenied("Access denied: No examples meet the criteria.")
+            return redirect("/projects")
         if current_example_id:
             current_example = get_object_or_404(
                 Example, pk=current_example_id, batch__project_id=project.id
