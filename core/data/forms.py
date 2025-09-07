@@ -1,4 +1,11 @@
+import logging
+
 from django import forms
+
+from data.models import Label
+
+
+log = logging.getLogger(__name__)
 
 
 class MultiLabelFormAnnotation(forms.Form):
@@ -42,7 +49,17 @@ class MultiLabelFormAnnotation(forms.Form):
 
 
 class MultiLabelFormExpert(forms.Form):
-    labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
+    selected_labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, example, codebook, user, **kwargs):
         super().__init__(*args, **kwargs)
+        self.example = example
+        self.user = user
+        labels_queryset = Label.objects.filter(project_id=codebook.project.id)
+        labels_choices = [(label.id, label.name) for label in labels_queryset]
+        self.fields["selected_labels"].choices = labels_choices
+
+    def save(self):
+        data = self.cleaned_data["selected_labels"]
+        labels = [int(i) for i in data if i.strip()]
+        self.example.set_user_annotations(user=self.user, label_ids=labels, phase="EXPERT")
