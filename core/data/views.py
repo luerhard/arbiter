@@ -1,7 +1,6 @@
 import logging
 
 from codebook.models import Codebook
-from .models import Batch
 from django.contrib import messages
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -9,6 +8,7 @@ from django.shortcuts import redirect
 from django.views.generic.edit import UpdateView
 
 from .forms import MultiLabelFormExpert
+from .models import Batch
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
