@@ -60,31 +60,6 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "simple",
         },
-        "file_discuss": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "discuss.log",
-            "formatter": "verbose",
-        },
-        "file_projects": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "projects.log",
-            "formatter": "verbose",
-        },
-        "file_codebook": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "codebook.log",
-            "formatter": "verbose",
-        },
-        "file_annotation": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "annotation.log",
-            "formatter": "verbose",
-        },
-        "file_expert": {
-            "class": "logging.FileHandler",
-            "filename": LOG_DIR / "expert.log",
-            "formatter": "verbose",
-        },
     },
     "formatters": {
         "verbose": {
@@ -101,10 +76,14 @@ LOGGING = {
             "handlers": ["console"],
             "level": os.getenv("DJANGO_LOG_LEVEL", "INFO"),
         },
-        "discuss": {"level": "DEBUG", "handlers": ["file_discuss"]},
-        "projects": {"level": "DEBUG", "handlers": ["file_projects"]},
-        "codebook": {"level": "DEBUG", "handlers": ["file_codebook"]},
-        "annotation": {"level": "DEBUG", "handlers": ["file_annotation"]},
-        "expert": {"level": "DEBUG", "handlers": ["file_expert"]},
     },
 }
+
+LOG_APPS = ["discuss", "projects", "codebook", "annotation", "expert", "data",]
+for app in LOG_APPS:
+    LOGGING["handlers"][f"file_{app}"] = {
+        "class": "logging.FileHandler",
+        "filename": LOG_DIR / f"{app}.log",
+        "formatter": "verbose",
+    }
+    LOGGING["loggers"][app] = {"level": "DEBUG", "handlers": [f"file_{app}"]}
