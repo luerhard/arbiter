@@ -8,9 +8,4 @@ urlpatterns = [
         views.ExpertDialogue.as_view(),
         name="expert-dialogue",
     ),
-    path(
-        "expert/save-labels/<int:codebook_id>/<int:batch_id>/<int:example_id>/",
-        views.save_resolution_labels,
-        name="expert-label-save",
-    ),
 ]

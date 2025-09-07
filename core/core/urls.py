@@ -31,6 +31,7 @@ urlpatterns = [
     path("discuss/", include("discuss.urls")),
     path("codebook/", include("codebook.urls")),
     path("expert/", include("expert.urls")),
+    path("data/", include("data.urls")),
 ]
 
 # Additional settings for development
