@@ -1,8 +1,8 @@
 import logging
 
 from codebook.models import Codebook
-from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
 
 from core.mixins import ExpertRequiredMixin
