@@ -112,8 +112,4 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         if content:
             self.object.save(content=content, commit_message=commit_message)
 
-        # TODO: Figure out how to make this work!
-        # if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        # return JsonResponse({"success": True})
-
         return redirect(self.object.get_absolute_url())

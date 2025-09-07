@@ -1,6 +1,7 @@
 import logging
 
 from codebook.models import Codebook
+from .models import Batch
 from django.contrib import messages
 from django.db import models
 from django.shortcuts import get_object_or_404
@@ -16,8 +17,9 @@ log = logging.getLogger(__name__)
 
 
 class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
-    def post(self, request, codebook_id, batch_id, example_id, *args, **kwargs):
+    def post(self, request, codebook_id, batch_id, example_id):
         user = request.user
+        batch = get_object_or_404(Batch, pk=batch_id)
         example = get_object_or_404(Example, pk=example_id, batch=batch_id)
         assignment = ExampleAssignment.objects.filter(example=example, user=user).first()
         codebook = get_object_or_404(Codebook, pk=codebook_id)
@@ -46,4 +48,5 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         if next_example:
             return redirect("expert-dialogue", codebook_id, batch_id, next_example.id)
         else:
+            batch.set_phase(Batch.Phase.FINAL)
             return redirect("/")

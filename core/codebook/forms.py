@@ -22,12 +22,11 @@ class CodebookForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.add_input(Submit("submit", "Save", css_class="btn-primary"))
-        # TODO: Also, turn off access to codebook/edit/ page. Make it only accept POST and check for admin?.
         labels_queryset = Label.objects.filter(project_id=kwargs["instance"].project_id)
         labels_choices = [(label.id, label.name) for label in labels_queryset]
         self.fields["selected_labels"].choices = labels_choices
 
-    def get_success_url(self, **kwargs):  # noqa: ARG002
+    def get_success_url(self):  # noqa: ARG002
         self.object.get_absolute_url()
 
     class Meta:

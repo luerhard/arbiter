@@ -95,7 +95,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             )
             disagr_count = disagr_ex.count()
             batch_data["disagreement"] = disagr_count
-            disagr_ex_first_id = -1
+            disagr_ex_first_id = 0
             if disagr_count > 0:
                 disagr_ex_first_id = disagr_ex.order_by("id").first().id
             batch_data["disagreement_first_id"] = disagr_ex_first_id
