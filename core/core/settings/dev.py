@@ -79,7 +79,7 @@ LOGGING = {
     },
 }
 
-LOG_APPS = ["discuss", "projects", "codebook", "annotation", "expert", "data",]
+LOG_APPS = ["discuss", "projects", "codebook", "annotation", "expert", "data"]
 for app in LOG_APPS:
     LOGGING["handlers"][f"file_{app}"] = {
         "class": "logging.FileHandler",
