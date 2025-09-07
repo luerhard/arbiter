@@ -85,14 +85,14 @@
                                         <input type="checkbox"
                                                class="btn-check btn-check-color"
                                                autocomplete="off"
-                                               id="label_checkbox_{{ forloop.counter }}"
+                                               id="label_checkbox_{{ label.id }}"
                                                name="selected_labels"
                                                value="{{ label.id }}"
                                                {% if label.id in prev_label_ids %}checked{% endif %}
-                                               onchange="colorContrast(document.getElementById('label_{{ forloop.counter }}'));">
+                                               onchange="colorContrast(this); document.getElementById('label_hidden_{{ label.id }}').checked ^= true;">
                                         <label class="btn flex-fill btn-custom-color"
-                                               for="label_checkbox_{{ forloop.counter }}"
-                                               id="label_{{ forloop.counter }}"
+                                               for="label_checkbox_{{ label.id }}"
+                                               id="label_{{ label.id }}"
                                                style="--label-color: {{ label.color }};
                                                       --text-color: #FFFFFF">{{ label.name }}</label>
                                     </div>
@@ -141,10 +141,15 @@
                                 <input type="hidden" name="sentence" value="{{ sentence.content }}">
                                 <input type="hidden" name="example_id" value="{{ example_id }}">
                                 <input type="hidden" name="batch_id" value="{{ batch_id }}">
-                                <input type="hidden"
-                                       name="selected_labels"
-                                       id="selected-labels-hidden"
-                                       value="">
+                                {% for label in labels %}
+                                <!-- I would want the type to be hidden, however JS treats hidden checkboxes as always checked. -->
+                                <input type="checkbox"
+                                        class="d-none"
+                                        id="label_hidden_{{ label.id }}"
+                                        name="selected_labels"
+                                        value="{{ label.id }}"
+                                        {% if label.id in prev_label_ids %}checked{% endif %}>
+                                {% endfor %}
                             </div>
                         </form>
                     </div>
@@ -179,12 +184,6 @@
     const cancelButton = document.getElementById('cancel-button');
     const rationaleDiv = document.getElementById('rationale-div');
 
-    function updateSelectedLabelsHiddenInput() {
-        const checked = Array.from(document.querySelectorAll('#labels-form input[name="selected_labels"]:checked'))
-            .map(cb => cb.value);
-        document.getElementById('selected-labels-hidden').value = checked.join(',');
-    };
-
     function colorContrast(labelElement) {
         const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
         const textColor = lib.funcs.inferTextColorByContrast(color);
@@ -199,8 +198,7 @@
             if (rationaleEmpty) {
                 showToast('Please add a rationale', 'bg-danger text-white');
                 return;
-            }
-            updateSelectedLabelsHiddenInput();
+            };
             const res = await fetch(codebookForm.action, {
                 method: codebookForm.method,
                 headers: {

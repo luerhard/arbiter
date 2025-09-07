@@ -27,11 +27,9 @@ class CodebookForm(forms.ModelForm):
         # While the other form sends it as "name=selected_labels        1,2" to codebook/edit/1
         # TODO: Therefore, we must create another form: LabelForm in data/forms and a model that would save those labels.
         # TODO: Make sure that the labelForm.submit() from expert/templates/dialogue.html is being processed by the data/models.py.
-        # TODO: Additionally we must find the reason why the parsed POST content looks so ugly and make it send
-        # parseable data for this CodebookForm.
+        # TODO: Also, turn off access to codebook/edit/ page. Make it only accept POST and check for admin?.
         labels_queryset = Label.objects.filter(project_id=kwargs["instance"].project_id)
-        labels_choices = dict([(label.id, label.name) for label in labels_queryset])
-        log.debug(f"{labels_choices = }")
+        labels_choices = [(label.id, label.name) for label in labels_queryset]
         self.fields["selected_labels"].choices = labels_choices
 
     def get_success_url(self, **kwargs):  # noqa: ARG002
