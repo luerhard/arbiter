@@ -4,7 +4,6 @@ from django import forms
 
 from data.models import Label
 
-
 log = logging.getLogger(__name__)
 
 

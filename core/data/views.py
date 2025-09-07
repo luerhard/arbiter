@@ -1,6 +1,5 @@
 import logging
 
-from data.models import Example
 from codebook.models import Codebook
 from django.contrib import messages
 from django.db import models
@@ -8,13 +7,10 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.generic.edit import UpdateView
 
-
+from .forms import MultiLabelFormExpert
+from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
-from core.mixins import ExpertRequiredMixin
-
-from .forms import MultiLabelFormExpert
-
 
 log = logging.getLogger(__name__)
 
