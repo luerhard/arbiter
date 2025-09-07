@@ -142,13 +142,13 @@
                                 <input type="hidden" name="example_id" value="{{ example_id }}">
                                 <input type="hidden" name="batch_id" value="{{ batch_id }}">
                                 {% for label in labels %}
-                                <!-- I would want the type to be hidden, however JS treats hidden checkboxes as always checked. -->
-                                <input type="checkbox"
-                                        class="d-none"
-                                        id="label_hidden_{{ label.id }}"
-                                        name="selected_labels"
-                                        value="{{ label.id }}"
-                                        {% if label.id in prev_label_ids %}checked{% endif %}>
+                                    <!-- I would want the type to be hidden, however JS treats hidden checkboxes as always checked. -->
+                                    <input type="checkbox"
+                                           class="d-none"
+                                           id="label_hidden_{{ label.id }}"
+                                           name="selected_labels"
+                                           value="{{ label.id }}"
+                                           {% if label.id in prev_label_ids %}checked{% endif %}>
                                 {% endfor %}
                             </div>
                         </form>
