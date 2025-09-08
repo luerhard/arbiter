@@ -49,4 +49,5 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
             return redirect("expert-dialogue", codebook_id, batch_id, next_example.id)
         else:
             batch.set_phase(Batch.Phase.FINAL)
-            return redirect("/")
+
+            return redirect("project-detail", codebook.project.id)

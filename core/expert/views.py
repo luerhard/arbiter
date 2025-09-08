@@ -1,6 +1,7 @@
 import logging
 
 from codebook.models import Codebook
+from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.generic.detail import DetailView
@@ -8,6 +9,7 @@ from django.views.generic.detail import DetailView
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
+from data.models import Batch
 from discuss.models import Message
 
 log = logging.getLogger(__name__)
@@ -18,6 +20,14 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     model = Codebook
     context_object_name = "codebook"
     template_name = "expert/dialogue.html"
+
+    def get(self, request, codebook_id, batch_id, example_id):
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
+        if not context:
+            project_id = get_object_or_404(Batch, id=batch_id).project.id
+            return redirect(reverse("project-detail", kwargs={"project_id": project_id}))
+        return self.render_to_response(context)
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -37,7 +47,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         ).order_by("id")
 
         if not all_examples.exists():
-            return redirect("/projects")
+            return None
         if current_example_id:
             current_example = get_object_or_404(
                 Example, pk=current_example_id, batch__project_id=project.id
