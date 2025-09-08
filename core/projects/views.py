@@ -93,11 +93,13 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 has_expert_decision=False,
                 # has_disagreement_after_discussion=True,
                 batch=batch,
-                batch__project_id=project.id
+                batch__project_id=project.id,
             )
             disagr_count = disagr_ex.count()
             batch_data["disagreement"] = disagr_count
-            batch_data["disagr_after_discussion"] = disagr_ex.filter(has_disagreement_after_discussion=True).count()
+            batch_data["disagr_after_discussion"] = disagr_ex.filter(
+                has_disagreement_after_discussion=True
+            ).count()
             disagr_ex_first_id = 0
             if disagr_count > 0:
                 disagr_ex_first_id = disagr_ex.order_by("id").first().id

@@ -1,15 +1,15 @@
 import logging
 
 from codebook.models import Codebook
-from django.urls import reverse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.views.generic.detail import DetailView
 
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
-from data.models import Example
 from data.models import Batch
+from data.models import Example
 from discuss.models import Message
 
 log = logging.getLogger(__name__)
