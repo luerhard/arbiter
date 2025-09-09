@@ -1,8 +1,8 @@
-import pytest
+from codebook.models import Codebook
 from django.contrib.auth import get_user_model
 from django.shortcuts import reverse
+import pytest
 
-from codebook.models import Codebook
 from data.models import Annotation
 from data.models import Example
 
@@ -16,9 +16,7 @@ def data_setup():
     Finds an example that is ready for expert decision from the populatedb data.
     """
     example = Example.objects.filter(
-        has_disagreement=True,
-        has_disagreement_after_discussion=True,
-        has_expert_decision=False
+        has_disagreement=True, has_disagreement_after_discussion=True, has_expert_decision=False
     ).first()
     assert example is not None, "No suitable example for expert decision found in populatedb"
 
@@ -43,7 +41,7 @@ class TestDataViews:
             kwargs={
                 "codebook_id": data_setup["codebook"].id,
                 "batch_id": data_setup["batch"].id,
-                "example_id":example.id,
+                "example_id": example.id,
             },
         )
         label_ids = [label.id for label in data_setup["labels"]]
@@ -68,7 +66,7 @@ class TestDataViews:
             kwargs={
                 "codebook_id": data_setup["codebook"].id,
                 "batch_id": data_setup["batch"].id,
-                "example_id":data_setup["example"].id,
+                "example_id": data_setup["example"].id,
             },
         )
         data = {"labels": [data_setup["labels"].first().id]}
