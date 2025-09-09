@@ -18,8 +18,8 @@
                                     <div class="d-flex justify-content-between">
                                         <h4 class="fw-bold col-md-7">Batch {{ batch.batch.batch_number }}</h4>
                                         {% if  batch.batch.phase == 'E' %}
-                                            <a href="{% url 'expert-dialogue' codebook_id=codebook.id batch_id=batch.batch.id example_id=0 %}"
-                                               class="btn btn-primary btn-rounded {% if batch.disagreement == 0 %}disabled{% endif %}"><i class="bi bi-hammer h6"></i> Resolve</a>
+                                            <a href="{% url 'expert-dialogue' codebook_id=codebook.id batch_id=batch.batch.id example_id=batch.disagreement_first_id %}"
+                                               class="btn btn-primary btn-rounded {% if batch.disagr_after_discussion == 0 %}disabled{% endif %}"><i class="bi bi-hammer h6"></i> Resolve</a>
                                         {% endif %}
                                         <a href="{% url 'export-batch' batch_id=batch.batch.id %}"
                                            class="btn btn-primary btn-rounded"><i class="bi bi-file-earmark-arrow-down-fill h6"></i> Download</a>
@@ -31,7 +31,8 @@
                                         <form id="form{{ batch.batch.id }}"
                                               class="form-check form-switch"
                                               hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
-                                              hx-trigger="change">
+                                              hx-trigger="change"
+                                              onchange="setTimeout(() => { location.reload() }, 3000)">
                                             {% csrf_token %}
                                             {% render_field batch.batch_phase_form.phase class="form-control border border-info" %}
                                         </form>
@@ -45,7 +46,7 @@
                                         </tr>
                                         <tr>
                                             <th>User</th>
-                                            <th>done?</th>
+                                            <th>done</th>
                                         </tr>
                                     </thead>
                                     <tbody>

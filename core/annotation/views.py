@@ -8,7 +8,7 @@ from django.views.generic import DetailView
 from django.views.generic import View
 
 from core.mixins import AnnotatorRequiredMixin
-from data.forms import MultiLabelForm
+from data.forms import MultiLabelFormAnnotation
 from data.models import ExampleAssignment
 from projects.models import Batch
 
@@ -59,7 +59,7 @@ def create_context(request, assignment, skip_annotated: bool = False):
         labels.append(new)
     sub_context["labels"] = labels
 
-    form = MultiLabelForm(assignment=assignment)
+    form = MultiLabelFormAnnotation(assignment=assignment)
     sub_context["label_form"] = form
 
     return sub_context
@@ -230,7 +230,7 @@ class EditAssignment(View):
 
     def post(self, request, assignment_id, *args, **kwargs):  # noqa: ARG002
         assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-        form = MultiLabelForm(request.POST, assignment=assignment)
+        form = MultiLabelFormAnnotation(request.POST, assignment=assignment)
         if form.is_valid():
             form.save()
             messages.success(self.request, "Saved.")

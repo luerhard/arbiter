@@ -85,13 +85,26 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "batch": batch,
                 "batch_phase_form": BatchPhaseForm(instance=batch),
                 "length": batch.examples.count(),
-                "disagreement": Example.objects.filter(
-                    batch=batch,
-                    has_disagreement=True,
-                    has_expert_decision=False,
-                ).count(),
                 "users": [],
             }
+            # Query examples with disagreements and no expert decisions
+            disagr_ex = Example.objects.filter(
+                has_disagreement=True,
+                has_expert_decision=False,
+                # has_disagreement_after_discussion=True,
+                batch=batch,
+                batch__project_id=project.id,
+            )
+            disagr_count = disagr_ex.count()
+            batch_data["disagreement"] = disagr_count
+            batch_data["disagr_after_discussion"] = disagr_ex.filter(
+                has_disagreement_after_discussion=True
+            ).count()
+            disagr_ex_first_id = 0
+            if disagr_count > 0:
+                disagr_ex_first_id = disagr_ex.order_by("id").first().id
+            batch_data["disagreement_first_id"] = disagr_ex_first_id
+
             for annotator in context["annotators"]:
                 annotated = ExampleAssignment.objects.filter(
                     user=annotator,
@@ -100,8 +113,10 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 ).count()
                 discussed = ExampleAssignment.objects.filter(
                     user=annotator,
-                    example__batch=batch,
                     is_discussed=True,
+                    example__batch=batch,
+                    example__has_disagreement=True,
+                    example__has_expert_decision=False,
                 ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
