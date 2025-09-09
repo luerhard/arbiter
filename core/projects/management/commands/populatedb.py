@@ -14,6 +14,16 @@ from projects.models import Project
 from projects.models import ProjectUser
 
 
+def uniform_choices(elementary_events: list):
+    """Makes a uniform choice over the power set of `elementary_space` (event_space)
+    by using a Poisson process modelled as a stream of bits."""
+    events = []
+    for event in elementary_events:
+        if random.getrandbits(1):
+            events.append(event)
+    return events
+
+
 def create_batch(project):
     batch = Batch.objects.create(
         project=project,
@@ -83,8 +93,7 @@ class Command(BaseCommand):
         random.seed(123)
         for example in batch.examples.all():
             for assignment in example.assignments.all():
-                n_annotations = random.randint(0, 2)
-                labels = random.choices(label_ids, k=n_annotations)
+                labels = uniform_choices(label_ids)
                 assignment.set_user_annotations(labels, "ANNOTATION")
         batch.set_phase(Batch.Phase.DISCUSSION)
 
@@ -98,6 +107,21 @@ class Command(BaseCommand):
             for assignment in example.assignments.all():
                 assignment.set_user_annotations([label_ids[0]], "ANNOTATION")
         batch.set_phase(Batch.Phase.DISCUSSION)
+
+        # Create a disagreement batch after discussion
+        batch = create_batch(project)
+        label_ids = [label.id for label in project.labels.all()]
+        random.seed(42)
+        for example in batch.examples.all():
+            for assignment in example.assignments.all():
+                labels = uniform_choices(label_ids)
+                assignment.set_user_annotations(labels, "ANNOTATION")
+        batch.set_phase(Batch.Phase.DISCUSSION)
+        for example in batch.examples.filter(has_disagreement=True).all():
+            for assignment in example.assignments.all():
+                labels = uniform_choices(label_ids)
+                assignment.set_user_annotations(labels, "DISCUSSION")
+        batch.set_phase(Batch.Phase.EXPERT)
 
         batch = create_batch(project)
 
