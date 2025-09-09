@@ -1,7 +1,7 @@
-import pytest
-from django.shortcuts import reverse
-
 from codebook.models import Codebook
+from django.shortcuts import reverse
+import pytest
+
 from data.models import Example
 
 
@@ -34,9 +34,7 @@ class TestExpertViews:
 
         assert example is not None, "No suitable example with disagreement found in populatedb"
 
-        url = reverse(
-            "expert-dialogue", args=[codebook.id, batch.id, example.id]
-        )
+        url = reverse("expert-dialogue", args=[codebook.id, batch.id, example.id])
         response = client.get(url)
 
         assert response.status_code == 200
@@ -55,9 +53,7 @@ class TestExpertViews:
 
         assert example is not None, "No suitable example with disagreement found in populatedb"
 
-        url = reverse(
-            "expert-dialogue", args=[codebook.id, batch.id, example.id]
-        )
+        url = reverse("expert-dialogue", args=[codebook.id, batch.id, example.id])
         response = client.get(url)
 
         assert response.status_code == 403

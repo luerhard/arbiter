@@ -1,12 +1,12 @@
+from codebook.models import Codebook
+from django.urls import reverse
 import pytest
 
-from codebook.models import Codebook
 from data.models import Example
 from data.models import Label
 from projects.models import Batch
 from projects.models import Project
 
-from django.urls import reverse
 URLS_EXPERT = [("codebook-view", (1,)), ("codebook-diff", (1,)), ("codebook-edit", (1,))]
 
 URLS_ANNOTATOR = [("codebook-view", (1,)), ("codebook-diff", (1,))]
@@ -50,7 +50,7 @@ class TestViews:
         assert login == True
         req = client.get(url)
         assert req.status_code == 200
-    
+
     @pytest.mark.parametrize("params", [("codebook-edit", (1,))])
     def test_codebook_update_view_annotator_access_denied(self, params, client):
         slug, args = params
@@ -108,4 +108,3 @@ class TestViews:
 
         codebook.refresh_from_db()
         assert codebook.content == new_content + "\n"
-
