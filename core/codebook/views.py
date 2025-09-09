@@ -37,8 +37,8 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        batch_old = self.request.GET.get("batch_old", 0)
         batch_new = self.request.GET.get("batch_new", self.object.project.max_batch_number)
+        batch_old = self.request.GET.get("batch_old", max(0, batch_new - 1))
         context["content_diff"] = self.object.diff(batch_old, batch_new)
         return context
 
@@ -56,5 +56,6 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         content = form.cleaned_data["content"]
-        self.object.save(content=content, commit_message="edited.")
+        commit_message = form.cleaned_data["correction_message"]
+        self.object.save(content=content, commit_message=commit_message)
         return redirect(self.object.get_absolute_url())
