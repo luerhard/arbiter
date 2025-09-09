@@ -3,7 +3,6 @@ from django.shortcuts import reverse
 
 from codebook.models import Codebook
 from data.models import Example
-from projects.models import Batch
 
 
 @pytest.fixture
