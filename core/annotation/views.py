@@ -171,9 +171,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
         context = create_context(self.request, assignment)
 
-        # TODO: CHANGE
         codebook = batch.project.codebook.get()
-        context["codebook"] = codebook
+        context.update(codebook.get_as_context(batch.batch_number))
         return context
 
     def get(
@@ -195,10 +194,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
         context = create_context(request, assignment)
 
-        # TODO: CHANGE
         codebook = batch.project.codebook.get()
-        context["content"] = codebook.content
-        context["content_diff"] = codebook.diff(batch.batch_number - 1, batch.batch_number)
+        context.update(codebook.get_as_context(batch.batch_number))
 
         return render(request, "annotation/index.html", context)
 

@@ -88,6 +88,27 @@ class TestViews:
         codebook.refresh_from_db()
         assert codebook.content == new_content + "\n"
 
+    def test_get_as_context(self, client, project_setup):
+        login = client.login(username="expert1", password="123")
+        assert login is True
+
+        codebook = project_setup["codebook"]
+        batch = project_setup["batch"]
+
+        # Update codebook content to create a new version
+        new_content = "This is the new version of the codebook."
+        codebook.save(content=new_content, commit_message="Update for batch 1")
+
+        # Tag this version for the batch
+        codebook.tag_version(batch.batch_number)
+
+        context = codebook.get_as_context(batch.batch_number)
+
+        assert "codebook" in context
+        assert "content_diff" in context
+        assert context["codebook"] == codebook
+        assert new_content in context["content_diff"]
+
     @pytest.mark.parametrize("params", URLS_EXPERT)
     def test_codebook_update_view_post_some_data(self, params, client, project_setup):
         slug, args = params

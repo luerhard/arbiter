@@ -41,7 +41,6 @@ class DiscussView(AnnotatorRequiredMixin, View):
         batch = Batch.objects.get(id=batch_id)
 
         codebook = batch.project.codebook.get()
-        context["content"] = codebook.content
-        context["content_diff"] = codebook.diff(batch.batch_number - 1, batch.batch_number)
+        context.update(codebook.get_as_context(batch.batch_number))
 
         return render(request, "discuss/index.html", context)
