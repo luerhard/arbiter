@@ -113,3 +113,6 @@ class Codebook(models.Model):
                     raise e
 
         super().save(**kwargs)
+
+    def get_as_context(self, batch_number: int):
+        return {"codebook": self, "content_diff": self.diff(batch_number - 1, batch_number)}
