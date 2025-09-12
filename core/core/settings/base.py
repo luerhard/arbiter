@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "widget_tweaks",
     "crispy_forms",
     "crispy_bootstrap5",
@@ -78,6 +79,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 AUTH_USER_MODEL = "users.User"
 
+
 LOGIN_URL = "/users/login"
 LOGIN_EXEMPT_URLS = [
     "^$",
@@ -104,10 +106,10 @@ TEMPLATES = [
 ASGI_APPLICATION = "core.asgi.application"
 
 
-# For InMemory channels
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": ["redis://redis:6379/0"]},
     },
 }
 
