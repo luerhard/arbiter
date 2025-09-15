@@ -16,7 +16,7 @@ from data.models import Annotation
 from data.models import Example
 from projects.models import Batch
 
-logging.basicConfig(level=logging.DEBUG)
+# logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 User = get_user_model()
