@@ -1,102 +1,133 @@
-export function updatePrevLabels(data) {
+export function renderPrevLabels(labels, user) {
     const container = document.getElementById("prev-labels");
     container.innerHTML = "";
-    let mytitleText;
-    let mybuttonDiv;
-    for (const [username, labels] of Object.entries(data["update-labels"])) {
-        let textDiv = document.createElement("div");
-        textDiv.className = "my-3";
-        container.appendChild(textDiv);
 
-        let titleText = document.createElement("p");
-        titleText.className = "d-flex mt-3 mb-3";
-        if (username == data["current-user"]) {
-            // save own title text to buffer
-            titleText.innerHTML = "Your previous annotations:";
-            mytitleText = titleText;
-        } else {
-            titleText.innerHTML = `Previous annotations of ${username}:`
-            textDiv.appendChild(titleText);
-        }
+    let myBlock = null; // defer "me" to append last
 
+    // helper: flatten [[{...}], [{...}]] -> [{...}, {...}]
+    const flatten = (arr) => (Array.isArray(arr) ? arr.flat(1).filter(Boolean) : []);
 
-        let buttonDiv = document.createElement("div");
-        buttonDiv.className = "label-grid";
+    for (const [username, rawList] of Object.entries(labels || {})) {
+        const labelList = flatten(rawList);
 
-        labels.forEach(label => {
+        const block = document.createElement("div");
+        block.className = "my-3";
 
-            let checkbox = document.createElement("input");
+        const title = document.createElement("p");
+        title.className = "d-flex mt-3 mb-3";
+        title.textContent =
+            username === user ? "Your previous annotations:" : `Previous annotations of ${username}:`;
+        block.appendChild(title);
+
+        const grid = document.createElement("div");
+        grid.className = "label-grid";
+
+        for (const lbl of labelList) {
+            const id = `${username}-${String(lbl.id)}`;
+
+            const checkbox = document.createElement("input");
             checkbox.disabled = true;
-            checkbox.id = username + label["id"];
+            checkbox.id = id;
             checkbox.type = "checkbox";
             checkbox.className = "btn-check btn-check-color";
-            checkbox.innerHTML = label["label"];
-            if (label["is_set"]) {
-                checkbox.checked = true;
-            } else {
-                checkbox.checked = false;
-            }
-            buttonDiv.appendChild(checkbox);
+            checkbox.checked = !!lbl.is_set;
+            grid.appendChild(checkbox);
 
-            let checkboxLabel = document.createElement("label");
-            checkboxLabel.innerHTML = label["label"];
-            checkboxLabel.htmlFor = username + label["id"];
+            const checkboxLabel = document.createElement("label");
+            checkboxLabel.textContent = lbl.label;
+            checkboxLabel.htmlFor = id;
             checkboxLabel.className = "btn btn-custom-color";
-            checkboxLabel.style.setProperty("--label-color", label["color"]);
+            checkboxLabel.style.setProperty("--label-color", String(lbl.color ?? "").trim());
+            grid.appendChild(checkboxLabel);
+        }
 
-            buttonDiv.appendChild(checkboxLabel);
+        block.appendChild(grid);
 
-        })
-        if (username == data["current-user"]) {
-            // save own title text to buffer
-            mybuttonDiv = buttonDiv;
+        if (username === user) {
+            myBlock = block; // append mine last
         } else {
-            container.appendChild(buttonDiv);
-
+            container.appendChild(block);
         }
     }
-    // insert own previous annotations last;
-    container.appendChild(mytitleText);
-    container.appendChild(mybuttonDiv);
 
+    if (myBlock) container.appendChild(myBlock);
 }
 
 
-
-export function updateCurrentLabels(data) {
+export function renderCurrentLabels(labels, user) {
     const container = document.getElementById("current-labels");
     container.innerHTML = "";
-    let titleText = document.createElement("p");
-    titleText.className = "mt-3 mb-3";
-    titleText.innerHTML = "Your revised annotation:";
-    container.appendChild(titleText);
 
-    let buttonGroup = document.createElement("div");
-    buttonGroup.className = "label-grid";
-    container.appendChild(buttonGroup);
-    const user = data["current-user"];
-    data["update-labels"][user].forEach(label => {
-        let checkbox = document.createElement("input");
+    const title = document.createElement("p");
+    title.className = "mt-3 mb-3";
+    title.textContent = "Your revised annotation:";
+    container.appendChild(title);
+
+    const grid = document.createElement("div");
+    grid.className = "label-grid";
+    container.appendChild(grid);
+
+    // flatten [[{...}], [{...}]] -> [{...}, {...}]
+    const flatten = (arr) => (Array.isArray(arr) ? arr.flat(1).filter(Boolean) : []);
+    const myLabels = flatten((labels || {})[user] || []);
+
+    for (const lbl of myLabels) {
+        const id = String(lbl.id);
+
+        const checkbox = document.createElement("input");
         checkbox.type = "checkbox";
         checkbox.className = "btn-check btn-check-color";
-        checkbox.id = label["id"];
-        checkbox.name = "label_" + label["id"];
-        buttonGroup.appendChild(checkbox);
+        checkbox.id = id;                 // keep numeric id to match collectLabels()
+        checkbox.name = `label_${id}`;
+        checkbox.value = id;
+        checkbox.checked = !!lbl.is_set;  // preselect from previous labels
+        grid.appendChild(checkbox);
 
-        let checkboxLabel = document.createElement("label");
-        checkboxLabel.innerHTML = label["label"];
-        checkboxLabel.htmlFor = label["id"];
-        checkboxLabel.className = "btn btn-custom-color";
-        checkboxLabel.style.setProperty("--label-color", label["color"]);
-        buttonGroup.appendChild(checkboxLabel)
-
-        if (label["is_set"] == true) {
-            checkbox.checked = true;
-        } else {
-            checkbox.checked = false;
-        }
-    })
+        const labelEl = document.createElement("label");
+        labelEl.className = "btn btn-custom-color";
+        labelEl.htmlFor = id;
+        labelEl.textContent = lbl.label;
+        labelEl.style.setProperty("--label-color", String(lbl.color ?? "").trim());
+        grid.appendChild(labelEl);
+    }
 }
+
+export function renderMessages(messages, currentUser) {
+    const container = document.getElementById("messages");
+    container.innerHTML = "";
+
+    messages.forEach(msg => {
+        const { user, text } = msg;
+
+        // Decide message type and CSS classes
+        let divClass, containerClass;
+        if (user === "system") {
+            divClass = "system-message";
+            containerClass = "d-flex flex-row";
+        } else if (user === currentUser) {
+            divClass = "self-message";
+            containerClass = "d-flex flex-row-reverse";
+        } else {
+            divClass = "other-message";
+            containerClass = "d-flex flex-row";
+        }
+
+        // Build message DOM
+        const outerDiv = document.createElement("div");
+        outerDiv.className = containerClass;
+
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${divClass}`;
+        msgDiv.textContent = text;
+
+        outerDiv.appendChild(msgDiv);
+        container.appendChild(outerDiv);
+    });
+
+    // Auto-scroll to bottom
+    container.scrollTop = container.scrollHeight;
+}
+
 
 export function collectLabels() {
     const container = document.getElementById("current-labels");
@@ -111,9 +142,9 @@ export function collectLabels() {
     return JSON.stringify(selected);
 }
 
-export function updateExample(data) {
+export function renderExample(data) {
     const exampleField = document.getElementById("current-example");
-    exampleField.innerHTML = data["update-example"];
+    exampleField.innerHTML = data;
 }
 
 export function lockButtons() {

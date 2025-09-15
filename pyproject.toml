@@ -24,6 +24,7 @@ dependencies = [
     "gitpython>=3.1.44,<4",
     "django-markdownify>=0.9.5,<0.10",
     "psycopg>=3.2.10",
+    "channels-redis>=4.2.1",
 ]
 
 [dependency-groups]

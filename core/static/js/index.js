@@ -12,6 +12,7 @@ import * as mousetrap from 'mousetrap';
 import * as funcs from "./functions";
 import * as discuss from "./discuss";
 
+window.lib = { funcs, discuss };
 export { funcs, discuss };
 
 window.bootstrap = bootstrap;
@@ -26,7 +27,7 @@ htmx.logger = function (elt, event, data) {
 htmx.logAll();
 
 //htmx + sortablejs integration
-htmx.onLoad(function(content) {
+htmx.onLoad(function (content) {
     var sortables = content.querySelectorAll(".sortable");
     funcs.sortableInit(sortables);
 })
@@ -63,7 +64,7 @@ function init_widgets_for_htmx_element(target) {
     // init modal dialogs
     if (target.tagName === 'DIALOG') {
         target.showModal();
-        htmx.on('.close-dialog', 'click', function(event) {
+        htmx.on('.close-dialog', 'click', function (event) {
             var dialog = htmx.find('dialog[open]');
             dialog.close();
             htmx.remove(dialog);

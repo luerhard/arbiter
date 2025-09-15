@@ -1,18 +1,25 @@
+from collections import defaultdict
 import json
 import logging
 
 from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 
-from .models import AnnotationEndReason
 from .models import Message
 from .models import Room
+from .room_state import get_state
+from .room_state import update_state
+from data.models import Annotation
 from data.models import Example
 from projects.models import Batch
 
+logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
+
+User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -21,44 +28,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.room_group_name = f"chat_{self.batch_id}"
         self.user = self.scope["user"]
-        self.discussion_ended = False
-        self.discussion_start = True
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
+        self.username = getattr(self.user, "username", str(self.user))
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
         await self.accept()
 
-        # SET UP N ONLINE COUNT
-        if "n_online" not in self.scope["room_state"]:
-            self.scope["room_state"]["n_online"] = 0
+        # Initialize / update room state in Redis
+        async def _init(state):
+            # required users (usernames) once
+            if not state["required_users"]:
+                annotators = await self.get_assigned_annotators()
+                state["required_users"] = sorted({u.username for u in annotators})
+            # join online users
+            if self.username not in state["online_users"]:
+                state["online_users"].append(self.username)
+            # init clicked_done entry
+            state["clicked_done"].setdefault(self.username, 0)
+            return state
 
-        if "required_users" not in self.scope["room_state"]:
-            self.scope["room_state"]["required_users"] = await self.get_assigned_annotators()
+        state = await update_state(self.batch_id, _init)
+        await self.group_send_user_connected(state)
+        await self.group_send_state()
+        log.debug(f"Current {state=} ")
 
-        if "online_users" not in self.scope["room_state"]:
-            self.scope["room_state"]["online_users"] = {self.user}
-        else:
-            self.scope["room_state"]["online_users"].add(self.user)
+        if (set(state["online_users"]) == set(state["required_users"])) and not state[
+            "discussion_ended"
+        ]:
+            if state["page"] == 0:
+                await self._set_next_and_reset()
+            await self.group_send_state()
 
-        if "page" not in self.scope["room_state"]:
-            self.scope["room_state"]["page"] = 1
-
-        await self.group_send_user_connected()
-
-        if self.scope["room_state"]["online_users"] == self.scope["room_state"]["required_users"]:
-            await self.group_send_current_example()
-
-        # SET UP SYNCED BUTTONS
-        if "clicked_done" not in self.scope["room_state"]:
-            self.scope["room_state"]["clicked_done"] = {self.user.username: 0}
-        elif self.user.username not in self.scope["room_state"]["clicked_done"]:
-            self.scope["room_state"]["clicked_done"][self.user.username] = 0
-
-    # GENERAL
     async def disconnect(self, close_code):  # noqa: ARG002
+        async def _leave(state):
+            if self.username in state["online_users"]:
+                state["online_users"].remove(self.username)
+            state["clicked_done"].pop(self.username, None)
+
+            return state
+
+        state = await update_state(self.batch_id, _leave)
         await self.group_send_user_disconnected()
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
 
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
-        if self.discussion_ended and self.scope["room_state"]["n_online"] == 0:
+        if len(state["online_users"]) == 0:
             log.debug("No users, closing websocket.")
             await self.close(code=1000)
 
@@ -66,104 +77,188 @@ class ChatConsumer(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         log.debug(f"Received: {data}")
 
-        # if chat message is sent
         if "message" in data.keys():
             message = data["message"]
+            username = self.user.username
+
             # return instantly if message is empty
             if not message.strip():
                 return
-            username = self.user.username
+            await self._append_chat_message(username=username, message=message)
+
             # send to all users
-            await self.group_send_chat_message(username=username, message=message)
+            await self.group_send_state()
 
         elif "clicked-done" in data.keys():
             labels = [int(label_id) for label_id in json.loads(data["labels"]) if label_id.strip()]
-            await self.save_annotation(labels)
-            await self.group_send_user_done()
+
+            await self._store_discussion_labels(self.username, labels)
+            await self._clicked_done(self.username)
+
+            if await self._all_done():
+                await self.save_labels_to_db()
+                await self._set_next_and_reset()
+            await self.group_send_state()
+
+    # ---------- LABEL HELPERS -----------------
+    @database_sync_to_async
+    def save_labels_to_db(self):
+        """Write cached labels to DB for all users for the given example."""
+        state = async_to_sync(self._get_state)()
+
+        example = Example.objects.get(pk=state["cur_example_id"])
+
+        # save per user
+        for username, label_ids in (state["discussion_labels"] or {}).items():
+            try:
+                user = User.objects.get(username=username)
+            except User.DoesNotExist:
+                continue
+            example.set_user_annotations(user=user, label_ids=label_ids, phase="DISCUSSION")
+
+    async def _store_discussion_labels(self, username, labels):
+        async def mut(state):
+            state["discussion_labels"][username] = labels
+            return state
+
+        return await update_state(self.batch_id, mut)
+
+    async def _clicked_done(self, username):
+        async def mut(state):
+            if state["clicked_done"][username]:
+                state["clicked_done"][username] = 0
+            else:
+                state["clicked_done"][username] = 1
+
+            return state
+
+        return await update_state(self.batch_id, mut)
+
+    async def _all_done(self):
+        state = await self._get_state()
+        required = set(state.get("required_users", []))
+        clicked = {u for u, v in (state.get("clicked_done", {}) or {}).items() if v == 1}
+        return required <= clicked
+
+    # ---------- CHAT HELPERS -----------------
+    def get_or_create_room(self):
+        room, _ = Room.objects.get_or_create(pk=self.batch_id)
+        return room
 
     @database_sync_to_async
-    def move_to_expert(self):
-        """
-        Run when all the examples were exhausted and change the batch phase to expert decision.
-        """
-        Batch.objects.get(id=self.batch_id).set_phase(Batch.Phase.EXPERT)
+    def save_message_to_db(self, username: str, message: str) -> None:
+        log.debug(f"Save message from {username}: {message}")
+        room = self.get_or_create_room()
+        state = async_to_sync(self._get_state)()
+        example_id = state.get("cur_example_id")
+        example_kw = {"example_id": example_id} if example_id else {"example": None}
+        Message.objects.create(room=room, user=username, message=message, **example_kw)
 
-    @async_to_sync
-    async def manage_end_annotation(self, reason):
-        """Run when no more examples left in the project."""
-        self.discussion_ended = True
-        log.debug(f"Notifying the group that annotation ended for the following reason {reason}.")
-        if reason == AnnotationEndReason.DISCUSSION_END:
-            await self.move_to_expert()
-            message = (
-                "Everything was annotated. In one minute the chat will close and you will "
-                "be sent to the projects page. Thank You!"
-            )
-            await self.group_send_chat_message(username="system", message=message)
-        elif reason == AnnotationEndReason.NO_EXAMPLES:
-            ...
-        await self.group_end_annotation(reason)
+    async def _append_chat_message(self, username: str, message: str):
+        async def _mut(s: dict, u=username, m=message):
+            s["messages"].append({"user": u, "text": m})
+            return s
 
-    async def group_end_annotation(self, reason):
-        """Notify the connected clients in group that annotation ended."""
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_end_annotation", "reason": reason.value},
-        )
+        await self.save_message_to_db(username=username, message=message)
+        return await update_state(self.batch_id, _mut)
 
-    async def send_end_annotation(self, event):  # noqa: ARG002
+    # ---------- STATE HELPERS -----------------
+    async def _get_state(self):
+        return await get_state(self.batch_id)
+
+    async def _set_next_and_reset(self):
+        state = await self._get_state()
+        if state["discussion_ended"]:
+            log.debug("Discussion ended.")
+            return
+
+        next_page = int(state.get("page", 0)) + 1
+        state["page"] = next_page
+        example, annotations = await database_sync_to_async(self.get_example)(state=state)
+
+        end_reason = None
+        msg = None
+        if example is None:
+            had_any = await database_sync_to_async(
+                lambda: Example.objects.filter(batch=self.batch_id, has_disagreement=True).exists(),
+            )()
+
+            if not had_any:
+                end_reason = "NO_EXAMPLES"
+                msg = "No disagreements exist."
+
+            else:
+                end_reason = "DISCUSSION_END"
+                msg = "All Examples discussed."
+
+        else:
+            if state["page"] != 1:
+                msg = "All done. Next Sentence."
+
+        async def mut(state):
+            if end_reason:
+                state["discussion_ended"] = end_reason
+            else:
+                state["page"] = next_page
+                state["cur_example_id"] = example.id
+                state["cur_example"] = example.content
+                state["annotation_labels"] = annotations
+
+                state["clicked_done"] = dict.fromkeys(state.get("online_users", []), 0)
+            return state
+
+        await update_state(self.batch_id, mut)
+
+        if msg:
+            await self._append_chat_message(username="system", message=msg)
+
+    async def send_state(self, event):  # noqa: ARG002
         """Notify the connected clients in group that annotation ended."""
         await self.send(
             text_data=json.dumps(
-                {"done": "/projects", "reason": event["reason"]},
+                {"state": event["state"], "user": self.username},
                 ensure_ascii=False,
             ),
         )
 
-    # Example UI
-    def get_example(self, page):
-        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).all()
+    async def group_send_state(self):
+        state = await self._get_state()
+        log.debug(f"Group send: {state=}")
+        await self.channel_layer.group_send(  # type: ignore
+            self.room_group_name,
+            {
+                "type": "send_state",
+                "state": state,
+            },
+        )
+
+    # ---------- EXAMPLE HELPERS -----------------
+
+    def get_example(self, state):
+        log.debug("Getting example")
+        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).distinct()
         paginator = Paginator(queryset, 1)
-        page_obj = paginator.get_page(page)
+        page_obj = paginator.get_page(state["page"])
 
-        if page_obj.number < page:
-            log.debug("No more annotations left, initiating the end of discussing annotations.")
-            if not self.discussion_ended:
-                self.manage_end_annotation(AnnotationEndReason.DISCUSSION_END)
-            return
+        if page_obj.number < state["page"] or not queryset.count():
+            return None, None
 
-        if not queryset.count():
-            # For now the only assumption will be that there
-            # is no disagreement and the examples are PRESENT
-            log.warning(
-                "Failed to get example. Examples with disagreements queryset count is zero.",
-            )
-            if not self.discussion_ended:
-                # batch = next(iter(Batch.objects.filter(batch_number=self.batch_id-1)))
-                # batch.set_phase(Batch.Phase.EXPERT)
-                self.manage_end_annotation(AnnotationEndReason.NO_EXAMPLES)
-            return
         example = page_obj.object_list[0]
-        return example
 
-    @database_sync_to_async
-    def example_annotations(self, page):
-        example = self.get_example(page)
+        log.debug("Getting annotations")
+        all_labels = example.labels.all()
 
-        if self.discussion_ended:
-            return
-
-        annotations = {}
-        log.debug(f"Got example: {example}")
-        for user in self.scope["room_state"]["online_users"]:
-            labels = []
-            query = example.get_user_annotations(
-                phase="ANNOTATION",
-                user=user,
+        by_user = defaultdict(list)
+        for user in state["required_users"]:
+            query = Annotation.objects.filter(
+                assignment__example=example,
+                assignment__user__username=user,
+                phase=Annotation.Phase.ANNOTATION,
             ).select_related("label")
             label_set = {anno.label for anno in query}
-            for label in example.labels.all():
-                labels.append(
+
+            for label in all_labels:
+                label = (
                     {
                         "id": label.id,
                         "label": label.name,
@@ -171,163 +266,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                         "is_set": True if label in label_set else False,
                     },
                 )
-            annotations[user.username] = labels
+                by_user[user].append(label)
 
-        log.debug(f"Returning annotations: {annotations}")
-        return [example, annotations]
-
-    @database_sync_to_async
-    def save_annotation(self, label_ids):
-        example = self.get_example(self.scope["room_state"]["page"])
-        if not example:
-            log.error(f"Couldn't get example for {self.scope["room_state"]["page"] =}")
-            return
-        example.set_user_annotations(user=self.user, label_ids=label_ids, phase="DISCUSSION")
-
-    async def group_send_current_example(self):
-        result = await self.example_annotations(
-            self.scope["room_state"]["page"],
-        )
-
-        if self.discussion_ended:
-            return
-
-        example, prev_annotations = result
-
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "send_current_example",
-                "update-example": example.content,
-                "update-labels": prev_annotations,
-            },
-        )
-
-    async def send_current_example(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "update-example": event["update-example"],
-                    "update-labels": event["update-labels"],
-                    "current-user": self.user.username,
-                },
-                ensure_ascii=False,
-            ),
-        )
-
-    async def group_send_next_example(self):
-        self.scope["room_state"]["page"] += 1
-        result = await self.example_annotations(
-            self.scope["room_state"]["page"],
-        )
-
-        if self.discussion_ended:
-            return
-
-        example, prev_annotations = result
-
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": "send_next_example",
-                "update-example": example.content,
-                "update-labels": prev_annotations,
-            },
-        )
-
-    async def send_next_example(self, event):
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "update-example": event["update-example"],
-                    "update-labels": event["update-labels"],
-                    "current-user": self.user.username,
-                },
-                ensure_ascii=False,
-            ),
-        )
-
-    async def group_send_user_done(self):
-        self.scope["room_state"]["clicked_done"][self.user.username] = 1
-        if not all(x == 1 for x in self.scope["room_state"]["clicked_done"].values()):
-            # TODO: maybe UPDATE UI of other users to show that this user has clicked done.
-            return
-
-        # send to all users
-        chat_msg = "All users done. Next sentence."
-        await self.group_send_chat_message(username="system", message=chat_msg)
-
-        await self.group_send_next_example()
-
-        # reset clicked_done
-        clicked_done = self.scope["room_state"]["clicked_done"]
-        for key in clicked_done:
-            clicked_done[key] = 0
-
-    # CHAT
-    def get_or_create_room(self):
-        room, _ = Room.objects.get_or_create(pk=self.batch_id)
-        return room
-
-    @staticmethod
-    def create_chat_message(msg, msg_type):
-        if msg_type == "self-message":
-            div_class = "self-message"
-            container_class = "d-flex flex-row-reverse"
-        elif msg_type == "other-message":
-            div_class = "other-message"
-            container_class = "d-flex flex-row"
-        elif msg_type == "system-message":
-            div_class = "system-message"
-            container_class = "d-flex flex-row"
-        else:
-            err_msg = f"Unknow message type: {msg_type}"
-            raise ValueError(err_msg)
-
-        message_html = (
-            f"<div class='{container_class}'><div class='message {div_class}'>{msg}</div></div>"
-        )
-        composed_message = f"<div hx-swap-oob='beforeend:#messages'>{message_html}</div>"
-        log.debug(f"Created the following message: {composed_message}")
-        return composed_message
-
-    async def group_send_chat_message(self, username, message):
-        log.debug(f"Send message from {username}: {message}")
-        # store message in db
-        if not self.discussion_ended:
-            await self.save_message_to_db(username=username, message=message)
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {"type": "send_chat_message", "message": message, "username": username},
-        )
-
-    async def send_chat_message(self, event):
-        message = event["message"]
-        username = event["username"]
-
-        if self.user.username == username:
-            chat_message = self.create_chat_message(message, msg_type="self-message")
-        elif username == "system":
-            chat_message = self.create_chat_message(message, msg_type="system-message")
-        else:
-            chat_message = self.create_chat_message(message, msg_type="other-message")
-
-        await self.send(text_data=json.dumps({"message": chat_message}, ensure_ascii=False))
-
-    @database_sync_to_async
-    def save_message_to_db(self, username: str, message: str) -> None:
-        """Save a message from a user to the database.
-
-        Parameters:
-        -----------
-        username: [str] The origin username of the message.
-        message: [str] The message to be saved.
-        """
-        log.debug(f"Save message from {username}: {message}")
-        room = self.get_or_create_room()
-        example = self.get_example(self.scope["room_state"]["page"])
-        if example:
-            Message.objects.create(room=room, example=example, user=username, message=message)
+        return example, by_user
 
     # ONLINE STATUS
     @database_sync_to_async
@@ -339,14 +280,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         msg = f"<div id='n-online-status' hx-swap-oob='true'> {n_online}</div>"
         return msg
 
-    async def group_send_user_connected(self):
-        self.scope["room_state"]["n_online"] += 1
+    async def group_send_user_connected(self, state=None):
         msg = f"{self.user.username} is now connected."
         log.debug(msg)
-        await self.group_send_chat_message(username="system", message=msg)
-        n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
+        await self._append_chat_message(username="system", message=msg)
 
-        await self.channel_layer.group_send(
+        state = state or await get_state(self.batch_id)
+        n_online_msg = self.create_n_online_message(len(state["online_users"]))
+
+        await self.channel_layer.group_send(  # type: ignore
             self.room_group_name,
             {"type": "send_user_connected", "n_online": n_online_msg},
         )
@@ -357,16 +299,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             text_data=json.dumps({"n_online": n_online}, ensure_ascii=False),
         )
 
-    async def group_send_user_disconnected(self):
-        self.scope["room_state"]["n_online"] -= 1
-        self.scope["room_state"]["online_users"].discard(self.user)
-
+    async def group_send_user_disconnected(self, state=None):
         msg = f"{self.user.username} has disconnected."
         log.debug(msg)
-        await self.group_send_chat_message(username="system", message=msg)
-        n_online_msg = self.create_n_online_message(self.scope["room_state"]["n_online"])
+        await self._append_chat_message(username="system", message=msg)
+        state = state or await get_state(self.batch_id)
+        n_online_msg = self.create_n_online_message(len(state["online_users"]))
 
-        await self.channel_layer.group_send(
+        await self.channel_layer.group_send(  # type: ignore
             self.room_group_name,
             {"type": "send_user_disconnected", "n_online": n_online_msg},
         )

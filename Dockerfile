@@ -1,10 +1,11 @@
 # ---- Base with uv + Python ----
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm AS base
 WORKDIR /app
-ENV UV_PROJECT_ENVIRONMENT=/app/.venv \
-    PATH="/app/.venv/bin:${PATH}" \
+ENV UV_PROJECT_ENVIRONMENT=/.venv \
+    PATH="/.venv/bin:${PATH}" \
     PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
+    PYTHONDONTWRITEBYTECODE=1 \
+    UV_LINK_MODE=copy
 
 RUN git config --global user.name "anntotationtool" && \
     git config --global user.email "annotation@tool.com"
