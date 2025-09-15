@@ -1,5 +1,3 @@
-from enum import Enum
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -20,7 +18,11 @@ class Message(models.Model):
     room = models.ForeignKey(Room, related_name="messages", on_delete=models.CASCADE)
     user = models.CharField(max_length=64)
     example = models.ForeignKey(
-        Example, related_name="messages", on_delete=models.CASCADE, blank=True, null=True,
+        Example,
+        related_name="messages",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
