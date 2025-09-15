@@ -46,7 +46,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return state
 
         await self._append_chat_message(
-            username="system", message=f"{self.username} is now connected.",
+            username="system",
+            message=f"{self.username} is now connected.",
         )
         state = await update_state(self.batch_id, _init)
         log.debug(f"Current {state=} ")
@@ -69,7 +70,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         state = await update_state(self.batch_id, _leave)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
         await self._append_chat_message(
-            username="system", message=f"{self.username} has disconnected.",
+            username="system",
+            message=f"{self.username} has disconnected.",
         )
         await self.group_send_state()
 
