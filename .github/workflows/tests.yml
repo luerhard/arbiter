@@ -30,9 +30,7 @@ jobs:
           key: uv-${{ runner.os }}-${{ steps.py.outputs.python-version || '3.11' }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
 
       - name: Sync Python deps (with dev groups)
-        run: uv sync --frozen
-        # If your project file lives at repo root and your Django app in ./core, this is fine.
-        # If pyproject.toml is inside ./core, add:  run: uv sync --frozen -C core
+        run: uv sync --frozen --group dev
 
       # --- Frontend ---
       - name: Set up Node.js
@@ -63,5 +61,4 @@ jobs:
       # --- Django test run ---
       - name: Run tests
         working-directory: core
-        run: uv run pytest -q
-        # -C core runs inside the ./core dir; drop it if manage.py/tests live at repo root
+        run: SQLITE_FOR_TESTS=1 uv run pytest -q
