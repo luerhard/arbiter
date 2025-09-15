@@ -10,11 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    env:
-      # set your settings module if needed
-      DJANGO_SETTINGS_MODULE: core.core.settings
-      PYTHONUNBUFFERED: "1"
-
     steps:
       - uses: actions/checkout@v4
 
