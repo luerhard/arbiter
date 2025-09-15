@@ -67,7 +67,6 @@ export function renderCurrentLabels(labels, user) {
     grid.className = "label-grid";
     container.appendChild(grid);
 
-    // flatten [[{...}], [{...}]] -> [{...}, {...}]
     const flatten = (arr) => (Array.isArray(arr) ? arr.flat(1).filter(Boolean) : []);
     const myLabels = flatten((labels || {})[user] || []);
 
