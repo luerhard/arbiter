@@ -45,9 +45,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             state["clicked_done"].setdefault(self.username, 0)
             return state
 
+        await self._append_chat_message(
+            username="system", message=f"{self.username} is now connected.",
+        )
         state = await update_state(self.batch_id, _init)
-        await self.group_send_user_connected(state)
-        await self.group_send_state()
         log.debug(f"Current {state=} ")
 
         if (set(state["online_users"]) == set(state["required_users"])) and not state[
@@ -55,7 +56,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ]:
             if state["page"] == 0:
                 await self._set_next_and_reset()
-            await self.group_send_state()
+        await self.group_send_state()
 
     async def disconnect(self, close_code):  # noqa: ARG002
         async def _leave(state):
@@ -66,8 +67,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return state
 
         state = await update_state(self.batch_id, _leave)
-        await self.group_send_user_disconnected()
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
+        await self._append_chat_message(
+            username="system", message=f"{self.username} has disconnected.",
+        )
+        await self.group_send_state()
 
         if len(state["online_users"]) == 0:
             log.debug("No users, closing websocket.")
@@ -272,49 +276,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         return example, by_user
 
-    # ONLINE STATUS
     @database_sync_to_async
     def get_assigned_annotators(self):
         return set(Batch.objects.get(id=self.batch_id).project.annotators)
-
-    @staticmethod
-    def create_n_online_message(n_online):
-        msg = f"<div id='n-online-status' hx-swap-oob='true'> {n_online}</div>"
-        return msg
-
-    async def group_send_user_connected(self, state=None):
-        msg = f"{self.user.username} is now connected."
-        log.debug(msg)
-        await self._append_chat_message(username="system", message=msg)
-
-        state = state or await get_state(self.batch_id)
-        n_online_msg = self.create_n_online_message(len(state["online_users"]))
-
-        await self.channel_layer.group_send(  # type: ignore
-            self.room_group_name,
-            {"type": "send_user_connected", "n_online": n_online_msg},
-        )
-
-    async def send_user_connected(self, event):
-        n_online = event["n_online"]
-        await self.send(
-            text_data=json.dumps({"n_online": n_online}, ensure_ascii=False),
-        )
-
-    async def group_send_user_disconnected(self, state=None):
-        msg = f"{self.user.username} has disconnected."
-        log.debug(msg)
-        await self._append_chat_message(username="system", message=msg)
-        state = state or await get_state(self.batch_id)
-        n_online_msg = self.create_n_online_message(len(state["online_users"]))
-
-        await self.channel_layer.group_send(  # type: ignore
-            self.room_group_name,
-            {"type": "send_user_disconnected", "n_online": n_online_msg},
-        )
-
-    async def send_user_disconnected(self, event):
-        n_online = event["n_online"]
-        await self.send(
-            text_data=json.dumps({"n_online": n_online}, ensure_ascii=False),
-        )
