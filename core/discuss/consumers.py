@@ -96,8 +96,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self._clicked_done(self.username)
 
             if await self._all_done():
-                await self.save_labels_to_db()
-                await self._set_next_and_reset()
+                state = await self._get_state()
+                if not state["discussed_ended"]:
+                    await self.save_labels_to_db()
+                    await self._set_next_and_reset()
             await self.group_send_state()
 
     # ---------- LABEL HELPERS -----------------
