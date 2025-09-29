@@ -1,16 +1,18 @@
-import "../css/custom.scss";
-// stupid workaround to load htmx due to missing UMD file. (required if we want htmx extensions to work)
-import "./htmx.js";
+import "../css/main.css";
+
+import htmx from "htmx.org";
 import "htmx-ext-ws";
+
 // boostrap-icons
 import "bootstrap-icons/font/bootstrap-icons.scss";
 import * as bootstrap from "bootstrap";
+
 // Mouse hotkeys
 import * as mousetrap from 'mousetrap';
 // javascript sortables (for codebook)
 
-import * as funcs from "./functions";
-import * as discuss from "./discuss";
+import * as funcs from "./functions.js";
+import * as discuss from "./discuss.js";
 
 window.lib = { funcs, discuss };
 export { funcs, discuss };

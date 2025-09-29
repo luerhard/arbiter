@@ -1,34 +1,10 @@
-<nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/">Home</a>
-        <button class="navbar-toggler"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarColor01"
-                aria-controls="navbarColor01"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav me-auto">
-                <!-- Login / Logout -->
-                {% if user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'project-list' %}">Projects</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'user-profile' %}">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                    </li>
-                {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'login' %}">Login</a>
-                    </li>
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-</nav>
+<c-navbar>
+    <c-navbar.navitem url="/">Home</c-navbar.navitem>
+{% if user.is_authenticated %}
+    <c-navbar.navitem url="{% url 'project-list' %}">Projects</c-navbar.navitem>
+    <c-navbar.navitem url="{% url 'user-profile' %}">Profile</c-navbar.navitem>
+    <c-navbar.navitem url="{% url 'logout' %}">Logout</c-navbar.navitem>
+{% else %}
+    <c-navbar.navitem url="{% url 'login' %}">Login</c-navbar.navitem>
+{% endif %}
+</c-navbar>

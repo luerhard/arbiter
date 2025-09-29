@@ -46,7 +46,6 @@ MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
-STATICFILES_DIRS = [BASE_DIR.parent.parent / "dist", BASE_DIR.parent / "static"]
 
 LOG_DIR = BASE_DIR.parent.parent / "logs"
 LOG_DIR.mkdir(exist_ok=True)
@@ -87,3 +86,5 @@ for app in LOG_APPS:
         "formatter": "verbose",
     }
     LOGGING["loggers"][app] = {"level": "DEBUG", "handlers": [f"file_{app}"]}
+
+DJANGO_VITE = {"default": {"dev_mode": True}}

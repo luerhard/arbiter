@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
+{% load django_vite %}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
@@ -9,8 +10,8 @@
               content="annotation label labeling text collaborative" />
         <meta name="description" content="Text Annotation Tool">
         <meta name="author" content="Lukas Erhard">
-        <link rel="stylesheet" href="{% static 'main.css' %}" type="text/css">
-        <script src="{% static 'main.js' %}"></script>
+        {% vite_hmr_client %}
+        {% vite_asset 'static/js/main.js' %}
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
         <header>
