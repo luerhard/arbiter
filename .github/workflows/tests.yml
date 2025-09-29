@@ -11,51 +11,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout the repository
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # Setup Python
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: install poetry + python dependencies
-        run: |
-          pip install poetry
-          poetry config virtualenvs.create true --local
-          poetry config virtualenvs.in-project true --local
-      - name: Restore python env if available
-        uses: actions/cache@v3
-        with:
-          path: ./.venv
-          key: venv-${{ hashFiles('poetry.lock') }}
-      - name: Install the project dependencies
-        run: poetry install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
 
-      # Setup npm + javascript dependencies
+      - name: Cache uv + venv
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            ./.venv
+          key: uv-${{ runner.os }}-${{ steps.py.outputs.python-version || '3.11' }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
+
+      - name: Sync Python deps (with dev groups)
+        run: uv sync --frozen --group dev
+
+      # --- Frontend ---
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Restore node_modules if available
-        uses: actions/cache@v3
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
         with:
-          path: ./node_modules
-          key: node-${{ hashFiles('package-lock.json') }}
-      - name: Install Node modules
-        run: npm install
+          path: |
+            ~/.npm
+            node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-      # Build CSS using webpack
-      - name: Build CSS assets
+      - name: Install Node deps
+        run: npm ci
+
+      - name: Build assets
         run: npx webpack --config webpack.config.js
-        # adjust the command if your build script is different
 
+      # --- Git identity for tests that touch git (e.g. codebook) ---
       - name: setup git credentials for codebook
         run: |
           git config --global user.email "test@test.com"
           git config --global user.name "Test Suite"
 
-      # Run the tests with Poetry
+      # --- Django test run ---
       - name: Run tests
-        run: cd core && poetry run pytest
+        working-directory: core
+        run: SQLITE_FOR_TESTS=1 uv run pytest -q

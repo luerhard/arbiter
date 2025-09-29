@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 from django.contrib import messages
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "widget_tweaks",
     "crispy_forms",
     "crispy_bootstrap5",
@@ -78,6 +80,7 @@ MIDDLEWARE = [
 ROOT_URLCONF = "core.urls"
 AUTH_USER_MODEL = "users.User"
 
+
 LOGIN_URL = "/users/login"
 LOGIN_EXEMPT_URLS = [
     "^$",
@@ -104,10 +107,10 @@ TEMPLATES = [
 ASGI_APPLICATION = "core.asgi.application"
 
 
-# For InMemory channels
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": ["redis://redis:6379/0"]},
     },
 }
 
@@ -122,14 +125,24 @@ CHANNEL_LAYERS = {
 # }
 
 # Database
-# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "../../db.sqlite3",
-    },
-}
+if os.getenv("SQLITE_FOR_TESTS") == "1":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        },
+    }
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("POSTGRES_DB"),
+            "USER": os.getenv("POSTGRES_USER"),
+            "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+            "HOST": "db",
+            "PORT": "5432",
+        },
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
