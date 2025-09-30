@@ -1,9 +1,9 @@
 import "../css/main.css";
+import '@tailwindplus/elements';
 
 import htmx from "htmx.org";
 window.htmx = htmx;
 await import("htmx-ext-ws");
-
 import Mousetrap from "mousetrap";
 import Alpine from 'alpinejs'
 window.Alpine = Alpine

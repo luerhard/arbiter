@@ -36,11 +36,5 @@
                 {% block content %}
                 {% endblock content %}
         </main> {% endcomment %}
-<script>
-  document.body.addEventListener("annotation-updated", function (event) {
-    alert("annotation-updated triggered with payload:\n" + JSON.stringify(event.detail, null, 2));
-    console.log("annotation-updated payload:", event.detail);
-  });
-</script>
     </body>
 </html>

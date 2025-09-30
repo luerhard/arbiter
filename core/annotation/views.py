@@ -39,10 +39,15 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
         context = {}
         context["assignment_id"] = assignment.id
-        # codebook = batch.project.codebook.get()
-        # context.update(codebook.get_as_context(batch.batch_number))
+        codebook = batch.project.codebook.get()
+        context.update(codebook.get_as_context(batch.batch_number))
 
-        return render(request, "annotation/index.html", context)
+        response = render(request, "annotation/index.html", context)
+        response["HX-Trigger"] = json.dumps(
+            {"annotation-updated": {"assignment_id": assignment.id}},
+        )
+
+        return response
 
 
 class EditAssignment(View):
