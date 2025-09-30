@@ -1,5 +1,5 @@
 <c-navbar>
-    <c-navbar.navitem url="/">Home</c-navbar.navitem>
+<c-navbar.navitem url="/">Home</c-navbar.navitem>
 {% if user.is_authenticated %}
     <c-navbar.navitem url="{% url 'project-list' %}">Projects</c-navbar.navitem>
     <c-navbar.navitem url="{% url 'user-profile' %}">Profile</c-navbar.navitem>

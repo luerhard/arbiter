@@ -4,7 +4,6 @@ import logging
 from django.contrib import messages
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.template.loader import render_to_string
 from django.views.generic import DetailView
 from django.views.generic import View
 
@@ -68,7 +67,6 @@ class EditAssignment(View):
         resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
         return resp
 
-
     def post(self, request, *args, **kwargs):  # noqa: ARG002
         assignment_id = request.POST.get("assignment_id")
         assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
@@ -89,7 +87,6 @@ class EditAssignment(View):
         return resp
 
 
-
 def get_progress(user, batch):
     """helper function to calculate current progress"""
     done = batch.examples.filter(
@@ -104,6 +101,7 @@ def get_progress(user, batch):
 
     return {"done": done, "total": total, "current": current}
 
+
 class HtmxPbar(View):
     def get(self, request):
         assignment_id = request.GET.get("assignment_id")
@@ -116,6 +114,7 @@ class HtmxPbar(View):
             ctx = {"progress": 0}
         return render(request, "annotation/partials/pbar.html", ctx)
 
+
 class HtmxSentence(View):
     def get(self, request):
         assignment_id = request.GET.get("assignment_id")
@@ -125,6 +124,7 @@ class HtmxSentence(View):
             context["example"] = assignment.example
 
         return render(request, "annotation/partials/sentence.html", context)
+
 
 class HtmxLabels(View):
     def get(self, request):
@@ -153,8 +153,8 @@ class HtmxLabels(View):
             form = MultiLabelFormAnnotation(assignment=assignment)
             context["label_form"] = form
 
-
         return render(request, "annotation/partials/labels.html", context)
+
 
 class HtmxNavBlock(View):
     def get(self, request):
@@ -169,7 +169,6 @@ class HtmxNavBlock(View):
             }
             context.update(ctx)
         return render(request, "annotation/partials/nav.html", context)
-
 
 
 class PrevSentence(AnnotatorRequiredMixin, View):

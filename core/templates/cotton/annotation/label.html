@@ -1,39 +1,23 @@
 <c-vars id value text color hotkey checked />
-
-<div
-  class="inline-block"
-  x-data="labelButton({
-    id: '{{ id }}',
-    value: '{{ value }}',
-    hotkey: '{{ hotkey|default:'' }}',
-    {% comment %} initiallyChecked: {{ 'true' if checked else 'false' }} {% endcomment %}
-  })"
->
-  <!-- Real checkbox for Django; visually hidden but stays in the form -->
-  <input
-    type="checkbox"
-    name="labels"
-    class="sr-only"
-    :id="id"
-    :value="value"
-    x-model="isChecked"
-  />
-
-  <!-- Tailwind-styled pill -->
-  <label
-    ::for="id"
-    class="select-none cursor-pointer rounded-2xl border px-3 py-2 text-sm transition
-           data-[active=true]:bg-[var(--label-color)] data-[active=true]:text-[var(--label-text)]
-           data-[active=false]:bg-white data-[active=false]:text-gray-800
-           data-[active=false]:hover:bg-gray-50 border-gray-300 shadow-sm"
-    :style="`--label-color: {{ color }}; --label-text: ${textColor()};`"
-    :data-active="String(isChecked)"
-    @click.prevent="toggle()"
-    @keydown.enter.prevent="toggle()"
-  >
-    {{ text }}
-    <template x-if="hotkey">
-      <span class="ml-1 text-xs opacity-70" x-text="`(${hotkey})`"></span>
-    </template>
-  </label>
+<div class="inline-block"
+     x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', {% comment %} initiallyChecked: {{ 'true' if checked else 'false' }} {% endcomment %} })">
+    <!-- Real checkbox for Django; visually hidden but stays in the form -->
+    <input type="checkbox"
+           name="labels"
+           class="sr-only"
+           :id="id"
+           :value="value"
+           x-model="isChecked" />
+    <!-- Tailwind-styled pill -->
+    <label ::for="id"
+           class="select-none cursor-pointer rounded-2xl border px-3 py-2 text-sm transition data-[active=true]:bg-[var(--label-color)] data-[active=true]:text-[var(--label-text)] data-[active=false]:bg-white data-[active=false]:text-gray-800 data-[active=false]:hover:bg-gray-50 border-gray-300 shadow-sm"
+           :style="`--label-color: {{ color }}; --label-text: ${textColor()};`"
+           :data-active="String(isChecked)"
+           @click.prevent="toggle()"
+           @keydown.enter.prevent="toggle()">
+        {{ text }}
+        <template x-if="hotkey">
+            <span class="ml-1 text-xs opacity-70" x-text="`(${hotkey})`"></span>
+        </template>
+    </label>
 </div>

@@ -11,25 +11,26 @@
         <meta name="description" content="Text Annotation Tool">
         <meta name="author" content="Lukas Erhard">
         {% vite_hmr_client %}
-        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}">
+        <link rel="stylesheet"
+              href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}">
         {% vite_asset 'static/js/main.js' %}
     </head>
     <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full">
         <div class="min-h-full">
-        {% include "navbar.html" %}
-          <div class="py-10">
-            <header>
-              <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                {% comment %} <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1> {% endcomment %}
-              </div>
-            </header>
-            <main>
-              <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-                  {% block content %}
-                  {% endblock content %}
-              </div>
-            </main>
-          </div>
+            {% include "navbar.html" %}
+            <div class="py-10">
+                <header>
+                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                        {% comment %} <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1> {% endcomment %}
+                    </div>
+                </header>
+                <main>
+                    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                        {% block content %}
+                        {% endblock content %}
+                    </div>
+                </main>
+            </div>
         </div>
         {% comment %} {% include "navbar.html" %}
         <main>
