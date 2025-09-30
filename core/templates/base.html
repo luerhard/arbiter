@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 {% load static %}
 {% load django_vite %}
-<html lang="en">
+<html class="h-full" lang="en">
     <head>
         <meta charset="UTF-8">
         <title>AnnotationTool</title>
@@ -11,60 +11,36 @@
         <meta name="description" content="Text Annotation Tool">
         <meta name="author" content="Lukas Erhard">
         {% vite_hmr_client %}
+        <link rel="stylesheet" href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}">
         {% vite_asset 'static/js/main.js' %}
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-        <header>
-            {% include "navbar.html" %}
-        </header>
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full">
+        <div class="min-h-full">
+        {% include "navbar.html" %}
+          <div class="py-10">
+            <header>
+              <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                {% comment %} <h1 class="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Dashboard</h1> {% endcomment %}
+              </div>
+            </header>
+            <main>
+              <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+                  {% block content %}
+                  {% endblock content %}
+              </div>
+            </main>
+          </div>
+        </div>
+        {% comment %} {% include "navbar.html" %}
         <main>
-            <div class="container">
                 {% block content %}
                 {% endblock content %}
-            </div>
-        </main>
-        <div data-toast-container
-             class="toast-container position-fixed top-0 start-50 translate-middle-x p-2">
-            <div data-toast-template
-                 class="toast align-items-center border-0"
-                 role="alert"
-                 aria-live="assertive"
-                 aria-atomic="true">
-                <div class="d-flex">
-                    <div data-toast-body class="toast-body"></div>
-                    <button type="button"
-                            class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-            {% for message in messages %}
-                <div class="toast align-items-center border-0 {{ message.tags }}"
-                     role="alert"
-                     aria-live="assertive"
-                     aria-atomic="true">
-                    <div class="d-flex">
-                        <div data-toast-body class="toast-body">{{ message.message }}</div>
-                        <button type="button"
-                                class="btn-close btn-close-white me-2 m-auto"
-                                data-bs-dismiss="toast"
-                                aria-label="Close"></button>
-                    </div>
-                </div>
-            {% endfor %}
-            <div id="toast"
-                 class="toast"
-                 role="alert"
-                 aria-live="assertive"
-                 aria-atomic="true">
-                <div class="d-flex">
-                    <div data-toast-body class="toast-body"></div>
-                    <button type="button"
-                            class="btn-close btn-close-white me-2 m-auto"
-                            data-bs-dismiss="toast"
-                            aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
+        </main> {% endcomment %}
+<script>
+  document.body.addEventListener("annotation-updated", function (event) {
+    alert("annotation-updated triggered with payload:\n" + JSON.stringify(event.detail, null, 2));
+    console.log("annotation-updated payload:", event.detail);
+  });
+</script>
     </body>
 </html>

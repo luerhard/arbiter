@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "193.196.54.251"]
 
 CSRF_TRUSTED_ORIGINS = ["http://193.196.54.251"]
 
-MEDIA_ROOT = BASE_DIR.parent.parent / "media"
+MEDIA_ROOT = BASE_DIR / "media"
 MEDIA_URL = "/media/"
 
 CODEBOOKS_ROOT = MEDIA_ROOT / "codebooks"
@@ -47,7 +47,7 @@ MIDDLEWARE += [
 ]
 
 
-LOG_DIR = BASE_DIR.parent.parent / "logs"
+LOG_DIR = BASE_DIR / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 
 LOGGING = {

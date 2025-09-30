@@ -75,7 +75,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
-    "core.middleware.HtmxMessageMiddleware",
+    # "core.middleware.HtmxMessageMiddleware",
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -182,6 +182,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
     BASE_DIR / "assets",
+    BASE_DIR / "node_modules",
 ]
 
 # This is the directory where collectstatic will put the files in production

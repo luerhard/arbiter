@@ -1,281 +1,57 @@
 {% extends "base.html" %}
-{% load custom_tags %}
-{% load widget_tweaks %}
-{% load partials %}
-{% block title %}
-    Annotate Sentence
-{% endblock title %}
-{% partialdef pbar %}
-<div class="progress bg-secondary mb-4"
-     id="pbar"
-     hx-swap-oob="true"
-     role="progressbar"
-     aria-label="Example with label"
-     aria-valuenow="{{ progress.current }}"
-     aria-valuemin="1"
-     aria-valuemax="100">
-    <div class="progress-bar bg-primary overflow-visible px-2"
-         style="width: {{ progress.current }}%">{{ progress.done }} / {{ progress.total }}</div>
+
+{%block content%}
+
+<script>
+  document.addEventListener('alpine:init', () => {
+    // Initialize once, maybe from Django context if available
+    Alpine.store('app', {
+      assignment_id: '{{ assignment_id|default:"" }}'
+    });
+  });
+
+  // If most requests need the same state, you could also do a single global hook:
+  // document.body.addEventListener('htmx:configRequest', (e) => {
+  //   e.detail.parameters.assignment_id = Alpine.store('app').assignment_id;
+  // });
+</script>
+
+<div x-data
+     @annotation-updated.window="$store.app.assignment_id = $event.detail.assignment_id ?? $store.app.assignment_id">
+
+<div class="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm dark:divide-white/10 dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10">
+  <div class="px-4 py-5 sm:px-6">
+    <div id="pbar"
+         hx-get="{% url 'annotate-pbar'%}"
+         :hx-vals='JSON.stringify({ assignment_id: $store.app.assignment_id })'
+         hx-trigger="load once, annotation-updated from:body"
+         hx-swap="innerHTML"
+         ></div>
+  </div>
+  <div class="px-4 py-5 sm:p-6">
+    <div id="sentence"
+         hx-get="{% url 'annotate-sentence' %}"
+         :hx-vals='JSON.stringify({ assignment_id: $store.app.assignment_id })'
+         hx-trigger="load once, annotation-updated from:body"
+         hx-swap="innerHTML"
+         ></div>
+  </div>
+  <div class="px-4 py-4 sm:px-6">
+    <div id="labels"
+     :hx-vals='JSON.stringify({ assignment_id: $store.app.assignment_id })'
+     hx-get="{% url 'annotate-labels' %}"
+     hx-trigger="load once, annotation-updated from:body"
+     hx-swap="innerHTML"></div>
+  </div>
+  <div class="px-4 py-4 sm:px-6">
+    <!-- Content goes here -->
+  <div id="nav-block"
+       hx-get="{% url 'annotate-nav-block' %}"
+       hx-trigger="load once, annotation-updated from:body"
+       :hx-vals='JSON.stringify({ assignment_id: $store.app.assignment_id })'
+       hx-swap="innerHTML"
+       ></div>
 </div>
-{% endpartialdef %}
-{% partialdef sentence %}
-<div class="card-body" id="sentence" hx-swap-oob="outerHTML">{{ example.content }}</div>
-{% endpartialdef %}
-{% partialdef labels %}
-<form id="label-form"
-      hx-post="{% url 'annotate-edit' assignment_id=assignment.id %}"
-      hx-target="#save-btn"
-      hx-swap-oob="true"
-      class="mt-5"
-      method="post">
-    {% csrf_token %}
-    <div class="label-grid" role="group">
-        {% for checkbox, detail in label_form.labels|zip_lists:label_form.label_details %}
-            <input type="checkbox"
-                   name="labels"
-                   class="btn-check btn-check-color"
-                   id="{{ checkbox.id_for_label }}"
-                   value="{{ checkbox.data.value }}"
-                   {% if checkbox.data.value in label_form.labels.value %}checked{% endif %}
-                   data-hotkey="{{ detail.hotkey }}" />
-            <label for="{{ checkbox.id_for_label }}"
-                   class="btn btn-custom-color"
-                   style="--label-color: {{ detail.color }}">
-                {{ checkbox.choice_label }}
-                {% if detail.hotkey %}({{ detail.hotkey }}){% endif %}
-            </label>
-        {% endfor %}
-    </div>
-</form>
-{% endpartialdef %}
-{% partialdef nav-block %}
-<div id="nav-block"
-     class="d-flex justify-content-center align-items-center mt-5"
-     hx-swap-oob="true">
-    <input type="hidden"
-           id="assignmentId"
-           name="assignment_id"
-           value="{{ assignment.id }}">
-    {# djlint:off H021 #}
-    <div class="d-flex justify-content-end" style="min-width: 100px;">
-        {# djlint:on #}
-        {% if has_prev %}
-            <button id="prev-btn"
-                    class="btn btn-outline-primary"
-                    hx-swap-oob="true"
-                    hx-get="{% url 'annotate-prev' %}"
-                    hx-include="#filterState, #assignmentId"
-                    hx-trigger="click,keydown[keyCode==37] from:window">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-        {% endif %}
-    </div>
-    <div class="mx-1">
-        <button type="submit"
-                id="save-btn"
-                form="label-form"
-                class="btn {% if saved or assignment.is_annotated %}btn-primary {% else %}btn-outline-primary{% endif %}">
-            Save <i class="bi bi-floppy"></i>
-        </button>
-    </div>
-    {# djlint:off H021 #}
-    <div class="d-flex justify-content-start" style="min-width: 100px;">
-        {# djlint:on #}
-        {% if has_next %}
-            <button id="next-btn"
-                    hx-swap-oob="true"
-                    hx-get="{% url 'annotate-next' %}"
-                    hx-include="#filterState, #assignmentId"
-                    class="btn btn-outline-primary"
-                    hx-trigger="click,keydown[keyCode==39] from:body">
-                <i class="bi bi-arrow-right"></i>
-            </button>
-        {% endif %}
-    </div>
 </div>
-{% endpartialdef %}
-{% block content %}
-    <!--top navigation-->
-    <div class="row mt-3 mb-3 justify-content-start">
-        <div class="col">
-            <input type="hidden" name="filter" id="filterState" value="none">
-            <button id="unfinished-toggle"
-                    tabindex="-1"
-                    class="btn btn-sm btn-outline-primary"
-                    onmousedown="toggleFilter()"
-                    hx-get="{% url 'annotate-reload' %}"
-                    hx-trigger="click"
-                    hx-swap="none"
-                    hx-include="#filterState, #assignmentId">Only unfinished</button>
-            <button class="btn btn-sm btn-outline-primary"
-                    id="codebook-toggle"
-                    tabindex="-1"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#codebook-col">Show Codebook</button>
-        </div>
-    </div>
-    <div class="row">
-        <div class="row" id="annotation">
-            <div class="row">
-                <div class="col mt-3">{% partial pbar %}</div>
-            </div>
-            <div class="row mt-3">
-                <div class="col">
-                    <div class="card shadow-sm">{% partial sentence %}</div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col">{% partial labels %}</div>
-                </div>
-                <div id="buttons">{% partial nav-block %}</div>
-            </div>
-        </div>
-        {% comment %} Codebook View and Control {% endcomment %}
-        <div class="row collapse overflow-y-auto mt-1"
-             id="codebook-col"
-             style="max-height: 45vh"
-             aria-expanded="false">
-            <div class="position-relative">
-                {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
-                <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
-                     role="group"
-                     aria-label="Diff and Position Control Buttons">
-                    {% comment %} Codebook Diff Button {% endcomment %}
-                    <input type="checkbox" class="btn-check" id="codebook-diff-check">
-                    <label class="btn btn-sm btn-outline-secondary"
-                           for="codebook-diff-check"
-                           title="Show Differences">
-                        <i class="bi bi-file-earmark-diff"></i>
-                    </label>
-                    {% comment %} Codebook Position Button {% endcomment %}
-                    <input type="checkbox" class="btn-check" id="codebook-pos-check">
-                    <label class="btn btn-sm btn-outline-secondary"
-                           for="codebook-pos-check"
-                           title="Toggle Position">
-                        <i class="bi bi-columns"></i>
-                    </label>
-                    {% comment %} Open Codebook in a New Window {% endcomment %}
-                    <input type="button" class="btn-check" id="codebook-open">
-                    <label class="btn btn-sm btn-outline-secondary"
-                           for="codebook-open"
-                           title="Open in New Window">
-                        <i class="bi bi-box-arrow-up-right"></i>
-                    </label>
-                </div>
-                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
-                <div class="codebook-view" id="codebook-diff-view" hidden>
-                    {% include "codebook/partials/view-diff-codebook.html" %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <script>
-        const diff_codebook_trigger = new Event("diffCodebookTrigger");
-
-        // set state of button and hidden variable for filter variable
-        function toggleFilter() {
-            const btn = document.getElementById("unfinished-toggle");
-            const filterInput = document.getElementById("filterState");
-            if (filterInput.value === "none") {
-                filterInput.value = "unfinished";
-                btn.classList.remove("btn-outline-primary");
-                btn.classList.add("btn-primary");
-            } else {
-                filterInput.value = "none";
-                btn.classList.remove("btn-primary");
-                btn.classList.add("btn-outline-primary");
-            }
-        };
-
-        function colorContrast() {
-            // auto-maximize contrast for font in colored buttons
-            document.querySelectorAll(".btn-custom-color").forEach(button => {
-                const color = getComputedStyle(button).getPropertyValue("--label-color").trim();
-                const textColor = lib.funcs.inferTextColorByContrast(color)
-                button.style.setProperty("--text-color", textColor);
-            });
-        };
-
-        // show state of codebook expansion on the button
-        document.addEventListener("DOMContentLoaded", function() {
-            const codebook_toggle = document.getElementById("codebook-toggle");
-            const codebook_col = document.getElementById("codebook-col");
-            const codebook_pos = document.getElementById("codebook-pos-check");
-            const codebook_open = document.getElementById("codebook-open");
-            const annotation = document.getElementById("annotation");
-            const codebook_diff_check = document.getElementById("codebook-diff-check");
-            const codebook_orig_view = document.getElementById("codebook-orig-view");
-            const codebook_diff_view = document.getElementById("codebook-diff-view");
-
-            codebook_col.addEventListener("shown.bs.collapse", function(e) {
-                codebook_toggle.classList.remove("btn-outline-primary");
-                codebook_toggle.classList.add("btn-primary");
-            });
-
-            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
-                codebook_toggle.classList.remove("btn-primary");
-                codebook_toggle.classList.add("btn-outline-primary");
-            });
-
-            codebook_pos.addEventListener("change", function() {
-                codebook_col.classList.toggle("row");
-                codebook_col.classList.toggle("col-5");
-                annotation.classList.toggle("row");
-                annotation.classList.toggle("col");
-                if (codebook_pos.checked) {
-                    codebook_col.style.maxHeight = "80vh";
-                } else {
-                    codebook_col.style.maxHeight = "45vh";
-                };
-            });
-
-            codebook_diff_check.addEventListener("change", function() {
-                codebook_diff_view.hidden = !codebook_diff_view.hidden
-                codebook_orig_view.hidden = !codebook_orig_view.hidden
-            });
-
-            codebook_open.addEventListener("click", function() {
-                codebook_toggle.click();
-                new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
-                timer = setInterval(function() {
-                    if (new_window.closed) {
-                        clearInterval(timer);
-                        codebook_toggle.click();
-                    }
-                }, 500);
-            });
-
-            colorContrast();
-        });
-
-        // disable enter button (should only ever toggle "Saved")
-        // necessary to not toggle the filter / codebook buttons when they were clicked previously
-        document.querySelectorAll("button").forEach(function(button) {
-            button.addEventListener("keydown", function(e) {
-                if (e.key === "Enter") {
-                    e.preventDefault();
-                }
-            });
-        });
-
-        document.addEventListener("htmx:load", function() {
-            const checkboxes = document.querySelectorAll("input[type='checkbox']");
-            checkboxes.forEach(function(checkbox) {
-                // Get custom hotkey from data attribute
-                const hotkey = checkbox.getAttribute("data-hotkey");
-                if (hotkey) {
-                    Mousetrap.bind(hotkey, function() {
-                        // Toggle the checkbox on key press
-                        checkbox.checked = !checkbox.checked;
-                    });
-                }
-            });
-            const saveBtn = document.getElementById("save-btn");
-            if (saveBtn) {
-                Mousetrap.bind("enter", function() {
-                    saveBtn.click();
-                });
-            }
-            colorContrast();
-        });
-    </script>
-{% endblock content %}
+</div>
+{%endblock content%}

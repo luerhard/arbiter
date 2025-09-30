@@ -12,14 +12,15 @@
   "author": "Lukas Erhard",
   "license": "MIT",
   "devDependencies": {
-    "vite": "^7.1.7",
-    "sass-embedded": "^1.93.2"
+    "sass-embedded": "^1.93.2",
+    "vite": "^7.1.7"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "@tailwindplus/elements": "^1.0.15",
+    "alpinejs": "^3.15.0",
     "bootstrap": "^5.3.3",
-    "bootstrap-icons": "^1.11.3",
+    "bootstrap-icons": "^1.13.1",
     "htmx-ext-ws": "^2.0.1",
     "htmx.org": "^2.0.2",
     "mousetrap": "^1.6.5",

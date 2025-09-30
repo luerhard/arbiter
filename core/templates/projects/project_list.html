@@ -1,63 +1,121 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="row">
-        <div class="col mt-4">
-            <div class="card">
-                <div class="card-header border-bottom-0">
-                    <div class="d-flex justify-content-center">
-                        <h2 class="fw-bold">Projects</h2>
-                    </div>
-                </div>
-                <div class="card-body card-list">
-                    {% for project_user in project_users %}
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="fw-bold">{{ project_user.project.name }}</h5>
-                            </div>
-                            <div class="card-body m-3">
-                                <div class="row">
-                                    <div class="col-8 col-md-4">
-                                        <dl>
-                                            <div class="d-flex justify-content-between">
-                                                <dt class="fw-bold text-nowrap">Assigned as</dt>
-                                                <dd class="text-start">
-                                                    {{ project_user.get_role_display }}
-                                                </dd>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <dt class="fw-bold text-nowrap">Active batches</dt>
-                                                <dd class="text-start">
-                                                    {{ project_user.project.annotator_n_active_batches }}
-                                                </dd>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <dt class="fw-bold text-nowrap">Annotation open</dt>
-                                                <dd class="text-start">
-                                                    {{ project_user.project.annotator_any_annotation_batches }}
-                                                </dd>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <dt class="fw-bold text-nowrap">Discussion open</dt>
-                                                <dd class="text-start">
-                                                    {{ project_user.project.annotator_any_discussion_batches }}
-                                                </dd>
-                                            </div>
-                                        </dl>
-                                    </div>
-                                    <div class="col d-flex justify-content-md-center">
-                                        <ul class="list-group">
-                                            <li class="list-group-item border-0 d-flex p-4 mb-2 border-radius-lg">
-                                                <a class="btn btn-primary text-nowrap"
-                                                   href="{% url 'project-detail' project_user.project.pk %}">Go to Project</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+{# templates/projects/table.html #}
+<div class="px-4 sm:px-6 lg:px-8">
+  <div class="sm:flex sm:items-center">
+    <div class="sm:flex-auto">
+      <h1 class="text-base font-semibold text-gray-900 dark:text-white">Projects</h1>
+      <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+        Your assigned projects including role, active batches, and current states.
+      </p>
     </div>
+
+    {# Optional: show the CTA only when you pass create_url in context #}
+    {% if create_url %}
+    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
+      <a href="{{ create_url }}"
+         class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500">
+        Create project
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="mt-8 flow-root">
+    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+        <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
+          <thead>
+            <tr>
+              <th scope="col" class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0 dark:text-white">Project</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Assigned as</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Active batches</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Annotation</th>
+              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">Discussion</th>
+              <th scope="col" class="py-3.5 pr-4 pl-3 text-right sm:pr-0"><span class="sr-only">Open</span></th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-gray-200 bg-white dark:divide-white/10 dark:bg-gray-900">
+            {% if project_users %}
+              {% for project_user in project_users %}
+                <tr class="hover:bg-gray-50/70 dark:hover:bg-white/5 transition">
+                  <!-- Project cell with initials tile -->
+                  <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
+                    <div class="flex items-center">
+                      <div class="hidden sm:flex sm:size-10 sm:shrink-0 sm:items-center sm:justify-center rounded-xl bg-gradient-to-tr from-indigo-500 via-sky-500 to-emerald-500 text-white font-semibold">
+                        {{ project_user.project.name|default:"–"|slice:":2"|upper }}
+                      </div>
+                      <div class="sm:ml-4">
+                        <div class="font-medium text-gray-900 dark:text-white">
+                          {{ project_user.project.name }}
+                        </div>
+                        {# Optional subtitle if you have it: #}
+                        {# <div class="mt-1 text-gray-500 dark:text-gray-400">{{ project_user.project.description }}</div> #}
+                      </div>
+                    </div>
+                  </td>
+
+                  <!-- Role -->
+                  <td class="px-3 py-5 text-sm whitespace-nowrap text-gray-700 dark:text-gray-300">
+                    <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-200 dark:ring-white/10">
+                      {{ project_user.get_role_display }}
+                    </span>
+                  </td>
+
+                  <!-- Active batches (number) -->
+                  <td class="px-3 py-5 text-sm whitespace-nowrap">
+                    <span class="font-semibold text-gray-900 dark:text-white">
+                      {{ project_user.project.annotator_n_active_batches }}
+                    </span>
+                  </td>
+
+                  <!-- Annotation open (boolean badge) -->
+                  <td class="px-3 py-5 text-sm whitespace-nowrap">
+                    {% if project_user.project.annotator_any_annotation_batches %}
+                      <span class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-500/50">
+                        Open
+                      </span>
+                    {% else %}
+                      <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-300 dark:ring-white/10">
+                        Closed
+                      </span>
+                    {% endif %}
+                  </td>
+
+                  <!-- Discussion open (boolean badge) -->
+                  <td class="px-3 py-5 text-sm whitespace-nowrap">
+                    {% if project_user.project.annotator_any_discussion_batches %}
+                      <span class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-500/50">
+                        Open
+                      </span>
+                    {% else %}
+                      <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-300 dark:ring-white/10">
+                        Closed
+                      </span>
+                    {% endif %}
+                  </td>
+
+                  <!-- Actions -->
+                  <td class="py-5 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-0">
+                    <a href="{% url 'project-detail' project_user.project.pk %}"
+                       class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300">
+                      Open<span class="sr-only">, {{ project_user.project.name }}</span>
+                    </a>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="6" class="py-12 text-center text-sm text-gray-600 dark:text-gray-300">
+                  No projects to display.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock content %}
