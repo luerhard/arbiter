@@ -15,7 +15,7 @@
               href="{% static 'bootstrap-icons/font/bootstrap-icons.css' %}">
         {% vite_asset 'static/js/main.js' %}
     </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full">
+    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full bg-white dark:bg-gray-900">
         <div class="min-h-full">
             {% include "navbar.html" %}
             <div class="py-10">
