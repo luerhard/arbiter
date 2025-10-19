@@ -14,9 +14,7 @@
      aria-valuemin="0"
      aria-valuemax="{{ total }}">
     <div class="bg-indigo-600 text-xs font-medium text-indigo-100 text-center p-1 leading-none rounded-full"
-         style="width: {{ progress }}%">
-        {{ done }} / {{ total }}
-    </div>
+         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
 </div>
 {% endpartialdef %}
 {% block content %}
@@ -31,15 +29,15 @@
                             <div id="n-online-status"></div>
                         </div>
                     </div>
-                    <div>
-                        {% partial pbar %}
-                    </div>
+                    <div>{% partial pbar %}</div>
                 </div>
                 <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                         <div class="space-y-4">
                             <div id="current-example"
-                                 class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">Waiting for others to arrive...</div>
+                                 class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
+                                Waiting for others to arrive...
+                            </div>
                             <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                 <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
                                 <div id="prev-labels" class="flex flex-wrap gap-2"></div>
@@ -64,12 +62,15 @@
                                        hx-vals="js:{'labels': lib.discuss.collectLabels()}"
                                        ws-send>
                                 <label for="save-done"
-                                       class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">Save & Done</label>
+                                       class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">
+                                    Save & Done
+                                </label>
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <div id="messages"
-                                 class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50"></div>
+                                 class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50">
+                            </div>
                             {% comment %} send button and htmx logic {% endcomment %}
                             <form class="flex mt-2" ws-send>
                                 <input type="text"
@@ -81,15 +82,15 @@
                                 <button class="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
                                         type="submit"
                                         aria-describedby="message-input">
-                                <!-- Using Heroicons -->
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                     fill="none" 
-                                     viewBox="0 0 24 24" 
-                                     stroke-width="1.5" 
-                                     stroke="currentColor" 
-                                     class="size-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                </svg>
+                                    <!-- Using Heroicons -->
+                                    <svg xmlns="http://www.w3.org/2000/svg"
+                                         fill="none"
+                                         viewBox="0 0 24 24"
+                                         stroke-width="1.5"
+                                         stroke="currentColor"
+                                         class="size-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                    </svg>
                                 </button>
                             </form>
                         </div>
@@ -98,11 +99,10 @@
             </div>
         </div>
         {% comment %} Codebook View and Control {% endcomment %}
-        <div class="collapse mt-5"
-             id="codebook-col"
-             aria-expanded="false">
+        <div class="collapse mt-5" id="codebook-col" aria-expanded="false">
             <div class="relative bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6"
-                 style="max-height: 80vh; overflow-y: auto;">
+                 style="max-height: 80vh;
+                        overflow-y: auto">
                 {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
                 <div class="absolute top-2 right-2 z-10 flex gap-1"
                      role="group"
@@ -136,22 +136,15 @@
                              fill="currentColor"
                              class="bi bi-box-arrow-up-right"
                              viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                  d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fill-rule="evenodd"
-                                  d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                            <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </label>
                 </div>
-                <div class="prose dark:prose-invert max-w-none"
-                     id="codebook-orig-view">
-                    {{ codebook.content|markdownify }}
-                </div>
+                <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{{ codebook.content|markdownify }}</div>
                 <div class="prose dark:prose-invert max-w-none"
                      id="codebook-diff-view"
-                     hidden>
-                    {{ codebook_diff|markdownify }}
-                </div>
+                     hidden>{{ codebook_diff|markdownify }}</div>
             </div>
         </div>
     </div>
