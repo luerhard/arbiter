@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+{% load static %}
+{% load partials %}
+{% partialdef pbar %}
+<div class="progress bg-secondary mb-4"
+     id="pbar"
+     hx-swap-oob="true"
+     hx-get="{% url 'update-pbar' batch_id=batch_id %}"
+     hx-trigger="refreshPbar"
+     role="progressbar"
+     aria-label="Example with label"
+     aria-valuenow="{{ progress }}"
+     aria-valuemin="0"
+     aria-valuemax="{{ total }}">
+    <div class="progress-bar bg-primary overflow-visible px-2"
+         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+</div>
+{% endpartialdef %}
+{% block content %}
+    <div class="row mt-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">BATCH ID: {{ batch_id }}</h5>
+                        <div class="d-flex">
+                            N Online:&nbsp;
+                            <div id="n-online-status"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">{% partial pbar %}</div>
+                </div>
+                <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col">
+                                    <div id="current-example">Waiting for others to arrive...</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <hr class="mt-3 mb-1" />
+                                    <div id="prev-labels"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <hr class="mt-3 mb-1" />
+                                    <div id="current-labels"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="d-flex justify-content-between mt-3">
+                                        {% comment %} Show Codebook Button {% endcomment %}
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                id="codebook-toggle"
+                                                tabindex="-1"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#codebook-col">Show Codebook</button>
+                                        {% comment %} Save Button {% endcomment %}
+                                        <input type="checkbox"
+                                               class="btn-check"
+                                               id="save-done"
+                                               name="clicked-done"
+                                               value="done"
+                                               hx-vals="js:{'labels': lib.discuss.collectLabels()}"
+                                               ws-send>
+                                        <label for="save-done" class="btn btn-outline-primary">Save & Done</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col mb-2">
+                            <div id="messages" class="chat-message-container"></div>
+                            {% comment %} send button and htmx logic {% endcomment %}
+                            <form class="input-group mt-1" ws-send>
+                                <input type="text"
+                                       id="message-input"
+                                       class="form-control rounded-0 rounded-start"
+                                       autocomplete="off"
+                                       name="message"
+                                       placeholder="Message...">
+                                <button class="btn btn-outline-primary"
+                                        type="submit"
+                                        aria-describedby="message-input">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} Codebook View and Control {% endcomment %}
+        <div class="row collapse overflow-y-auto mt-5"
+             id="codebook-col"
+             style="max-height: 80vh"
+             aria-expanded="false">
+            <div class="position-relative">
+                {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
+                <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
+                     role="group"
+                     aria-label="Diff Control Button">
+                    {% comment %} Codebook Diff Button {% endcomment %}
+                    <input type="checkbox"
+                           class="btn-check"
+                           id="codebook-diff-check"
+                           autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-diff-check"
+                           title="Show Differences">
+                        <i class="bi bi-file-earmark-diff"></i>
+                    </label>
+                    {% comment %} Open Codebook in a New Window {% endcomment %}
+                    <input type="button" class="btn-check" id="codebook-open">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-open"
+                           title="Open in New Window">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </label>
+                </div>
+                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div class="codebook-view" id="codebook-diff-view" hidden>
+                    {% include "codebook/partials/view-diff-codebook.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let local_state = {
+            version: -1
+        };
+
+        let server_state = {
+            version: 0
+        };
+
+        const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
+        // show state of codebook expansion on the button
+        document.addEventListener("DOMContentLoaded", function() {
+            const codebook_toggle = document.getElementById("codebook-toggle");
+            const codebook_col = document.getElementById("codebook-col");
+            const codebook_open = document.getElementById("codebook-open");
+            const codebook_diff_check = document.getElementById("codebook-diff-check");
+            const codebook_orig_view = document.getElementById("codebook-orig-view");
+            const codebook_diff_view = document.getElementById("codebook-diff-view");
+
+            codebook_col.addEventListener("shown.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-outline-primary");
+                codebook_toggle.classList.add("btn-primary");
+            });
+
+            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
+                codebook_toggle.classList.remove("btn-primary");
+                codebook_toggle.classList.add("btn-outline-primary");
+            });
+
+            codebook_diff_check.addEventListener("change", function() {
+                codebook_diff_view.hidden = !codebook_diff_view.hidden
+                codebook_orig_view.hidden = !codebook_orig_view.hidden
+            });
+
+            codebook_open.addEventListener("click", function() {
+                codebook_toggle.click();
+                new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
+                timer = setInterval(function() {
+                    if (new_window.closed) {
+                        clearInterval(timer);
+                        codebook_toggle.click();
+                    }
+                }, 500);
+            });
+        });
+
+        // disable enter button (should only ever toggle "Saved")
+        // necessary to not toggle the filter / codebook buttons when they were clicked previously
+        document.querySelectorAll('button').forEach(function(button) {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+
+        function close_room(data) {
+            window.location = data["done"];
+        }
+        // handle everything after receiving data
+        document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+            // parse JSON data to object
+            const data = JSON.parse(event.detail.message);
+            console.log("WebSocket Message Received: ", data);
+
+            if ("done" in data) {
+                const intervalID = setInterval(close_room, 60000, data);
+                console.log(intervalID);
+            }
+
+            if ("no_examples" in data) {
+                document.getElementById("current-example").innerText = "No examples have disagreements."
+            }
+
+            console.log("setting user")
+            if (typeof data.user === "string") {
+                window.user = data.user;
+            }
+
+            console.log("checking server state");
+            const server_state = (data && typeof data === "object") ? data.state : null;
+            window.server_state = server_state;
+            console.log(server_state);
+
+            if (server_state) {
+                if (typeof local_state !== "object" || typeof local_state.version !== "number") {
+                    local_state = {
+                        version: -1
+                    };
+                }
+
+                const user = window.user;
+                const server_version = Number(server_state.version ?? 0);
+                const local_version = Number(local_state.version ?? -1);
+
+                if (server_version > local_version) {
+                    console.log("got new state version")
+
+                    if (server_state.cur_example_id !== local_state.cur_example_id) {
+                        console.log("rendering example");
+                        lib.discuss.renderExample(server_state.cur_example);
+
+                        console.log("rendering prev labels");
+                        lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
+
+                        console.log("rendering current labels");
+                        lib.discuss.renderCurrentLabels(server_state.annotation_labels, user);
+
+                        console.log("unlock save button");
+                        lib.discuss.unlockSaveDone();
+                    }
+
+                    lib.discuss.renderMessages(server_state.messages, user);
+                    lib.discuss.renderOnlineStatus(server_state.online_users);
+
+                }
+
+                local_state = server_state;
+            } else {
+                // what do do when no server state?
+            }
+
+            htmx.trigger("#pbar", "refreshPbar");
+
+            document.querySelectorAll('.btn-custom-color').forEach(button => {
+                const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
+                const textColor = lib.funcs.inferTextColorByContrast(color)
+                button.style.setProperty("--text-color", textColor);
+            });
+        })
+
+        // handle everything after sending data
+        document.body.addEventListener('htmx:wsAfterSend', function(event) {
+            const data = JSON.parse(event.detail.message); // Event detail contains the message data
+            console.log("triggered aftersend");
+
+            // Clear Chat text-input after message is sent or Save & Done.
+            const inputField = document.getElementById('message-input');
+            if (inputField) {
+                inputField.value = ''; // Clear the input field
+            }
+
+            if ("clicked-done" in data) {
+                console.log("lock fields");
+                lib.discuss.lockButtons();
+            }
+        });
+    </script>
+{% endblock content %}
