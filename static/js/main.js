@@ -1,12 +1,15 @@
 import "../css/main.css";
 import '@tailwindplus/elements';
 
+
 import htmx from "htmx.org";
 window.htmx = htmx;
-await import("htmx-ext-ws");
+import "htmx-ext-ws";
+
 import Mousetrap from "mousetrap";
-import Alpine from 'alpinejs'
-window.Alpine = Alpine
+
+import Alpine from 'alpinejs';
+window.Alpine = Alpine;
 
 import { navBlock, labelButton } from "./annotation.js";
 Alpine.data("labelButton", labelButton);
