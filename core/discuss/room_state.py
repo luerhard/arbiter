@@ -1,12 +1,15 @@
 # core/discuss/room_state.py
 from collections.abc import Awaitable
 from collections.abc import Callable
+import logging
 import json
 import os
 from typing import Any
 
 from redis.asyncio import Redis
 from redis.exceptions import WatchError
+
+log = logging.getLogger(__name__)
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 _redis: Redis | None = None
@@ -20,6 +23,7 @@ def _r() -> Redis:
 
 
 def _key(batch_id: int | str) -> str:
+    log.debug(f"room:{batch_id}")
     return f"room:{batch_id}"
 
 

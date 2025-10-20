@@ -14,7 +14,9 @@
      aria-valuemin="0"
      aria-valuemax="{{ total }}">
     <div class="bg-indigo-600 text-xs font-medium text-indigo-100 text-center p-1 leading-none rounded-full"
-         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+         style="width: {{ progress }}%">
+        {{ done }} / {{ total }}
+    </div>
 </div>
 {% endpartialdef %}
 {% block content %}
@@ -29,15 +31,15 @@
                             <div id="n-online-status"></div>
                         </div>
                     </div>
-                    <div>{% partial pbar %}</div>
+                    <div>
+                        {% partial pbar %}
+                    </div>
                 </div>
                 <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                         <div class="space-y-4">
                             <div id="current-example"
-                                 class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
-                                Waiting for others to arrive...
-                            </div>
+                                 class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">Waiting for others to arrive...</div>
                             <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                 <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
                                 <div id="prev-labels" class="flex flex-wrap gap-2"></div>
@@ -62,15 +64,12 @@
                                        hx-vals="js:{'labels': lib.discuss.collectLabels()}"
                                        ws-send>
                                 <label for="save-done"
-                                       class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">
-                                    Save & Done
-                                </label>
+                                       class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">Save & Done</label>
                             </div>
                         </div>
                         <div class="flex flex-col">
                             <div id="messages"
-                                 class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50">
-                            </div>
+                                 class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50"></div>
                             {% comment %} send button and htmx logic {% endcomment %}
                             <form class="flex mt-2" ws-send>
                                 <input type="text"
@@ -82,15 +81,15 @@
                                 <button class="inline-flex items-center rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600"
                                         type="submit"
                                         aria-describedby="message-input">
-                                    <!-- Using Heroicons -->
-                                    <svg xmlns="http://www.w3.org/2000/svg"
-                                         fill="none"
-                                         viewBox="0 0 24 24"
-                                         stroke-width="1.5"
-                                         stroke="currentColor"
-                                         class="size-4">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-                                    </svg>
+                                <!-- Using Heroicons -->
+                                <svg xmlns="http://www.w3.org/2000/svg"
+                                     fill="none" 
+                                     viewBox="0 0 24 24" 
+                                     stroke-width="1.5" 
+                                     stroke="currentColor" 
+                                     class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                                </svg>
                                 </button>
                             </form>
                         </div>
@@ -99,10 +98,11 @@
             </div>
         </div>
         {% comment %} Codebook View and Control {% endcomment %}
-        <div class="collapse mt-5" id="codebook-col" aria-expanded="false">
+        <div class="collapse mt-5"
+             id="codebook-col"
+             aria-expanded="false">
             <div class="relative bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6"
-                 style="max-height: 80vh;
-                        overflow-y: auto">
+                 style="max-height: 80vh; overflow-y: auto;">
                 {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
                 <div class="absolute top-2 right-2 z-10 flex gap-1"
                      role="group"
@@ -112,7 +112,7 @@
                            class="sr-only peer"
                            id="codebook-diff-check"
                            autocomplete="off">
-                    <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:peer-checked:bg-gray-600"
+                    <label class="inline-flex items-center justify-center w-9 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:peer-checked:bg-gray-600"
                            for="codebook-diff-check"
                            title="Show Differences">
                         <svg xmlns="http://www.w3.org/2000/svg"
@@ -136,19 +136,168 @@
                              fill="currentColor"
                              class="bi bi-box-arrow-up-right"
                              viewBox="0 0 16 16">
-                            <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                            <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            <path fill-rule="evenodd"
+                                  d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
+                            <path fill-rule="evenodd"
+                                  d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
                         </svg>
                     </label>
                 </div>
-                <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{{ codebook.content|markdownify }}</div>
+                <div class="prose dark:prose-invert max-w-none"
+                     id="codebook-orig-view">
+                    {{ codebook.content|markdownify }}
+                </div>
                 <div class="prose dark:prose-invert max-w-none"
                      id="codebook-diff-view"
-                     hidden>{{ codebook_diff|markdownify }}</div>
+                     hidden>
+                    {{ codebook_diff|markdownify }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% extends "base.html" %}
+{% load static %}
+{% load partials %}
+{% partialdef pbar %}
+<div class="progress bg-secondary mb-4"
+     id="pbar"
+     hx-swap-oob="true"
+     hx-get="{% url 'update-pbar' batch_id=batch_id %}"
+     hx-trigger="refreshPbar"
+     role="progressbar"
+     aria-label="Example with label"
+     aria-valuenow="{{ progress }}"
+     aria-valuemin="0"
+     aria-valuemax="{{ total }}">
+    <div class="progress-bar bg-primary overflow-visible px-2"
+         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
+</div>
+{% endpartialdef %}
+{% block content %}
+    <div class="row mt-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <h5 class="card-title">BATCH ID: {{ batch_id }}</h5>
+                        <div class="d-flex">
+                            N Online:&nbsp;
+                            <div id="n-online-status"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col">{% partial pbar %}</div>
+                </div>
+                <div class="mt-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="row">
+                                <div class="col">
+                                    <div id="current-example">Waiting for others to arrive...</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <hr class="mt-3 mb-1" />
+                                    <div id="prev-labels"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <hr class="mt-3 mb-1" />
+                                    <div id="current-labels"></div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col">
+                                    <div class="d-flex justify-content-between mt-3">
+                                        {% comment %} Show Codebook Button {% endcomment %}
+                                        <button class="btn btn-sm btn-outline-primary"
+                                                id="codebook-toggle"
+                                                tabindex="-1"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#codebook-col">Show Codebook</button>
+                                        {% comment %} Save Button {% endcomment %}
+                                        <input type="checkbox"
+                                               class="btn-check"
+                                               id="save-done"
+                                               name="clicked-done"
+                                               value="done"
+                                               hx-vals="js:{'labels': lib.discuss.collectLabels()}"
+                                               ws-send>
+                                        <label for="save-done" class="btn btn-outline-primary">Save & Done</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col mb-2">
+                            <div id="messages" class="chat-message-container"></div>
+                            {% comment %} send button and htmx logic {% endcomment %}
+                            <form class="input-group mt-1" ws-send>
+                                <input type="text"
+                                       id="message-input"
+                                       class="form-control rounded-0 rounded-start"
+                                       autocomplete="off"
+                                       name="message"
+                                       placeholder="Message...">
+                                <button class="btn btn-outline-primary"
+                                        type="submit"
+                                        aria-describedby="message-input">
+                                    <i class="bi bi-send"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% comment %} Codebook View and Control {% endcomment %}
+        <div class="row collapse overflow-y-auto mt-5"
+             id="codebook-col"
+             style="max-height: 80vh"
+             aria-expanded="false">
+            <div class="position-relative">
+                {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
+                <div class="position-absolute top-0 end-0 m-2 z-3 d-flex gap-1"
+                     role="group"
+                     aria-label="Diff Control Button">
+                    {% comment %} Codebook Diff Button {% endcomment %}
+                    <input type="checkbox"
+                           class="btn-check"
+                           id="codebook-diff-check"
+                           autocomplete="off">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-diff-check"
+                           title="Show Differences">
+                        <i class="bi bi-file-earmark-diff"></i>
+                    </label>
+                    {% comment %} Open Codebook in a New Window {% endcomment %}
+                    <input type="button" class="btn-check" id="codebook-open">
+                    <label class="btn btn-sm btn-outline-secondary"
+                           for="codebook-open"
+                           title="Open in New Window">
+                        <i class="bi bi-box-arrow-up-right"></i>
+                    </label>
+                </div>
+                <div class="codebook-view" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
+                <div class="codebook-view" id="codebook-diff-view" hidden>
+                    {% include "codebook/partials/view-diff-codebook.html" %}
+                </div>
             </div>
         </div>
     </div>
     <script>
+        let local_state = {
+            version: -1
+        };
+
+        let server_state = {
+            version: 0
+        };
+
+        const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
         // show state of codebook expansion on the button
         document.addEventListener("DOMContentLoaded", function() {
             const codebook_toggle = document.getElementById("codebook-toggle");
@@ -159,13 +308,13 @@
             const codebook_diff_view = document.getElementById("codebook-diff-view");
 
             codebook_col.addEventListener("shown.bs.collapse", function(e) {
-                codebook_toggle.classList.remove("bg-white", "dark:bg-gray-800", "text-gray-700", "dark:text-gray-300");
-                codebook_toggle.classList.add("bg-gray-200", "dark:bg-gray-700", "text-gray-800", "dark:text-gray-200");
+                codebook_toggle.classList.remove("btn-outline-primary");
+                codebook_toggle.classList.add("btn-primary");
             });
 
             codebook_col.addEventListener("hidden.bs.collapse", function(e) {
-                codebook_toggle.classList.add("bg-white", "dark:bg-gray-800", "text-gray-700", "dark:text-gray-300");
-                codebook_toggle.classList.remove("bg-gray-200", "dark:bg-gray-700", "text-gray-800", "dark:text-gray-200");
+                codebook_toggle.classList.remove("btn-primary");
+                codebook_toggle.classList.add("btn-outline-primary");
             });
 
             codebook_diff_check.addEventListener("change", function() {
@@ -175,7 +324,7 @@
 
             codebook_open.addEventListener("click", function() {
                 codebook_toggle.click();
-                new_window = window.open("{% url 'codebook-view' codebook_id=codebook.id %}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
+                new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
                 timer = setInterval(function() {
                     if (new_window.closed) {
                         clearInterval(timer);
@@ -183,6 +332,109 @@
                     }
                 }, 500);
             });
+        });
+
+        // disable enter button (should only ever toggle "Saved")
+        // necessary to not toggle the filter / codebook buttons when they were clicked previously
+        document.querySelectorAll('button').forEach(function(button) {
+            button.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+
+        function close_room(data) {
+            window.location = data["done"];
+        }
+        // handle everything after receiving data
+        document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+            // parse JSON data to object
+            const data = JSON.parse(event.detail.message);
+            console.log("WebSocket Message Received: ", data);
+
+            if ("done" in data) {
+                const intervalID = setInterval(close_room, 60000, data);
+                console.log(intervalID);
+            }
+
+            if ("no_examples" in data) {
+                document.getElementById("current-example").innerText = "No examples have disagreements."
+            }
+
+            console.log("setting user")
+            if (typeof data.user === "string") {
+                window.user = data.user;
+            }
+
+            console.log("checking server state");
+            const server_state = (data && typeof data === "object") ? data.state : null;
+            window.server_state = server_state;
+            console.log(server_state);
+
+            if (server_state) {
+                if (typeof local_state !== "object" || typeof local_state.version !== "number") {
+                    local_state = {
+                        version: -1
+                    };
+                }
+
+                const user = window.user;
+                const server_version = Number(server_state.version ?? 0);
+                const local_version = Number(local_state.version ?? -1);
+
+                if (server_version > local_version) {
+                    console.log("got new state version")
+
+                    if (server_state.cur_example_id !== local_state.cur_example_id) {
+                        console.log("rendering example");
+                        lib.discuss.renderExample(server_state.cur_example);
+
+                        console.log("rendering prev labels");
+                        lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
+
+                        console.log("rendering current labels");
+                        lib.discuss.renderCurrentLabels(server_state.annotation_labels, user);
+
+                        console.log("unlock save button");
+                        lib.discuss.unlockSaveDone();
+                    }
+
+                    lib.discuss.renderMessages(server_state.messages, user);
+                    lib.discuss.renderOnlineStatus(server_state.online_users);
+
+                }
+
+                local_state = server_state;
+            } else {
+                // what do do when no server state?
+            }
+
+            htmx.trigger("#pbar", "refreshPbar");
+
+            document.querySelectorAll('.btn-custom-color').forEach(button => {
+                const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
+                const textColor = lib.funcs.inferTextColorByContrast(color)
+                button.style.setProperty("--text-color", textColor);
+            });
+        })
+
+        // handle everything after sending data
+        document.body.addEventListener('htmx:wsAfterSend', function(event) {
+            const data = JSON.parse(event.detail.message); // Event detail contains the message data
+            console.log("triggered aftersend");
+
+            // Clear Chat text-input after message is sent or Save & Done.
+            const inputField = document.getElementById('message-input');
+            if (inputField) {
+                inputField.value = ''; // Clear the input field
+            }
+
+            if ("clicked-done" in data) {
+                console.log("lock fields");
+                lib.discuss.lockButtons();
+            }
         });
     </script>
 {% endblock content %}
