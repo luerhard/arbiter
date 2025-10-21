@@ -102,7 +102,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug(f"{self.username} clicked done.")
             await self._clicked_done(self.username)
 
-            log.debug(f"Await self._all_done().")
+            log.debug("Await self._all_done().")
             if await self._all_done():
                 state = await self._get_state()
                 log.debug(f"{not state["discussed_ended"] = }")
@@ -136,6 +136,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def _clicked_done(self, username):
         log.debug(f"{username = } clicked done.")
+
         async def mut(state):
             log.debug(f"{state["clicked_done"] = }")
             if state["clicked_done"][username]:

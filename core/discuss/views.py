@@ -9,7 +9,6 @@ from core.mixins import AnnotatorRequiredMixin
 from data.models import ExampleAssignment
 from projects.models import Batch
 
-
 log = logging.getLogger(__name__)
 
 
@@ -40,7 +39,7 @@ class HtmxPbar(View):
         if assignment_id:
             ctx = {
                 # TODO: get the actual progress
-                "progress": 2,# get_progress(request.user, assignment.example.batch),
+                "progress": 2,  # get_progress(request.user, assignment.example.batch),
             }
         else:
             ctx = {"progress": 0}
