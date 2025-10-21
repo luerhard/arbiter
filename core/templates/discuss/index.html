@@ -2,21 +2,6 @@
 {% load static %}
 {% load partials %}
 {% load markdownify %}
-{% partialdef pbar %}
-<div class="w-full bg-gray-200 rounded-full dark:bg-gray-700 mb-4"
-     id="pbar"
-     hx-swap-oob="true"
-     hx-get="{% url 'update-pbar' batch_id=batch_id %}"
-     hx-trigger="refreshPbar"
-     role="progressbar"
-     aria-label="Annotation progress"
-     aria-valuenow="{{ progress }}"
-     aria-valuemin="0"
-     aria-valuemax="{{ total }}">
-    <div class="bg-indigo-600 text-xs font-medium text-indigo-100 text-center p-1 leading-none rounded-full"
-         style="width: {{ progress }}%">{{ done }} / {{ total }}</div>
-</div>
-{% endpartialdef %}
 {% block content %}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3">
         <div class="bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
@@ -29,7 +14,11 @@
                             <div id="n-online-status"></div>
                         </div>
                     </div>
-                    <div>{% partial pbar %}</div>
+                    <div class="px-4 py-5 sm:px-6">
+                    <div id="pbar"
+                        hx-get="{% url 'discuss-pbar' %}"
+                        hx-trigger="load once, annotation-updated from:body"
+                        hx-swap="innerHTML"></div>
                 </div>
                 <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">

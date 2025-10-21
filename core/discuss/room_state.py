@@ -45,6 +45,7 @@ def _defaults() -> dict[str, Any]:
 
 async def get_state(batch_id: int | str) -> dict[str, Any]:
     raw = await _r().get(_key(batch_id))
+    log.debug(f"{raw = }")
     return json.loads(raw) if raw else _defaults()
 
 

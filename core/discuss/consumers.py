@@ -99,10 +99,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             labels = [int(label_id) for label_id in json.loads(data["labels"]) if label_id.strip()]
 
             await self._store_discussion_labels(self.username, labels)
+            log.debug(f"{self.username} clicked done.")
             await self._clicked_done(self.username)
 
+            log.debug(f"Await self._all_done().")
             if await self._all_done():
                 state = await self._get_state()
+                log.debug(f"{not state["discussed_ended"] = }")
                 if not state["discussed_ended"]:
                     await self.save_labels_to_db()
                     await self._set_next_and_reset()
@@ -132,9 +135,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return await update_state(self.batch_id, mut)
 
     async def _clicked_done(self, username):
+        log.debug(f"{username = } clicked done.")
         async def mut(state):
+            log.debug(f"{state["clicked_done"] = }")
             if state["clicked_done"][username]:
+                # TODO: Looks like on reload the user can press Save & Done
+                # even after having pressed it previously.
+                # After pressing it again the boolean rotates.
                 state["clicked_done"][username] = 0
+                # This means the button should change the un/lock dynamically on the frontend.
             else:
                 state["clicked_done"][username] = 1
 
@@ -144,8 +153,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def _all_done(self):
         state = await self._get_state()
+        log.debug(f"{state = }")
         required = set(state.get("required_users", []))
         clicked = {u for u, v in (state.get("clicked_done", {}) or {}).items() if v == 1}
+        log.debug(f"{required <= clicked = }")
         return required <= clicked
 
     # ---------- CHAT HELPERS -----------------
@@ -245,6 +256,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_example(self, state):
         log.debug("Getting example")
         queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).distinct()
+        log.debug(f"{queryset = }")
         paginator = Paginator(queryset, 1)
         page_obj = paginator.get_page(state["page"])
 
