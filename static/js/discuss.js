@@ -99,11 +99,14 @@ export function renderMessages(messages, currentUser) {
         const { user, text } = msg;
 
         // Decide message type and CSS classes
+        // TODO: Make sure that a DOM element is created with the correct labels and attributes.
         let divClass, containerClass;
         if (user === "system") {
+            // <c-discuss.system-message text="Annotator 1 connected."/>
             divClass = "system-message";
-            containerClass = "d-flex flex-row";
+            containerClass = "d-flex flex-row text-gray-900 dark:text-gray-100";
         } else if (user === currentUser) {
+            // <c-discuss.chat-bubble name="test user" time="12:52" text="This is test text."/>
             divClass = "self-message";
             containerClass = "d-flex flex-row-reverse";
         } else {
