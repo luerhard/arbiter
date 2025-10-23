@@ -91,44 +91,42 @@ export function renderCurrentLabels(labels, user) {
     }
 }
 
-export function renderMessages(messages, currentUser) {
-    const container = document.getElementById("messages");
-    container.innerHTML = "";
+// export function renderMessages(messages, currentUser) {
+//     const container = document.getElementById("messages");
+//     container.innerHTML = "";
 
-    messages.forEach(msg => {
-        const { user, text } = msg;
+//     messages.forEach(msg => {
+//         const { user, text } = msg;
 
-        // Decide message type and CSS classes
-        // TODO: Make sure that a DOM element is created with the correct labels and attributes.
-        let divClass, containerClass;
-        if (user === "system") {
-            // <c-discuss.system-message text="Annotator 1 connected."/>
-            divClass = "system-message";
-            containerClass = "d-flex flex-row text-gray-900 dark:text-gray-100";
-        } else if (user === currentUser) {
-            // <c-discuss.chat-bubble name="test user" time="12:52" text="This is test text."/>
-            divClass = "self-message";
-            containerClass = "d-flex flex-row-reverse";
-        } else {
-            divClass = "other-message";
-            containerClass = "d-flex flex-row";
-        }
+//         // Decide message type and CSS classes
+//         // TODO: Make sure that a DOM element is created with the correct labels and attributes.
+//         let divClass, containerClass;
+//         if (user === "system") {
+//             divClass = "system-message";
+//             containerClass = "d-flex flex-row text-gray-900 dark:text-gray-100";
+//         } else if (user === currentUser) {
+//             divClass = "self-message";
+//             containerClass = "d-flex flex-row-reverse";
+//         } else {
+//             divClass = "other-message";
+//             containerClass = "d-flex flex-row";
+//         }
 
-        // Build message DOM
-        const outerDiv = document.createElement("div");
-        outerDiv.className = containerClass;
+//         // Build message DOM
+//         const outerDiv = document.createElement("div");
+//         outerDiv.className = containerClass;
 
-        const msgDiv = document.createElement("div");
-        msgDiv.className = `message ${divClass}`;
-        msgDiv.textContent = text;
+//         const msgDiv = document.createElement("div");
+//         msgDiv.className = `message ${divClass}`;
+//         msgDiv.textContent = text;
 
-        outerDiv.appendChild(msgDiv);
-        container.appendChild(outerDiv);
-    });
+//         outerDiv.appendChild(msgDiv);
+//         container.appendChild(outerDiv);
+//     });
 
-    // Auto-scroll to bottom
-    container.scrollTop = container.scrollHeight;
-}
+//     // Auto-scroll to bottom
+//     container.scrollTop = container.scrollHeight;
+// }
 
 
 export function collectLabels() {
