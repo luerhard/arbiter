@@ -59,7 +59,7 @@
                             <div class="flex flex-col">
                                 <div id="messages"
                                      class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50">
-                                    <c-discuss.chat/>
+                                    <c-discuss.chat />
                                 </div>
                                 {% comment %} send button and htmx logic {% endcomment %}
                                 <form class="flex mt-2" ws-send>
@@ -149,16 +149,39 @@
 
             document.addEventListener("alpine:init", () => {
                 Alpine.data("chatManager", () => {
-                    messages = [
-                        {id: 0, user: 'annotator1', text: 'hi'}, 
-                        {id: 1, user: 'system', text: 'annotator1 is now connected.'}, 
-                        {id: 2, user: 'system', text: 'annotator1 has disconnected.'}, 
-                        {id: 3, user: 'system', text: 'annotator1 is now connected.'}, 
-                        {id: 4, user: 'annotator1', text: 'hi'}, 
-                        {id: 5, user: 'annotator2', text: 'hello world. Test.'}, 
-                        {id: 6, user: 'system', text: 'annotator1 has disconnected.'}, 
-                        {id: 7, user: 'system', text: 'annotator1 is now connected.'}
-                    ];
+                    messages = [{
+                        id: 0,
+                        user: 'annotator1',
+                        text: 'hi'
+                    }, {
+                        id: 1,
+                        user: 'system',
+                        text: 'annotator1 is now connected.'
+                    }, {
+                        id: 2,
+                        user: 'system',
+                        text: 'annotator1 has disconnected.'
+                    }, {
+                        id: 3,
+                        user: 'system',
+                        text: 'annotator1 is now connected.'
+                    }, {
+                        id: 4,
+                        user: 'annotator1',
+                        text: 'hi'
+                    }, {
+                        id: 5,
+                        user: 'annotator2',
+                        text: 'hello world. Test.'
+                    }, {
+                        id: 6,
+                        user: 'system',
+                        text: 'annotator1 has disconnected.'
+                    }, {
+                        id: 7,
+                        user: 'system',
+                        text: 'annotator1 is now connected.'
+                    }];
                 });
             });
 
