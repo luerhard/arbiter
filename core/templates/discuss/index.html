@@ -142,10 +142,11 @@
             let local_state = {
                 version: -1
             };
-
             let server_state = {
                 version: 0
             };
+            let user_self = "annotator1";
+            let user_other = "annotator2";
 
             document.addEventListener("alpine:init", () => {
                 Alpine.data("chatManager", () => {
@@ -183,6 +184,8 @@
                         text: 'annotator1 is now connected.'
                     }];
                 });
+                Alpine.store("user_self", user_self);
+                Alpine.store("user_other", user_other);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
