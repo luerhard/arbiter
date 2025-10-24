@@ -1,5 +1,4 @@
 <div x-data
-     @newmsg.document="console.log(Alpine.store('chat').messages)"
      class="chat-messages">
     <template x-for="message in $store.chat.messages" :key="message.id">
         <div class="message"

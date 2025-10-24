@@ -297,8 +297,6 @@
                                 })
                             });
                         last_render_n = server_state.messages.length;
-                        // Dispatching and delegating the bulk of message rendering to Alpine for debugging
-                        document.dispatchEvent(new Event("newmsg"));
 
                         lib.discuss.renderOnlineStatus(server_state.online_users);
                     }
