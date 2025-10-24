@@ -1,5 +1,4 @@
-<div x-data
-     class="chat-messages">
+<div x-data class="chat-messages">
     <template x-for="message in $store.chat.messages" :key="message.id">
         <div class="message"
              :id="'message-' + message.id"
