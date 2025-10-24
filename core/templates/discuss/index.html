@@ -58,8 +58,9 @@
                             </div>
                             <div class="flex flex-col">
                                 <div id="messages"
-                                     class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50">
+                                     class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50 overscroll-none">
                                     <c-discuss.chat />
+                                    <div id="chat-bottom"></div>
                                 </div>
                                 {% comment %} send button and htmx logic {% endcomment %}
                                 <form class="flex mt-2" ws-send>
@@ -149,9 +150,12 @@
             let user_self;
             let user_other;
 
+            let scrollToBottom;
+
             document.addEventListener("alpine:init", () => {
                 Alpine.store("chat", {
-                    messages: []
+                    messages: [],
+                    last_render_id: 0,
                 });
                 Alpine.store("user_self", user_self);
                 Alpine.store("user_other", user_other);
@@ -193,6 +197,22 @@
                         }
                     }, 500);
                 });
+                bottom_el = document.getElementById("chat-bottom");
+                scrollToBottom = (element = bottom_el) => {
+                    window.setTimeout(() => {
+                        // I couldn't think of anything better other than firing it twice.
+                        bottom_el.scrollIntoView({
+                            behavior: 'smooth',
+                            container: 'nearest',
+                            block: 'center',
+                        });
+                        bottom_el.scrollIntoView({
+                            behavior: 'smooth',
+                            container: 'nearest',
+                            block: 'center',
+                        });
+                    }, 500);
+                };
             });
 
             // disable enter button (should only ever toggle "Saved")
@@ -266,6 +286,7 @@
                             lib.discuss.unlockSaveDone();
                         }
 
+                        Alpine.store("chat").last_render_id = server_state.messages.length - 1;
                         // Push only the latest messages
                         server_state.messages.slice(last_render_n)
                             .forEach((message, i) => {
@@ -274,8 +295,8 @@
                                     ...message,
                                     id: i + last_render_n
                                 })
-                            })
-                        last_render_n = server_state.messages.length - 1;
+                            });
+                        last_render_n = server_state.messages.length;
                         // Dispatching and delegating the bulk of message rendering to Alpine for debugging
                         document.dispatchEvent(new Event("newmsg"));
 
