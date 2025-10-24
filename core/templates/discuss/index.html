@@ -8,12 +8,6 @@
             <div class="p-6">
                 <div class="grid grid-cols-1 gap-6">
                     <div>
-                        <div>
-                            Self-user: <span x-text="$store.user_self"></span>
-                        </div>
-                        <div>
-                            Other-user: <span x-text="$store.user_other"></span>
-                        </div>
                         <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">BATCH ID: {{ batch_id }}</h2>
                         <div class="flex items-center text-sm text-gray-600 dark:text-gray-400">
                             N Online:&nbsp;
@@ -151,13 +145,12 @@
             let server_state = {
                 version: 0
             };
+            let last_render_n = 0;  // Inclusive last rendered message
             let user_self;
             let user_other;
 
             document.addEventListener("alpine:init", () => {
-                Alpine.data("chatManager", () => {
-                    messages = [];
-                });
+                Alpine.store("chat", {messages: []});
                 Alpine.store("user_self", user_self);
                 Alpine.store("user_other", user_other);
             });
@@ -271,14 +264,16 @@
                             lib.discuss.unlockSaveDone();
                         }
 
-                        // Dispatching and delegating the bulk of message rendering to Alpine
+                        // Push only the latest messages
+                        server_state.messages.slice(last_render_n)
+                        .forEach((message, i) => {
+                            // Add an id to each message added to the chat store
+                            Alpine.store("chat").messages.push({...message, id: i + last_render_n})
+                        })
+                        last_render_n = server_state.messages.length - 1;
+                        // Dispatching and delegating the bulk of message rendering to Alpine for debugging
                         document.dispatchEvent(new Event("newmsg"));
-                        // TODO: make sure they get rendered first, then flush the messages from the chatManager.
-                        // TODO: Use the ids to check which message id was last rendered, then rendered everything else
-                        // from there.
-                        Alpine.data("chatManager", () => {
-                            messages = server_state.messages;
-                        });
+
                         lib.discuss.renderOnlineStatus(server_state.online_users);
                     }
 
