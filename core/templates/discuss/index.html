@@ -29,7 +29,9 @@
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
-                                    <div id="prev-labels" class="flex flex-wrap gap-2"></div>
+                                    <div id="prev-labels" class="flex flex-wrap gap-2">
+                                        <c-discuss.label id=1 text="Anti-Elitism" color="#2c3e50" checked />
+                                    </div>
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Your labels</h3>
@@ -58,19 +60,19 @@
                             </div>
                             <div class="flex flex-col">
                                 <div id="messages"
-                                     class="flex-grow overflow-y-auto h-96 border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50 overscroll-none scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                                     class="flex-grow overflow-y-auto h-96 rounded-t-md border border-gray-200 border-b-transparent dark:border-gray-700 dark:border-b-transparent p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50 overscroll-none scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent">
                                     <c-discuss.chat />
                                     <div id="chat-bottom"></div>
                                 </div>
                                 {% comment %} send button and htmx logic {% endcomment %}
-                                <form class="flex mt-2" ws-send>
+                                <form class="flex" ws-send>
                                     <input type="text"
                                            id="message-input"
-                                           class="flex-grow pl-3 block w-full rounded-l-md border-gray-300 shadow-sm caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+                                           class="flex-grow pl-3 block w-full rounded-bl-md border border-gray-300 dark:border-gray-700 shadow-sm caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
                                            autocomplete="off"
                                            name="message"
                                            placeholder="Message...">
-                                    <button class="inline-flex items-center rounded-r-md border border-l-0 bg-blue-500 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-blue-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-blue-600"
+                                    <button class="inline-flex items-center rounded-br-md border border-blue-500 border-l-0 bg-blue-500 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-blue-600"
                                             type="submit"
                                             aria-describedby="message-input">
                                         <!-- Using Heroicons -->
@@ -146,9 +148,7 @@
             let server_state = {
                 version: 0
             };
-            let last_render_n = 0; // Inclusive last rendered message
-            let user_self;
-            let user_other;
+            let last_render_n = 0; // Exclusive last rendered message
 
             let scrollToBottom;
 
@@ -157,8 +157,8 @@
                     messages: [],
                     last_render_id: 0,
                 });
-                Alpine.store("user_self", user_self);
-                Alpine.store("user_other", user_other);
+                Alpine.store("user_self", undefined);
+                Alpine.store("user_other", undefined);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
@@ -197,10 +197,12 @@
                         }
                     }, 500);
                 });
+
                 bottom_el = document.getElementById("chat-bottom");
                 scrollToBottom = (element = bottom_el) => {
                     window.setTimeout(() => {
                         // I couldn't think of anything better other than firing it twice.
+                        // Otherwise it doesn't completely scroll down.
                         bottom_el.scrollIntoView({
                             behavior: 'smooth',
                             container: 'nearest',
@@ -211,7 +213,7 @@
                             container: 'nearest',
                             block: 'center',
                         });
-                    }, 500);
+                    }, 200);
                 };
             });
 
@@ -276,8 +278,8 @@
                             console.log("rendering example");
                             lib.discuss.renderExample(server_state.cur_example);
 
-                            console.log("rendering prev labels");
-                            lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
+                            // console.log("rendering prev labels");
+                            // lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
 
                             console.log("rendering current labels");
                             lib.discuss.renderCurrentLabels(server_state.annotation_labels, user);
@@ -308,6 +310,7 @@
 
                 htmx.trigger("#pbar", "refreshPbar");
 
+                // TODO: Check later if this is useful code.
                 document.querySelectorAll('.btn-custom-color').forEach(button => {
                     const color = getComputedStyle(button).getPropertyValue('--label-color').trim();
                     const textColor = lib.funcs.inferTextColorByContrast(color)
