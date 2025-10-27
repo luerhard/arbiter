@@ -1,6 +1,5 @@
 <c-vars id text color checked />
-<div class="inline-block"
-     x-data="">
+<div class="inline-block" x-data="">
     <!-- Real checkbox for Django; visually hidden but stays in the form -->
     <input type="checkbox"
            name="labels"
@@ -13,6 +12,5 @@
            :style="`--label-color: {{ color }}; --label-text: ${textColor()};`"
            :data-active="String(isChecked)"
            @click.prevent="toggle()"
-           @keydown.enter.prevent="toggle()">
-    </label>
+           @keydown.enter.prevent="toggle()"></label>
 </div>
