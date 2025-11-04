@@ -158,7 +158,11 @@
                 });
                 Alpine.store("user_self", undefined);
                 Alpine.store("user_other", undefined);
-                Alpine.store("labels", [{id: 1}, {id: 2}]);
+                Alpine.store("labels", [{
+                    id: 1
+                }, {
+                    id: 2
+                }]);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
