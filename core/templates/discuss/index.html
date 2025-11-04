@@ -29,9 +29,8 @@
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
-                                    <div id="prev-labels" class="flex flex-wrap gap-2">
-                                        <c-discuss.label id=1 text="Anti-Elitism" color="#2c3e50" checked />
-                                    </div>
+                                    <!-- Real checkbox for Django; visually hidden but stays in the form -->
+                                    <c-discuss.label />
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Your labels</h3>
@@ -159,6 +158,7 @@
                 });
                 Alpine.store("user_self", undefined);
                 Alpine.store("user_other", undefined);
+                Alpine.store("labels", [{id: 1}, {id: 2}]);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
@@ -280,6 +280,10 @@
 
                             // console.log("rendering prev labels");
                             // lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
+                            ann_labels = server_state.annotation_labels;
+                            user1_labels = ann_labels.annotator1;
+                            console.log(user1_labels);
+                            Alpine.store("labels", user1_labels.flat());
 
                             console.log("rendering current labels");
                             lib.discuss.renderCurrentLabels(server_state.annotation_labels, user);
