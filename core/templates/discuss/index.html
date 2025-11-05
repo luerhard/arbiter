@@ -23,18 +23,21 @@
                     <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                             <div class="space-y-4">
-                                <div id="current-example"
-                                     class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
-                                    Waiting for others to arrive...
+                                <div x-data id="current-example"
+                                     class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300" x-text="$store.example">
+                                    
                                 </div>
-                                <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
+                                <div class="border-t border-gray-200 dark:border-gray-700 pt-4" x-data>
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
                                     <!-- Real checkbox for Django; visually hidden but stays in the form -->
-                                    <c-discuss.label />
+                                    <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">Your previous annotations</div>
+                                    <c-discuss.labels user="self" disabled/>
+                                    <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">Previous annotations of <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline" x-text="$store.user_other"></span></div>
+                                    <c-discuss.labels user="other" disabled/>
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Your labels</h3>
-                                    <div id="current-labels" class="flex flex-wrap gap-2"></div>
+                                    <c-discuss.labels user="self" enabled/>
                                 </div>
                                 <div class="flex justify-between items-center mt-4">
                                     {% comment %} Show Codebook Button {% endcomment %}
@@ -49,7 +52,7 @@
                                            id="save-done"
                                            name="clicked-done"
                                            value="done"
-                                           hx-vals="js:{'labels': lib.discuss.collectLabels()}"
+                                           hx-vals="js:{'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
                                            ws-send>
                                     <label for="save-done"
                                            class="inline-flex items-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 cursor-pointer">
@@ -148,21 +151,21 @@
                 version: 0
             };
             let last_render_n = 0; // Exclusive last rendered message
+            let user_self = undefined;
+            let user_other = undefined;
 
             let scrollToBottom;
 
             document.addEventListener("alpine:init", () => {
+                Alpine.store("example", "Waiting for others to arrive...")
                 Alpine.store("chat", {
                     messages: [],
                     last_render_id: 0,
                 });
                 Alpine.store("user_self", undefined);
                 Alpine.store("user_other", undefined);
-                Alpine.store("labels", [{
-                    id: 1
-                }, {
-                    id: 2
-                }]);
+                Alpine.store("labels_self", []);
+                Alpine.store("labels_other", []);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
@@ -246,17 +249,18 @@
                 }
 
                 if ("no_examples" in data) {
-                    document.getElementById("current-example").innerText = "No examples have disagreements."
+                    Alpine.store("example", "No examples have disagreements.");
                 }
 
                 console.log("setting user")
                 if (typeof data.user === "string") {
-                    window.user = data.user;
+                    user_self = data.user;
                     Alpine.store("user_self", data.user);
                     // This will assume that only two people required for discussion, no more, no less.
                     users = data.state.required_users;
                     // If its not the so-called self-user then it must be the other one.
-                    Alpine.store("user_other", users[0] === data.user ? users[1] : users[0]);
+                    user_other = users[0] === data.user ? users[1] : users[0];
+                    Alpine.store("user_other", user_other);
                 }
 
                 console.log("checking server state");
@@ -271,7 +275,6 @@
                         };
                     }
 
-                    const user = window.user;
                     const server_version = Number(server_state.version ?? 0);
                     const local_version = Number(local_state.version ?? -1);
 
@@ -279,18 +282,12 @@
                         console.log("got new state version")
 
                         if (server_state.cur_example_id !== local_state.cur_example_id) {
-                            console.log("rendering example");
-                            lib.discuss.renderExample(server_state.cur_example);
+                            Alpine.store("example", server_state.cur_example);
 
-                            // console.log("rendering prev labels");
-                            // lib.discuss.renderPrevLabels(server_state.annotation_labels, user);
-                            ann_labels = server_state.annotation_labels;
-                            user1_labels = ann_labels.annotator1;
-                            console.log(user1_labels);
-                            Alpine.store("labels", user1_labels.flat());
-
-                            console.log("rendering current labels");
-                            lib.discuss.renderCurrentLabels(server_state.annotation_labels, user);
+                            // The property `checked` should be modifiable and then read when saving.
+                            // Flatten, then add checked property to each label, then pass it to Alpine.store.
+                            Alpine.store("labels_self", server_state.annotation_labels[user_self].flat().map((i) => ({...i, checked: i.is_set})));
+                            Alpine.store("labels_other", server_state.annotation_labels[user_other].flat().map((i) => ({...i, checked: i.is_set})));
 
                             console.log("unlock save button");
                             lib.discuss.unlockSaveDone();
