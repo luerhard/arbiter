@@ -23,21 +23,24 @@
                     <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                             <div class="space-y-4">
-                                <div x-data id="current-example"
-                                     class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300" x-text="$store.example">
-                                    
-                                </div>
+                                <div x-data
+                                     id="current-example"
+                                     class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
+                                     x-text="$store.example"></div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4" x-data>
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
                                     <!-- Real checkbox for Django; visually hidden but stays in the form -->
                                     <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">Your previous annotations</div>
-                                    <c-discuss.labels user="self" disabled/>
-                                    <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">Previous annotations of <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline" x-text="$store.user_other"></span></div>
-                                    <c-discuss.labels user="other" disabled/>
+                                    <c-discuss.labels user="self" disabled />
+                                    <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">
+                                        Previous annotations of <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline"
+       x-text="$store.user_other"></span>
+                                    </div>
+                                    <c-discuss.labels user="other" disabled />
                                 </div>
                                 <div class="border-t border-gray-200 dark:border-gray-700 pt-4">
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Your labels</h3>
-                                    <c-discuss.labels user="self" enabled/>
+                                    <c-discuss.labels user="self" enabled />
                                 </div>
                                 <div class="flex justify-between items-center mt-4">
                                     {% comment %} Show Codebook Button {% endcomment %}
@@ -286,8 +289,14 @@
 
                             // The property `checked` should be modifiable and then read when saving.
                             // Flatten, then add checked property to each label, then pass it to Alpine.store.
-                            Alpine.store("labels_self", server_state.annotation_labels[user_self].flat().map((i) => ({...i, checked: i.is_set})));
-                            Alpine.store("labels_other", server_state.annotation_labels[user_other].flat().map((i) => ({...i, checked: i.is_set})));
+                            Alpine.store("labels_self", server_state.annotation_labels[user_self].flat().map((i) => ({
+                                ...i,
+                                checked: i.is_set
+                            })));
+                            Alpine.store("labels_other", server_state.annotation_labels[user_other].flat().map((i) => ({
+                                ...i,
+                                checked: i.is_set
+                            })));
 
                             console.log("unlock save button");
                             lib.discuss.unlockSaveDone();

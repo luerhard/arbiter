@@ -1,40 +1,35 @@
-<c-vars user/>
-<div x-data
-     class="flex flex-wrap gap-2">
+<c-vars user />
+<div x-data class="flex flex-wrap gap-2">
     {% if user == "self" %}
-    <template x-for="label in $store.labels_self">
-        <div>
-            <input type="checkbox"
-                   name="labels"
-                   class="sr-only peer"
-                   :id="'label-' + label.id"
-                   {% if disabled is True %} disabled {% endif %}
-                   {% if enabled is True %} :checked="label.checked" {% elif disabled is True %} :checked="label.is_set" {% endif %}
-                    />
-            <label :for="'label-' + label.id"
-                   {% if enabled is True %} @click="label.checked = !label.checked" {% endif %}
-                   x-text="label.label"
-                   class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default"
-                    >
-            </label>
-        </div>
-    </template>
+        <template x-for="label in $store.labels_self">
+            <div>
+                <input type="checkbox"
+                       name="labels"
+                       class="sr-only peer"
+                       :id="'label-' + label.id"
+                       {% if disabled is True %}disabled{% endif %}
+                       {% if enabled is True %} :checked="label.checked" {% elif disabled is True %} :checked="label.is_set" {% endif %} />
+                <label :for="'label-' + label.id"
+                       {% if enabled is True %}@click="label.checked = !label.checked"{% endif %}
+                       x-text="label.label"
+                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default">
+                </label>
+            </div>
+        </template>
     {% elif user == "other" %}
-    <template x-for="label in $store.labels_other">
-        <div>
-            <input type="checkbox"
-                   name="labels"
-                   class="sr-only peer"
-                   :id="'label-' + label.id"
-                   {% if disabled is True %} disabled {% endif %}
-                   {% if enabled is True %} :checked="label.checked" {% elif disabled is True %} :checked="label.is_set" {% endif %}
-                    />
-            <label :for="'label-' + label.id"
-                   {% if enabled is True %} @click="label.checked = !label.checked" {% endif %}
-                   x-text="label.label"
-                   class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default"
-                    >
-        </div>
-    </template>
-    {% endif %}
-</div>
+        <template x-for="label in $store.labels_other">
+            <div>
+                <input type="checkbox"
+                       name="labels"
+                       class="sr-only peer"
+                       :id="'label-' + label.id"
+                       {% if disabled is True %}disabled{% endif %}
+                       {% if enabled is True %} :checked="label.checked" {% elif disabled is True %} :checked="label.is_set" {% endif %} />
+                <label :for="'label-' + label.id"
+                       {% if enabled is True %}@click="label.checked = !label.checked"{% endif %}
+                       x-text="label.label"
+                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default">
+                </div>
+            </template>
+        {% endif %}
+    </div>
