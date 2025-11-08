@@ -12,7 +12,7 @@
                 <label :for="'label-' + label.id"
                        {% if enabled is True %}@click="label.checked = !label.checked"{% endif %}
                        x-text="label.label"
-                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default">
+                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-gray-100 dark:bg-gray-200 text-gray-800 peer-not-disabled:hover:bg-white peer-not-disabled:peer-not-checked:hover:border-gray-400 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-checked:shadow-blue-400/60 peer-disabled:cursor-default">
                 </label>
             </div>
         </template>
@@ -28,7 +28,7 @@
                 <label :for="'label-' + label.id"
                        {% if enabled is True %}@click="label.checked = !label.checked"{% endif %}
                        x-text="label.label"
-                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-white text-gray-800 peer-not-disabled:hover:bg-gray-300 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-disabled:cursor-default">
+                       class="cursor-pointer rounded-2xl border px-3 py-2 text-sm transition bg-gray-100 dark:bg-gray-200 text-gray-800 peer-not-disabled:hover:bg-white peer-not-disabled:peer-not-checked:hover:border-gray-400 peer-not-disabled:peer-checked:hover:bg-blue-300 peer-checked:border-blue-400 shadow-sm peer-checked:bg-blue-400 peer-checked:shadow-blue-400/60 peer-disabled:cursor-default">
                 </div>
             </template>
         {% endif %}
