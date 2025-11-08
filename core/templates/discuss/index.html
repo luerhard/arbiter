@@ -49,17 +49,17 @@
                                             data-bs-toggle="collapse"
                                             data-bs-target="#codebook-col">Show Codebook</button>
                                     {% comment %} Save Button {% endcomment %}
-                                    <div x-data> 
+                                    <div x-data>
                                         <input type="checkbox"
-                                            class="sr-only peer"
-                                            id="save-done"
-                                            name="clicked-done"
-                                            value="done"
-                                            hx-vals="js:{'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
-                                            :disabled="$store.save_disabled"
-                                            ws-send>
+                                               class="sr-only peer"
+                                               id="save-done"
+                                               name="clicked-done"
+                                               value="done"
+                                               hx-vals="js:{'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+                                               :disabled="$store.save_disabled"
+                                               ws-send>
                                         <label for="save-done"
-                                            class="cursor-pointer peer-disabled:cursor-default inline-flex items-center rounded-md border border-transparent bg-indigo-600 peer-disabled:bg-indigo-600/80 px-4 py-2 text-sm font-medium text-white shadow-sm peer-not-disabled:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                               class="cursor-pointer peer-disabled:cursor-default inline-flex items-center rounded-md border border-transparent bg-indigo-600 peer-disabled:bg-indigo-600/80 px-4 py-2 text-sm font-medium text-white shadow-sm peer-not-disabled:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                             Save & Done
                                         </label>
                                     </div>
