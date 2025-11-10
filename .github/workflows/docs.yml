@@ -18,8 +18,8 @@ jobs:
       - name: Install uv
         id: setup-uv
         uses: astral-sh/setup-uv@v7
-      - name: Setup python
-        run: uv python install
+        with:
+          python-version: 3.12
       #----------------------------------------------
       # ------ install dependencies ----------------
       #----------------------------------------------
