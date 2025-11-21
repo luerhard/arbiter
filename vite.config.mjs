@@ -5,6 +5,17 @@ import inject from '@rollup/plugin-inject'
 
 export default defineConfig({
     base: "/static/",
+    server: {
+        host: '0.0.0.0',
+        port: 5173,
+        watch: {
+            usePolling: true,
+        },
+        hmr: {
+            host: 'localhost',
+            overlay: false
+        },
+    },
     build: {
         manifest: "manifest.json",
         outDir: resolve("./assets"),
@@ -20,11 +31,5 @@ export default defineConfig({
             htmx: 'htmx.org'
         }),
     ],
-    server: {
-        host: 'localhost',
-        port: 5173,
-        strictPort: true,
-        cors: true
-    }
 
 })
