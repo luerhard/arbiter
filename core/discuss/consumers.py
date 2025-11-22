@@ -96,7 +96,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_state()
 
         elif "clicked-done" in data.keys():
-            labels = [int(label_id) for label_id in json.loads(data["labels"]) if label_id.strip()]
+            labels = [label_id for label_id in data["labels"]]
 
             await self._store_discussion_labels(self.username, labels)
             log.debug(f"{self.username} clicked done.")
@@ -105,8 +105,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug("Await self._all_done().")
             if await self._all_done():
                 state = await self._get_state()
-                log.debug(f"{not state["discussed_ended"] = }")
-                if not state["discussed_ended"]:
+                # log.debug(f"{not state["discussion_ended"] = }")
+                if not state["discussion_ended"]:
                     await self.save_labels_to_db()
                     await self._set_next_and_reset()
             await self.group_send_state()
