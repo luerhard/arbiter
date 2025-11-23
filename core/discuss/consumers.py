@@ -194,7 +194,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         next_page = int(state.get("page", 0)) + 1
         state["page"] = next_page
-        example, annotations = await database_sync_to_async(self.get_example)(state=state)
+        example, annotations, total_pages = await database_sync_to_async(self.get_example)(state=state)
 
         end_reason = None
         msg = None
@@ -223,6 +223,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
                 state["annotation_labels"] = annotations
+                state["total_pages"] = total_pages
 
                 state["clicked_done"] = dict.fromkeys(state.get("online_users", []), 0)
             return state
@@ -260,6 +261,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         log.debug(f"{queryset = }")
         paginator = Paginator(queryset, 1)
         page_obj = paginator.get_page(state["page"])
+        total_pages = paginator.count
 
         if page_obj.number < state["page"] or not queryset.count():
             return None, None
@@ -289,7 +291,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 by_user[user].append(label)
 
-        return example, by_user
+        return example, by_user, total_pages
 
     @database_sync_to_async
     def get_assigned_annotators(self):

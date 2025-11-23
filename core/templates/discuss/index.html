@@ -302,6 +302,12 @@
                                 checked: i.is_set
                             })));
 
+                            Alpine.store("progress", {
+                                done: server_state["page"]-1,
+                                total: server_state["total_pages"],
+                                ratio: 100 * (server_state["page"]-1) / server_state["total_pages"],
+                            });
+
                             console.log("unlock save button");
                             // TODO: Discuss when the button should be locked.
                             // lib.discuss.unlockSaveDone();
