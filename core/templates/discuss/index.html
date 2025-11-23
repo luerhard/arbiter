@@ -144,10 +144,10 @@
             </div>
         </div>
         <script>
-            let local_state = {
+            window.local_state = {
                 version: -1
             };
-            let server_state = {
+            window.server_state = {
                 version: 0
             };
             let last_render_n = 0; // Exclusive last rendered message
@@ -242,7 +242,7 @@
 
             function close_room(data) {
                 window.location = data["done"];
-            }
+            };
             // handle everything after receiving data
             document.body.addEventListener('htmx:wsAfterMessage', function(event) {
                 // parse JSON data to object
@@ -252,11 +252,11 @@
                 if ("done" in data) {
                     const intervalID = setInterval(close_room, 60000, data);
                     console.log(intervalID);
-                }
+                };
 
                 if ("no_examples" in data) {
                     Alpine.store("example", "No examples have disagreements.");
-                }
+                };
 
                 console.log("setting user")
                 if (typeof data.user === "string") {
@@ -267,7 +267,7 @@
                     // If its not the so-called self-user then it must be the other one.
                     user_other = users[0] === data.user ? users[1] : users[0];
                     Alpine.store("user_other", user_other);
-                }
+                };
 
                 console.log("checking server state");
                 const server_state = (data && typeof data === "object") ? data.state : null;
@@ -279,7 +279,7 @@
                         local_state = {
                             version: -1
                         };
-                    }
+                    };
 
                     const server_version = Number(server_state.version ?? 0);
                     const local_version = Number(local_state.version ?? -1);
@@ -287,16 +287,17 @@
                     if (server_version > local_version) {
                         console.log("got new state version")
 
-                        if (server_state.cur_example_id !== local_state.cur_example_id) {
+                        if (server_state.cur_example_id !== local_state.cur_example_id && server_state.cur_example) {
                             Alpine.store("example", server_state.cur_example);
 
                             // The property `checked` should be modifiable and then read when saving.
                             // Flatten, then add checked property to each label, then pass it to Alpine.store.
-                            Alpine.store("labels_self", server_state.annotation_labels[user_self].flat().map((i) => ({
+                            let labels = server_state.annotation_labels;
+                            Alpine.store("labels_self", labels[user_self].flat().map((i) => ({
                                 ...i,
                                 checked: i.is_set
                             })));
-                            Alpine.store("labels_other", server_state.annotation_labels[user_other].flat().map((i) => ({
+                            Alpine.store("labels_other", labels[user_other].flat().map((i) => ({
                                 ...i,
                                 checked: i.is_set
                             })));
@@ -305,7 +306,7 @@
                             // TODO: Discuss when the button should be locked.
                             // lib.discuss.unlockSaveDone();
                             Alpine.store("save_disabled", false);
-                        }
+                        };
 
                         Alpine.store("chat").last_render_id = server_state.messages.length - 1;
                         // Push only the latest messages
@@ -320,13 +321,13 @@
                         last_render_n = server_state.messages.length;
 
                         lib.discuss.renderOnlineStatus(server_state.online_users);
-                    }
+                    };
 
                     local_state = server_state;
                 } else {
                     // what do do when no server state?
-                }
-            })
+                };
+            });
 
             // handle everything after sending data
             document.body.addEventListener('htmx:wsAfterSend', function(event) {
@@ -337,12 +338,12 @@
                 const inputField = document.getElementById('message-input');
                 if (inputField) {
                     inputField.value = ''; // Clear the input field
-                }
+                };
 
                 if ("clicked-done" in data) {
                     console.log("Locking labels.");
                     window.dispatchEvent(new CustomEvent("lock-labels"));
-                }
+                };
             });
         </script>
     {% endblock content %}
