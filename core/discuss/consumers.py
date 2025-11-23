@@ -194,7 +194,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         next_page = int(state.get("page", 0)) + 1
         state["page"] = next_page
-        example, annotations, total_pages = await database_sync_to_async(self.get_example)(state=state)
+        example, annotations, total_pages = await database_sync_to_async(self.get_example)(
+            state=state
+        )
 
         end_reason = None
         msg = None
