@@ -14,12 +14,7 @@
                             <div id="n-online-status"></div>
                         </div>
                     </div>
-                    <div class="px-4 py-5 sm:px-6">
-                        <div id="pbar"
-                             hx-get="{% url 'discuss-pbar' %}"
-                             hx-trigger="load once, annotation-updated from:body"
-                             hx-swap="innerHTML"></div>
-                    </div>
+                    <c-discuss.progressbar/>
                     <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
                             <div class="space-y-4">
@@ -172,6 +167,11 @@
                 Alpine.store("user_other", undefined);
                 Alpine.store("labels_self", []);
                 Alpine.store("labels_other", []);
+                Alpine.store("progress", {
+                    done: 0,
+                    total: 0,
+                    ratio: 0,
+                });
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
@@ -326,8 +326,6 @@
                 } else {
                     // what do do when no server state?
                 }
-
-                htmx.trigger("#pbar", "refreshPbar");
             })
 
             // handle everything after sending data

@@ -1,7 +1,7 @@
 <c-vars user id />
 <div x-data class="flex flex-wrap gap-2" id="{{ id }}">
     <template x-for="label in $store.labels_{{ user }}">
-        <!-- The c-component that does not have enabled attribute is
+        <!-- The c-component that does not have the "enabled" attribute is
             deemed saved by default. -->
         <div x-data="{saved: !'{{ enabled }}'.toLowerCase()}">
             <input type="checkbox"
