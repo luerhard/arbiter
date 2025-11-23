@@ -40,6 +40,7 @@ def _defaults() -> dict[str, Any]:
         "discussion_labels": {},
         "clicked_done": {},  # {username: 0|1}
         "messages": [],  # dict-keys: username, msg
+        "total_pages": 0,
     }
 
 
