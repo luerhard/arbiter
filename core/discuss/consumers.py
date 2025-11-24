@@ -266,7 +266,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         total_pages = paginator.count
 
         if page_obj.number < state["page"] or not queryset.count():
-            return None, None
+            return None, None, total_pages + 1
 
         example = page_obj.object_list[0]
 
