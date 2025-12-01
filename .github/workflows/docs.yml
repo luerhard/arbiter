@@ -13,22 +13,17 @@ jobs:
       #       check-out repo and set-up python
       #----------------------------------------------
       - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Set up python 3.11
-        id: setup-python
-        uses: actions/setup-python@v4
+        uses: actions/checkout@v5
+      - name: Install uv
+        id: setup-uv
+        uses: astral-sh/setup-uv@v7
         with:
-          python-version: "3.11"
-      #----------------------------------------------
-      #  -----  install & configure poetry  ---------
-      #----------------------------------------------
-      - name: Install Poetry
-        run: pipx install poetry
+          python-version: 3.12
       #----------------------------------------------
       # ------ install dependencies ----------------
       #----------------------------------------------
       - name: Install dependencies
-        run: poetry install --no-interaction
+        run: uv sync --frozen --group docs
       #----------------------------------------------
       # run sphinx
       #----------------------------------------------
@@ -37,7 +32,7 @@ jobs:
           mkdir gh-pages
           touch gh-pages/.nojekyll
           cd docs/
-          poetry run sphinx-build -b html . _build
+          uv run sphinx-build -b html . _build
           cp -r _build/* ../gh-pages/
       #----------------------------------------------
       # deploy to gh-pages

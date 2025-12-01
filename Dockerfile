@@ -27,7 +27,7 @@ CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
 # ---- Dev image (with debugger) ----
 FROM base AS dev
 COPY pyproject.toml uv.lock README.md ./
-RUN ["uv", "sync", "--frozen", "--group", "dev"]
+RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
 COPY . .
 # wait for VS Code debugger to attach, then run Daphne
 WORKDIR /app/core/
