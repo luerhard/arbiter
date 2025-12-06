@@ -50,7 +50,7 @@
                                                id="save-done"
                                                name="clicked-done"
                                                value="done"
-                                               hx-vals="js:{'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+                                               hx-vals="js:{'clicked-done': 'done', 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
                                                :disabled="$store.save_disabled"
                                                ws-send>
                                         <label for="save-done"
@@ -308,10 +308,10 @@
                                 ratio: 100 * (server_state["page"]) / server_state["total_pages"],
                             });
 
-                            console.log("unlock save button");
-                            // TODO: Discuss when the button should be locked.
-                            // lib.discuss.unlockSaveDone();
+                            console.log("Unlocking save button.");
                             Alpine.store("save_disabled", false);
+                            console.log("Unlocking labels.");
+                            window.dispatchEvent(new CustomEvent("unlock-labels"));
                         };
 
                         Alpine.store("chat").last_render_id = server_state.messages.length - 1;
@@ -349,6 +349,7 @@
                 if ("clicked-done" in data) {
                     console.log("Locking labels.");
                     window.dispatchEvent(new CustomEvent("lock-labels"));
+                    Alpine.store("save_disabled", true);
                 };
             });
         </script>
