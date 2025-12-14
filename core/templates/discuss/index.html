@@ -20,16 +20,16 @@
                             <div class="grid gap-6 items-start">
                                 <div class="space-y-4">
                                     <div x-data
-                                         id="current-example"
-                                         class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
-                                         x-text="$store.example"></div>
+                                        id="current-example"
+                                        class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
+                                        x-text="$store.example"></div>
                                     <div class="border-t border-gray-200 dark:border-gray-700 pt-4" x-data>
                                         <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels before discussion</h3>
                                         <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">Your previous annotations</div>
                                         <c-discuss.labels user="self" id="prev-labels-self" />
                                         <div class="text-md text-gray-800 dark:text-gray-200 mb-2 mt-3">
                                             Previous annotations of <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline"
-       x-text="$store.user_other"></span>
+        x-text="$store.user_other"></span>
                                         </div>
                                         <c-discuss.labels user="other" id="prev-labels-other" />
                                     </div>
@@ -46,15 +46,15 @@
                                         {% comment %} Save Button {% endcomment %}
                                         <div x-data>
                                             <input type="checkbox"
-                                                   class="sr-only peer"
-                                                   id="save-done"
-                                                   name="clicked-done"
-                                                   value="done"
-                                                   hx-vals="js:{'clicked-done': 'done', 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
-                                                   :disabled="$store.save_disabled"
-                                                   ws-send>
+                                                class="sr-only peer"
+                                                id="save-done"
+                                                name="clicked-done"
+                                                value="done"
+                                                hx-vals="js:{'clicked-done': 'done', 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+                                                :disabled="$store.save_disabled"
+                                                ws-send>
                                             <label for="save-done"
-                                                   class="cursor-pointer peer-disabled:cursor-default inline-flex items-center rounded-md border border-transparent bg-indigo-600 peer-disabled:bg-indigo-600/80 px-4 py-2 text-sm font-medium text-white shadow-sm peer-not-disabled:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                                class="cursor-pointer peer-disabled:cursor-default inline-flex items-center rounded-md border border-transparent bg-indigo-600 peer-disabled:bg-indigo-600/80 px-4 py-2 text-sm font-medium text-white shadow-sm peer-not-disabled:hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                                                 Save & Done
                                             </label>
                                         </div>
@@ -65,28 +65,28 @@
                     </div>
                     <div class="flex flex-col">
                         <div id="messages"
-                             class="flex-grow overflow-y-auto h-96 rounded-t-md border border-gray-200 border-b-transparent dark:border-gray-700 dark:border-b-transparent p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50 overscroll-none scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent">
+                                class="flex-grow overflow-y-auto h-96 rounded-t-md border border-gray-200 border-b-transparent dark:border-gray-700 dark:border-b-transparent p-4 space-y-4 bg-gray-50 dark:bg-gray-800/50 overscroll-none scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent">
                             <c-discuss.chat />
                             <div id="chat-bottom"></div>
                         </div>
                         {% comment %} send button and htmx logic {% endcomment %}
                         <form class="flex" ws-send>
                             <input type="text"
-                                   id="message-input"
-                                   class="flex-grow pl-3 block w-full rounded-bl-md border border-gray-300 shadow-sm caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
-                                   autocomplete="off"
-                                   name="message"
-                                   placeholder="Message...">
+                                    id="message-input"
+                                    class="flex-grow pl-3 block w-full rounded-bl-md border border-gray-300 shadow-sm caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 sm:text-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
+                                    autocomplete="off"
+                                    name="message"
+                                    placeholder="Message...">
                             <button class="inline-flex items-center rounded-br-md border border-blue-500 border-l-0 bg-blue-500 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 dark:bg-blue-700 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-blue-600"
                                     type="submit"
                                     aria-describedby="message-input">
                                 <!-- Using Heroicons -->
                                 <svg xmlns="http://www.w3.org/2000/svg"
-                                     fill="none"
-                                     viewBox="0 0 24 24"
-                                     stroke-width="1.5"
-                                     stroke="currentColor"
-                                     class="size-4">
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="size-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                                 </svg>
                             </button>
@@ -95,307 +95,255 @@
                 </div>
             </div>
             {% comment %} Codebook View and Control {% endcomment %}
-            <div x-data class="pb-6 px-6" id="codebook-col" aria-expanded="false">
-                <div class="hidden relative bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 rounded-lg border-y border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
-                     :class="{ 'hidden': !$store.codebook }"
-                     style="max-height: 80vh;
-                            overflow-y: auto">
-                    {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
-                    <div class="absolute top-2 right-2 z-10 flex gap-1"
-                         role="group"
-                         aria-label="Diff Control Button">
-                        {% comment %} Codebook Diff Button {% endcomment %}
-                        <input type="checkbox"
-                               class="sr-only peer"
-                               id="codebook-diff-check"
-                               autocomplete="off">
-                        <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300  dark:peer-checked:text-gray-300 dark:peer-checked:hover:text-gray-300 dark:peer-checked:bg-blue-700 dark:peer-checked:hover:bg-blue-600"
-                               for="codebook-diff-check"
-                               title="Show Differences">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke-width="1.5"
-                                 stroke="currentColor"
-                                 class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                            </svg>
-                        </label>
-                        {% comment %} Open Codebook in a New Window {% endcomment %}
-                        <input type="button" class="sr-only" id="codebook-open">
-                        <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                               for="codebook-open"
-                               title="Open in New Window">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 fill="none"
-                                 viewBox="0 0 24 24"
-                                 stroke-width="1.5"
-                                 stroke="currentColor"
-                                 class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                            </svg>
-                        </label>
-                        <div x-data>
-                            <div class="hidden pb-6 px-6"
-                                 :class="{ 'hidden': !$store.codebook }"
-                                 id="codebook-col"
-                                 aria-expanded="false">
-                                <div class="relative bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 rounded-lg border-y border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
-                                     style="max-height: 80vh;
-                                            overflow-y: auto">
-                                    {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
-                                    <div class="absolute top-2 right-2 z-10 flex gap-1"
-                                         role="group"
-                                         aria-label="Diff Control Button">
-                                        {% comment %} Codebook Diff Button {% endcomment %}
-                                        <input type="checkbox"
-                                               class="sr-only peer"
-                                               id="codebook-diff-check"
-                                               autocomplete="off">
-                                        <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300  dark:peer-checked:text-gray-300 dark:peer-checked:hover:text-gray-300 dark:peer-checked:bg-blue-700 dark:peer-checked:hover:bg-blue-600"
-                                               for="codebook-diff-check"
-                                               title="Show Differences">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 fill="none"
-                                                 viewBox="0 0 24 24"
-                                                 stroke-width="1.5"
-                                                 stroke="currentColor"
-                                                 class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                            </svg>
-                                        </label>
-                                        {% comment %} Open Codebook in a New Window {% endcomment %}
-                                        <input type="button" class="sr-only" id="codebook-open">
-                                        <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 cursor-pointer"
-                                               for="codebook-open"
-                                               title="Open in New Window">
-                                            <svg xmlns="http://www.w3.org/2000/svg"
-                                                 fill="none"
-                                                 viewBox="0 0 24 24"
-                                                 stroke-width="1.5"
-                                                 stroke="currentColor"
-                                                 class="size-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-                                            </svg>
-                                        </label>
-                                    </div>
-                                    <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{{ codebook.content|markdownify }}</div>
-                                    <div class="prose dark:prose-invert max-w-none"
-                                         id="codebook-diff-view"
-                                         hidden>{{ codebook_diff|markdownify }}</div>
-                                </div>
-                            </div>
+            <div x-data>
+                <div class="hidden pb-6 px-6" :class="{ 'hidden': !$store.codebook }" id="codebook-col" aria-expanded="false">
+                    <div class="relative bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 rounded-lg border-y border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
+                        style="max-height: 80vh;
+                                overflow-y: auto">
+                        {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
+                        <div class="absolute top-2 right-2 z-10 flex gap-1"
+                            role="group"
+                            aria-label="Diff Control Button">
+                            {% comment %} Codebook Diff Button {% endcomment %}
+                            <input type="checkbox"
+                                class="sr-only peer"
+                                id="codebook-diff-check"
+                                autocomplete="off">
+                            <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300  dark:peer-checked:text-gray-300 dark:peer-checked:hover:text-gray-300 dark:peer-checked:bg-blue-700 dark:peer-checked:hover:bg-blue-600"
+                                for="codebook-diff-check"
+                                title="Show Differences">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
+                                </svg>
+                            </label>
+                            {% comment %} Open Codebook in a New Window {% endcomment %}
+                            <input type="button" class="sr-only" id="codebook-open">
+                            <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 cursor-pointer"
+                                for="codebook-open"
+                                title="Open in New Window">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                                </svg>
+                            </label>
                         </div>
+                        <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{{ codebook.content|markdownify }}</div>
+                        <div class="prose dark:prose-invert max-w-none"
+                            id="codebook-diff-view"
+                            hidden>{{ codebook_diff|markdownify }}</div>
                     </div>
-                    <script>
-                        window.local_state = {
+                </div>
+            </div>
+        </div>
+        <script>
+            window.local_state = {
+                version: -1
+            };
+            window.server_state = {
+                version: 0
+            };
+            let last_render_n = 0; // Exclusive last rendered message
+            let user_self = undefined;
+            let user_other = undefined;
+
+            let scrollToBottom;
+
+            document.addEventListener("alpine:init", () => {
+                Alpine.store("example", "Waiting for others to arrive...")
+                Alpine.store("chat", {
+                    messages: [],
+                    last_render_id: 0,
+                });
+                Alpine.store("save_disabled", true);
+                Alpine.store("user_self", undefined);
+                Alpine.store("user_other", undefined);
+                Alpine.store("labels_self", []);
+                Alpine.store("labels_other", []);
+                Alpine.store("progress", {
+                    done: 0,
+                    total: 0,
+                    ratio: 0,
+                });
+                Alpine.store("codebook", false);
+            });
+
+            const diff_codebook_trigger = new Event("diffCodebookTrigger");
+
+            // show state of codebook expansion on the button
+            document.addEventListener("DOMContentLoaded", function() {
+                const codebook_toggle = document.getElementById("codebook-toggle");
+                const codebook_col = document.getElementById("codebook-col");
+                const codebook_open = document.getElementById("codebook-open");
+                const codebook_diff_check = document.getElementById("codebook-diff-check");
+                const codebook_orig_view = document.getElementById("codebook-orig-view");
+                const codebook_diff_view = document.getElementById("codebook-diff-view");
+
+                codebook_col.addEventListener("shown.bs.collapse", function(e) {
+                    codebook_toggle.classList.remove("btn-outline-primary");
+                    codebook_toggle.classList.add("btn-primary");
+                });
+
+                codebook_col.addEventListener("hidden.bs.collapse", function(e) {
+                    codebook_toggle.classList.remove("btn-primary");
+                    codebook_toggle.classList.add("btn-outline-primary");
+                });
+
+                codebook_diff_check.addEventListener("change", function() {
+                    codebook_diff_view.hidden = !codebook_diff_view.hidden
+                    codebook_orig_view.hidden = !codebook_orig_view.hidden
+                });
+
+                codebook_open.addEventListener("click", function() {
+                    codebook_toggle.click();
+                    new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
+                    timer = setInterval(function() {
+                        if (new_window.closed) {
+                            clearInterval(timer);
+                            codebook_toggle.click();
+                        }
+                    }, 500);
+                });
+
+                bottom_el = document.getElementById("chat-bottom");
+                scrollToBottom = (element = bottom_el) => {
+                    window.setTimeout(() => {
+                        // I couldn't think of anything better other than firing it twice.
+                        // Otherwise it doesn't completely scroll down.
+                        bottom_el.scrollIntoView({
+                            behavior: 'smooth',
+                            container: 'nearest',
+                            block: 'center',
+                        });
+                        bottom_el.scrollIntoView({
+                            behavior: 'smooth',
+                            container: 'nearest',
+                            block: 'center',
+                        });
+                    }, 200);
+                };
+            });
+
+            // disable enter button (should only ever toggle "Saved")
+            // necessary to not toggle the filter / codebook buttons when they were clicked previously
+            document.querySelectorAll('button').forEach(function(button) {
+                button.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            function close_room(data) {
+                window.location = data["done"];
+            };
+            // handle everything after receiving data
+            document.body.addEventListener('htmx:wsAfterMessage', function(event) {
+                // parse JSON data to object
+                const data = JSON.parse(event.detail.message);
+                console.log("WebSocket Message Received: ", data);
+
+                if ("done" in data) {
+                    const intervalID = setInterval(close_room, 60000, data);
+                    console.log(intervalID);
+                };
+
+                if ("no_examples" in data) {
+                    Alpine.store("example", "No examples have disagreements.");
+                };
+
+                console.log("setting user")
+                if (typeof data.user === "string") {
+                    user_self = data.user;
+                    Alpine.store("user_self", data.user);
+                    // This will assume that only two people required for discussion, no more, no less.
+                    users = data.state.required_users;
+                    // If its not the so-called self-user then it must be the other one.
+                    user_other = users[0] === data.user ? users[1] : users[0];
+                    Alpine.store("user_other", user_other);
+                };
+
+                console.log("checking server state");
+                const server_state = (data && typeof data === "object") ? data.state : null;
+                window.server_state = server_state;
+                console.log(server_state);
+
+                if (server_state) {
+                    if (typeof local_state !== "object" || typeof local_state.version !== "number") {
+                        local_state = {
                             version: -1
                         };
-                        window.server_state = {
-                            version: 0
-                        };
-                        let last_render_n = 0; // Exclusive last rendered message
-                        let user_self = undefined;
-                        let user_other = undefined;
+                    };
 
-                        let scrollToBottom;
+                    const server_version = Number(server_state.version ?? 0);
+                    const local_version = Number(local_state.version ?? -1);
 
-                        document.addEventListener("alpine:init", () => {
-                            Alpine.store("example", "Waiting for others to arrive...")
-                            Alpine.store("chat", {
-                                messages: [],
-                                last_render_id: 0,
-                            });
-                            Alpine.store("save_disabled", true);
-                            Alpine.store("user_self", undefined);
-                            Alpine.store("user_other", undefined);
-                            Alpine.store("labels_self", []);
-                            Alpine.store("labels_other", []);
+                    if (server_version > local_version) {
+                        console.log("got new state version")
+
+                        if (server_state.cur_example_id !== local_state.cur_example_id && server_state.cur_example) {
+                            Alpine.store("example", server_state.cur_example);
+
+                            // The property `checked` should be modifiable and then read when saving.
+                            // Flatten, then add checked property to each label, then pass it to Alpine.store.
+                            let labels = server_state.annotation_labels;
+                            Alpine.store("labels_self", labels[user_self].flat().map((i) => ({
+                                ...i,
+                                checked: i.is_set
+                            })));
+                            Alpine.store("labels_other", labels[user_other].flat().map((i) => ({
+                                ...i,
+                                checked: i.is_set
+                            })));
+
                             Alpine.store("progress", {
-                                done: 0,
-                                total: 0,
-                                ratio: 0,
-                            });
-                            Alpine.store("codebook", false);
-                        });
-
-                        const diff_codebook_trigger = new Event("diffCodebookTrigger");
-
-                        // show state of codebook expansion on the button
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const codebook_toggle = document.getElementById("codebook-toggle");
-                            const codebook_col = document.getElementById("codebook-col");
-                            const codebook_open = document.getElementById("codebook-open");
-                            const codebook_diff_check = document.getElementById("codebook-diff-check");
-                            const codebook_orig_view = document.getElementById("codebook-orig-view");
-                            const codebook_diff_view = document.getElementById("codebook-diff-view");
-
-                            codebook_col.addEventListener("shown.bs.collapse", function(e) {
-                                codebook_toggle.classList.remove("btn-outline-primary");
-                                codebook_toggle.classList.add("btn-primary");
+                                done: server_state["page"],
+                                total: server_state["total_pages"],
+                                ratio: 100 * (server_state["page"]) / server_state["total_pages"],
                             });
 
-                            codebook_col.addEventListener("hidden.bs.collapse", function(e) {
-                                codebook_toggle.classList.remove("btn-primary");
-                                codebook_toggle.classList.add("btn-outline-primary");
-                            });
-
-                            codebook_diff_check.addEventListener("change", function() {
-                                codebook_diff_view.hidden = !codebook_diff_view.hidden
-                                codebook_orig_view.hidden = !codebook_orig_view.hidden
-                            });
-
-                            codebook_open.addEventListener("click", function() {
-                                codebook_toggle.click();
-                                new_window = window.open("/codebook/view/{{ batch_id }}", "Codebook Pop-up", "popup,left=100,top=100,width=700,height=1000");
-                                timer = setInterval(function() {
-                                    if (new_window.closed) {
-                                        clearInterval(timer);
-                                        codebook_toggle.click();
-                                    }
-                                }, 500);
-                            });
-
-                            bottom_el = document.getElementById("chat-bottom");
-                            scrollToBottom = (element = bottom_el) => {
-                                window.setTimeout(() => {
-                                    // I couldn't think of anything better other than firing it twice.
-                                    // Otherwise it doesn't completely scroll down.
-                                    bottom_el.scrollIntoView({
-                                        behavior: 'smooth',
-                                        container: 'nearest',
-                                        block: 'center',
-                                    });
-                                    bottom_el.scrollIntoView({
-                                        behavior: 'smooth',
-                                        container: 'nearest',
-                                        block: 'center',
-                                    });
-                                }, 200);
-                            };
-                        });
-
-                        // disable enter button (should only ever toggle "Saved")
-                        // necessary to not toggle the filter / codebook buttons when they were clicked previously
-                        document.querySelectorAll('button').forEach(function(button) {
-                            button.addEventListener('keydown', function(e) {
-                                if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                }
-                            });
-                        });
-
-                        function close_room(data) {
-                            window.location = data["done"];
+                            console.log("Unlocking save button.");
+                            Alpine.store("save_disabled", false);
+                            console.log("Unlocking labels.");
+                            window.dispatchEvent(new CustomEvent("unlock-labels"));
                         };
-                        // handle everything after receiving data
-                        document.body.addEventListener('htmx:wsAfterMessage', function(event) {
-                            // parse JSON data to object
-                            const data = JSON.parse(event.detail.message);
-                            console.log("WebSocket Message Received: ", data);
 
-                            if ("done" in data) {
-                                const intervalID = setInterval(close_room, 60000, data);
-                                console.log(intervalID);
-                            };
+                        Alpine.store("chat").last_render_id = server_state.messages.length - 1;
+                        // Push only the latest messages
+                        server_state.messages.slice(last_render_n)
+                            .forEach((message, i) => {
+                                // Add an id to each message added to the chat store
+                                Alpine.store("chat").messages.push({
+                                    ...message,
+                                    id: i + last_render_n
+                                })
+                            });
+                        last_render_n = server_state.messages.length;
 
-                            if ("no_examples" in data) {
-                                Alpine.store("example", "No examples have disagreements.");
-                            };
+                        lib.discuss.renderOnlineStatus(server_state.online_users);
+                    };
 
-                            console.log("setting user")
-                            if (typeof data.user === "string") {
-                                user_self = data.user;
-                                Alpine.store("user_self", data.user);
-                                // This will assume that only two people required for discussion, no more, no less.
-                                users = data.state.required_users;
-                                // If its not the so-called self-user then it must be the other one.
-                                user_other = users[0] === data.user ? users[1] : users[0];
-                                Alpine.store("user_other", user_other);
-                            };
+                    local_state = server_state;
+                } else {
+                    // what do do when no server state?
+                };
+            });
 
-                            console.log("checking server state");
-                            const server_state = (data && typeof data === "object") ? data.state : null;
-                            window.server_state = server_state;
-                            console.log(server_state);
+            // handle everything after sending data
+            document.body.addEventListener('htmx:wsAfterSend', function(event) {
+                const data = JSON.parse(event.detail.message); // Event detail contains the message data
+                console.log("triggered aftersend");
 
-                            if (server_state) {
-                                if (typeof local_state !== "object" || typeof local_state.version !== "number") {
-                                    local_state = {
-                                        version: -1
-                                    };
-                                };
+                // Clear Chat text-input after message is sent or Save & Done.
+                const inputField = document.getElementById('message-input');
+                if (inputField) {
+                    inputField.value = ''; // Clear the input field
+                };
 
-                                const server_version = Number(server_state.version ?? 0);
-                                const local_version = Number(local_state.version ?? -1);
+                if ("clicked-done" in data) {
+                    console.log("Locking labels.");
+                    window.dispatchEvent(new CustomEvent("lock-labels"));
+                    Alpine.store("save_disabled", true);
+                };
+            });
+        </script>
+    {% endblock content %}
 
-                                if (server_version > local_version) {
-                                    console.log("got new state version")
-
-                                    if (server_state.cur_example_id !== local_state.cur_example_id && server_state.cur_example) {
-                                        Alpine.store("example", server_state.cur_example);
-
-                                        // The property `checked` should be modifiable and then read when saving.
-                                        // Flatten, then add checked property to each label, then pass it to Alpine.store.
-                                        let labels = server_state.annotation_labels;
-                                        Alpine.store("labels_self", labels[user_self].flat().map((i) => ({
-                                            ...i,
-                                            checked: i.is_set
-                                        })));
-                                        Alpine.store("labels_other", labels[user_other].flat().map((i) => ({
-                                            ...i,
-                                            checked: i.is_set
-                                        })));
-
-                                        Alpine.store("progress", {
-                                            done: server_state["page"],
-                                            total: server_state["total_pages"],
-                                            ratio: 100 * (server_state["page"]) / server_state["total_pages"],
-                                        });
-
-                                        console.log("Unlocking save button.");
-                                        Alpine.store("save_disabled", false);
-                                        console.log("Unlocking labels.");
-                                        window.dispatchEvent(new CustomEvent("unlock-labels"));
-                                    };
-
-                                    Alpine.store("chat").last_render_id = server_state.messages.length - 1;
-                                    // Push only the latest messages
-                                    server_state.messages.slice(last_render_n)
-                                        .forEach((message, i) => {
-                                            // Add an id to each message added to the chat store
-                                            Alpine.store("chat").messages.push({
-                                                ...message,
-                                                id: i + last_render_n
-                                            })
-                                        });
-                                    last_render_n = server_state.messages.length;
-
-                                    lib.discuss.renderOnlineStatus(server_state.online_users);
-                                };
-
-                                local_state = server_state;
-                            } else {
-                                // what do do when no server state?
-                            };
-                        });
-
-                        // handle everything after sending data
-                        document.body.addEventListener('htmx:wsAfterSend', function(event) {
-                            const data = JSON.parse(event.detail.message); // Event detail contains the message data
-                            console.log("triggered aftersend");
-
-                            // Clear Chat text-input after message is sent or Save & Done.
-                            const inputField = document.getElementById('message-input');
-                            if (inputField) {
-                                inputField.value = ''; // Clear the input field
-                            };
-
-                            if ("clicked-done" in data) {
-                                console.log("Locking labels.");
-                                window.dispatchEvent(new CustomEvent("lock-labels"));
-                                Alpine.store("save_disabled", true);
-                            };
-                        });
-                    </script>
-                {% endblock content %}
