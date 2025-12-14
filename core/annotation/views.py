@@ -178,7 +178,6 @@ class PrevSentence(AnnotatorRequiredMixin, View):
 
         current = ExampleAssignment.objects.get(id=assignment_id)
         nxt = current.previous(skip_annotated=skip_annotated) or current
-        log.debug(nxt)
 
         resp = HttpResponse(
             f'<input id="assignmentId" name="assignment_id" value="{nxt.id}" '
@@ -196,7 +195,6 @@ class NextSentence(AnnotatorRequiredMixin, View):
 
         current = ExampleAssignment.objects.get(id=assignment_id)
         nxt = current.next(skip_annotated=skip_annotated) or current
-        log.debug(nxt)
 
         payload = {
             "assignment_id": nxt.id,
