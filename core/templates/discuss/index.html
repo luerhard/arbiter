@@ -60,7 +60,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
@@ -96,8 +95,8 @@
                 </div>
             </div>
             {% comment %} Codebook View and Control {% endcomment %}
-            <div x-data class="mt-5" id="codebook-col" aria-expanded="false">
-                <div class="hidden relative bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
+            <div x-data class="pb-6 px-6" id="codebook-col" aria-expanded="false">
+                <div class="hidden relative bg-gray-50 dark:bg-gray-800/50 text-gray-900 dark:text-gray-100 rounded-lg border-y border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
                      :class="{ 'hidden': !$store.codebook }"
                      style="max-height: 80vh;
                             overflow-y: auto">
@@ -110,17 +109,11 @@
                                class="sr-only peer"
                                id="codebook-diff-check"
                                autocomplete="off">
-                        <label class="inline-flex items-center justify-center w-9 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 dark:peer-checked:bg-gray-600"
+                        <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 peer-checked:bg-gray-200 peer-checked:text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300  dark:peer-checked:text-gray-300 dark:peer-checked:hover:text-gray-300 dark:peer-checked:bg-blue-700 dark:peer-checked:hover:bg-blue-600"
                                for="codebook-diff-check"
                                title="Show Differences">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 width="16"
-                                 height="16"
-                                 fill="currentColor"
-                                 class="bi bi-file-earmark-diff"
-                                 viewBox="0 0 16 16">
-                                <path d="M8 5a.5.5 0 0 1 .5.5V7H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V8H6a.5.5 0 0 1 0-1h1.5V5.5A.5.5 0 0 1 8 5m-1 9H6a.5.5 0 0 1 0-1h1a.5.5 0 0 1 0 1" />
-                                <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                             </svg>
                         </label>
                         {% comment %} Open Codebook in a New Window {% endcomment %}
@@ -128,14 +121,8 @@
                         <label class="inline-flex items-center justify-center w-10 h-10 rounded-md border border-gray-300 bg-white text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300 cursor-pointer"
                                for="codebook-open"
                                title="Open in New Window">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                 width="16"
-                                 height="16"
-                                 fill="currentColor"
-                                 class="bi bi-box-arrow-up-right"
-                                 viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5" />
-                                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
                             </svg>
                         </label>
                     </div>
