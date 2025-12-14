@@ -36,13 +36,12 @@
                                     <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Your labels</h3>
                                     <c-discuss.labels user="self" id="current-labels" enabled />
                                 </div>
-                                <div class="flex justify-between items-center mt-4">
+                                <div x-data class="flex justify-between items-center mt-4">
                                     {% comment %} Show Codebook Button {% endcomment %}
                                     <button class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
                                             id="codebook-toggle"
                                             tabindex="-1"
-                                            data-bs-toggle="collapse"
-                                            data-bs-target="#codebook-col">Show Codebook</button>
+                                            @click="$store.codebook = !$store.codebook">Show Codebook</button>
                                     {% comment %} Save Button {% endcomment %}
                                     <div x-data>
                                         <input type="checkbox"
@@ -94,8 +93,9 @@
                 </div>
             </div>
             {% comment %} Codebook View and Control {% endcomment %}
-            <div class="collapse mt-5" id="codebook-col" aria-expanded="false">
-                <div class="relative bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+            <div x-data class="mt-5" id="codebook-col" aria-expanded="false">
+                <div class="hidden relative bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 p-6 scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent"
+                     :class="{ 'hidden': !$store.codebook }"
                      style="max-height: 80vh;
                             overflow-y: auto">
                     {% comment %} Creates a button group with checkboxes that float on the top right corner of the codebook view. {% endcomment %}
@@ -172,6 +172,7 @@
                     total: 0,
                     ratio: 0,
                 });
+                Alpine.store("codebook", false);
             });
 
             const diff_codebook_trigger = new Event("diffCodebookTrigger");
