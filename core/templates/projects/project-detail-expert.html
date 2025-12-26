@@ -40,6 +40,7 @@
                                                                  @click.away="open = false"
                                                                  class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-900 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                                                                 <!-- TODO: For now, the button works but there's no feedback. A notification should be created. -->
+                                                                <!-- TODO: Add light theme to the dropdown. -->
                                                                 <form hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
                                                                       hx-swap="none"
                                                                       onchange="setTimeout(() => { location.reload() }, 3000)"
