@@ -21,6 +21,30 @@
         <!-- 5. Expert Labels -->
     </div>
     <!-- II. Codebook Column -->
-    <div class=""></div>
+    <div class="border-l">
+        <!-- 1. Title -->
+        <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800 font-bold text-xl">
+            Codebook
+        </div>
+        <!-- 2. Codebook Form -->
+        <form method="post"
+        id="codebook-form"
+        action="{% url 'codebook-edit' codebook.pk %}">
+        {% csrf_token %}
+        <!-- TODO: Check if form-group and overflow-auto is Bootstrap or not. -->
+        <div class="form-group">
+            <div id="codebook-rendered" class="overflow-auto max-h-[645px] scrollbar">
+                {% include "codebook/partials/view-codebook.html" %}
+            </div>
+            <!-- `d-none` likely divide-none -->
+            <!-- form-control? -->
+            <textarea id="codebook-content" name="content" class="form-control d-none whitespace-pre-wrap" rows="20">
+                {{ codebook.content }}
+            </textarea>
+        </div>
+        <!-- Rationale -->
+        <div></div>
+        </form>
+    </div>
 </div>
 {% endblock content %}
