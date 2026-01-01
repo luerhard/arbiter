@@ -18,7 +18,7 @@ RUN ["uv", "sync", "--frozen", "--no-dev", "--compile-bytecode"]
 # ---- Runtime (prod) ----
 FROM base AS runtime
 # copy the venv from deps stage
-COPY --from=deps /app/.venv /app/.venv
+# COPY --from=deps /app/.venv /app/.venv
 # app code last for better caching
 COPY . .
 # Default prod command (override in compose for dev)
