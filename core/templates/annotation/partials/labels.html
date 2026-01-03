@@ -7,7 +7,7 @@
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2"
          role="group">
         {% for checkbox, detail in label_form.labels|zip_lists:label_form.label_details %}
-            <c-annotation.label id="{{ checkbox.id_for_label }}" value="{{ checkbox.data.value }}" text="{{ checkbox.choice_label }}" color="{{ detail.color }}" hotkey="{{ detail.hotkey }}" />
+            <c-label id="{{ checkbox.id_for_label }}" value="{{ checkbox.data.value }}" text="{{ checkbox.choice_label }}" color="{{ detail.color }}" hotkey="{{ detail.hotkey }}" />
         {% endfor %}
     </div>
 </form>

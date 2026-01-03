@@ -1,20 +1,23 @@
-<c-vars id value text color hotkey checked />
+<c-vars id value text color hotkey checked disabled />
 <div class="inline-block"
-     x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', {% comment %} initiallyChecked: {{ 'true' if checked else 'false' }} {% endcomment %} })">
+     x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', initiallyChecked: {% if checked %} true {% else %} false {% endif %} })">
     <!-- Real checkbox for Django; visually hidden but stays in the form -->
     <input type="checkbox"
            name="labels"
            class="sr-only peer"
            :id="id"
            :value="value"
+           {% if disabled is True %} disabled {% endif %}
            x-model="isChecked" />
     <!-- Tailwind-styled pill -->
     <label ::for="id"
            class="cursor-pointer peer-disabled:cursor-default rounded-2xl border px-3 py-2 text-sm transition shadow-sm peer-checked:shadow-blue-400/60 select-none bg-gray-100 peer-disabled:bg-gray-100/80 dark:bg-gray-200 dark:peer-disabled:bg-gray-200/80 text-gray-800 peer-not-disabled:hover:bg-white peer-not-disabled:peer-not-checked:hover:border-gray-400 peer-not-disabled:peer-checked:hover:bg-blue-500 peer-checked:border-blue-400 peer-disabled:peer-checked:border-blue-400/80 peer-checked:bg-blue-400 peer-disabled:peer-checked:bg-blue-400/80"
-           :style="`--label-color: {{ color }}; --label-text: ${textColor()};`"
+           {% comment %} :style="`--label-color: {{ color }}; --label-text: ${textColor()};`" {% endcomment %}
            :data-active="String(isChecked)"
+           {% if disabled is False %}
            @click.prevent="toggle()"
-           @keydown.enter.prevent="toggle()">
+           @keydown.enter.prevent="toggle()"
+           {% endif %}>
         {{ text }}
         <template x-if="hotkey">
             <span class="ml-1 text-xs opacity-70" x-text="`(${hotkey})`"></span>

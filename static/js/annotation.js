@@ -75,6 +75,7 @@ export function labelButton({ id, value, hotkey, initiallyChecked }) {
         },
 
         textColor() {
+            // TODO: Later this must change the tailwind CSS color class instead of the style color.
             const tmp = document.createElement('div');
             tmp.style.color = this.resolveColor() || '#ffffff';
             document.body.appendChild(tmp);

@@ -7,18 +7,48 @@
 {% block content %}
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 grid gap-6 grid-cols-1 lg:grid-cols-2 rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <!-- I. Label Resolution Column -->
-        <div class="">
+        <div class="*:mt-2">
             <!-- 1. Title -->
             <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800 font-bold text-xl">
                 Resolve Disagreement
             </div>
-            <!-- 2. Previous Labels -->
-            <div></div>
-            <!-- 3. Chat History -->
-            <div></div>
-            <!-- 4. After Discussion Labels -->
-            <div></div>
-            <!-- 5. Expert Labels -->
+            <!-- 2. Sentence -->
+            <div class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">{{ sentence }}</div>
+            <!-- 3. Previous Labels -->
+            <div>
+                <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels Before Discussion</h3>
+                {% for annotation in prev_annotations %}
+                <!-- py-4 to account for the roundedness of the c-label pill. -->
+                <div class="py-4">
+                    <div class="inline-block min-w-1/3"><c-label text="{{ annotation.label }}" checked disabled /></div>
+                    <span>assigned by:</span>
+                    <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline">{{ annotation.assignment.user }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- 4. Chat History -->
+            <div>
+                <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Chat History</h3>
+                {% for message in chat_messages %}
+                <div>{{ message.user }} {{ message.message }}</div>
+                <div type="self-message" class="flex items-start gap-2.5 mb-3" dir="rtl">
+                    <div class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-blue-400 rounded-e-xl rounded-es-xl dark:bg-blue-700">
+                        <div class="flex items-center space-x-2 justify-end" dir="ltr">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white text-right">{{ message.user }}</span>
+                        </div>
+                        <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1" dir="ltr">{{ message.message }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- 5. After Discussion Labels -->
+            <div>
+                <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Labels After Discussion</h3>
+            </div>
+            <!-- 6. Expert Labels -->
+            <div>
+                <h3 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-2">Select Labels for Sentence</h3>
+            </div>
         </div>
         <!-- II. Codebook Column -->
         <div class="">
