@@ -3,7 +3,7 @@
 {% load partials %}
 {% load markdownify %}
 {% block content %}
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-3" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
         <div class="bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-6">
                 <div class="grid grid-cols-2 gap-6">
@@ -16,7 +16,7 @@
                             </div>
                         </div>
                         <c-discuss.progressbar />
-                        <div class="mt-4" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+                        <div class="mt-4">
                             <div class="grid gap-6 items-start">
                                 <div class="space-y-4">
                                     <div x-data
