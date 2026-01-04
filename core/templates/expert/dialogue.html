@@ -65,10 +65,8 @@
                 <form method="post"
                       id="labels-form"
                       action="{% url 'expert-label-save' codebook.pk batch_id sentence.id %}">
-                {% csrf_token %}
-                {% for label in labels %}
-                    <c-label text="{{ label.name }}" value="{{ label.id }}" />
-                {% endfor %}
+                    {% csrf_token %}
+                    {% for label in labels %}<c-label text="{{ label.name }}" value="{{ label.id }}" />{% endfor %}
                 </form>
             </div>
         </div>
