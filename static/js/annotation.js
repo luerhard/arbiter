@@ -41,12 +41,13 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
         }
     };
 }
-export function labelButton({ id, value, hotkey, initiallyChecked }) {
+export function labelButton({ id, value, hotkey, initiallyChecked, disabled}) {
     return {
         id,
         value,
         hotkey,
         isChecked: !!initiallyChecked,
+        disabled: false,
         _onKey: null,
 
         init() {
@@ -68,7 +69,7 @@ export function labelButton({ id, value, hotkey, initiallyChecked }) {
             }
         },
 
-        toggle() { this.isChecked = !this.isChecked; },
+        toggle() { if (!disabled) this.isChecked = !this.isChecked; },
 
         resolveColor() {
             return this.$el?.style?.getPropertyValue?.('--label-color')?.trim() || '';
