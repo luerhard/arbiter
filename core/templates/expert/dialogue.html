@@ -16,7 +16,9 @@
                     <div class="px-4 py-2 font-semibold">Text/Sentence</div>
                     <div class="p-4">
                         <div id="current-example"
-                            class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">{{ sentence }}</div>
+                             class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
+                            {{ sentence }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -49,7 +51,7 @@
                                         <span class="text-sm font-semibold text-gray-900 dark:text-white text-right">{{ message.user }}</span>
                                     </div>
                                     <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1"
-                                    dir="ltr">{{ message.message }}</p>
+                                       dir="ltr">{{ message.message }}</p>
                                 </div>
                             </div>
                         {% endfor %}
@@ -80,12 +82,7 @@
                         <div class="p-4">
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                                 {% for label in labels %}
-                                    <c-label text="{{ label.name }}"
-                                             value="{{ label.id }}"
-                                             id="label_checkbox_{{ label.id }}"
-                                             name="selected_labels"
-                                             checked
-                                    />
+                                    <c-label text="{{ label.name }}" value="{{ label.id }}" id="label_checkbox_{{ label.id }}" name="selected_labels" checked />
                                 {% endfor %}
                             </div>
                         </div>
@@ -106,7 +103,11 @@
                                      style="max-height: 645px">
                                     {% include "codebook/partials/view-codebook.html" %}
                                 </div>
-                                <textarea id="codebook-content" name="content" class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 hidden scrollbar" rows="20" style="white-space: pre-wrap;">{{ codebook.content }}</textarea>
+                                <textarea id="codebook-content"
+                                          name="content"
+                                          class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 hidden scrollbar"
+                                          rows="20"
+                                          style="white-space: pre-wrap">{{ codebook.content }}</textarea>
                             </div>
                             <div id="rationale-div" class="my-3 hidden">
                                 <label for="rationale" class="block font-medium mb-1">Rationale</label>
@@ -154,87 +155,86 @@
             {% endif %}
         </div>
     </div>
+    <script>
+        const codebookForm = document.getElementById('codebook-form');
+        const labelsForm = document.getElementById('labels-form');
+        const textarea = document.getElementById('codebook-content');
+        const rationaleTextarea = document.getElementById('rationale');
+        const rendered = document.getElementById('codebook-rendered');
+        const editButton = document.getElementById('edit-save-button');
+        const buttonsDiv = document.getElementById('div-save-undo');
+        const cancelButton = document.getElementById('cancel-button');
+        const rationaleDiv = document.getElementById('rationale-div');
 
-<script>
-    const codebookForm = document.getElementById('codebook-form');
-    const labelsForm = document.getElementById('labels-form');
-    const textarea = document.getElementById('codebook-content');
-    const rationaleTextarea = document.getElementById('rationale');
-    const rendered = document.getElementById('codebook-rendered');
-    const editButton = document.getElementById('edit-save-button');
-    const buttonsDiv = document.getElementById('div-save-undo');
-    const cancelButton = document.getElementById('cancel-button');
-    const rationaleDiv = document.getElementById('rationale-div');
-
-    function colorContrast(labelElement) {
-        const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
-        const textColor = lib.funcs.inferTextColorByContrast(color);
-        labelElement.style.setProperty("--text-color", textColor);
-    };
-
-    async function submitBothForms() {
-        const isEdit = !textarea.classList.contains('hidden');
-        const rationaleEmpty = !rationaleTextarea.value.trim();
-
-        if (isEdit) {
-            if (rationaleEmpty) {
-                // showToast placeholder
-                return;
-            };
-            const res = await fetch(codebookForm.action, {
-                method: codebookForm.method,
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-                body: new FormData(codebookForm),
-            });
-
-            if (!res.ok) {
-                // showToast placeholder
-                return;
-            };
-
-            setTimeout(() => {
-                labelsForm.submit();
-            }, 2000);
-        } else {
-            setTimeout(() => {
-                labelsForm.submit();
-            }, 2000);
+        function colorContrast(labelElement) {
+            const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
+            const textColor = lib.funcs.inferTextColorByContrast(color);
+            labelElement.style.setProperty("--text-color", textColor);
         };
-    };
 
-    function toggleEdit() {
-        if (textarea.classList.contains('hidden')) {
-            rendered.classList.add('hidden')
-            textarea.classList.remove('hidden');
-            textarea.removeAttribute('readonly');
+        async function submitBothForms() {
+            const isEdit = !textarea.classList.contains('hidden');
+            const rationaleEmpty = !rationaleTextarea.value.trim();
 
-            editButton.classList.add('hidden');
-            cancelButton.classList.remove('hidden');
-            rationaleDiv.classList.remove('hidden');
-        };
-    };
+            if (isEdit) {
+                if (rationaleEmpty) {
+                    // showToast placeholder
+                    return;
+                };
+                const res = await fetch(codebookForm.action, {
+                    method: codebookForm.method,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: new FormData(codebookForm),
+                });
 
-    function toggleUndo() {
-        if (!textarea.readOnly) {
-            textarea.value = "{{ codebook.content|escapejs }}";
-            textarea.readOnly = true;
-            textarea.classList.add('hidden');
-            if (rendered) {
-                rendered.classList.remove('hidden');
+                if (!res.ok) {
+                    // showToast placeholder
+                    return;
+                };
+
+                setTimeout(() => {
+                    labelsForm.submit();
+                }, 2000);
+            } else {
+                setTimeout(() => {
+                    labelsForm.submit();
+                }, 2000);
             };
-
-            editButton.classList.remove('hidden');
-            cancelButton.classList.add('hidden');
-            buttonsDiv.classList.remove('flex-row');
-            buttonsDiv.classList.add('flex-col');
-            rationaleDiv.classList.add('hidden');
         };
-    };
 
-    function showToast(text, tags = "") {
-        // TODO: Add tailwind toast
-    };
-</script>
+        function toggleEdit() {
+            if (textarea.classList.contains('hidden')) {
+                rendered.classList.add('hidden')
+                textarea.classList.remove('hidden');
+                textarea.removeAttribute('readonly');
+
+                editButton.classList.add('hidden');
+                cancelButton.classList.remove('hidden');
+                rationaleDiv.classList.remove('hidden');
+            };
+        };
+
+        function toggleUndo() {
+            if (!textarea.readOnly) {
+                textarea.value = "{{ codebook.content|escapejs }}";
+                textarea.readOnly = true;
+                textarea.classList.add('hidden');
+                if (rendered) {
+                    rendered.classList.remove('hidden');
+                };
+
+                editButton.classList.remove('hidden');
+                cancelButton.classList.add('hidden');
+                buttonsDiv.classList.remove('flex-row');
+                buttonsDiv.classList.add('flex-col');
+                rationaleDiv.classList.add('hidden');
+            };
+        };
+
+        function showToast(text, tags = "") {
+            // TODO: Add tailwind toast
+        };
+    </script>
 {% endblock content %}
