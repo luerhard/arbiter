@@ -45,13 +45,14 @@
                     <div class="px-4 py-2 font-semibold">Chat History</div>
                     <div class="p-4">
                         {% for message in chat_messages %}
-                            <div type="self-message" class="flex items-start gap-2.5 mb-3" dir="rtl">
-                                <div class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-blue-400 rounded-e-xl rounded-es-xl dark:bg-blue-700">
-                                    <div class="flex items-center space-x-2 justify-end" dir="ltr">
-                                        <span class="text-sm font-semibold text-gray-900 dark:text-white text-right">{{ message.user }}</span>
+                            <div type="other-message"
+                                class="other-message flex items-start gap-2.5 mb-3">
+                                <div class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-gray-300 rounded-e-xl rounded-es-xl dark:bg-gray-700">
+                                    <div class="flex items-center space-x-2" dir="ltr">
+                                        <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
                                     </div>
                                     <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1"
-                                       dir="ltr">{{ message.message }}</p>
+                                    dir="ltr">{{ message.message }}</p>
                                 </div>
                             </div>
                         {% endfor %}
@@ -234,7 +235,7 @@
         };
 
         function showToast(text, tags = "") {
-            // TODO: Add tailwind toast
+            // TODO: Add tailwind toast: https://tailwindcss.com/plus/ui-blocks/application-ui/overlays/notifications
         };
     </script>
 {% endblock content %}
