@@ -15,7 +15,7 @@ import { navBlock, labelButton } from "./annotation.js";
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 
-Alpine.start()
+Alpine.start();
 
 // Your modules
 import * as funcs from "./functions.js";
