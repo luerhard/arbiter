@@ -1,14 +1,14 @@
 <template id="notification">
     <div x-data="notification"
          x-ref="renderedNotification"
-         class="pointer-events-auto w-full max-w-sm translate-y-0 transform rounded-lg bg-white opacity-100 shadow-lg outline-1 outline-black/5 transition duration-300 ease-out sm:translate-x-0 dark:bg-gray-800 dark:-outline-offset-1 dark:outline-white/10 starting:translate-y-2 starting:opacity-0 starting:sm:translate-x-2 starting:sm:translate-y-0">
+         class=" overflow-hidden pointer-events-auto w-full max-w-sm translate-y-0 transform rounded-lg bg-white opacity-100 shadow-lg outline-1 outline-black/5 transition duration-300 ease-out sm:translate-x-0 dark:bg-gray-800 dark:-outline-offset-1 dark:outline-white/10 starting:translate-y-2 starting:opacity-0 starting:sm:translate-x-2 starting:sm:translate-y-0">
         <div class="p-4">
             <div class="flex items-start">
                 <div id="notifyIcon" class="shrink-0"></div>
                 <div class="ml-3 w-0 flex-1 pt-0.5">
                     <p id="notifyHead"
-                       class="text-sm font-medium text-gray-900 dark:text-white">Successfully saved!</p>
-                    <!-- <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Anyone with a link can now view this file.</p> -->
+                       class="text-sm font-medium text-gray-900 dark:text-white"></p>
+                    <!-- <p id="notifyBody" class="mt-1 text-sm text-gray-500 dark:text-gray-400">Anyone with a link can now view this file.</p> -->
                 </div>
                 <div class="ml-4 flex shrink-0">
                     <button type="button"
@@ -26,5 +26,6 @@
                 </div>
             </div>
         </div>
+        <div class="h-1 w-full bg-indigo-500 transition-transform duration-5000 ease-linear translate-x-0 starting:translate-x-[-100%]"></div>
     </div>
 </template>
