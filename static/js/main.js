@@ -29,5 +29,5 @@ window.lib = { funcs, discuss, expert };
 export { funcs, discuss, expert };
 
 // Debugging
-// htmx.logger = (elt, event, data) => console?.log?.(event, elt, data);
-// htmx.logAll();
+htmx.logger = (elt, event, data) => console?.log?.(event, elt, data);
+htmx.logAll();
