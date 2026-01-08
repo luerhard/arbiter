@@ -155,19 +155,7 @@
                         onclick="submitBothForms()">Finish</button>
             {% endif %}
         </div>
-        <!-- Live Notification Area -->
-        <div aria-live="assertive"
-             class="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6">
-            <div id="notification-area"
-                 class="flex w-full flex-col items-center space-y-4 sm:items-end">
-                <!-- Notification panel, dynamically insert notification into the live region when it needs to be displayed -->
-            </div>
-        </div>
-        <!-- Notification Template -->
         <c-expert.notification />
-        <!-- SVG Templates -->
-        <c-expert.check-circle />
-        <c-expert.x-circle />
     </div>
     <script>
         const codebookForm = document.getElementById('codebook-form');
@@ -179,28 +167,6 @@
         const buttonsDiv = document.getElementById('div-save-undo');
         const cancelButton = document.getElementById('cancel-button');
         const rationaleDiv = document.getElementById('rationale-div');
-        const notifyArea = document.getElementById('notification-area');
-        const notifyTemplate = document.getElementById('notification');
-        const checkCircle = document.getElementById('check-circle');
-        const xCircle = document.getElementById('x-circle');
-
-        document.addEventListener("alpine:init", () => {
-            Alpine.data('notification', () => ({
-                timer: null,
-                init() {
-                    this.timer = setTimeout(() => {
-                        this.clear()
-                    }, 5000);
-                },
-                clear() {
-                    this.$refs.renderedNotification.parentNode.removeChild(this.$refs.renderedNotification);
-                },
-                // Component destructor
-                destroy() {
-                    clearInterval(this.timer);
-                },
-            }));
-        });
 
         function colorContrast(labelElement) {
             const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
@@ -214,7 +180,7 @@
 
             if (isEdit) {
                 if (rationaleEmpty) {
-                    notification("Please add a rationale.", true);
+                    lib.expert.notify("Please add a rationale.", "x-circle");
                     return;
                 };
                 const res = await fetch(codebookForm.action, {
@@ -226,19 +192,19 @@
                 });
 
                 if (!res.ok) {
-                    notification("Codebook update failed.", true);
+                    lib.expert.notify("Codebook update failed.", "x-circle");
                     return;
                 };
 
+                lib.expert.notify("Disagreement resolution saved.");
                 setTimeout(() => {
-                    notification("Disagreement resolution saved.");
                     labelsForm.submit();
-                }, 2000);
+                }, 3000);
             } else {
+                lib.expert.notify("Disagreement resolution saved.");
                 setTimeout(() => {
-                    notification("Disagreement resolution saved.");
                     labelsForm.submit();
-                }, 2000);
+                }, 3000);
             };
         };
 
@@ -269,16 +235,6 @@
                 buttonsDiv.classList.add('flex-col');
                 rationaleDiv.classList.add('hidden');
             };
-        };
-
-        function notification(text, failure = false) {
-            const clone = document.importNode(notifyTemplate.content, true);
-            if (failure)
-                clone.getElementById('notifyIcon').appendChild(document.importNode(xCircle.content, true));
-            else
-                clone.getElementById('notifyIcon').appendChild(document.importNode(checkCircle.content, true));
-            clone.getElementById('notifyHead').textContent = text;
-            notifyArea.appendChild(clone);
         };
     </script>
 {% endblock content %}

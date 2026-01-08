@@ -1,3 +1,13 @@
+<!-- Live Notification Area -->
+<div aria-live="assertive"
+        class="pointer-events-none fixed inset-0 flex items-end px-4 py-6 sm:items-start sm:p-6">
+    <div id="notification-area"
+            class="flex w-full flex-col items-center space-y-4 sm:items-end">
+        <!-- Notification panel, dynamically insert notification into the live region when it needs to be displayed -->
+    </div>
+</div>
+
+<!-- Notification Template -->
 <template id="notification">
     <div x-data="notification"
          x-ref="renderedNotification"
@@ -26,7 +36,11 @@
                 </div>
             </div>
         </div>
-        <div class="h-1 w-full bg-indigo-500 transition-transform duration-5000 ease-linear translate-x-0 starting:translate-x-[-100%]">
+        <div class="h-1 w-full bg-indigo-500 transition-transform duration-3000 ease-linear translate-x-0 starting:translate-x-[-100%]">
         </div>
     </div>
 </template>
+<!-- SVG Templates -->
+<c-expert.check-circle />
+<c-expert.x-circle />
+<c-expert.arrow-up-circle />

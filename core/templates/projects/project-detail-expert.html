@@ -39,13 +39,12 @@
                                                             <div x-show="open"
                                                                  @click.away="open = false"
                                                                  class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-50 dark:bg-gray-900 shadow-lg ring-1 ring-gray-200 dark:ring-gray-800 focus:outline-none">
-                                                                <!-- TODO: For now, the button works but there's no feedback. A notification should be created. -->
                                                                 <form hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
                                                                       hx-swap="none"
                                                                       class="py-1">
                                                                     {% csrf_token %}
                                                                     {% for value, text in batch.batch_phase_form.fields.phase.choices %}
-                                                                        <button type="submit" name="phase" value="{{ value }}" @click="open = false; setTimeout(() => { location.reload() }, 3000)" class="block w-full px-4 py-2 text-left text-sm
+                                                                        <button type="submit" name="phase" value="{{ value }}" @click="open = false; lib.expert.notify('Changes made.', 'arrow-up-circle'); setTimeout(() => { location.reload() }, 3000)" class="block w-full px-4 py-2 text-left text-sm
                                                                             {% if batch.batch.phase == value %}
                                                                                 bg-gray-200 dark:bg-gray-800 text-black dark:text-white
                                                                             {% else %}
@@ -110,5 +109,6 @@
                 </div>
             </div>
         </section>
+        <c-expert.notification />
     </div>
 {% endblock content %}
