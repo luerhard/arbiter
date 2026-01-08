@@ -8,10 +8,10 @@
                 <div type="self-message" class="flex items-start gap-2.5 mb-3" dir="rtl">
                     <div class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-blue-400 rounded-e-xl rounded-es-xl dark:bg-blue-700">
                         <div class="flex items-center space-x-2 justify-end" dir="ltr">
-                            <span class="text-sm font-semibold text-gray-900 dark:text-white text-right"
+                            <span class="text-sm font-semibold text-right"
                                   x-text="message.user"></span>
                         </div>
-                        <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1"
+                        <p class="self-start text-sm font-normal py-1"
                            dir="ltr"
                            x-text="message.text"></p>
                     </div>
@@ -23,10 +23,10 @@
                      class="other-message flex items-start gap-2.5 mb-3">
                     <div class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-gray-300 rounded-e-xl rounded-es-xl dark:bg-gray-700">
                         <div class="flex items-center space-x-2" dir="ltr">
-                            <span class="text-sm font-semibold text-gray-900 dark:text-white"
+                            <span class="text-sm font-semibold"
                                   x-text="message.user"></span>
                         </div>
-                        <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1"
+                        <p class="self-start text-sm font-normal py-1"
                            dir="ltr"
                            x-text="message.text"></p>
                     </div>
@@ -35,7 +35,7 @@
             <!-- System Message -->
             <template x-if="message.user === 'system'">
                 <div type="system-message" class="justify-items-center">
-                    <div class="d-flex flex-row text-gray-900 dark:text-gray-100">
+                    <div class="d-flex flex-row">
                         <span x-text="message.text"></span>
                     </div>
                 </div>

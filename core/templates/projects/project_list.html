@@ -4,7 +4,7 @@
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="sm:flex sm:items-center">
             <div class="sm:flex-auto">
-                <h1 class="text-base font-semibold text-gray-900 dark:text-white">Projects</h1>
+                <h1 class="text-base font-semibold">Projects</h1>
                 <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
                     Your assigned projects including role, active batches, and current states.
                 </p>
@@ -30,19 +30,19 @@
                                     Project
                                 </th>
                                 <th scope="col"
-                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                                    class="px-3 py-3.5 text-left text-sm font-semibold">
                                     Assigned as
                                 </th>
                                 <th scope="col"
-                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                                    class="px-3 py-3.5 text-left text-sm font-semibold">
                                     Active batches
                                 </th>
                                 <th scope="col"
-                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                                    class="px-3 py-3.5 text-left text-sm font-semibold">
                                     Annotation
                                 </th>
                                 <th scope="col"
-                                    class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 dark:text-white">
+                                    class="px-3 py-3.5 text-left text-sm font-semibold">
                                     Discussion
                                 </th>
                                 <th scope="col" class="py-3.5 pr-4 pl-3 text-right sm:pr-0">
@@ -61,7 +61,7 @@
                                                     {{ project_user.project.name|default:"–"|slice:":2"|upper }}
                                                 </div>
                                                 <div class="sm:ml-4">
-                                                    <div class="font-medium text-gray-900 dark:text-white">{{ project_user.project.name }}</div>
+                                                    <div class="font-medium">{{ project_user.project.name }}</div>
                                                     {# Optional subtitle if you have it: #}
                                                     {# <div class="mt-1 text-gray-500 dark:text-gray-400">{{ project_user.project.description }}</div> #}
                                                 </div>
@@ -75,7 +75,7 @@
                                         </td>
                                         <!-- Active batches (number) -->
                                         <td class="px-3 py-5 text-sm whitespace-nowrap">
-                                            <span class="font-semibold text-gray-900 dark:text-white">{{ project_user.project.annotator_n_active_batches }}</span>
+                                            <span class="font-semibold">{{ project_user.project.annotator_n_active_batches }}</span>
                                         </td>
                                         <!-- Annotation open (boolean badge) -->
                                         <td class="px-3 py-5 text-sm whitespace-nowrap">
