@@ -45,11 +45,13 @@
                                                                       class="py-1">
                                                                     {% csrf_token %}
                                                                     {% for value, text in batch.batch_phase_form.fields.phase.choices %}
-                                                                        <button type="submit"
-                                                                                name="phase"
-                                                                                value="{{ value }}"
-                                                                                @click="open = false; setTimeout(() => { location.reload() }, 3000)"
-                                                                                class="block w-full px-4 py-2 text-left text-sm {% if batch.batch.phase == value %}bg-gray-200 dark:bg-gray-800 text-black dark:text-white{% else %}text-gray-700 dark:text-gray-300{% endif %} hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white">
+                                                                        <button type="submit" name="phase" value="{{ value }}" @click="open = false; setTimeout(() => { location.reload() }, 3000)" class="block w-full px-4 py-2 text-left text-sm
+                                                                            {% if batch.batch.phase == value %}
+                                                                                bg-gray-200 dark:bg-gray-800 text-black dark:text-white
+                                                                            {% else %}
+                                                                                text-gray-700 dark:text-gray-300
+                                                                            {% endif %}
+                                                                            hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white">
                                                                             {{ text }}
                                                                         </button>
                                                                     {% endfor %}
