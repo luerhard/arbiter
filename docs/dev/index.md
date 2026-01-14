@@ -4,112 +4,52 @@ We currently use a couple of techonologies that are required to contribute.
 
 ## Installation
 
-### 1. Install python dependencies
-
-To manage our python environment, we use `poetry`. Install poetry in your system or any other python installation or (better) via `pipx`.
+to start everything for the first time:
 
 ```bash
-pipx install poetry
-```
+# start the services
+docker compose up
 
-I would strongly advise to keep your virtual environment close to your source code.
-You can configure `poetry` in that way by running
+# create all tables in the database
+docker exec annotationtool-web-1 uv run manage.py migrate
 
-```bash
-poetry config --global virtualenvs.in-project true
-```
-
-To create the virtual environment and install all requirements, run (from the root of the repo):
-
-```
-poetry install
-```
-
-### 2. Install node requirements
-
-For everything JavaScript and SCSS, we use npm as a package manager.
-[Click here](https://nodejs.org/en/learn/getting-started/how-to-install-nodejs) for installation instructions.
-
-Once node (and npm) are installed, run (from the root of the repo):
-
-```bash
-npm install
-```
-
-### 3. Copy the sqlite Test-DB
-
-The test database is necessary to have some sample data in your database while developing locally.
-To create testdata into your database, go to the root of the git repository and execute:
-
-```bash
-rm db.sqlite3
-cd core/
-python manage.py migrate
-python manage.py populatedb
-```
-
-## Running the app locally
-
-### 1. Run webpack
-
-We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.
-
-Webpack is a powerful module bundler for JavaScript applications. The --watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.
-
-
-To run webpack, run
-
-```bash
-npm run start
-```
-
-Initially, this will create the `dist/` folder and put all necessary static files in it.
-If you do not intend to change any CSS, SCSS or .js files, you can just kill the server by `Ctrl+C` in the terminal.
-However, I would strongly recommend to just keep it running.
-It will automatically recompile all necessary files if they change.
-
-To run webpack continuously and watch for file changes, run
-
-```bash
-npm run watch
-```
-
-### 2. Run Django Server
-
-To run the django server that actually serves the site, there are a couple of options.
-
-First, you can run (from the root of the directory):
-
-```bash
-npm run django
-```
-
-This is just a shortcut for
-
-```bash
-cd core
-poetry run python manage.py runserver
-```
-
-Whenever the output tells you that there are **unapplied migrations**, run:
-
-```bash
-cd core
-poetry run python manage.py migrate
+# populate the DB with test data
+docker exec annotationtool-web-1 uv run manage.py populatedb
 ```
 
 This should spawn a webserver that is accessible in the browser via [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-### Run tests
-
-To run the tests, run
+To delete to everything, including the database:
 
 ```bash
-cd core
-poetry run pytest
+# stop all ccontainers
+docker compose down
+
+# remove the docker volume that contains the database data
+docker volume rm annotationtool_pgdata
 ```
 
-## Development Server
+
+## Run tests
+
+to run the tests locally, use:
+
+```
+docker compose run --rm -e SQLITE_FOR_TESTS=1 web uv run pytest -v
+```
+
+`-v` is optional here but gives some more infos on all tests.
+
+## Build documentation locally
+
+```bash
+docker compose run --rm web bash -c "cd ../docs; make html"
+```
+
+This will create `docs/_build/html/index.html` which is the starting page of the documentation.
+
+
+# Development Server
 
 ### Access
 

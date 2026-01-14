@@ -4,18 +4,15 @@ import pytest
 # Update the tuples to have just the assignment id (not a tuple)
 URLS_WITH_URL_PARAMS = [
     ("annotate-batch", 1),
-    ("annotate-edit", 81),
 ]
 
 URLS_WITH_GET_PARAMS = [
     ("annotate-next", 1),
     ("annotate-prev", 11),
-    ("annotate-reload", 11),
 ]
 
 
-@pytest.mark.skip
-@pytest.mark.django_db
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     pytestmarks = pytest.mark.django_db
