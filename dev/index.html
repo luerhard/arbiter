@@ -46,29 +46,20 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">A guide for devs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#install-python-dependencies">1. Install python dependencies</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#install-node-requirements">2. Install node requirements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#copy-the-sqlite-test-db">3. Copy the sqlite Test-DB</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-tests">Run tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#build-documentation-locally">Build documentation locally</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#running-the-app-locally">Running the app locally</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#run-webpack">1. Run webpack</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#run-django-server">2. Run Django Server</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#run-tests">Run tests</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#development-server">Development Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#access">Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#current-users">Current Users</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#admin">admin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotator1">annotator1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotator2">annotator2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#expert1">expert1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#expert2">expert2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#passwords">Passwords</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="#development-server">Development Server</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#access">Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#current-users">Current Users</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#admin">admin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annotator1">annotator1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#annotator2">annotator2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expert1">expert1</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#expert2">expert2</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#passwords">Passwords</a></li>
 </ul>
 </li>
 </ul>
@@ -105,135 +96,87 @@
 <p>We currently use a couple of techonologies that are required to contribute.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<section id="install-python-dependencies">
-<h3>1. Install python dependencies<a class="headerlink" href="#install-python-dependencies" title="Link to this heading"></a></h3>
-<p>To manage our python environment, we use <code class="docutils literal notranslate"><span class="pre">poetry</span></code>. Install poetry in your system or any other python installation or (better) via <code class="docutils literal notranslate"><span class="pre">pipx</span></code>.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pipx<span class="w"> </span>install<span class="w"> </span>poetry
-</pre></div>
-</div>
-<p>I would strongly advise to keep your virtual environment close to your source code.
-You can configure <code class="docutils literal notranslate"><span class="pre">poetry</span></code> in that way by running</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>config<span class="w"> </span>--global<span class="w"> </span>virtualenvs.in-project<span class="w"> </span><span class="nb">true</span>
-</pre></div>
-</div>
-<p>To create the virtual environment and install all requirements, run (from the root of the repo):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">poetry</span> <span class="n">install</span>
-</pre></div>
-</div>
-</section>
-<section id="install-node-requirements">
-<h3>2. Install node requirements<a class="headerlink" href="#install-node-requirements" title="Link to this heading"></a></h3>
-<p>For everything JavaScript and SCSS, we use npm as a package manager.
-<a class="reference external" href="https://nodejs.org/en/learn/getting-started/how-to-install-nodejs">Click here</a> for installation instructions.</p>
-<p>Once node (and npm) are installed, run (from the root of the repo):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>install
-</pre></div>
-</div>
-</section>
-<section id="copy-the-sqlite-test-db">
-<h3>3. Copy the sqlite Test-DB<a class="headerlink" href="#copy-the-sqlite-test-db" title="Link to this heading"></a></h3>
-<p>The test database is necessary to have some sample data in your database while developing locally.
-To create testdata into your database, go to the root of the git repository and execute:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rm<span class="w"> </span>db.sqlite3
-<span class="nb">cd</span><span class="w"> </span>core/
-python<span class="w"> </span>manage.py<span class="w"> </span>migrate
-python<span class="w"> </span>manage.py<span class="w"> </span>populatedb
-</pre></div>
-</div>
-</section>
-</section>
-<section id="running-the-app-locally">
-<h2>Running the app locally<a class="headerlink" href="#running-the-app-locally" title="Link to this heading"></a></h2>
-<section id="run-webpack">
-<h3>1. Run webpack<a class="headerlink" href="#run-webpack" title="Link to this heading"></a></h3>
-<p>We currently use webpack to compile our SCSS files to CSS and to bundle all CSS and JavaScript files.</p>
-<p>Webpack is a powerful module bundler for JavaScript applications. The –watch option in Webpack is used to keep the build process running in the background, watching for any changes in the source files. When a file is modified, Webpack automatically recompiles the changes, which is useful for speeding up the development process by providing near-instant feedback on changes.</p>
-<p>To run webpack, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>start
-</pre></div>
-</div>
-<p>Initially, this will create the <code class="docutils literal notranslate"><span class="pre">dist/</span></code> folder and put all necessary static files in it.
-If you do not intend to change any CSS, SCSS or .js files, you can just kill the server by <code class="docutils literal notranslate"><span class="pre">Ctrl+C</span></code> in the terminal.
-However, I would strongly recommend to just keep it running.
-It will automatically recompile all necessary files if they change.</p>
-<p>To run webpack continuously and watch for file changes, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>watch
-</pre></div>
-</div>
-</section>
-<section id="run-django-server">
-<h3>2. Run Django Server<a class="headerlink" href="#run-django-server" title="Link to this heading"></a></h3>
-<p>To run the django server that actually serves the site, there are a couple of options.</p>
-<p>First, you can run (from the root of the directory):</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>run<span class="w"> </span>django
-</pre></div>
-</div>
-<p>This is just a shortcut for</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
-poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>runserver
-</pre></div>
-</div>
-<p>Whenever the output tells you that there are <strong>unapplied migrations</strong>, run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
-poetry<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+<p>to start everything for the first time:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># start the services</span>
+docker<span class="w"> </span>compose<span class="w"> </span>up
+
+<span class="c1"># create all tables in the database</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>migrate
+
+<span class="c1"># populate the DB with test data</span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>populatedb
 </pre></div>
 </div>
 <p>This should spawn a webserver that is accessible in the browser via <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
-</section>
-<section id="run-tests">
-<h3>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h3>
-<p>To run the tests, run</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>core
-poetry<span class="w"> </span>run<span class="w"> </span>pytest
+<p>To delete to everything, including the database:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all ccontainers</span>
+docker<span class="w"> </span>compose<span class="w"> </span>down
+
+<span class="c1"># remove the docker volume that contains the database data</span>
+docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>annotationtool_pgdata
 </pre></div>
 </div>
 </section>
+<section id="run-tests">
+<h2>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h2>
+<p>to run the tests locally, use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="o">-</span><span class="n">e</span> <span class="n">SQLITE_FOR_TESTS</span><span class="o">=</span><span class="mi">1</span> <span class="n">web</span> <span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">-v</span></code> is optional here but gives some more infos on all tests.</p>
+</section>
+<section id="build-documentation-locally">
+<h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs; make html&quot;</span>
+</pre></div>
+</div>
+<p>This will create <code class="docutils literal notranslate"><span class="pre">docs/_build/html/index.html</span></code> which is the starting page of the documentation.</p>
+</section>
 </section>
 <section id="development-server">
-<h2>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h2>
+<h1>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h1>
 <section id="access">
-<h3>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h3>
+<h2>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h2>
 <p>We now have a development Server which serves as a showcase of the current state of the project.</p>
 <p>The adress is: <a class="reference external" href="http://193.196.54.251">http://193.196.54.251</a></p>
 <p>To access it, you need to be in the University of Stuttgart VPN (or physically on campus).</p>
 </section>
 <section id="current-users">
-<h3>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h3>
+<h2>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h2>
 <section id="admin">
-<h4>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h4>
+<h3>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on <a class="reference external" href="http://193.196.54.251/admin">http://193.196.54.251/admin</a>. If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.</p></li>
 </ul>
 </section>
 <section id="annotator1">
-<h4>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h4>
+<h3>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>default annotator without special permissions</p></li>
 </ul>
 </section>
 <section id="annotator2">
-<h4>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h4>
+<h3>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>same as annotator1. Exists because we want 2 annotators for each project</p></li>
 </ul>
 </section>
 <section id="expert1">
-<h4>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h4>
+<h3>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>A role to show the expert interface.</p></li>
 </ul>
 </section>
 <section id="expert2">
-<h4>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h4>
+<h3>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>A second expert.</p></li>
 <li><p>expert2 should behave the same as expert1.</p></li>
 </ul>
 </section>
 <section id="passwords">
-<h4>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h4>
+<h3>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h3>
 <p>every user has a password of “123”.</p>
-</section>
 </section>
 </section>
 </section>
