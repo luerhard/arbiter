@@ -29,7 +29,7 @@ def create_batch(project):
         project=project,
         phase=Batch.Phase.ANNOTATION,
     )
-    test_df = pd.read_csv(settings.BASE_DIR / "../tests/testdata/examples.csv")
+    test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
     for i, row in test_df.iterrows():
         ex = Example.objects.create(batch=batch, content=row["text"])
@@ -84,7 +84,7 @@ class Command(BaseCommand):
         )
         codebook = Codebook.objects.get(project=project)
         codebook_content = (
-            settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long_v1.md"
+            settings.BASE_DIR / "core/tests/testdata/codebook_populism_long_v1.md"
         ).read_text()
         codebook.save(content=codebook_content)
 
@@ -98,7 +98,7 @@ class Command(BaseCommand):
         batch.set_phase(Batch.Phase.DISCUSSION)
 
         codebook_content = (
-            settings.BASE_DIR.parent / "tests/testdata/codebook_populism_long_v2.md"
+            settings.BASE_DIR / "core/tests/testdata/codebook_populism_long_v2.md"
         ).read_text()
         codebook.save(content=codebook_content)
         batch = create_batch(project)
@@ -136,7 +136,7 @@ class Command(BaseCommand):
 
         codebook = Codebook.objects.get(project=project)
         codebook_content = (
-            settings.BASE_DIR.parent / "tests/testdata/codebook_emotions_short.md"
+            settings.BASE_DIR / "core/tests/testdata/codebook_emotions_short.md"
         ).read_text()
         codebook.save(content=codebook_content)
         batch = create_batch(project)

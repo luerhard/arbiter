@@ -7,10 +7,13 @@ urlpatterns = [
 ]
 
 htmx_patterns = [
+    path("htmx/pbar", views.HtmxPbar.as_view(), name="annotate-pbar"),
+    path("htmx/labels", views.HtmxLabels.as_view(), name="annotate-labels"),
+    path("htmx/sentence", views.HtmxSentence.as_view(), name="annotate-sentence"),
+    path("htmx/nav-block", views.HtmxNavBlock.as_view(), name="annotate-nav-block"),
     path("next/", views.NextSentence.as_view(), name="annotate-next"),
-    path("reload/", views.ReloadSentence.as_view(), name="annotate-reload"),
     path("prev/", views.PrevSentence.as_view(), name="annotate-prev"),
-    path("example/edit/<int:assignment_id>", views.EditAssignment.as_view(), name="annotate-edit"),
+    path("htmx/edit/", views.EditAssignment.as_view(), name="annotate-edit"),
 ]
 
 urlpatterns += htmx_patterns

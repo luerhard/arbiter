@@ -18,7 +18,7 @@ RUN ["uv", "sync", "--frozen", "--no-dev", "--compile-bytecode"]
 # ---- Runtime (prod) ----
 FROM base AS runtime
 # copy the venv from deps stage
-COPY --from=deps /app/.venv /app/.venv
+# COPY --from=deps /app/.venv /app/.venv
 # app code last for better caching
 COPY . .
 # Default prod command (override in compose for dev)
@@ -27,7 +27,7 @@ CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
 # ---- Dev image (with debugger) ----
 FROM base AS dev
 COPY pyproject.toml uv.lock README.md ./
-RUN ["uv", "sync", "--frozen", "--group", "dev"]
+RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
 COPY . .
 # wait for VS Code debugger to attach, then run Daphne
 WORKDIR /app/core/

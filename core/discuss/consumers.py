@@ -96,14 +96,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_state()
 
         elif "clicked-done" in data.keys():
-            labels = [int(label_id) for label_id in json.loads(data["labels"]) if label_id.strip()]
+            labels = [label_id for label_id in data["labels"]]
 
             await self._store_discussion_labels(self.username, labels)
+            log.debug(f"{self.username} clicked done.")
             await self._clicked_done(self.username)
 
+            log.debug("Await self._all_done().")
             if await self._all_done():
                 state = await self._get_state()
-                if not state["discussed_ended"]:
+                # log.debug(f"{not state["discussion_ended"] = }")
+                if not state["discussion_ended"]:
                     await self.save_labels_to_db()
                     await self._set_next_and_reset()
             await self.group_send_state()
@@ -132,9 +135,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return await update_state(self.batch_id, mut)
 
     async def _clicked_done(self, username):
+        log.debug(f"{username = } clicked done.")
+
         async def mut(state):
+            log.debug(f"{state["clicked_done"] = }")
             if state["clicked_done"][username]:
+                # TODO: Looks like on reload the user can press Save & Done
+                # even after having pressed it previously.
+                # After pressing it again the boolean rotates.
                 state["clicked_done"][username] = 0
+                # This means the button should change the un/lock dynamically on the frontend.
             else:
                 state["clicked_done"][username] = 1
 
@@ -144,8 +154,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def _all_done(self):
         state = await self._get_state()
+        log.debug(f"{state = }")
         required = set(state.get("required_users", []))
         clicked = {u for u, v in (state.get("clicked_done", {}) or {}).items() if v == 1}
+        log.debug(f"{required <= clicked = }")
         return required <= clicked
 
     # ---------- CHAT HELPERS -----------------
@@ -182,7 +194,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         next_page = int(state.get("page", 0)) + 1
         state["page"] = next_page
-        example, annotations = await database_sync_to_async(self.get_example)(state=state)
+        example, annotations, total_pages = await database_sync_to_async(self.get_example)(
+            state=state
+        )
 
         end_reason = None
         msg = None
@@ -211,6 +225,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
                 state["annotation_labels"] = annotations
+                state["total_pages"] = total_pages
 
                 state["clicked_done"] = dict.fromkeys(state.get("online_users", []), 0)
             return state
@@ -245,11 +260,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_example(self, state):
         log.debug("Getting example")
         queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).distinct()
+        log.debug(f"{queryset = }")
         paginator = Paginator(queryset, 1)
         page_obj = paginator.get_page(state["page"])
+        total_pages = paginator.count
 
         if page_obj.number < state["page"] or not queryset.count():
-            return None, None
+            return None, None, total_pages + 1
 
         example = page_obj.object_list[0]
 
@@ -276,7 +293,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 by_user[user].append(label)
 
-        return example, by_user
+        return example, by_user, total_pages
 
     @database_sync_to_async
     def get_assigned_annotators(self):

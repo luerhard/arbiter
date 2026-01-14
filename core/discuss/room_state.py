@@ -2,11 +2,14 @@
 from collections.abc import Awaitable
 from collections.abc import Callable
 import json
+import logging
 import os
 from typing import Any
 
 from redis.asyncio import Redis
 from redis.exceptions import WatchError
+
+log = logging.getLogger(__name__)
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
 _redis: Redis | None = None
@@ -20,6 +23,7 @@ def _r() -> Redis:
 
 
 def _key(batch_id: int | str) -> str:
+    log.debug(f"room:{batch_id}")
     return f"room:{batch_id}"
 
 
@@ -36,11 +40,13 @@ def _defaults() -> dict[str, Any]:
         "discussion_labels": {},
         "clicked_done": {},  # {username: 0|1}
         "messages": [],  # dict-keys: username, msg
+        "total_pages": 0,
     }
 
 
 async def get_state(batch_id: int | str) -> dict[str, Any]:
     raw = await _r().get(_key(batch_id))
+    log.debug(f"{raw = }")
     return json.loads(raw) if raw else _defaults()
 
 

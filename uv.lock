@@ -26,11 +26,13 @@ dependencies = [
     { name = "crispy-bootstrap5" },
     { name = "django" },
     { name = "django-colorfield" },
+    { name = "django-cotton" },
     { name = "django-crispy-forms" },
     { name = "django-htmx" },
     { name = "django-markdownify" },
     { name = "django-nested-admin" },
     { name = "django-template-partials" },
+    { name = "django-vite" },
     { name = "django-widget-tweaks" },
     { name = "gitpython" },
     { name = "pandas" },
@@ -60,11 +62,13 @@ requires-dist = [
     { name = "crispy-bootstrap5", specifier = "~=2024.10" },
     { name = "django", specifier = "~=5.1" },
     { name = "django-colorfield", specifier = ">=0.11.0,<0.12" },
+    { name = "django-cotton", specifier = ">=2.1.3" },
     { name = "django-crispy-forms", specifier = "~=2.3" },
     { name = "django-htmx", specifier = ">=1.18.0,<2" },
     { name = "django-markdownify", specifier = ">=0.9.5,<0.10" },
     { name = "django-nested-admin", specifier = ">=4.1.1,<5" },
     { name = "django-template-partials", specifier = "~=24.4" },
+    { name = "django-vite", specifier = ">=3.1.0" },
     { name = "django-widget-tweaks", specifier = ">=1.5.0,<2" },
     { name = "gitpython", specifier = ">=3.1.44,<4" },
     { name = "pandas", specifier = ">=2.2,<3.0" },
@@ -495,6 +499,18 @@ wheels = [
 ]
 
 [[package]]
+name = "django-cotton"
+version = "2.1.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c3/99/36e318ebd1ace3fc874541a02e7e4149def8e21aab85aceb7bb01e17607b/django_cotton-2.1.3.tar.gz", hash = "sha256:737f9c088549d7febbf78532856ddf1270799675a4bc9fa191a5db0e195a9c13", size = 23432, upload-time = "2025-06-30T17:31:29.29Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/ec/5e5318af0304962be43e3b912aef024d8ac08c0f9a9dfcc4f0cd55d0e74e/django_cotton-2.1.3-py3-none-any.whl", hash = "sha256:f33658d05a8f5ecf7448bdf1089e2ad27d2ce42e59c752216129701d7d153c89", size = 22214, upload-time = "2025-06-30T17:31:28.093Z" },
+]
+
+[[package]]
 name = "django-crispy-forms"
 version = "2.3"
 source = { registry = "https://pypi.org/simple" }
@@ -568,6 +584,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/1c/ff/2a7ddae12ca8e5fea1a41af05924c04f1bb4aec7157b04a88b829dd93d4a/django_template_partials-24.4.tar.gz", hash = "sha256:25b67301470fc274ecc419e5e5fd4686a5020b1c038fd241a70eb087809034b6", size = 14538, upload-time = "2024-08-16T10:51:30.204Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/31/72/d8eea70683b25230e0d2647b5cf6f2db4a7e7d35cb6170506d9618196374/django_template_partials-24.4-py2.py3-none-any.whl", hash = "sha256:ee59d3839385d7f648907c3fa8d5923fcd66cd8090f141fe2a1c338b917984e2", size = 8439, upload-time = "2024-08-16T10:51:28.437Z" },
+]
+
+[[package]]
+name = "django-vite"
+version = "3.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/23/fe/4be07f538bbf9bf8bf73b045552ec2a1b4fba67e3176abb30490b643368e/django_vite-3.1.0.tar.gz", hash = "sha256:8b4ffe4a9fa81ff568bfb195e74dde8694aaf13fd4b656ae60bf59cce08b85e8", size = 25434, upload-time = "2025-02-23T15:32:07.914Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/30/59/7df4b1077fa41b43b4e542696d75138dbb86a65f44248c607b3e0f1014ce/django_vite-3.1.0-py3-none-any.whl", hash = "sha256:4e46572bd6b1ce70784be129205dc2ffcbc7a3c19fea50bebfb72b327bbde5fc", size = 23579, upload-time = "2025-02-23T15:32:06.603Z" },
 ]
 
 [[package]]

@@ -13,52 +13,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-
-      - name: Cache uv + venv
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            ./.venv
-          key: uv-${{ runner.os }}-${{ steps.py.outputs.python-version || '3.11' }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}
-
-      - name: Sync Python deps (with dev groups)
-        run: uv sync --frozen --group dev
-
-      # --- Frontend ---
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.npm
-            node_modules
-          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install Node deps
-        run: npm ci
-
-      - name: Build assets
-        run: npx webpack --config webpack.config.js
-
-      # --- Git identity for tests that touch git (e.g. codebook) ---
-      - name: setup git credentials for codebook
+      - name: Create Env File
         run: |
-          git config --global user.email "test@test.com"
-          git config --global user.name "Test Suite"
+          echo "POSTGRES_DB=test_db" >> .env
+          echo "POSTGRES_USER=test_user" >> .env
+          echo "POSTGRES_PASSWORD=test_password" >> .env
 
-      # --- Django test run ---
+      - name: Run Docker Compose
+        uses: hoverkraft-tech/compose-action@v2.4.3
+        with:
+          compose-file: ./docker-compose.yaml
+
       - name: Run tests
-        working-directory: core
-        run: SQLITE_FOR_TESTS=1 uv run pytest -q
+        run: SQLITE_FOR_TESTS=1 docker compose run --rm web uv run pytest -q

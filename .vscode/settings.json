@@ -3,5 +3,9 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/core"
     ],
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "workbench.colorCustomizations": {
+        // "minimap.background": "#1a1b2688",
+        // "scrollbar.shadow": "#1a1b2688"
+    },
 }

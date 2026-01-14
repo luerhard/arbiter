@@ -33,3 +33,5 @@ AUTH_PASSWORD_VALIDATORS = [
 DEBUG = False
 
 ALLOWED_HOSTS = []
+
+DJANGO_VITE = {"default": {"dev_mode": False}}

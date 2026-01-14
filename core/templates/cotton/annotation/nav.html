@@ -1,0 +1,44 @@
+<div id="nav-buttons"
+     x-data="navBlock({ hasPrev: {{ has_prev|yesno:'true,false' }}, hasNext: {{ has_next|yesno:'true,false' }}, saveFormId: '{{ save_form_id|default:"label-form" }}' })"
+     class="mt-5 flex items-center justify-center gap-3">
+    <!-- Prev -->
+    <button x-ref="prev"
+            hx-get="{{ prev_url }}"
+            hx-include="#assignmentId"
+            hx-target="body"
+            hx-swap="none"
+            class="min-w-[2.5rem] rounded border px-3 py-2 text-sm enabled:bg-gray-50 enabled:hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed border-gray-300 text-gray-800"
+            aria-label="Previous (←)">
+        <i class="bi bi-arrow-left"></i>
+    </button>
+    <!-- Save -->
+    <button hx-target="body"
+            hx-swap="none"
+            :disabled="busy"
+            type="submit"
+            :form="saveFormId"
+            class="rounded px-4 py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed text-white"
+            :class="{'bg-blue-600 hover:bg-blue-700': !busy, 'bg-blue-400': busy}">
+        <span x-show="!busy">Save</span>
+        <span x-show="busy" class="inline-flex items-center gap-2">
+            <svg class="h-4 w-4 animate-spin"
+                 viewBox="0 0 24 24"
+                 fill="none"
+                 stroke="currentColor">
+                <circle cx="12" cy="12" r="9" stroke-width="2" opacity=".25"></circle>
+                <path d="M21 12a9 9 0 0 1-9 9" stroke-width="2" stroke-linecap="round"></path>
+            </svg>
+            Saving…
+        </span>
+    </button>
+    <!-- Next -->
+    <button x-ref="next"
+            hx-get="{{ next_url }}"
+            hx-include="#assignmentId"
+            hx-target="body"
+            hx-swap="none"
+            class="min-w-[2.5rem] rounded border px-3 py-2 text-sm enabled:bg-gray-50 enabled:hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed border-gray-300 text-gray-800"
+            aria-label="Next (→)">
+        <i class="bi bi-arrow-right"></i>
+    </button>
+</div>

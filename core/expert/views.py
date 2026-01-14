@@ -96,4 +96,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context["prev_label_ids"] = prev_label_ids
         context["labels"] = project.labels.all()
 
+        log.debug("Providing the following context for the expert resolution")
+        log.debug(context)
         return context
