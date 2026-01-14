@@ -50,7 +50,7 @@ jobs:
         run: npm ci
 
       - name: Build assets
-        run: npx webpack --config webpack.config.js
+        run: vite build
 
       # --- Git identity for tests that touch git (e.g. codebook) ---
       - name: setup git credentials for codebook
