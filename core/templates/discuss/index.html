@@ -8,7 +8,7 @@
          ws-connect="/ws/chat/{{ batch_id }}">
         <div class="bg-white dark:bg-gray-900 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
             <div class="p-6">
-                <div class="grid grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <div>
                         <div>
                             <h2 class="text-lg font-bold">BATCH ID: {{ batch_id }}</h2>
@@ -141,10 +141,10 @@
                                 </svg>
                             </label>
                         </div>
-                        <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{{ codebook.content|markdownify }}</div>
+                        <div class="prose dark:prose-invert max-w-none" id="codebook-orig-view">{% include "codebook/partials/view-codebook.html" %}</div>
                         <div class="prose dark:prose-invert max-w-none"
                              id="codebook-diff-view"
-                             hidden>{{ codebook_diff|markdownify }}</div>
+                             hidden>{% include "codebook/partials/view-codebook.html" %}</div>
                     </div>
                 </div>
             </div>
