@@ -25,4 +25,4 @@ jobs:
           compose-file: ./docker-compose.yaml
 
       - name: Run tests
-        run: SQLITE_FOR_TESTS=1 docker compose run --rm web uv run pytest -q
+        run: docker compose run --rm -e SQLITE_FOR_TESTS=1 web uv run pytest -q
