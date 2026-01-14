@@ -2,6 +2,18 @@
 
 We currently use a couple of techonologies that are required to contribute.
 
+## Requirements 
+We use docker to manage requirements. 
+
+The docker-compose.yaml file contains the necessary services. 
+
+Currently, these are:
+
+web: web app  
+vite: for compilation of js, css, and npm to manage the packages
+redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators. 
+Postgres: Database
+
 ## Installation
 
 to start everything for the first time:
@@ -47,6 +59,34 @@ docker compose run --rm web bash -c "cd ../docs; make html"
 ```
 
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
+
+
+## Overview and explanation 
+### Django web app
+The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/
+
+The Django web framework is based on modular apps. 
+Our tool (currently) consists of the following apps 
+* annotation 
+* codebook 
+* discuss
+* expert 
+* projects 
+* users 
+and 
+* data 
+
+The apps represent modular parts of the tool. 
+They each consist of apps.py, models.py, urls.py and views.py files. 
+The models.py contains classes for the database models. 
+The views.py contain the logic for what to display. 
+The urls.py contain the URL declarations for the app.
+
+Data is a bit different from the others, because it contains the connecting bits. 
+
+For each app, there also is a template in the templates directory, which contains the html. 
+This follows Django's principle to seperate the design from the view functionality. 
+
 
 
 # Development Server
