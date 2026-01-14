@@ -16,7 +16,7 @@ jobs:
       - name: Run Docker Compose
         uses: hoverkraft-tech/compose-action@v2.4.3
         with:
-          compose-file: .docker-compose.yaml
+          compose-file: ./docker-compose.yaml
 
       - name: Run tests
         run: SQLITE_FOR_TESTS=1 docker compose run --rm web uv run pytest -q
