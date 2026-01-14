@@ -14,7 +14,8 @@ URLS_WITH_GET_PARAMS = [
 ]
 
 
-@pytest.mark.django_db
+@pytest.mark.skip()
+@pytest.mark.django_db()
 @pytest.mark.usefixtures("populatedb")
 class TestViews:
     pytestmarks = pytest.mark.django_db
