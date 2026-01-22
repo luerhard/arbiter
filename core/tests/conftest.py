@@ -11,7 +11,6 @@ def run_sql(sql):
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_blocker):  # noqa: PT004
-
     settings.DATABASES["default"]["NAME"] = "postgres"
     connection.close()
 
