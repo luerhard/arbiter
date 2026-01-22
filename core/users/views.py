@@ -1,4 +1,5 @@
 import logging
+
 from django.contrib.auth import login
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_not_required
@@ -43,21 +44,20 @@ def user_logout(request):
 
 
 def user_profile(request):
-    
     user = request.user
     log.debug(user)
-    #groups = {group.name for group in user.groups.all()}
+    # groups = {group.name for group in user.groups.all()}
 
     context = {
-        "username" : user.username, 
+        "username": user.username,
         "first_name": user.first_name,
-        "last_name":user.last_name,
+        "last_name": user.last_name,
         "email": user.email,
-        "user_id":user.id,
-        "password":user.password
-        #"is_admin": "Admin" in groups,
-        #"is_expert": "Expert" in groups,
-        #"is_annotator": "Annotator" in groups,
+        "user_id": user.id,
+        "password": user.password,
+        # "is_admin": "Admin" in groups,
+        # "is_expert": "Expert" in groups,
+        # "is_annotator": "Annotator" in groups,
     }
     log.debug(context)
     return render(request, "users/profile.html", context)
