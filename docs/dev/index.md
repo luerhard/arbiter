@@ -61,7 +61,7 @@ docker compose run --rm web bash -c "cd ../docs; make html"
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
 
 
-## Overview and explanation 
+## Overview and starting point 
 ### Django web app
 The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/
 
