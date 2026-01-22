@@ -4,7 +4,6 @@ from projects.models import Project
 from users.models import User
 
 
-@pytest.mark.usefixtures("populatedb")
 class TestUserModel:
     pytestmark = pytest.mark.django_db
 

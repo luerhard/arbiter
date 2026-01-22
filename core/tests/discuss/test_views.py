@@ -6,8 +6,7 @@ URLS_LOGIN_REQUIRED = [
 ]
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("populatedb")
+@pytest.mark.django_db()
 class TestViews:
     @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
     def test_login_required_not_logged_in(self, params, client):

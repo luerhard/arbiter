@@ -12,7 +12,7 @@ URLS_EXPERT = [("codebook-view", (1,)), ("codebook-diff", (1,)), ("codebook-edit
 URLS_ANNOTATOR = [("codebook-view", (1,)), ("codebook-diff", (1,))]
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_setup():
     return {
         "project": Project.objects.first(),
@@ -23,8 +23,7 @@ def project_setup():
     }
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("populatedb")
+@pytest.mark.django_db()
 class TestViews:
     @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR))
     def test_login_required_not_logged_in(self, params, client):

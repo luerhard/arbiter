@@ -9,14 +9,14 @@ from data.models import Example
 User = get_user_model()
 
 
-@pytest.fixture
+@pytest.fixture()
 def data_setup():
     """
     Fixture to provide data for expert view tests.
     Finds an example that is ready for expert decision from the populatedb data.
     """
     example = Example.objects.filter(
-        has_disagreement=True, has_disagreement_after_discussion=True, has_expert_decision=False
+        has_disagreement=True, has_disagreement_after_discussion=True, has_expert_decision=False,
     ).first()
     assert example is not None, "No suitable example for expert decision found in populatedb"
 
@@ -28,8 +28,7 @@ def data_setup():
     }
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("populatedb")
+@pytest.mark.django_db()
 class TestDataViews:
     def test_save_labels_expert_view(self, client, data_setup):
         client.login(username="expert1", password="123")

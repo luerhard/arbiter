@@ -12,10 +12,8 @@ URLS_WITH_GET_PARAMS = [
 ]
 
 
-@pytest.mark.django_db
-@pytest.mark.usefixtures("populatedb")
 class TestViews:
-    pytestmarks = pytest.mark.django_db
+    pytestmark = pytest.mark.django_db
 
     @pytest.mark.parametrize(("slug", "assignment_id"), URLS_WITH_GET_PARAMS)
     def test_login_required_not_logged_in_get_params_urls(self, slug, assignment_id, client):
