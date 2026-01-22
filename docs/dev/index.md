@@ -2,16 +2,16 @@
 
 We currently use a couple of techonologies that are required to contribute.
 
-## Requirements 
-We use docker to manage requirements. 
+## Requirements
+We use docker to manage requirements.
 
-The docker-compose.yaml file contains the necessary services. 
+The docker-compose.yaml file contains the necessary services.
 
 Currently, these are:
 
-web: web app  
+web: web app
 vite: for compilation of js, css, and npm to manage the packages
-redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators. 
+redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators.
 Postgres: Database
 
 ## Installation
@@ -47,7 +47,7 @@ docker volume rm annotationtool_pgdata
 to run the tests locally, use:
 
 ```
-docker compose run --rm -e SQLITE_FOR_TESTS=1 web uv run pytest -v
+docker compose run --rm web uv run pytest -v
 ```
 
 `-v` is optional here but gives some more infos on all tests.
@@ -61,31 +61,31 @@ docker compose run --rm web bash -c "cd ../docs; make html"
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
 
 
-## Overview and explanation 
+## Overview and explanation
 ### Django web app
 The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/
 
-The Django web framework is based on modular apps. 
-Our tool (currently) consists of the following apps 
-* annotation 
-* codebook 
+The Django web framework is based on modular apps.
+Our tool (currently) consists of the following apps
+* annotation
+* codebook
 * discuss
-* expert 
-* projects 
-* users 
-and 
-* data 
+* expert
+* projects
+* users
+and
+* data
 
-The apps represent modular parts of the tool. 
-They each consist of apps.py, models.py, urls.py and views.py files. 
-The models.py contains classes for the database models. 
-The views.py contain the logic for what to display. 
+The apps represent modular parts of the tool.
+They each consist of apps.py, models.py, urls.py and views.py files.
+The models.py contains classes for the database models.
+The views.py contain the logic for what to display.
 The urls.py contain the URL declarations for the app.
 
-Data is a bit different from the others, because it contains the connecting bits. 
+Data is a bit different from the others, because it contains the connecting bits.
 
-For each app, there also is a template in the templates directory, which contains the html. 
-This follows Django's principle to seperate the design from the view functionality. 
+For each app, there also is a template in the templates directory, which contains the html.
+This follows Django's principle to seperate the design from the view functionality.
 
 
 
