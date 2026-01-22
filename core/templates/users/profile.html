@@ -3,30 +3,31 @@
     User Profile
 {% endblock title %}
 {% block content %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Variable</th>
-                <th>Value</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Username</td>
-                <td>{{ user.username }}</td>
-            </tr>
-            <tr>
-                <td>Is Annotator</td>
-                <td>{{ is_annotator }}</td>
-            </tr>
-            <tr>
-                <td>Is Expert</td>
-                <td>{{ is_expert }}</td>
-            </tr>
-            <tr>
-                <td>Is Admin</td>
-                <td>{{ is_admin }}</td>
-            </tr>
-        </tbody>
-    </table>
+<div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800/50 dark:shadow-none dark:inset-ring dark:inset-ring-white/10">
+ <div class="px-4 py-6 sm:px-6">
+  <h3 class="text-base/7 font-semibold text-gray-900 dark:text-white">Your profile</h3>
+  <!--<p class="mt-1 max-w-2xl text-sm/6 text-gray-500 dark:text-gray-300"></p>-->
+ </div>
+ <div class="border-t border-gray-100 dark:border-white/5">
+  <dl class="divide-y divide-gray-100 dark:divide-white/5">
+   <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Username</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">{{ username }}</dd>
+   </div>    
+   <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Full name</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">{{ first_name }} {{ last_name }}</dd>
+   </div>
+   <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Email address</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">{{ email }}</dd>
+   </div>
+   <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+    <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">User id</dt>
+    <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">{{ user_id }}</dd>
+   </div>
+  </dl>
+ </div>
+</div>
+
 {% endblock content %}
