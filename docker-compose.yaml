@@ -4,6 +4,8 @@ services:
       context: .
       target: dev
     env_file: .env
+    environment:
+      - POSTGRES_HOST=db
     volumes:
       - .:/app # hot-reload + editable
       - media:/app/media
