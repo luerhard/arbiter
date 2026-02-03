@@ -1,9 +1,0 @@
-{
-    "python.testing.cwd": "${workspaceFolder}",
-    "python.testing.pytestEnabled": true,
-    "python.testing.pytestPath": "${workspaceFolder}/../.vscode/test.sh",
-    "python.testing.envFile": "${workspaceFolder}/../.env.test",
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}"
-    ]
-}
