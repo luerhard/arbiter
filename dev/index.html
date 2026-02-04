@@ -48,6 +48,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">A guide for devs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-env">The .env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-tests">Run tests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-documentation-locally">Build documentation locally</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overview-and-starting-point">Overview and starting point</a><ul>
@@ -104,7 +105,7 @@
 <p>We use docker to manage requirements.</p>
 <p>The docker-compose.yaml file contains the necessary services.</p>
 <p>Currently, these are:</p>
-<p>web: web app<br />
+<p>web: web app
 vite: for compilation of js, css, and npm to manage the packages
 redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators.
 Postgres: Database</p>
@@ -132,13 +133,42 @@ docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> <
 </pre></div>
 </div>
 </section>
+<section id="the-env">
+<h2>The .env<a class="headerlink" href="#the-env" title="Link to this heading"></a></h2>
+<p>For everything to work properly, it is necessary to create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file in the root directory with the following variables defined:</p>
+<ul class="simple">
+<li><p>user, password, and db can changed.</p></li>
+<li><p>do NOT change host or port.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="m">1</span>
+
+<span class="nv">POSTGRES_DB</span><span class="o">=</span>annotationtool
+<span class="nv">POSTGRES_USER</span><span class="o">=</span>myuser
+<span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>mypassword
+<span class="nv">POSTGRES_HOST</span><span class="o">=</span>localhost
+<span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
+</pre></div>
+</div>
+</section>
 <section id="run-tests">
 <h2>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h2>
-<p>to run the tests locally, use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="o">-</span><span class="n">e</span> <span class="n">SQLITE_FOR_TESTS</span><span class="o">=</span><span class="mi">1</span> <span class="n">web</span> <span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
+<p>To run the tests locally, there are two options:</p>
+<ol class="arabic simple">
+<li><p>run tests from command line within in the docker container:</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">web</span> <span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">-v</span></code> is optional here but gives some more infos on all tests.</p>
+<ol class="arabic simple" start="2">
+<li><p>run tests locally. This is nice to use, e.g. the test runner in VSCode to run / debug single tests. These, however, require a working installation of the virtual environment outside the container. The docker containers still have to be running to give access to the PostgresDB where a test database is created to run the tests.</p></li>
+</ol>
+<p>So to do this</p>
+<ol class="arabic simple">
+<li><p>make sure the docker compose containers are running</p></li>
+<li><p>make sure the virtual environment is installed (run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> to make sure)</p></li>
+<li><p>now, either run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">pytest</span></code> from the command-line or use the built-in test runner in VSCode.</p></li>
+</ol>
 </section>
 <section id="build-documentation-locally">
 <h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
