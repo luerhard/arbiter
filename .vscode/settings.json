@@ -1,11 +1,8 @@
 {
+    "python.envFile": "${workspaceFolder}/.env",
     "python.testing.cwd": "${workspaceFolder}/core",
+    "python.testing.pytestEnabled": true,
     "python.analysis.extraPaths": [
         "${workspaceFolder}/core"
     ],
-    "python-envs.pythonProjects": [],
-    "workbench.colorCustomizations": {
-        // "minimap.background": "#1a1b2688",
-        // "scrollbar.shadow": "#1a1b2688"
-    },
 }

@@ -13,7 +13,6 @@ URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 
 
 @pytest.mark.django_db
-@pytest.mark.usefixtures("populatedb")
 class TestViews:
     @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR + URLS_ANYROLE))
     def test_login_required_not_logged_in(self, params, client):

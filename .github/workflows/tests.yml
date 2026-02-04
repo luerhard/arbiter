@@ -15,7 +15,7 @@ jobs:
 
       - name: Create Env File
         run: |
-          echo "POSTGRES_DB=test_db" >> .env
+          echo "POSTGRES_DB=annotationtool" >> .env
           echo "POSTGRES_USER=test_user" >> .env
           echo "POSTGRES_PASSWORD=test_password" >> .env
 
@@ -25,4 +25,4 @@ jobs:
           compose-file: ./docker-compose.yaml
 
       - name: Run tests
-        run: docker compose run --rm -e SQLITE_FOR_TESTS=1 web uv run pytest -q
+        run: docker compose run --rm web uv run pytest -q

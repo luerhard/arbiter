@@ -4,8 +4,11 @@ services:
       context: .
       target: dev
     env_file: .env
+    environment:
+      - POSTGRES_HOST=db
     volumes:
       - .:/app # hot-reload + editable
+      - media:/app/media
     ports:
       - "8000:8000" # app
       - "5678:5678" # debugpy
@@ -44,5 +47,6 @@ services:
       - "6379:6379"
 
 volumes:
+  media:
   pgdata:
   node_modules:
