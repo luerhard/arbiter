@@ -40,7 +40,7 @@ class User(AbstractUser):
         )
         grouped = {role.label: set() for role in projectusermodel.Role}
         for project_user in all_assigned_projects:
-            grouped[project_user.get_role_display()].add(project_user.project)
+            grouped[project_user.get_default_role_display()].add(project_user.project)
         return grouped
 
     @property

@@ -28,7 +28,7 @@ class CodebookView(AnyRoleRequiredMixin, DetailView):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
-        context["role"] = project_user.role
+        context["role"] = project_user.default_role
         context["content"] = context["codebook"].content
         return context
 
@@ -86,7 +86,8 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
             phase=Annotation.Phase.DISCUSSION,
         )
         messages = (
-            Message.objects.filter(example=current_example)
+            Message.objects
+            .filter(example=current_example)
             .exclude(user="system")
             .order_by("created_at")
         )

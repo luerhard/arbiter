@@ -34,7 +34,8 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects.filter(user=self.request.user)
+            ProjectUser.objects
+            .filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
@@ -48,9 +49,9 @@ class ProjectDetailView(RedirectView):
         project = get_object_or_404(Project, id=project_id)
         project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
 
-        if project_user.role == ProjectUser.Role.ANNOTATOR:
+        if project_user.default_role == ProjectUser.Role.ANNOTATOR:
             return reverse("project-detail-annotator", kwargs={"project_id": project_id})
-        elif project_user.role == ProjectUser.Role.EXPERT:
+        elif project_user.default_role == ProjectUser.Role.EXPERT:
             return reverse("project-detail-expert", kwargs={"project_id": project_id})
         else:
             return reverse("home")
@@ -69,11 +70,11 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectUser.Role.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
@@ -98,7 +99,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             disagr_count = disagr_ex.count()
             batch_data["disagreement"] = disagr_count
             batch_data["disagr_after_discussion"] = disagr_ex.filter(
-                has_disagreement_after_discussion=True
+                has_disagreement_after_discussion=True,
             ).count()
             disagr_ex_first_id = 0
             if disagr_count > 0:
@@ -139,11 +140,11 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectUser.Role.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
