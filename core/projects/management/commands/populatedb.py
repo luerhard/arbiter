@@ -47,10 +47,10 @@ def create_project(name, description, labels, annotators, experts):
     )
 
     for u in annotators:
-        ProjectUser.objects.create(project=project, user=u, role=ProjectUser.Role.ANNOTATOR)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.ANNOTATOR)
 
     for u in experts:
-        ProjectUser.objects.create(project=project, user=u, role=ProjectUser.Role.EXPERT)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.EXPERT)
 
     for i, label in enumerate(labels, 1):
         Label.objects.create(project=project, name=label, hotkey=str(i))

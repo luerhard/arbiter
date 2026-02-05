@@ -30,7 +30,7 @@ class User(AbstractUser):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = []
 
-    objects = UserManager()
+    objects = UserManager()  # type: ignore
 
     @property
     def assigned_projects(self):
@@ -48,7 +48,8 @@ class User(AbstractUser):
         # TODO: optimize!
         projectusermodel = apps.get_model("projects.ProjectUser")
         all_projects = (
-            projectusermodel.objects.prefetch_related("project")
+            projectusermodel.objects
+            .prefetch_related("project")
             .prefetch_related("project__batches")
             .filter(user_id=self.pk)
             .all()
