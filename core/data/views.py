@@ -12,6 +12,8 @@ from .models import Batch
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
+from projects.models import BatchAssignment
+from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
 
@@ -21,14 +23,25 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         user = request.user
         batch = get_object_or_404(Batch, pk=batch_id)
         example = get_object_or_404(Example, pk=example_id, batch=batch_id)
-        assignment = ExampleAssignment.objects.filter(example=example, user=user).first()
+        assignment = ExampleAssignment.objects.filter(
+            example=example,
+            batch_assignment__user=user,
+        ).first()
         codebook = get_object_or_404(Codebook, pk=codebook_id)
         if not assignment:
+            batch_assignment, _ = BatchAssignment.objects.get_or_create(
+                batch=batch,
+                user=user,
+                defaults={"role": ProjectUser.Role.EXPERT, "phase": batch.phase},
+            )
             max_order = ExampleAssignment.objects.filter(
-                user=user, example__batch=example.batch
+                batch_assignment__user=user,
+                example__batch=example.batch,
             ).aggregate(models.Max("order", default=0))["order__max"]
             assignment = ExampleAssignment.objects.create(
-                example=example, user=user, order=max_order + 1
+                example=example,
+                batch_assignment=batch_assignment,
+                order=max_order + 1,
             )
         form = MultiLabelFormExpert(request.POST, codebook=codebook, example=example, user=user)
         if form.is_valid():

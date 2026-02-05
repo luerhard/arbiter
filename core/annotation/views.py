@@ -31,7 +31,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             assignment = ExampleAssignment.objects.get(id=assignment_id)
         else:
             assignment = (
-                ExampleAssignment.objects.filter(user=request.user, example__batch=batch)
+                ExampleAssignment.objects
+                .filter(batch_assignment__user=request.user, example__batch=batch)
                 .order_by("order")
                 .first()
             )
@@ -90,7 +91,7 @@ class EditAssignment(View):
 def get_progress(user, batch):
     """helper function to calculate current progress"""
     done = batch.examples.filter(
-        assignments__user=user,
+        assignments__batch_assignment__user=user,
         assignments__is_annotated=1,
     ).count()
     total = batch.examples.count()

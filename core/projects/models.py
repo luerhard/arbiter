@@ -165,3 +165,8 @@ class BatchAssignment(models.Model):
         choices=Batch.Phase,
         db_index=True,
     )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("batch", "user"), name="unique_batch_user"),
+        ]

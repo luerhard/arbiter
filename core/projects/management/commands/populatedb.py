@@ -10,6 +10,7 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
+from projects.models import BatchAssignment
 from projects.models import Project
 from projects.models import ProjectUser
 
@@ -31,10 +32,25 @@ def create_batch(project):
     )
     test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
+    annotators = list(project.annotators)
+    batch_assignments = {
+        user.id: BatchAssignment.objects.create(
+            batch=batch,
+            user=user,
+            role=ProjectUser.Role.ANNOTATOR,
+            phase=batch.phase,
+        )
+        for user in annotators
+    }
+
     for i, row in test_df.iterrows():
         ex = Example.objects.create(batch=batch, content=row["text"])
-        for user in project.annotators:
-            ExampleAssignment.objects.create(example=ex, user=user, order=i)
+        for user in annotators:
+            ExampleAssignment.objects.create(
+                example=ex,
+                batch_assignment=batch_assignments[user.id],
+                order=i,
+            )
 
     batch.set_phase(Batch.Phase.ANNOTATION)
     return batch

@@ -56,19 +56,31 @@ class Annotation(models.Model):
 
 class ExampleAssignment(models.Model):
     example = models.ForeignKey("Example", related_name="assignments", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name="assignments", on_delete=models.CASCADE)
     batch_assignment = models.ForeignKey(
-        BatchAssignment, related_name="examples_assignments", on_delete=models.CASCADE,
+        BatchAssignment,
+        related_name="examples_assignments",
+        on_delete=models.CASCADE,
     )
     order = models.PositiveIntegerField(db_index=True)
     is_annotated = models.BooleanField(default=False)
     is_discussed = models.BooleanField(default=False)
     last_updated = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("example", "batch_assignment"), name="unique_example_batch_assignment",
+            ),
+        ]
+
+    @property
+    def user(self):
+        return self.batch_assignment.user
+
     def previous(self, skip_annotated: bool = False):
         query = ExampleAssignment.objects.filter(
             example__batch=self.example.batch,
-            user=self.user,
+            batch_assignment=self.batch_assignment,
             order__lt=self.order,
         )
 
@@ -80,7 +92,7 @@ class ExampleAssignment(models.Model):
     def next(self, skip_annotated: bool = False):
         query = ExampleAssignment.objects.filter(
             example__batch=self.example.batch,
-            user=self.user,
+            batch_assignment=self.batch_assignment,
             order__gt=self.order,
         )
 
@@ -127,7 +139,7 @@ class ExampleAssignment(models.Model):
             example=self.example,
             is_annotated=True,
             annotations__phase=Annotation.Phase.ANNOTATION,
-        ).prefetch_related("annotations__label", "user")
+        ).prefetch_related("annotations__label", "batch_assignment__user")
 
         # group by user
         user_annotations = defaultdict(set)
@@ -149,7 +161,7 @@ class ExampleAssignment(models.Model):
             example=self.example,
             is_annotated=True,
             annotations__phase=Annotation.Phase.DISCUSSION,
-        ).prefetch_related("annotations__label", "user")
+        ).prefetch_related("annotations__label", "batch_assignment__user")
         # group by user
         user_annotations = defaultdict(set)
         for assignment in assignments:
@@ -167,7 +179,7 @@ class ExampleAssignment(models.Model):
         # auto set order for the first time
         if self.order is None:
             max_order = ExampleAssignment.objects.filter(
-                user=self.user,
+                batch_assignment=self.batch_assignment,
                 example__batch=self.example.batch,
             ).aggregate(max_order=models.Max("order"))["max_order"]
 
@@ -180,19 +192,18 @@ class ExampleAssignment(models.Model):
 class Example(models.Model):
     batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
-    has_disagreement = models.BooleanField(default=False)
-    has_disagreement_after_discussion = models.BooleanField(default=False)
-    has_expert_decision = models.BooleanField(default=False)
+
+    assignees = models.ManyToManyField(
+        BatchAssignment,
+        through=ExampleAssignment,
+        related_name="examples",
+    )
 
     class Meta:
         ordering = ["pk"]
 
     def __str__(self):
         return self.content
-
-    @property
-    def project(self):
-        return self.batch.project
 
     @property
     def labels(self):
@@ -204,14 +215,14 @@ class Example(models.Model):
         if phase == Annotation.Phase.ANNOTATION:
             return Annotation.objects.filter(
                 assignment__example=self,
-                assignment__user=user,
+                assignment__batch_assignment__user=user,
                 assignment__is_annotated=1,
                 phase=phase,
             )
         elif phase == Annotation.Phase.DISCUSSION:
             return Annotation.objects.filter(
                 assignment__example=self,
-                assignment__user=user,
+                assignment__batch_assignment__user=user,
                 assignment__is_discussed=1,
                 phase=phase,
             )
@@ -228,5 +239,5 @@ class Example(models.Model):
         label_ids: list[int],
         phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
     ):
-        assignment = ExampleAssignment.objects.get(example=self, user=user)
+        assignment = ExampleAssignment.objects.get(example=self, batch_assignment__user=user)
         assignment.set_user_annotations(label_ids=label_ids, phase=phase)

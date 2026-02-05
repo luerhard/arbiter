@@ -108,12 +108,12 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 
             for annotator in context["annotators"]:
                 annotated = ExampleAssignment.objects.filter(
-                    user=annotator,
+                    batch_assignment__user=annotator,
                     example__batch=batch,
                     is_annotated=True,
                 ).count()
                 discussed = ExampleAssignment.objects.filter(
-                    user=annotator,
+                    batch_assignment__user=annotator,
                     is_discussed=True,
                     example__batch=batch,
                     example__has_disagreement=True,
@@ -155,7 +155,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
             batch_data = {
                 "batch": batch,
                 "done": batch.examples.filter(
-                    assignments__user=self.request.user,
+                    assignments__batch_assignment__user=self.request.user,
                     assignments__is_annotated=1,
                 ).count(),
                 "length": batch.examples.count(),
