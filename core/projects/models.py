@@ -23,7 +23,7 @@ class ProjectUser(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.user.username} -> {self.role} -> {self.project.name}"
+        return f"{self.user.username} -> {self.default_role} -> {self.project.name}"
 
 
 class Project(models.Model):
@@ -152,9 +152,9 @@ class Batch(models.Model):
         self.save()
 
 
-class BatchAssignment:
+class BatchAssignment(models.Model):
     batch = models.ForeignKey(Batch, related_name="batch_assignments", on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name="batch_assignments", on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, related_name="batch_assignments", on_delete=models.CASCADE)
     role = models.CharField(max_length=1, choices=ProjectUser.Role, blank=False)
 
     phase = models.CharField(

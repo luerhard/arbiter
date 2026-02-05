@@ -5,6 +5,7 @@ from colorfield.fields import ColorField
 from django.db import models
 
 from projects.models import Batch
+from projects.models import BatchAssignment
 from projects.models import Project
 from users.models import User
 
@@ -56,6 +57,9 @@ class Annotation(models.Model):
 class ExampleAssignment(models.Model):
     example = models.ForeignKey("Example", related_name="assignments", on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name="assignments", on_delete=models.CASCADE)
+    batch_assignment = models.ForeignKey(
+        BatchAssignment, related_name="examples_assignments", on_delete=models.CASCADE,
+    )
     order = models.PositiveIntegerField(db_index=True)
     is_annotated = models.BooleanField(default=False)
     is_discussed = models.BooleanField(default=False)
