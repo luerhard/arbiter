@@ -34,11 +34,6 @@ class ProjectCreateForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False,
     )
-    labels = forms.CharField(
-        required=False,
-        widget=forms.Textarea,
-        help_text="One label per line. Example: Positive",
-    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -53,9 +48,6 @@ class ProjectCreateForm(forms.Form):
         })
         self.fields["description"].widget.attrs.update(
             {"class": base_input, "rows": 4, "placeholder": "What is this project about?"},
-        )
-        self.fields["labels"].widget.attrs.update(
-            {"class": base_input, "rows": 5, "placeholder": "Positive\nNegative\nNeutral"},
         )
         for field in ("annotators", "experts"):
             self.fields[field].widget.attrs.update(
