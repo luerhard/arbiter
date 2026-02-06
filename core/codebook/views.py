@@ -86,8 +86,7 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
             phase=Annotation.Phase.DISCUSSION,
         )
         messages = (
-            Message.objects
-            .filter(example=current_example)
+            Message.objects.filter(example=current_example)
             .exclude(user="system")
             .order_by("created_at")
         )

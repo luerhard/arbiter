@@ -7,20 +7,14 @@
                 <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                     You have completed all available assignments for this batch.
                 </p>
-                <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-                    Progress: {{ progress.done }} / {{ progress.total }}
-                </p>
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">Progress: {{ progress.done }} / {{ progress.total }}</p>
             </div>
         </div>
         <div class="mt-6 flex flex-wrap gap-3">
             <a class="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-               href="{% url 'project-detail-annotator' project.id %}">
-                Back to project
-            </a>
+               href="{% url 'project-detail-annotator' project.id %}">Back to project</a>
             <a class="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
-               href="{% url 'project-list' %}">
-                All projects
-            </a>
+               href="{% url 'project-list' %}">All projects</a>
         </div>
     </div>
 {% endblock content %}

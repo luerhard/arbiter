@@ -262,8 +262,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def get_example(self, state):
         log.debug("Getting example")
         examples = [
-            e for e in Example.objects.filter(batch=self.batch_id).distinct()
-            if e.has_disagreement
+            e for e in Example.objects.filter(batch=self.batch_id).distinct() if e.has_disagreement
         ]
         log.debug(f"{examples =}")
         paginator = Paginator(examples, 1)

@@ -7,7 +7,6 @@ from django.db import models
 from projects.models import Batch
 from projects.models import BatchAssignment
 from projects.models import Project
-from users.models import User
 
 
 class Label(models.Model):
@@ -69,7 +68,8 @@ class ExampleAssignment(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=("example", "batch_assignment"), name="unique_example_batch_assignment",
+                fields=("example", "batch_assignment"),
+                name="unique_example_batch_assignment",
             ),
         ]
 

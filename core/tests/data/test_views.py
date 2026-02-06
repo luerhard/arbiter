@@ -9,7 +9,7 @@ from data.models import Example
 User = get_user_model()
 
 
-@pytest.fixture()
+@pytest.fixture
 def data_setup():
     """
     Fixture to provide data for expert view tests.
@@ -35,7 +35,7 @@ def data_setup():
     }
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 class TestDataViews:
     def test_save_labels_expert_view(self, client, data_setup):
         client.login(username="expert1", password="123")

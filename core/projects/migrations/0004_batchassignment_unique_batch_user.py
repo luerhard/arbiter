@@ -6,7 +6,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0003_batchassignment"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),

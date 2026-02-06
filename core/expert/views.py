@@ -54,7 +54,9 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             return None
         if current_example_id:
             current_example = get_object_or_404(
-                Example, pk=current_example_id, batch__project_id=project.id,
+                Example,
+                pk=current_example_id,
+                batch__project_id=project.id,
             )
             if not (
                 current_example.has_disagreement_after_discussion

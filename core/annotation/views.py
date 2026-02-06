@@ -33,8 +33,9 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             assignment = ExampleAssignment.objects.get(id=assignment_id)
         else:
             assignment = (
-                ExampleAssignment.objects
-                .filter(batch_assignment__user=request.user, example__batch=batch)
+                ExampleAssignment.objects.filter(
+                    batch_assignment__user=request.user, example__batch=batch
+                )
                 .order_by("order")
                 .first()
             )

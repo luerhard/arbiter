@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0002_example_has_disagreement_after_discussion_and_more"),
         ("projects", "0003_batchassignment"),
@@ -16,7 +15,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="exampleassignment",
             name="batch_assignment",
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, related_name="examples_assignments", to="projects.batchassignment"),
+            field=models.ForeignKey(
+                default=1,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="examples_assignments",
+                to="projects.batchassignment",
+            ),
             preserve_default=False,
         ),
     ]

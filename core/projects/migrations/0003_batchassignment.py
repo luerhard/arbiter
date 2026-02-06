@@ -7,7 +7,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("projects", "0002_rename_role_projectuser_default_role"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
@@ -17,11 +16,47 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name="BatchAssignment",
             fields=[
-                ("id", models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name="ID")),
-                ("role", models.CharField(choices=[("A", "Annotator"), ("E", "Expert")], max_length=1)),
-                ("phase", models.CharField(choices=[("S", "Setup"), ("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision"), ("F", "Finalized")], db_index=True, default="S", max_length=1)),
-                ("batch", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="batch_assignments", to="projects.batch")),
-                ("user", models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="batch_assignments", to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "role",
+                    models.CharField(choices=[("A", "Annotator"), ("E", "Expert")], max_length=1),
+                ),
+                (
+                    "phase",
+                    models.CharField(
+                        choices=[
+                            ("S", "Setup"),
+                            ("A", "Annotation"),
+                            ("D", "Discussion"),
+                            ("E", "ExpertDecision"),
+                            ("F", "Finalized"),
+                        ],
+                        db_index=True,
+                        default="S",
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "batch",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="batch_assignments",
+                        to="projects.batch",
+                    ),
+                ),
+                (
+                    "user",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="batch_assignments",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
     ]

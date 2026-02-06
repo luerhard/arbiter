@@ -34,8 +34,7 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects
-            .filter(user=self.request.user)
+            ProjectUser.objects.filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
@@ -90,7 +89,8 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             }
             # Query examples with disagreements and no expert decisions
             disagr_ex = [
-                e for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
+                e
+                for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
                 if e.has_disagreement and not e.has_expert_decision
             ]
             disagr_count = len(disagr_ex)
