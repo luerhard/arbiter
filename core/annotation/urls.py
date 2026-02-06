@@ -4,6 +4,11 @@ from . import views
 
 urlpatterns = [
     path("batch/<int:batch_id>", views.AnnotateView.as_view(), name="annotate-batch"),
+    path(
+        "batch/<int:batch_id>/done",
+        views.AnnotationDoneView.as_view(),
+        name="annotate-done",
+    ),
 ]
 
 htmx_patterns = [

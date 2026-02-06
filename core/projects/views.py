@@ -48,9 +48,9 @@ class ProjectDetailView(RedirectView):
         project = get_object_or_404(Project, id=project_id)
         project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
 
-        if project_user.role == ProjectUser.Role.ANNOTATOR:
+        if project_user.default_role == ProjectUser.Role.ANNOTATOR:
             return reverse("project-detail-annotator", kwargs={"project_id": project_id})
-        elif project_user.role == ProjectUser.Role.EXPERT:
+        elif project_user.default_role == ProjectUser.Role.EXPERT:
             return reverse("project-detail-expert", kwargs={"project_id": project_id})
         else:
             return reverse("home")
@@ -69,11 +69,11 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectUser.Role.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
@@ -88,35 +88,32 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "users": [],
             }
             # Query examples with disagreements and no expert decisions
-            disagr_ex = Example.objects.filter(
-                has_disagreement=True,
-                has_expert_decision=False,
-                # has_disagreement_after_discussion=True,
-                batch=batch,
-                batch__project_id=project.id,
-            )
-            disagr_count = disagr_ex.count()
+            disagr_ex = [
+                e
+                for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
+                if e.has_disagreement and not e.has_expert_decision
+            ]
+            disagr_count = len(disagr_ex)
             batch_data["disagreement"] = disagr_count
-            batch_data["disagr_after_discussion"] = disagr_ex.filter(
-                has_disagreement_after_discussion=True
-            ).count()
+            batch_data["disagr_after_discussion"] = len(
+                [e for e in disagr_ex if e.has_disagreement_after_discussion],
+            )
             disagr_ex_first_id = 0
             if disagr_count > 0:
-                disagr_ex_first_id = disagr_ex.order_by("id").first().id
+                disagr_ex_first_id = sorted(disagr_ex, key=lambda e: e.id)[0].id
             batch_data["disagreement_first_id"] = disagr_ex_first_id
 
+            disagr_ids = [e.id for e in disagr_ex]
             for annotator in context["annotators"]:
                 annotated = ExampleAssignment.objects.filter(
-                    user=annotator,
+                    batch_assignment__user=annotator,
                     example__batch=batch,
                     is_annotated=True,
                 ).count()
                 discussed = ExampleAssignment.objects.filter(
-                    user=annotator,
+                    batch_assignment__user=annotator,
                     is_discussed=True,
-                    example__batch=batch,
-                    example__has_disagreement=True,
-                    example__has_expert_decision=False,
+                    example_id__in=disagr_ids,
                 ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
@@ -139,11 +136,11 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectUser.Role.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
@@ -154,7 +151,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
             batch_data = {
                 "batch": batch,
                 "done": batch.examples.filter(
-                    assignments__user=self.request.user,
+                    assignments__batch_assignment__user=self.request.user,
                     assignments__is_annotated=1,
                 ).count(),
                 "length": batch.examples.count(),

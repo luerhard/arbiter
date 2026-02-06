@@ -15,7 +15,7 @@ class ProjectUser(models.Model):
         ANNOTATOR = "A", "Annotator"
         EXPERT = "E", "Expert"
 
-    role = models.CharField(max_length=1, choices=Role, default=Role.ANNOTATOR)
+    default_role = models.CharField(max_length=1, choices=Role, default=Role.ANNOTATOR)
 
     class Meta:
         constraints = [
@@ -23,7 +23,7 @@ class ProjectUser(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.user.username} -> {self.role} -> {self.project.name}"
+        return f"{self.user.username} -> {self.default_role} -> {self.project.name}"
 
 
 class Project(models.Model):
@@ -59,14 +59,14 @@ class Project(models.Model):
     def annotators(self):
         return User.objects.filter(
             projectuser__project=self,
-            projectuser__role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
         )
 
     @property
     def experts(self):
         return User.objects.filter(
             projectuser__project=self,
-            projectuser__role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectUser.Role.EXPERT,
         )
 
     @property
@@ -148,3 +148,23 @@ class Batch(models.Model):
             codebook = self.project.codebook.get()
             codebook.tag_version(self.batch_number)
         self.save()
+
+
+class BatchAssignment(models.Model):
+    batch = models.ForeignKey(Batch, related_name="batch_assignments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="batch_assignments", on_delete=models.CASCADE)
+    role = models.CharField(max_length=1, choices=ProjectUser.Role, blank=False)
+
+    phase = models.CharField(
+        default=Batch.Phase.SETUP,
+        null=False,
+        blank=False,
+        max_length=1,
+        choices=Batch.Phase,
+        db_index=True,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=("batch", "user"), name="unique_batch_user"),
+        ]

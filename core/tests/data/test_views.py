@@ -15,11 +15,16 @@ def data_setup():
     Fixture to provide data for expert view tests.
     Finds an example that is ready for expert decision from the populatedb data.
     """
-    example = Example.objects.filter(
-        has_disagreement=True,
-        has_disagreement_after_discussion=True,
-        has_expert_decision=False,
-    ).first()
+    example = next(
+        (
+            e
+            for e in Example.objects.all()
+            if e.has_disagreement
+            and e.has_disagreement_after_discussion
+            and not e.has_expert_decision
+        ),
+        None,
+    )
     assert example is not None, "No suitable example for expert decision found in populatedb"
 
     return {

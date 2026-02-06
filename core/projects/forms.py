@@ -5,6 +5,7 @@ import pandas as pd
 from data.models import Example
 from data.models import ExampleAssignment
 from projects.models import Batch
+from projects.models import BatchAssignment
 from projects.models import ProjectUser
 from users.models import User
 
@@ -100,11 +101,23 @@ class BatchForm(forms.ModelForm):
         batch = Batch(project=project, batch_number=max_batch_number)
         batch.save()
         default_annotators = batch.project.annotators.all()
+        batch_assignments = {
+            annotator.id: BatchAssignment.objects.create(
+                batch=batch,
+                user=annotator,
+                role=ProjectUser.Role.ANNOTATOR,
+                phase=batch.phase,
+            )
+            for annotator in default_annotators
+        }
         for _, row in df.iterrows():
             example = Example(batch=batch, content=row["text"])
             example.save()
             for annotator in default_annotators:
-                assignment = ExampleAssignment(user=annotator, example=example)
+                assignment = ExampleAssignment(
+                    example=example,
+                    batch_assignment=batch_assignments[annotator.id],
+                )
                 assignment.save()
 
         return batch

@@ -96,7 +96,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.group_send_state()
 
         elif "clicked-done" in data.keys():
-            labels = [label_id for label_id in data["labels"]]
+            labels = list(data["labels"])
 
             await self._store_discussion_labels(self.username, labels)
             log.debug(f"{self.username} clicked done.")
@@ -135,10 +135,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return await update_state(self.batch_id, mut)
 
     async def _clicked_done(self, username):
-        log.debug(f"{username = } clicked done.")
+        log.debug(f"{username =} clicked done.")
 
         async def mut(state):
-            log.debug(f"{state["clicked_done"] = }")
+            log.debug(f"{state["clicked_done"] =}")
             if state["clicked_done"][username]:
                 # TODO: Looks like on reload the user can press Save & Done
                 # even after having pressed it previously.
@@ -154,10 +154,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def _all_done(self):
         state = await self._get_state()
-        log.debug(f"{state = }")
+        log.debug(f"{state =}")
         required = set(state.get("required_users", []))
         clicked = {u for u, v in (state.get("clicked_done", {}) or {}).items() if v == 1}
-        log.debug(f"{required <= clicked = }")
+        log.debug(f"{required <= clicked =}")
         return required <= clicked
 
     # ---------- CHAT HELPERS -----------------
@@ -195,14 +195,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         next_page = int(state.get("page", 0)) + 1
         state["page"] = next_page
         example, annotations, total_pages = await database_sync_to_async(self.get_example)(
-            state=state
+            state=state,
         )
 
         end_reason = None
         msg = None
         if example is None:
             had_any = await database_sync_to_async(
-                lambda: Example.objects.filter(batch=self.batch_id, has_disagreement=True).exists(),
+                lambda: any(
+                    e.has_disagreement for e in Example.objects.filter(batch=self.batch_id)
+                ),
             )()
 
             if not had_any:
@@ -259,13 +261,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def get_example(self, state):
         log.debug("Getting example")
-        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).distinct()
-        log.debug(f"{queryset = }")
-        paginator = Paginator(queryset, 1)
+        examples = [
+            e for e in Example.objects.filter(batch=self.batch_id).distinct() if e.has_disagreement
+        ]
+        log.debug(f"{examples =}")
+        paginator = Paginator(examples, 1)
         page_obj = paginator.get_page(state["page"])
         total_pages = paginator.count
 
-        if page_obj.number < state["page"] or not queryset.count():
+        if page_obj.number < state["page"] or not examples:
             return None, None, total_pages + 1
 
         example = page_obj.object_list[0]
@@ -277,7 +281,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for user in state["required_users"]:
             query = Annotation.objects.filter(
                 assignment__example=example,
-                assignment__user__username=user,
+                assignment__batch_assignment__user__username=user,
                 phase=Annotation.Phase.ANNOTATION,
             ).select_related("label")
             label_set = {anno.label for anno in query}
