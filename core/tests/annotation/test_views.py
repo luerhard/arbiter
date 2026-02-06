@@ -35,10 +35,17 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
 
-    @pytest.mark.parametrize(("slug", "param"), URLS_WITH_URL_PARAMS)
-    def test_login_required_as_annotator_url_params(self, slug, param, client):
-        url = reverse(slug, args=(param,))
+    def test_annotation_view_of_unfinished_batch(self, client):
+        url = reverse("annotate-batch", args=(4,))
         login = client.login(username="annotator1", password="123")
         assert login == True
         req = client.get(url)
         assert req.status_code == 200
+
+    def test_annotation_view_of_finished_batch(self, client):
+        url = reverse("annotate-batch", args=(1,))
+        login = client.login(username="annotator1", password="123")
+        assert login == True
+        req = client.get(url)
+        assert req.status_code == 302
+        assert req.url == "/annotation/batch/1/done"
