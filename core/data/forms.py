@@ -48,7 +48,7 @@ class MultiLabelFormAnnotation(forms.Form):
 
 
 class MultiLabelFormExpert(forms.Form):
-    selected_labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
+    labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, example, codebook, user, **kwargs):
         super().__init__(*args, **kwargs)
@@ -56,9 +56,9 @@ class MultiLabelFormExpert(forms.Form):
         self.user = user
         labels_queryset = Label.objects.filter(project_id=codebook.project.id)
         labels_choices = [(label.id, label.name) for label in labels_queryset]
-        self.fields["selected_labels"].choices = labels_choices
+        self.fields["labels"].choices = labels_choices
 
     def save(self):
-        data = self.cleaned_data["selected_labels"]
+        data = self.cleaned_data["labels"]
         labels = [int(i) for i in data if i.strip()]
         self.example.set_user_annotations(user=self.user, label_ids=labels, phase="EXPERT")

@@ -111,9 +111,6 @@ class ExampleAssignment(models.Model):
             self.is_annotated = True
         elif phase == Annotation.Phase.DISCUSSION:
             self.is_discussed = True
-        elif phase == Annotation.Phase.EXPERT:
-            self.example.has_expert_decision = True
-            self.example.save()
 
         # delete previous annotations if any
         Annotation.objects.filter(phase=phase, assignment=self).delete()
@@ -134,46 +131,10 @@ class ExampleAssignment(models.Model):
             self.check_for_disagreement_after_discussion()
 
     def check_for_disagreement(self):
-        # Get annotations for anntation phase
-        assignments = ExampleAssignment.objects.filter(
-            example=self.example,
-            is_annotated=True,
-            annotations__phase=Annotation.Phase.ANNOTATION,
-        ).prefetch_related("annotations__label", "batch_assignment__user")
-
-        # group by user
-        user_annotations = defaultdict(set)
-        for assignment in assignments:
-            for annotation in assignment.annotations.all():
-                user_annotations[assignment.user.id].add(annotation.label.id)
-
-        unique_annotations = {frozenset(labels) for labels in user_annotations.values()}
-
-        if len(unique_annotations) > 1:
-            self.example.has_disagreement = True
-        else:
-            self.example.has_disagreement = False
-
-        self.example.save()
+        return self.example.has_disagreement
 
     def check_for_disagreement_after_discussion(self):
-        assignments = ExampleAssignment.objects.filter(
-            example=self.example,
-            is_annotated=True,
-            annotations__phase=Annotation.Phase.DISCUSSION,
-        ).prefetch_related("annotations__label", "batch_assignment__user")
-        # group by user
-        user_annotations = defaultdict(set)
-        for assignment in assignments:
-            for annotation in assignment.annotations.all():
-                user_annotations[assignment.user.id].add(annotation.label.id)
-
-        unique_annotations = {frozenset(labels) for labels in user_annotations.values()}
-
-        if len(unique_annotations) > 1:
-            self.example.has_disagreement_after_discussion = True
-
-        self.example.save()
+        return self.example.has_disagreement_after_discussion
 
     def save(self, *args, **kwargs):
         # auto set order for the first time
@@ -209,6 +170,49 @@ class Example(models.Model):
     def labels(self):
         return self.batch.project.labels
 
+    def _has_disagreement_for_phase(self, phase: str) -> bool:
+        if phase == Annotation.Phase.ANNOTATION:
+            assignment_filter = {"assignment__is_annotated": True}
+        elif phase == Annotation.Phase.DISCUSSION:
+            assignment_filter = {"assignment__is_discussed": True}
+        else:
+            assignment_filter = {}
+
+        rows = (
+            Annotation.objects.filter(
+                assignment__example=self,
+                phase=phase,
+                **assignment_filter,
+            )
+            .values(
+                "assignment__batch_assignment__user_id",
+                "label_id",
+            )
+            .order_by()
+        )
+
+        by_user = defaultdict(set)
+        for row in rows:
+            by_user[row["assignment__batch_assignment__user_id"]].add(row["label_id"])
+
+        unique_label_sets = {frozenset(labels) for labels in by_user.values()}
+        return len(unique_label_sets) > 1
+
+    @property
+    def has_expert_decision(self) -> bool:
+        return Annotation.objects.filter(
+            assignment__example=self,
+            phase=Annotation.Phase.EXPERT,
+        ).exists()
+
+    @property
+    def has_disagreement(self) -> bool:
+        return self._has_disagreement_for_phase(Annotation.Phase.ANNOTATION)
+
+    @property
+    def has_disagreement_after_discussion(self) -> bool:
+        return self._has_disagreement_for_phase(Annotation.Phase.DISCUSSION)
+
     def get_user_annotations(self, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"], user=None):
         phase = getattr(Annotation.Phase, phase)
 
@@ -229,7 +233,6 @@ class Example(models.Model):
         else:
             return Annotation.objects.filter(
                 assignment__example=self,
-                assignment__example__has_expert_decision=1,
                 phase=phase,
             )
 

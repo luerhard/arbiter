@@ -202,7 +202,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         msg = None
         if example is None:
             had_any = await database_sync_to_async(
-                lambda: Example.objects.filter(batch=self.batch_id, has_disagreement=True).exists(),
+                lambda: any(
+                    e.has_disagreement for e in Example.objects.filter(batch=self.batch_id)
+                ),
             )()
 
             if not had_any:
@@ -259,13 +261,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def get_example(self, state):
         log.debug("Getting example")
-        queryset = Example.objects.filter(batch=self.batch_id, has_disagreement=True).distinct()
-        log.debug(f"{queryset =}")
-        paginator = Paginator(queryset, 1)
+        examples = [
+            e for e in Example.objects.filter(batch=self.batch_id).distinct()
+            if e.has_disagreement
+        ]
+        log.debug(f"{examples =}")
+        paginator = Paginator(examples, 1)
         page_obj = paginator.get_page(state["page"])
         total_pages = paginator.count
 
-        if page_obj.number < state["page"] or not queryset.count():
+        if page_obj.number < state["page"] or not examples:
             return None, None, total_pages + 1
 
         example = page_obj.object_list[0]

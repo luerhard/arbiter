@@ -5,14 +5,18 @@ import pytest
 from data.models import Example
 
 
-@pytest.fixture
+@pytest.fixture()
 def project_setup():
     # Assumes populatedb creates at least one project, batch, example, and label
     # and that the example has disagreement for the expert view to work.
-    example = Example.objects.filter(
-        has_disagreement=True,
-        has_disagreement_after_discussion=True,
-    ).first()
+    example = next(
+        (
+            e
+            for e in Example.objects.all()
+            if e.has_disagreement and e.has_disagreement_after_discussion
+        ),
+        None,
+    )
 
     return {
         "batch": example.batch,
@@ -21,7 +25,7 @@ def project_setup():
     }
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 class TestExpertViews:
     def test_expert_dialogue_view_get_as_expert(self, client, project_setup):
         """Tests that an expert can access the expert dialogue view."""

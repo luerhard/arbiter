@@ -89,23 +89,21 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "users": [],
             }
             # Query examples with disagreements and no expert decisions
-            disagr_ex = Example.objects.filter(
-                has_disagreement=True,
-                has_expert_decision=False,
-                # has_disagreement_after_discussion=True,
-                batch=batch,
-                batch__project_id=project.id,
-            )
-            disagr_count = disagr_ex.count()
+            disagr_ex = [
+                e for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
+                if e.has_disagreement and not e.has_expert_decision
+            ]
+            disagr_count = len(disagr_ex)
             batch_data["disagreement"] = disagr_count
-            batch_data["disagr_after_discussion"] = disagr_ex.filter(
-                has_disagreement_after_discussion=True,
-            ).count()
+            batch_data["disagr_after_discussion"] = len(
+                [e for e in disagr_ex if e.has_disagreement_after_discussion],
+            )
             disagr_ex_first_id = 0
             if disagr_count > 0:
-                disagr_ex_first_id = disagr_ex.order_by("id").first().id
+                disagr_ex_first_id = sorted(disagr_ex, key=lambda e: e.id)[0].id
             batch_data["disagreement_first_id"] = disagr_ex_first_id
 
+            disagr_ids = [e.id for e in disagr_ex]
             for annotator in context["annotators"]:
                 annotated = ExampleAssignment.objects.filter(
                     batch_assignment__user=annotator,
@@ -115,9 +113,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 discussed = ExampleAssignment.objects.filter(
                     batch_assignment__user=annotator,
                     is_discussed=True,
-                    example__batch=batch,
-                    example__has_disagreement=True,
-                    example__has_expert_decision=False,
+                    example_id__in=disagr_ids,
                 ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)

@@ -133,7 +133,7 @@ class Command(BaseCommand):
                 labels = uniform_choices(label_ids)
                 assignment.set_user_annotations(labels, "ANNOTATION")
         batch.set_phase(Batch.Phase.DISCUSSION)
-        for example in batch.examples.filter(has_disagreement=True).all():
+        for example in [e for e in batch.examples.all() if e.has_disagreement]:
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
                 assignment.set_user_annotations(labels, "DISCUSSION")

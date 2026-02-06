@@ -50,14 +50,17 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         else:
             messages.error(self.request, f"Something was invalid: {form}")
 
-        all_examples = Example.objects.filter(
-            has_disagreement=True,
-            has_disagreement_after_discussion=True,
-            has_expert_decision=False,
-            batch_id=batch_id,
-            batch__project_id=codebook.project.id,
-        ).order_by("id")
-        next_example = all_examples.filter(id__gt=example.id).order_by("id").first()
+        all_examples = [
+            e
+            for e in Example.objects.filter(
+                batch_id=batch_id,
+                batch__project_id=codebook.project.id,
+            ).order_by("id")
+            if e.has_disagreement
+            and e.has_disagreement_after_discussion
+            and not e.has_expert_decision
+        ]
+        next_example = next((e for e in all_examples if e.id > example.id), None)
         if next_example:
             return redirect("expert-dialogue", codebook_id, batch_id, next_example.id)
         else:
