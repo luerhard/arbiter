@@ -39,8 +39,7 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects
-            .filter(user=self.request.user)
+            ProjectUser.objects.filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
