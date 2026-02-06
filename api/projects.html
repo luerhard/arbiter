@@ -66,6 +66,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#projects.models.ProjectUser"><code class="docutils literal notranslate"><span class="pre">ProjectUser</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.models.Project"><code class="docutils literal notranslate"><span class="pre">Project</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.models.Batch"><code class="docutils literal notranslate"><span class="pre">Batch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#projects.models.BatchAssignment"><code class="docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -232,13 +233,13 @@ method.</p>
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-projects.models" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="projects.models.ProjectUser">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">ProjectUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.ProjectUser" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">ProjectUser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_role</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.ProjectUser" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">projects_projectuser</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
-<li><p><strong>role</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Role</p></li>
+<li><p><strong>default_role</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Default role</p></li>
 </ul>
 </dd>
 </dl>
@@ -281,10 +282,10 @@ method.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="projects.models.ProjectUser.role">
-<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#projects.models.ProjectUser.role" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="projects.models.ProjectUser.default_role">
+<span class="sig-name descname"><span class="pre">default_role</span></span><a class="headerlink" href="#projects.models.ProjectUser.default_role" title="Link to this definition"></a></dt>
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
-<p>Role</p>
+<p>Default role</p>
 <p>Choices:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
@@ -303,9 +304,9 @@ method.</p>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="projects.models.ProjectUser.get_role_display">
-<span class="sig-name descname"><span class="pre">get_role_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">role&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.ProjectUser.get_role_display" title="Link to this definition"></a></dt>
-<dd><p>Shows the label of the <a class="reference internal" href="#projects.models.ProjectUser.role" title="projects.models.ProjectUser.role"><code class="xref py py-attr docutils literal notranslate"><span class="pre">role</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
+<dt class="sig sig-object py" id="projects.models.ProjectUser.get_default_role_display">
+<span class="sig-name descname"><span class="pre">get_default_role_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">default_role&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.ProjectUser.get_default_role_display" title="Link to this definition"></a></dt>
+<dd><p>Shows the label of the <a class="reference internal" href="#projects.models.ProjectUser.default_role" title="projects.models.ProjectUser.default_role"><code class="xref py py-attr docutils literal notranslate"><span class="pre">default_role</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -504,7 +505,10 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <p>Reverse relationships:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>examples</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – All examples of this batch (related name of <a class="reference internal" href="data.html#data.models.Example.batch" title="data.models.Example.batch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code></a>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>examples</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – All examples of this batch (related name of <a class="reference internal" href="data.html#data.models.Example.batch" title="data.models.Example.batch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code></a>)</p></li>
+<li><p><strong>batch_assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – All batch assignments of this batch (related name of <a class="reference internal" href="#projects.models.BatchAssignment.batch" title="projects.models.BatchAssignment.batch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code></a>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py class">
@@ -607,6 +611,13 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.Batch.batch_assignments">
+<span class="sig-name descname"><span class="pre">batch_assignments</span></span><a class="headerlink" href="#projects.models.Batch.batch_assignments" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
+<p>All batch assignments of this batch (related name of <a class="reference internal" href="#projects.models.BatchAssignment.batch" title="projects.models.BatchAssignment.batch"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Batch.examples">
 <span class="sig-name descname"><span class="pre">examples</span></span><a class="headerlink" href="#projects.models.Batch.examples" title="Link to this definition"></a></dt>
 <dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a></p>
@@ -635,6 +646,140 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dt class="sig sig-object py" id="projects.models.Batch.project_id">
 <span class="sig-name descname"><span class="pre">project_id</span></span><a class="headerlink" href="#projects.models.Batch.project_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#projects.models.Batch.project" title="projects.models.Batch.project"><code class="xref py py-class docutils literal notranslate"><span class="pre">project</span></code></a> instead.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">BatchAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">role</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.BatchAssignment" title="Link to this definition"></a></dt>
+<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">projects_batchassignment</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
+<li><p><strong>role</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Role</p></li>
+<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Phase</p></li>
+</ul>
+</dd>
+</dl>
+<p>Relationship fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – Batch (related name: <a class="reference internal" href="#projects.models.Batch.batch_assignments" title="projects.models.Batch.batch_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignments</span></code></a>)</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="users.html#users.models.User" title="users.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – User (related name: <a class="reference internal" href="users.html#users.models.User.batch_assignments" title="users.models.User.batch_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignments</span></code></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Reverse relationships:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>examples_assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – All examples assignments of this batch assignment (related name of <a class="reference internal" href="data.html#data.models.ExampleAssignment.batch_assignment" title="data.models.ExampleAssignment.batch_assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignment</span></code></a>)</p></li>
+<li><p><strong>examples</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – All examples of this batch assignment (related name of <a class="reference internal" href="data.html#data.models.Example.assignees" title="data.models.Example.assignees"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignees</span></code></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.batch">
+<span class="sig-name descname"><span class="pre">batch</span></span><a class="headerlink" href="#projects.models.BatchAssignment.batch" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a></p>
+<p>Batch (related name: <a class="reference internal" href="#projects.models.Batch.batch_assignments" title="projects.models.Batch.batch_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignments</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.user">
+<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#projects.models.BatchAssignment.user" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="users.html#users.models.User" title="users.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a></p>
+<p>User (related name: <a class="reference internal" href="users.html#users.models.User.batch_assignments" title="users.models.User.batch_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignments</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.role">
+<span class="sig-name descname"><span class="pre">role</span></span><a class="headerlink" href="#projects.models.BatchAssignment.role" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
+<p>Role</p>
+<p>Choices:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.phase">
+<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#projects.models.BatchAssignment.phase" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
+<p>Phase</p>
+<p>Choices:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#projects.models.BatchAssignment.DoesNotExist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#projects.models.BatchAssignment.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.batch_id">
+<span class="sig-name descname"><span class="pre">batch_id</span></span><a class="headerlink" href="#projects.models.BatchAssignment.batch_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#projects.models.BatchAssignment.batch" title="projects.models.BatchAssignment.batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.examples">
+<span class="sig-name descname"><span class="pre">examples</span></span><a class="headerlink" href="#projects.models.BatchAssignment.examples" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a></p>
+<p>All examples of this batch assignment (related name of <a class="reference internal" href="data.html#data.models.Example.assignees" title="data.models.Example.assignees"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignees</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.examples_assignments">
+<span class="sig-name descname"><span class="pre">examples_assignments</span></span><a class="headerlink" href="#projects.models.BatchAssignment.examples_assignments" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
+<p>All examples assignments of this batch assignment (related name of <a class="reference internal" href="data.html#data.models.ExampleAssignment.batch_assignment" title="data.models.ExampleAssignment.batch_assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">batch_assignment</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.get_phase_display">
+<span class="sig-name descname"><span class="pre">get_phase_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">phase&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.BatchAssignment.get_phase_display" title="Link to this definition"></a></dt>
+<dd><p>Shows the label of the <a class="reference internal" href="#projects.models.BatchAssignment.phase" title="projects.models.BatchAssignment.phase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">phase</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.get_role_display">
+<span class="sig-name descname"><span class="pre">get_role_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">role&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.BatchAssignment.get_role_display" title="Link to this definition"></a></dt>
+<dd><p>Shows the label of the <a class="reference internal" href="#projects.models.BatchAssignment.role" title="projects.models.BatchAssignment.role"><code class="xref py py-attr docutils literal notranslate"><span class="pre">role</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#projects.models.BatchAssignment.id" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
+<p>Primary key: ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#projects.models.BatchAssignment.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.BatchAssignment.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#projects.models.BatchAssignment.user_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#projects.models.BatchAssignment.user" title="projects.models.BatchAssignment.user"><code class="xref py py-class docutils literal notranslate"><span class="pre">user</span></code></a> instead.</p>
 </dd></dl>
 
 </dd></dl>

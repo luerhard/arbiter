@@ -306,7 +306,7 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_annotated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_discussed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_annotated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_discussed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_exampleassignment</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -324,7 +324,7 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>example</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – Example (related name: <a class="reference internal" href="#data.models.Example.assignments" title="data.models.Example.assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code></a>)</p></li>
-<li><p><strong>user</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="users.html#users.models.User" title="users.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a>) – User (related name: <a class="reference internal" href="users.html#users.models.User.assignments" title="users.models.User.assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code></a>)</p></li>
+<li><p><strong>batch_assignment</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Batch assignment (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples_assignments" title="projects.models.BatchAssignment.examples_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -342,10 +342,10 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.user">
-<span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#data.models.ExampleAssignment.user" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="users.html#users.models.User" title="users.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a></p>
-<p>User (related name: <a class="reference internal" href="users.html#users.models.User.assignments" title="users.models.User.assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code></a>)</p>
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment">
+<span class="sig-name descname"><span class="pre">batch_assignment</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
+<p>Batch assignment (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples_assignments" title="projects.models.BatchAssignment.examples_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code></a>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -375,6 +375,11 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a></p>
 <p>Last updated</p>
 </dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#data.models.ExampleAssignment.user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.previous">
@@ -429,6 +434,12 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment_id">
+<span class="sig-name descname"><span class="pre">batch_assignment_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.batch_assignment" title="data.models.ExampleAssignment.batch_assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch_assignment</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.example_id">
 <span class="sig-name descname"><span class="pre">example_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-class docutils literal notranslate"><span class="pre">example</span></code></a> instead.</p>
@@ -458,33 +469,27 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.ExampleAssignment.objects" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.user_id">
-<span class="sig-name descname"><span class="pre">user_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.user_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.user" title="data.models.ExampleAssignment.user"><code class="xref py py-class docutils literal notranslate"><span class="pre">user</span></code></a> instead.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data.models.Example">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_disagreement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_disagreement_after_discussion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_expert_decision</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_example</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
 <li><p><strong>content</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.0)"><em>TextField</em></a>) – Content</p></li>
-<li><p><strong>has_disagreement</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><em>BooleanField</em></a>) – Has disagreement</p></li>
-<li><p><strong>has_disagreement_after_discussion</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><em>BooleanField</em></a>) – Has disagreement after discussion</p></li>
-<li><p><strong>has_expert_decision</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><em>BooleanField</em></a>) – Has expert decision</p></li>
 </ul>
 </dd>
 </dl>
 <p>Relationship fields:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>batch</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – Batch (related name: <a class="reference internal" href="projects.html#projects.models.Batch.examples" title="projects.models.Batch.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – Batch (related name: <a class="reference internal" href="projects.html#projects.models.Batch.examples" title="projects.models.Batch.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p></li>
+<li><p><strong>assignees</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Assignees (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples" title="projects.models.BatchAssignment.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p></li>
+</ul>
 </dd>
 </dl>
 <p>Reverse relationships:</p>
@@ -511,34 +516,30 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.has_disagreement">
-<span class="sig-name descname"><span class="pre">has_disagreement</span></span><a class="headerlink" href="#data.models.Example.has_disagreement" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
-<p>Has disagreement</p>
+<dt class="sig sig-object py" id="data.models.Example.assignees">
+<span class="sig-name descname"><span class="pre">assignees</span></span><a class="headerlink" href="#data.models.Example.assignees" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
+<p>Assignees (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples" title="projects.models.BatchAssignment.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p>
 </dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.has_disagreement_after_discussion">
-<span class="sig-name descname"><span class="pre">has_disagreement_after_discussion</span></span><a class="headerlink" href="#data.models.Example.has_disagreement_after_discussion" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
-<p>Has disagreement after discussion</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.has_expert_decision">
-<span class="sig-name descname"><span class="pre">has_expert_decision</span></span><a class="headerlink" href="#data.models.Example.has_expert_decision" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
-<p>Has expert decision</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Example.project">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#data.models.Example.project" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="data.models.Example.labels">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#data.models.Example.labels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_expert_decision">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_expert_decision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_expert_decision" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_disagreement">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_disagreement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_disagreement_after_discussion">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement_after_discussion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_disagreement_after_discussion" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
