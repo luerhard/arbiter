@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
+from django.shortcuts import render
 from django.shortcuts import reverse
 from django.views.generic import DetailView
 from django.views.generic import ListView
@@ -12,6 +14,7 @@ from django.views.generic import View
 import pandas as pd
 
 from .forms import BatchPhaseForm
+from .forms import ProjectCreateForm
 from core.mixins import AnnotatorRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
@@ -34,10 +37,73 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects.filter(user=self.request.user)
+            ProjectUser.objects
+            .filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["create_url"] = reverse("project-create") if self.request.user.is_staff else None
+        return context
+
+
+class ProjectCreateView(View):
+    def get(self, request):
+        form = ProjectCreateForm()
+        return render(request, "projects/project_create.html", {"form": form})
+
+    def post(self, request):
+        form = ProjectCreateForm(request.POST)
+        if not form.is_valid():
+            return render(request, "projects/project_create.html", {"form": form})
+
+        project = Project.objects.create(
+            name=form.cleaned_data["name"],
+            description=form.cleaned_data["description"],
+        )
+
+        project_users = []
+        for user in form.cleaned_data["annotators"]:
+            project_users.append(
+                ProjectUser(
+                    project=project,
+                    user=user,
+                    default_role=ProjectUser.Role.ANNOTATOR,
+                ),
+            )
+        for user in form.cleaned_data["experts"]:
+            project_users.append(
+                ProjectUser(
+                    project=project,
+                    user=user,
+                    default_role=ProjectUser.Role.EXPERT,
+                ),
+            )
+        if project_users:
+            ProjectUser.objects.bulk_create(project_users)
+
+        labels_raw = form.cleaned_data.get("labels") or ""
+        labels = []
+        seen = set()
+        for line in labels_raw.splitlines():
+            name = line.strip()
+            if not name:
+                continue
+            key = name.lower()
+            if key in seen:
+                continue
+            seen.add(key)
+            labels.append(name)
+        if labels:
+            from data.models import Label
+
+            Label.objects.bulk_create(
+                [Label(project=project, name=label) for label in labels],
+            )
+
+        return redirect("project-detail", project_id=project.id)
 
 
 class ProjectDetailView(RedirectView):

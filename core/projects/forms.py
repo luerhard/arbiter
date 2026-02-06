@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 from django.db.models import Max
 import pandas as pd
 
@@ -6,6 +7,7 @@ from data.models import Example
 from data.models import ExampleAssignment
 from projects.models import Batch
 from projects.models import BatchAssignment
+from projects.models import Project
 from projects.models import ProjectUser
 from users.models import User
 
@@ -13,6 +15,63 @@ from users.models import User
 class ProjectForm(forms.ModelForm):
     name = forms.CharField(max_length=100, help_text="Name of the Project")
     description = forms.CharField(widget=forms.Textarea)
+
+    class Meta:
+        model = Project
+        fields = ["name", "description"]
+
+
+class ProjectCreateForm(forms.Form):
+    name = forms.CharField(max_length=100, label="Project title")
+    description = forms.CharField(widget=forms.Textarea, required=True)
+    annotators = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+    experts = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+    )
+    labels = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+        help_text="One label per line. Example: Positive",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        base_input = (
+            "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "
+            "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "
+            "dark:border-white/10 dark:bg-gray-900 dark:text-white"
+        )
+        self.fields["name"].widget.attrs.update({
+            "class": base_input,
+            "placeholder": "Project title",
+        })
+        self.fields["description"].widget.attrs.update(
+            {"class": base_input, "rows": 4, "placeholder": "What is this project about?"},
+        )
+        self.fields["labels"].widget.attrs.update(
+            {"class": base_input, "rows": 5, "placeholder": "Positive\nNegative\nNeutral"},
+        )
+        for field in ("annotators", "experts"):
+            self.fields[field].widget.attrs.update(
+                {"class": "space-y-2 text-sm text-gray-700 dark:text-gray-300"},
+            )
+
+    def clean(self):
+        cleaned = super().clean()
+        annotators = set(cleaned.get("annotators") or [])
+        experts = set(cleaned.get("experts") or [])
+        overlap = annotators & experts
+        if overlap:
+            names = ", ".join(sorted(u.username for u in overlap))
+            msg = f"Users cannot be both annotator and expert: {names}"
+            raise ValidationError(msg)
+        return cleaned
 
 
 class ProjectAssignmentForm(forms.ModelForm):
@@ -77,7 +136,7 @@ class BatchForm(forms.ModelForm):
 
     file = forms.FileField(required=False)
 
-    def save(self, commit=True):  ## noqa: ARG002
+    def save(self, commit=True):  # noqa: ARG002
         data = self.cleaned_data
         project = data["project"]
         project.save()
