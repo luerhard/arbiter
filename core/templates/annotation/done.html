@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="mx-auto max-w-3xl rounded-lg bg-white p-8 shadow-sm dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10">
+        <div class="flex items-start justify-between gap-6">
+            <div>
+                <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">All done</h1>
+                <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                    You have completed all available assignments for this batch.
+                </p>
+                <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+                    Progress: {{ progress.done }} / {{ progress.total }}
+                </p>
+            </div>
+        </div>
+        <div class="mt-6 flex flex-wrap gap-3">
+            <a class="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
+               href="{% url 'project-detail-annotator' project.id %}">
+                Back to project
+            </a>
+            <a class="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
+               href="{% url 'project-list' %}">
+                All projects
+            </a>
+        </div>
+    </div>
+{% endblock content %}
