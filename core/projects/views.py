@@ -84,26 +84,51 @@ class ProjectCreateView(View):
         if project_users:
             ProjectUser.objects.bulk_create(project_users)
 
-        labels_raw = form.cleaned_data.get("labels") or ""
+        label_names = request.POST.getlist("label_name")
+        label_colors = request.POST.getlist("label_color")
+        label_hotkeys = request.POST.getlist("label_hotkey")
+
         labels = []
-        seen = set()
-        for line in labels_raw.splitlines():
-            name = line.strip()
+        seen_names = set()
+        seen_hotkeys = set()
+        for name, color, hotkey in zip(label_names, label_colors, label_hotkeys, strict=False):
+            name = (name or "").strip()
             if not name:
                 continue
-            key = name.lower()
-            if key in seen:
+            name_key = name.lower()
+            if name_key in seen_names:
                 continue
-            seen.add(key)
-            labels.append(name)
+            seen_names.add(name_key)
+            hotkey = (hotkey or "").strip() or None
+            if hotkey and hotkey.lower() in seen_hotkeys:
+                continue
+            if hotkey:
+                seen_hotkeys.add(hotkey.lower())
+            color = (color or "").strip() or None
+            labels.append({"name": name, "color": color, "hotkey": hotkey})
+
         if labels:
             from data.models import Label
 
             Label.objects.bulk_create(
-                [Label(project=project, name=label) for label in labels],
+                [
+                    Label(
+                        project=project,
+                        name=label["name"],
+                        color=label["color"] or Label._meta.get_field("color").default,
+                        hotkey=label["hotkey"],
+                    )
+                    for label in labels
+                ],
             )
 
         return redirect("project-detail", project_id=project.id)
+
+
+class ProjectLabelRowView(View):
+    def get(self, request):
+        index = int(request.GET.get("index", 0))
+        return render(request, "projects/partials/label_row.html", {"index": index})
 
 
 class ProjectDetailView(RedirectView):
