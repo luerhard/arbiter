@@ -91,7 +91,7 @@ class ProjectAssignmentForm(forms.ModelForm):
                 user=annotator,
                 project=data["project"],
             )
-            assign.role = assign.Role.ANNOTATOR
+            assign.default_role = assign.Role.ANNOTATOR
             if created:
                 new.append(assign)
             else:
@@ -102,7 +102,7 @@ class ProjectAssignmentForm(forms.ModelForm):
                 user=annotator,
                 project=data["project"],
             )
-            assign.role = assign.Role.EXPERT
+            assign.default_role = assign.Role.EXPERT
             if created:
                 new.append(assign)
             else:
@@ -112,6 +112,29 @@ class ProjectAssignmentForm(forms.ModelForm):
             ProjectUser.objects.bulk_create(new)
         if existing:
             ProjectUser.objects.bulk_update(new, fields=["role"])
+
+
+class BatchCreateForm(forms.Form):
+    file = forms.FileField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["file"].widget.attrs.update(
+            {
+                "class": "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "  # noqa: E501
+                "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "  # noqa: E501
+                "dark:border-white/10 dark:bg-gray-900 dark:text-white",
+                "accept": ".csv,.xlsx",
+            },
+        )
+
+    def clean_file(self):
+        file = self.cleaned_data["file"]
+        name = (file.name or "").lower()
+        if not (name.endswith(".csv") or name.endswith(".xlsx")):
+            msg = "Please upload a .csv or .xlsx file."
+            raise ValidationError(msg)
+        return file
 
 
 class BatchForm(forms.ModelForm):

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="mx-auto max-w-3xl">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Create batch</h1>
+            <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                Upload a CSV or XLSX file with a <code class="px-1">text</code> column.
+            </p>
+        </div>
+
+        <form method="post"
+              enctype="multipart/form-data"
+              class="mt-6 space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="rounded-md bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-900/30 dark:text-rose-200">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div>
+                <label class="block text-sm font-medium text-gray-900 dark:text-white">Data file</label>
+                <div class="mt-2">
+                    {{ form.file }}
+                </div>
+                {% if form.file.errors %}
+                    <p class="mt-1 text-sm text-rose-600">{{ form.file.errors }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button type="submit"
+                        class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">
+                    Create batch
+                </button>
+                <a href="{% url 'project-detail' project.id %}"
+                   class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

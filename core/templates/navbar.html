@@ -2,6 +2,7 @@
 <c-navbar.navitem url="/">Home</c-navbar.navitem>
 {% if user.is_authenticated %}
     <c-navbar.navitem url="{% url 'project-list' %}">Projects</c-navbar.navitem>
+    <c-navbar.navitem url="{% url 'project-create' %}">Create project</c-navbar.navitem>
     <c-navbar.navitem url="{% url 'user-profile' %}">Profile</c-navbar.navitem>
     <c-navbar.navitem url="{% url 'logout' %}">Logout</c-navbar.navitem>
 {% else %}

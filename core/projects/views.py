@@ -13,6 +13,7 @@ from django.views.generic import RedirectView
 from django.views.generic import View
 import pandas as pd
 
+from .forms import BatchCreateForm
 from .forms import BatchPhaseForm
 from .forms import ProjectCreateForm
 from core.mixins import AnnotatorRequiredMixin
@@ -21,6 +22,7 @@ from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
+from projects.models import BatchAssignment
 from projects.models import Project
 from projects.models import ProjectUser
 
@@ -121,6 +123,71 @@ class ProjectCreateView(View):
                     for label in labels
                 ],
             )
+
+        return redirect("project-detail", project_id=project.id)
+
+
+class ProjectBatchCreateView(ExpertRequiredMixin, View):
+    def get(self, request, project_id):
+        project = get_object_or_404(Project, id=project_id)
+        form = BatchCreateForm()
+        return render(
+            request,
+            "projects/batch_create.html",
+            {"project": project, "form": form},
+        )
+
+    def post(self, request, project_id):
+        project = get_object_or_404(Project, id=project_id)
+        form = BatchCreateForm(request.POST, request.FILES)
+        if not form.is_valid():
+            return render(
+                request,
+                "projects/batch_create.html",
+                {"project": project, "form": form},
+            )
+
+        file = form.cleaned_data["file"]
+        if file.name.endswith(".csv"):
+            df = pd.read_csv(file)
+        elif file.name.endswith(".xlsx"):
+            df = pd.read_excel(file)
+        else:
+            form.add_error("file", "Unsupported file type.")
+            return render(
+                request,
+                "projects/batch_create.html",
+                {"project": project, "form": form},
+            )
+        if "text" not in df.columns:
+            form.add_error("file", "Missing required 'text' column.")
+            return render(
+                request,
+                "projects/batch_create.html",
+                {"project": project, "form": form},
+            )
+
+        batch = Batch(project=project)
+        batch.save()
+
+        default_annotators = project.annotators.all()
+        batch_assignments = {
+            annotator.id: BatchAssignment.objects.create(
+                batch=batch,
+                user=annotator,
+                role=ProjectUser.Role.ANNOTATOR,
+                phase=batch.phase,
+            )
+            for annotator in default_annotators
+        }
+        for _, row in df.iterrows():
+            example = Example(batch=batch, content=row["text"])
+            example.save()
+            for annotator in default_annotators:
+                ExampleAssignment.objects.create(
+                    example=example,
+                    batch_assignment=batch_assignments[annotator.id],
+                )
 
         return redirect("project-detail", project_id=project.id)
 
