@@ -65,7 +65,7 @@ class EditAssignment(View):
 
             payload = {"assignment_id": assignment.pk}
         else:
-            msg = "ass"
+            msg = "No assignment id found in request"
             raise Exception(msg)
 
         resp = HttpResponse(status=200)
