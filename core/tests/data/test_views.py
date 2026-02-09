@@ -37,6 +37,19 @@ def data_setup():
 
 @pytest.mark.django_db
 class TestDataViews:
+    def test_save_labels_expert_requires_login(self, client, data_setup):
+        url = reverse(
+            "expert-label-save",
+            kwargs={
+                "codebook_id": data_setup["codebook"].id,
+                "batch_id": data_setup["batch"].id,
+                "example_id": data_setup["example"].id,
+            },
+        )
+        data = {"labels": [data_setup["labels"].first().id]}
+        response = client.post(url, data)
+        assert response.status_code == 302
+
     def test_save_labels_expert_view(self, client, data_setup):
         client.login(username="expert1", password="123")
         example = data_setup["example"]

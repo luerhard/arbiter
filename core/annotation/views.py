@@ -61,7 +61,7 @@ class EditAssignment(View):
         if assignment_id:
             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
             submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-            assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
+            assignment.set_user_annotations(label_ids=submitted_labels)
 
             payload = {"assignment_id": assignment.pk}
         else:
