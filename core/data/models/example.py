@@ -108,5 +108,9 @@ class Example(models.Model):
         label_ids: list[int],
         phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
     ):
-        assignment = ExampleAssignment.objects.get(example=self, batch_assignment__user=user)
-        assignment.set_user_annotations(label_ids=label_ids, phase=phase)
+        assignment = ExampleAssignment.objects.get(
+            example=self,
+            batch_assignment__user=user,
+            phase=getattr(Batch.Phase, phase),
+        )
+        assignment.set_user_annotations(label_ids=label_ids)
