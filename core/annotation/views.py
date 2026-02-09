@@ -33,9 +33,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             assignment = ExampleAssignment.objects.get(id=assignment_id)
         else:
             assignment = (
-                ExampleAssignment.objects.filter(
-                    batch_assignment__user=request.user, example__batch=batch
-                )
+                ExampleAssignment.objects
+                .filter(batch_assignment__user=request.user, example__batch=batch)
                 .order_by("order")
                 .first()
             )
@@ -61,11 +60,10 @@ class EditAssignment(View):
         assignment_id = request.GET.get("assignment_id")
         if assignment_id:
             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-            batch = assignment.example.batch
             submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
             assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
-            payload = {"assignment_id": assignment.id}
+            payload = {"assignment_id": assignment.pk}
         else:
             msg = "ass"
             raise Exception(msg)
@@ -94,7 +92,7 @@ class EditAssignment(View):
             resp["HX-Redirect"] = reverse("annotate-done", kwargs={"batch_id": batch.id})
             return resp
 
-        payload = {"assignment_id": next_assignment.id, "batch_id": batch.id}
+        payload = {"assignment_id": next_assignment.pk, "batch_id": batch.id}
         resp = HttpResponse(status=204)
         resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
         return resp
@@ -113,10 +111,16 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 
 def get_progress(user, batch):
     """helper function to calculate current progress"""
-    done = batch.examples.filter(
-        assignments__batch_assignment__user=user,
-        assignments__is_annotated=1,
-    ).count()
+    done = (
+        batch.examples
+        .filter(
+            assignments__batch_assignment__user=user,
+            assignments__phase=Batch.Phase.ANNOTATION,
+            assignments__done__isnull=False,
+        )
+        .distinct()
+        .count()
+    )
     total = batch.examples.count()
     try:
         current = int(done / total * 100)
@@ -155,10 +159,8 @@ class HtmxLabels(View):
         assignment_id = request.GET.get("assignment_id")
         context = {}
         if assignment_id:
-            assignment = ExampleAssignment.objects.get(id=assignment_id)
-            previous_annotations = (
-                assignment.annotations.filter(phase="ANNOTATION").select_related("label").all()
-            )
+            assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+            previous_annotations = assignment.annotations.select_related("label").all()
 
             example = assignment.example
             labels = []
