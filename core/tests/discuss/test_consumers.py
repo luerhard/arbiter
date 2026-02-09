@@ -1,0 +1,232 @@
+import os
+import uuid
+
+from asgiref.sync import async_to_sync
+from channels.testing import WebsocketCommunicator
+from django.contrib.auth import get_user_model
+from django.test import override_settings
+import pytest
+import redis
+
+from core.asgi import application
+from data.models import Example
+from data.models import ExampleAssignment
+from data.models.models import Annotation
+from data.models.models import Label
+from discuss import room_state
+from discuss.models import Message
+from projects.models import Batch
+from projects.models import BatchAssignment
+from projects.models import Project
+from projects.models import ProjectUser
+
+User = get_user_model()
+
+TEST_CHANNEL_LAYERS = {
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+}
+
+
+@pytest.fixture
+def redis_test_state(monkeypatch):
+    url = os.environ.get("TEST_REDIS_URL", "redis://localhost:6379/15")
+    monkeypatch.setattr(room_state, "REDIS_URL", url)
+    room_state._redis = None
+    client = redis.Redis.from_url(url, decode_responses=True)
+    client.flushdb()
+    yield
+    room_state._redis = None
+    client.flushdb()
+    client.close()
+
+
+@pytest.fixture
+def discussion_setup(db):
+    user = User.objects.filter(username="annotator1").first()
+    if user is None:
+        user = User.objects.create_user(username="annotator1", password="123")
+
+    project = Project.objects.filter(name="Test Project").first()
+    if project is None:
+        project = Project.objects.create(name="Test Project", description="Test Desc")
+
+    ProjectUser.objects.get_or_create(
+        project=project,
+        user=user,
+        defaults={"default_role": ProjectUser.Role.ANNOTATOR},
+    )
+    batch = Batch.objects.create(project=project, phase=Batch.Phase.DISCUSSION)
+    return user, batch
+
+
+@pytest.fixture
+def discussion_with_disagreement(db):
+    user1, _ = User.objects.get_or_create(username="discuss_annotator_1")
+    user2, _ = User.objects.get_or_create(username="discuss_annotator_2")
+
+    project = Project.objects.create(name="Discuss Project", description="Discuss Desc")
+    ProjectUser.objects.create(
+        project=project,
+        user=user1,
+        default_role=ProjectUser.Role.ANNOTATOR,
+    )
+    ProjectUser.objects.create(
+        project=project,
+        user=user2,
+        default_role=ProjectUser.Role.ANNOTATOR,
+    )
+
+    label1 = Label.objects.create(project=project, name="Label A")
+    label2 = Label.objects.create(project=project, name="Label B")
+
+    batch = Batch.objects.create(project=project, phase=Batch.Phase.DISCUSSION)
+    ex = Example.objects.create(batch=batch, content="Example with disagreement")
+
+    ba1 = BatchAssignment.objects.create(batch=batch, user=user1, role=ProjectUser.Role.ANNOTATOR)
+    ba2 = BatchAssignment.objects.create(batch=batch, user=user2, role=ProjectUser.Role.ANNOTATOR)
+
+    a1 = ExampleAssignment.objects.create(
+        example=ex,
+        batch_assignment=ba1,
+        phase=Batch.Phase.ANNOTATION,
+        order=1,
+    )
+    a2 = ExampleAssignment.objects.create(
+        example=ex,
+        batch_assignment=ba2,
+        phase=Batch.Phase.ANNOTATION,
+        order=1,
+    )
+
+    Annotation.objects.create(assignment=a1, label=label1)
+    Annotation.objects.create(assignment=a2, label=label2)
+
+    return user1, user2, batch, ex, [label1, label2]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_connect_sets_users(redis_test_state, discussion_setup):
+    user, batch = discussion_setup
+
+    async def run():
+        communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        communicator.scope["user"] = user
+
+        connected, _ = await communicator.connect()
+        assert connected is True
+
+        response = await communicator.receive_json_from()
+        state = response["state"]
+        assert user.username in state["online_users"]
+        assert user.username in state["required_users"]
+
+        await communicator.disconnect()
+
+    async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_message_appends_to_state(redis_test_state, discussion_setup):
+    user, batch = discussion_setup
+    message_text = f"hello-{uuid.uuid4().hex}"
+    Message.objects.filter(room_id=batch.id, user=user.username).delete()
+
+    async def run():
+        communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        communicator.scope["user"] = user
+
+        connected, _ = await communicator.connect()
+        assert connected is True
+
+        await communicator.receive_json_from()
+
+        await communicator.send_json_to({"message": message_text})
+        response = await communicator.receive_json_from()
+        state = response["state"]
+        assert any(
+            msg.get("user") == user.username and msg.get("text") == message_text
+            for msg in state["messages"]
+        )
+
+        await communicator.disconnect()
+
+    async_to_sync(run)()
+    msg = Message.objects.filter(
+        room_id=batch.id,
+        user=user.username,
+        message=message_text,
+    ).first()
+    assert msg is not None
+    assert msg.example is None
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
+    user, batch = discussion_setup
+
+    async def run():
+        communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        communicator.scope["user"] = user
+
+        connected, _ = await communicator.connect()
+        assert connected is True
+
+        await communicator.receive_json_from()
+
+        await communicator.send_json_to({"clicked-done": True, "labels": [1]})
+        response = await communicator.receive_json_from()
+        state = response["state"]
+        assert state["clicked_done"][user.username] == 1
+        assert state["discussion_labels"][user.username] == [1]
+
+        await communicator.disconnect()
+
+    async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_populates_annotation_labels(redis_test_state, discussion_with_disagreement):
+    user1, user2, batch, _example, labels = discussion_with_disagreement
+
+    async def run():
+        comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm1.scope["user"] = user1
+        connected, _ = await comm1.connect()
+        assert connected is True
+        await comm1.receive_json_from()
+
+        comm2 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm2.scope["user"] = user2
+        connected, _ = await comm2.connect()
+        assert connected is True
+
+        state = None
+        for _ in range(3):
+            response = await comm2.receive_json_from()
+            state = response.get("state")
+            if state and state.get("annotation_labels"):
+                break
+
+        assert state is not None
+        assert state["annotation_labels"]
+
+        for username in [user1.username, user2.username]:
+            user_labels = state["annotation_labels"][username]
+            assert len(user_labels) == len(labels)
+            first = user_labels[0]
+            if isinstance(first, (list, tuple)):
+                first = first[0]
+            assert isinstance(first, dict)
+            assert "id" in first
+            assert "label" in first
+            assert "color" in first
+            assert "is_set" in first
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
