@@ -105,18 +105,26 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 
             disagr_ids = [e.id for e in disagr_ex]
             for annotator in context["annotators"]:
-                annotated = ExampleAssignment.objects.filter(
-                    batch_assignment__user=annotator,
-                    example__batch=batch,
-                    phase=Batch.Phase.ANNOTATION,
-                    done__isnull=False,
-                ).distinct().count()
-                discussed = ExampleAssignment.objects.filter(
-                    batch_assignment__user=annotator,
-                    phase=Batch.Phase.DISCUSSION,
-                    done__isnull=False,
-                    example_id__in=disagr_ids,
-                ).distinct().count()
+                annotated = (
+                    ExampleAssignment.objects.filter(
+                        batch_assignment__user=annotator,
+                        example__batch=batch,
+                        phase=Batch.Phase.ANNOTATION,
+                        done__isnull=False,
+                    )
+                    .distinct()
+                    .count()
+                )
+                discussed = (
+                    ExampleAssignment.objects.filter(
+                        batch_assignment__user=annotator,
+                        phase=Batch.Phase.DISCUSSION,
+                        done__isnull=False,
+                        example_id__in=disagr_ids,
+                    )
+                    .distinct()
+                    .count()
+                )
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
@@ -156,7 +164,9 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
                     assignments__batch_assignment__user=self.request.user,
                     assignments__phase=Batch.Phase.ANNOTATION,
                     assignments__done__isnull=False,
-                ).distinct().count(),
+                )
+                .distinct()
+                .count(),
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)

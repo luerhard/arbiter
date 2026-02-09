@@ -51,8 +51,7 @@ class BatchAssignment(models.Model):
             return Example.objects.none()
 
         assignments = (
-            ExampleAssignment.objects
-            .filter(
+            ExampleAssignment.objects.filter(
                 example__batch=self.batch,
                 phase=phase,
                 batch_assignment__user_id__in=annotator_ids,
