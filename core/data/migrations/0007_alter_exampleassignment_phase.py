@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0006_remove_exampleassignment_unique_example_batch_assignment_and_more"),
     ]
@@ -14,6 +13,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="exampleassignment",
             name="phase",
-            field=models.CharField(choices=[("S", "Setup"), ("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision"), ("F", "Finalized")], db_index=True, max_length=1),
+            field=models.CharField(
+                choices=[
+                    ("S", "Setup"),
+                    ("A", "Annotation"),
+                    ("D", "Discussion"),
+                    ("E", "ExpertDecision"),
+                    ("F", "Finalized"),
+                ],
+                db_index=True,
+                max_length=1,
+            ),
         ),
     ]

@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0005_example_batch"),
         ("projects", "0004_batchassignment_unique_batch_user"),
@@ -31,12 +30,20 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="exampleassignment",
             name="phase",
-            field=models.CharField(choices=[("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision")], db_index=True, default=1, max_length=1),
+            field=models.CharField(
+                choices=[("A", "Annotation"), ("D", "Discussion"), ("E", "ExpertDecision")],
+                db_index=True,
+                default=1,
+                max_length=1,
+            ),
             preserve_default=False,
         ),
         migrations.AddConstraint(
             model_name="exampleassignment",
-            constraint=models.UniqueConstraint(fields=("example", "batch_assignment", "phase"), name="unique_example_batch_assignment"),
+            constraint=models.UniqueConstraint(
+                fields=("example", "batch_assignment", "phase"),
+                name="unique_example_batch_assignment",
+            ),
         ),
         migrations.RemoveField(
             model_name="annotation",

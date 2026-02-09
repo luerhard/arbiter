@@ -27,8 +27,7 @@ class Batch(models.Model):
     @property
     def max_batch_number(self):
         max_batch_number = (
-            Batch.objects
-            .filter(project=self.project)
+            Batch.objects.filter(project=self.project)
             .aggregate(models.Max("batch_number"))
             .get("batch_number__max", 0)
         )
