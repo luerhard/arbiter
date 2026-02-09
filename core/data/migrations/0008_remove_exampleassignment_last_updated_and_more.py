@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0007_alter_exampleassignment_phase"),
     ]

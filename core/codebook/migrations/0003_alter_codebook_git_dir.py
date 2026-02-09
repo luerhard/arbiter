@@ -7,7 +7,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("codebook", "0002_alter_codebook_git_dir"),
     ]
@@ -16,6 +15,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="codebook",
             name="git_dir",
-            field=models.FilePathField(allow_files=False, allow_folders=True, path=pathlib.PurePosixPath("/Users/lukas/git/AnnotationTool/media/codebooks")),
+            field=models.FilePathField(
+                allow_files=False,
+                allow_folders=True,
+                path=pathlib.PurePosixPath("/Users/lukas/git/AnnotationTool/media/codebooks"),
+            ),
         ),
     ]
