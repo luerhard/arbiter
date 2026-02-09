@@ -61,12 +61,7 @@ class ExampleAssignment(models.Model):
 
         return query.order_by("order").first()
 
-    def set_user_annotations(self, label_ids: list[int], phase: str | None = None):
-        if phase is not None:
-            if isinstance(phase, str) and len(phase) > 1:
-                phase = getattr(Batch.Phase, phase)
-            if self.phase != phase:
-                self.phase = phase
+    def set_user_annotations(self, label_ids: list[int]):
 
         # delete previous annotations if any
         self.annotations.all().delete()

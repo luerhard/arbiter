@@ -26,7 +26,7 @@ description = "The Annotation Tool."
 license = "MIT"
 name = "annotationtool"
 readme = "README.md"
-requires-python = ">=3.10,<4.0"
+requires-python = ">=3.13,<4.0"
 version = "0.0.1"
 
 [dependency-groups]
