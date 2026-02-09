@@ -8,10 +8,10 @@ from django.shortcuts import redirect
 from django.views.generic.edit import UpdateView
 
 from .forms import MultiLabelFormExpert
-from .models import Batch
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
+from projects.models import Batch
 from projects.models import BatchAssignment
 from projects.models import ProjectUser
 

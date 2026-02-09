@@ -265,13 +265,15 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 annotated = ExampleAssignment.objects.filter(
                     batch_assignment__user=annotator,
                     example__batch=batch,
-                    is_annotated=True,
-                ).count()
+                    phase=Batch.Phase.ANNOTATION,
+                    done__isnull=False,
+                ).distinct().count()
                 discussed = ExampleAssignment.objects.filter(
                     batch_assignment__user=annotator,
-                    is_discussed=True,
+                    phase=Batch.Phase.DISCUSSION,
+                    done__isnull=False,
                     example_id__in=disagr_ids,
-                ).count()
+                ).distinct().count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
@@ -309,8 +311,9 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
                 "batch": batch,
                 "done": batch.examples.filter(
                     assignments__batch_assignment__user=self.request.user,
-                    assignments__is_annotated=1,
-                ).count(),
+                    assignments__phase=Batch.Phase.ANNOTATION,
+                    assignments__done__isnull=False,
+                ).distinct().count(),
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)

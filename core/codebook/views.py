@@ -13,6 +13,7 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
+from projects.models import Batch
 from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
@@ -79,14 +80,15 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         selected_label_names = [label.name for label in selected_labels]
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.ANNOTATION,
+            assignment__phase=Batch.Phase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.DISCUSSION,
+            assignment__phase=Batch.Phase.DISCUSSION,
         )
         messages = (
-            Message.objects.filter(example=current_example)
+            Message.objects
+            .filter(example=current_example)
             .exclude(user="system")
             .order_by("created_at")
         )
