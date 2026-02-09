@@ -8,9 +8,9 @@ from django.views.generic.detail import DetailView
 
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
-from data.models import Batch
 from data.models import Example
 from discuss.models import Message
+from projects.models import Batch
 
 log = logging.getLogger(__name__)
 
@@ -74,14 +74,15 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.ANNOTATION,
+            assignment__phase=Batch.Phase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.DISCUSSION,
+            assignment__phase=Batch.Phase.DISCUSSION,
         )
         messages = (
-            Message.objects.filter(
+            Message.objects
+            .filter(
                 example=current_example,
             )
             .exclude(user="system")

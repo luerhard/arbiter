@@ -50,6 +50,7 @@ def create_batch(project):
                 example=ex,
                 batch_assignment=batch_assignments[user.id],
                 order=i,
+                phase=Batch.Phase.ANNOTATION,
             )
 
     batch.set_phase(Batch.Phase.ANNOTATION)
@@ -110,7 +111,7 @@ class Command(BaseCommand):
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "ANNOTATION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.DISCUSSION)
 
         codebook_content = (
@@ -121,7 +122,7 @@ class Command(BaseCommand):
 
         for example in batch.examples.all():
             for assignment in example.assignments.all():
-                assignment.set_user_annotations([label_ids[0]], "ANNOTATION")
+                assignment.set_user_annotations([label_ids[0]])
         batch.set_phase(Batch.Phase.DISCUSSION)
 
         # Create a disagreement batch after discussion
@@ -131,12 +132,12 @@ class Command(BaseCommand):
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "ANNOTATION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.DISCUSSION)
         for example in [e for e in batch.examples.all() if e.has_disagreement]:
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "DISCUSSION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.EXPERT)
 
         batch = create_batch(project)
