@@ -29,7 +29,8 @@ TEST_CHANNEL_LAYERS = {
 
 @pytest.fixture
 def redis_test_state(monkeypatch):
-    url = os.environ.get("TEST_REDIS_URL", "redis://localhost:6379/15")
+    redis_host = os.environ.get("REDIS_HOST", "localhost")
+    url = f"redis://{redis_host}:6379/15"
     monkeypatch.setattr(room_state, "REDIS_URL", url)
     room_state._redis = None
     client = redis.Redis.from_url(url, decode_responses=True)
