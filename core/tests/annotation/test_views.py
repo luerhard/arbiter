@@ -7,11 +7,17 @@ from projects.models import Batch
 # Update the tuples to have just the assignment id (not a tuple)
 URLS_WITH_URL_PARAMS = [
     ("annotate-batch", 1),
+    ("annotate-done", 1),
 ]
 
 URLS_WITH_GET_PARAMS = [
     ("annotate-next", 1),
     ("annotate-prev", 11),
+    ("annotate-pbar", 1),
+    ("annotate-labels", 1),
+    ("annotate-sentence", 1),
+    ("annotate-nav-block", 1),
+    ("annotate-edit", 1),
 ]
 
 
@@ -77,3 +83,10 @@ class TestViews:
         labels = labels_resp.context["labels"]
         assert isinstance(labels, list)
         assert len(labels) > 0
+
+    def test_annotation_done_view(self, client):
+        login = client.login(username="annotator1", password="123")
+        assert login is True
+        url = reverse("annotate-done", args=(1,))
+        req = client.get(url)
+        assert req.status_code == 200
