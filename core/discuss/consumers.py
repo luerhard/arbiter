@@ -138,7 +138,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         log.debug(f"{username =} clicked done.")
 
         async def mut(state):
-            log.debug(f"{state["clicked_done"] =}")
+            log.debug(f"clicked done state: {state['clicked_done']}")
             if state["clicked_done"][username]:
                 # TODO: Looks like on reload the user can press Save & Done
                 # even after having pressed it previously.
@@ -282,7 +282,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             query = Annotation.objects.filter(
                 assignment__example=example,
                 assignment__batch_assignment__user__username=user,
-                phase=Annotation.Phase.ANNOTATION,
+                assignment__phase=Batch.Phase.ANNOTATION,
             ).select_related("label")
             label_set = {anno.label for anno in query}
 
