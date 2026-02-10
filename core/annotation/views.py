@@ -34,7 +34,7 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         else:
             assignment = (
                 ExampleAssignment.objects.filter(
-                    batch_assignment__user=request.user, example__batch=batch
+                    batch_assignment__user=request.user, example__batch=batch,
                 )
                 .order_by("order")
                 .first()
@@ -84,8 +84,6 @@ class EditAssignment(View):
             messages.error(self.request, f"Something was invalid: {form}")
 
         batch = assignment.example.batch
-        submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-        assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
         next_assignment = assignment.next()
         if not next_assignment:

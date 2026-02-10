@@ -1,6 +1,7 @@
 from django.urls import reverse
 import pytest
 
+from data.models import Annotation
 from data.models import ExampleAssignment
 from projects.models import Batch
 
@@ -83,6 +84,62 @@ class TestViews:
         labels = labels_resp.context["labels"]
         assert isinstance(labels, list)
         assert len(labels) > 0
+
+    def test_annotate_view_context_contains_codebook_and_diff(self, client):
+        login = client.login(username="annotator1", password="123")
+        assert login is True
+
+        ExampleAssignment.objects.filter(
+            example__batch_id=1,
+            batch_assignment__user__username="annotator1",
+            phase=Batch.Phase.ANNOTATION,
+        ).update(done=None)
+
+        url = reverse("annotate-batch", args=(1,))
+        resp = client.get(url)
+        assert resp.status_code == 200
+        assert resp.context is not None
+        assert "assignment_id" in resp.context
+        assert "codebook" in resp.context
+        assert "content_diff" in resp.context
+
+        assert resp.context["codebook"].project_id == Batch.objects.get(id=1).project_id
+        assert isinstance(resp.context["content_diff"], str)
+
+    def test_edit_assignment_persists_annotations_and_marks_done(self, client):
+        login = client.login(username="annotator1", password="123")
+        assert login is True
+
+        assignment = (
+            ExampleAssignment.objects.filter(
+                example__batch_id=1,
+                batch_assignment__user__username="annotator1",
+                phase=Batch.Phase.ANNOTATION,
+            )
+            .select_related("example", "batch_assignment")
+            .order_by("order", "id")
+            .first()
+        )
+        assert assignment is not None
+
+        assignment.annotations.all().delete()
+        ExampleAssignment.objects.filter(id=assignment.id).update(done=None)
+        assignment.refresh_from_db()
+        assert assignment.done is None
+
+        label = assignment.example.labels.order_by("id").first()
+        assert label is not None
+
+        edit_url = reverse("annotate-edit")
+        resp = client.post(
+            edit_url,
+            data={"assignment_id": assignment.id, "labels": [str(label.id)]},
+        )
+        assert resp.status_code in (200, 204)
+
+        assignment.refresh_from_db()
+        assert assignment.done is not None
+        assert Annotation.objects.filter(assignment=assignment, label_id=label.id).exists()
 
     def test_annotation_done_view(self, client):
         login = client.login(username="annotator1", password="123")
