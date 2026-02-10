@@ -79,17 +79,6 @@ class Batch(models.Model):
 
         role = getattr(ProjectUser.Role, role_key)
 
-        # Ensure batch assignments exist for the target role (e.g., experts).
-        for user in self.project.users.filter(
-            projectuser__project=self.project,
-            projectuser__default_role=role,
-        ):
-            BatchAssignment.objects.get_or_create(
-                batch=self,
-                user=user,
-                defaults={"role": role, "phase": self.phase},
-            )
-
         examples = list(
             Example.objects.filter(batch=self).disagreements(phase=source_phase).order_by("id"),
         )

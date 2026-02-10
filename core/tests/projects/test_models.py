@@ -57,6 +57,12 @@ def _create_project_with_batch():
         role=ProjectUser.Role.ANNOTATOR,
         phase=batch.phase,
     )
+    BatchAssignment.objects.create(
+        batch=batch,
+        user=expert,
+        role=ProjectUser.Role.EXPERT,
+        phase=batch.phase,
+    )
 
     ex1 = Example.objects.create(batch=batch, content="Example 1")
     ex2 = Example.objects.create(batch=batch, content="Example 2")
@@ -156,10 +162,3 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     )
     assert expert_assignments.count() == 1
     assert expert_assignments.first().example_id == ex1.id
-
-    # expert batch assignment should exist
-    assert BatchAssignment.objects.filter(
-        batch=batch,
-        user=data["expert"],
-        role=ProjectUser.Role.EXPERT,
-    ).exists()

@@ -21,6 +21,43 @@
                 <div class="mt-2">{{ form.file }}</div>
                 {% if form.file.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.file.errors }}</p>{% endif %}
             </div>
+            {% if role_rows %}
+                <div>
+                    <h2 class="text-sm font-medium text-gray-900 dark:text-white">Batch roles</h2>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        Roles are pre-selected from the project defaults. Choose <span class="font-medium">None</span> to exclude a user from this batch.
+                    </p>
+                    <div class="mt-4 overflow-x-auto rounded-md border border-gray-200 dark:border-white/10">
+                        <table class="min-w-full divide-y divide-gray-200 text-sm dark:divide-white/10">
+                            <thead class="bg-gray-50 dark:bg-gray-900/40">
+                                <tr>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">User</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Default role</th>
+                                    <th class="px-4 py-2 text-left font-medium text-gray-700 dark:text-gray-300">Batch role</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 bg-white dark:divide-white/10 dark:bg-transparent">
+                                {% for row in role_rows %}
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-white/5">
+                                        <td class="px-4 py-2 text-gray-900 dark:text-white">
+                                            {{ row.project_user.user.username }}
+                                        </td>
+                                        <td class="px-4 py-2 text-gray-700 dark:text-gray-300">
+                                            {{ row.project_user.get_default_role_display }}
+                                        </td>
+                                        <td class="px-4 py-2">
+                                            {{ row.field }}
+                                            {% if row.field.errors %}
+                                                <p class="mt-1 text-sm text-rose-600">{{ row.field.errors }}</p>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
             <div class="flex items-center gap-3">
                 <button type="submit"
                         class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">

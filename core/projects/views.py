@@ -129,21 +129,21 @@ class ProjectCreateView(View):
 class ProjectBatchCreateView(ExpertRequiredMixin, View):
     def get(self, request, project_id):
         project = get_object_or_404(Project, id=project_id)
-        form = BatchCreateForm()
+        form = BatchCreateForm(project=project)
         return render(
             request,
             "projects/batch_create.html",
-            {"project": project, "form": form},
+            {"project": project, "form": form, "role_rows": form.role_rows},
         )
 
     def post(self, request, project_id):
         project = get_object_or_404(Project, id=project_id)
-        form = BatchCreateForm(request.POST, request.FILES)
+        form = BatchCreateForm(request.POST, request.FILES, project=project)
         if not form.is_valid():
             return render(
                 request,
                 "projects/batch_create.html",
-                {"project": project, "form": form},
+                {"project": project, "form": form, "role_rows": form.role_rows},
             )
 
         file = form.cleaned_data["file"]
@@ -156,37 +156,55 @@ class ProjectBatchCreateView(ExpertRequiredMixin, View):
             return render(
                 request,
                 "projects/batch_create.html",
-                {"project": project, "form": form},
+                {"project": project, "form": form, "role_rows": form.role_rows},
             )
         if "text" not in df.columns:
             form.add_error("file", "Missing required 'text' column.")
             return render(
                 request,
                 "projects/batch_create.html",
-                {"project": project, "form": form},
+                {"project": project, "form": form, "role_rows": form.role_rows},
             )
 
-        batch = Batch(project=project)
-        batch.save()
+        batch = Batch.objects.create(project=project)
 
-        default_annotators = project.annotators.all()
-        batch_assignments = {
-            annotator.id: BatchAssignment.objects.create(
-                batch=batch,
-                user=annotator,
-                role=ProjectUser.Role.ANNOTATOR,
-                phase=batch.phase,
+        # Create batch assignments for all project users, allowing opting out ("None").
+        batch_assignments = []
+        for project_user in form.project_users:
+            role_value = form.cleaned_data.get(f"role_user_{project_user.user_id}") or ""
+            if not role_value:
+                continue
+            batch_assignments.append(
+                BatchAssignment(
+                    batch=batch,
+                    user=project_user.user,
+                    role=role_value,
+                    phase=batch.phase,
+                ),
             )
-            for annotator in default_annotators
-        }
-        for _, row in df.iterrows():
-            example = Example(batch=batch, content=row["text"])
-            example.save()
-            for annotator in default_annotators:
-                ExampleAssignment.objects.create(
-                    example=example,
-                    batch_assignment=batch_assignments[annotator.id],
-                )
+        if batch_assignments:
+            BatchAssignment.objects.bulk_create(batch_assignments)
+
+        texts = ["" if pd.isna(text) else str(text) for text in df["text"].tolist()]
+        examples = [Example(batch=batch, content=text) for text in texts]
+        Example.objects.bulk_create(examples)
+
+        annotator_assignments = list(
+            BatchAssignment.objects.filter(batch=batch, role=ProjectUser.Role.ANNOTATOR),
+        )
+        if annotator_assignments:
+            example_assignments = []
+            for order, example in enumerate(examples, 1):
+                for batch_assignment in annotator_assignments:
+                    example_assignments.append(
+                        ExampleAssignment(
+                            example=example,
+                            batch_assignment=batch_assignment,
+                            phase=Batch.Phase.ANNOTATION,
+                            order=order,
+                        ),
+                    )
+            ExampleAssignment.objects.bulk_create(example_assignments)
 
         return redirect("project-detail", project_id=project.id)
 

@@ -3,6 +3,7 @@ import logging
 from codebook.models import Codebook
 from django.contrib import messages
 from django.db import models
+from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.views.generic.edit import UpdateView
@@ -29,10 +30,17 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         ).first()
         codebook = get_object_or_404(Codebook, pk=codebook_id)
         if not assignment:
-            batch_assignment, _ = BatchAssignment.objects.get_or_create(
+            if not BatchAssignment.objects.filter(
                 batch=batch,
                 user=user,
-                defaults={"role": ProjectUser.Role.EXPERT, "phase": batch.phase},
+                role=ProjectUser.Role.EXPERT,
+            ).exists():
+                return HttpResponseForbidden("You are not assigned to this batch.")
+
+            batch_assignment = BatchAssignment.objects.get(
+                batch=batch,
+                user=user,
+                role=ProjectUser.Role.EXPERT,
             )
             max_order = ExampleAssignment.objects.filter(
                 batch_assignment__user=user,
@@ -42,6 +50,7 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
                 example=example,
                 batch_assignment=batch_assignment,
                 order=max_order + 1,
+                phase=Batch.Phase.EXPERT,
             )
         form = MultiLabelFormExpert(request.POST, codebook=codebook, example=example, user=user)
         if form.is_valid():

@@ -46,7 +46,7 @@ class ProjectCreateForm(forms.Form):
             {
                 "class": base_input,
                 "placeholder": "Project title",
-            }
+            },
         )
         self.fields["description"].widget.attrs.update(
             {"class": base_input, "rows": 4, "placeholder": "What is this project about?"},
@@ -119,7 +119,8 @@ class ProjectAssignmentForm(forms.ModelForm):
 class BatchCreateForm(forms.Form):
     file = forms.FileField(required=True)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, project: Project, **kwargs):
+        self.project = project
         super().__init__(*args, **kwargs)
         self.fields["file"].widget.attrs.update(
             {
@@ -130,6 +131,44 @@ class BatchCreateForm(forms.Form):
             },
         )
 
+        base_select = (
+            "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "
+            "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "
+            "dark:border-white/10 dark:bg-gray-900 dark:text-white"
+        )
+
+        self.project_users = list(
+            ProjectUser.objects.filter(project=project)
+            .select_related("user")
+            .order_by("user__username", "user__id"),
+        )
+        self.role_field_names: list[str] = []
+        for project_user in self.project_users:
+            field_name = f"role_user_{project_user.user_id}"
+            self.role_field_names.append(field_name)
+            self.fields[field_name] = forms.ChoiceField(
+                required=False,
+                choices=[
+                    ("", "None"),
+                    *ProjectUser.Role.choices,
+                ],
+                initial=project_user.default_role,
+                widget=forms.Select(attrs={"class": base_select}),
+            )
+
+    def clean(self):
+        cleaned = super().clean()
+
+        roles = [(cleaned.get(name) or "") for name in self.role_field_names]
+        annotators = sum(1 for role in roles if role == ProjectUser.Role.ANNOTATOR)
+        experts = sum(1 for role in roles if role == ProjectUser.Role.EXPERT)
+
+        if annotators < 2 or experts < 1:
+            msg = "Select at least 2 annotators and 1 expert for this batch."
+            raise ValidationError(msg)
+
+        return cleaned
+
     def clean_file(self):
         file = self.cleaned_data["file"]
         name = (file.name or "").lower()
@@ -137,6 +176,16 @@ class BatchCreateForm(forms.Form):
             msg = "Please upload a .csv or .xlsx file."
             raise ValidationError(msg)
         return file
+
+    @property
+    def role_rows(self):
+        return [
+            {
+                "project_user": project_user,
+                "field": self[f"role_user_{project_user.user_id}"],
+            }
+            for project_user in self.project_users
+        ]
 
 
 class BatchForm(forms.ModelForm):
@@ -186,13 +235,15 @@ class BatchForm(forms.ModelForm):
             )
             for annotator in default_annotators
         }
-        for _, row in df.iterrows():
+        for order, (_, row) in enumerate(df.iterrows(), 1):
             example = Example(batch=batch, content=row["text"])
             example.save()
             for annotator in default_annotators:
                 assignment = ExampleAssignment(
                     example=example,
                     batch_assignment=batch_assignments[annotator.id],
+                    phase=Batch.Phase.ANNOTATION,
+                    order=order,
                 )
                 assignment.save()
 
