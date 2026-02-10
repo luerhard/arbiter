@@ -52,10 +52,10 @@
 <li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.models">Models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data.models.Label"><code class="docutils literal notranslate"><span class="pre">Label</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data.models.Annotation"><code class="docutils literal notranslate"><span class="pre">Annotation</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#data.models.ExampleAssignment"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#data.models.Example"><code class="docutils literal notranslate"><span class="pre">Example</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data.models.ExampleAssignment"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#data.models.Label"><code class="docutils literal notranslate"><span class="pre">Label</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -99,6 +99,365 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <section id="module-data.models">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-data.models" title="Link to this heading"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="data.models.Annotation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Annotation" title="Link to this definition"></a></dt>
+<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_annotation</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p>
+</dd>
+</dl>
+<p>Relationship fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assignment</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – Assignment (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">annotations</span></code>)</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Label" title="data.models.models.Label"><code class="xref py py-class docutils literal notranslate"><span class="pre">Label</span></code></a>) – Label (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.assignment">
+<span class="sig-name descname"><span class="pre">assignment</span></span><a class="headerlink" href="#data.models.Annotation.assignment" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
+<p>Assignment (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">annotations</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.label">
+<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#data.models.Annotation.label" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Label" title="data.models.models.Label"><code class="xref py py-class docutils literal notranslate"><span class="pre">Label</span></code></a></p>
+<p>Label (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code>)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Annotation.sentence">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sentence</span></span><a class="headerlink" href="#data.models.Annotation.sentence" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.Annotation.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.Annotation.DoesNotExist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.Annotation.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.Annotation.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.assignment_id">
+<span class="sig-name descname"><span class="pre">assignment_id</span></span><a class="headerlink" href="#data.models.Annotation.assignment_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.Annotation.assignment" title="data.models.Annotation.assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">assignment</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.Annotation.id" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
+<p>Primary key: ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.label_id">
+<span class="sig-name descname"><span class="pre">label_id</span></span><a class="headerlink" href="#data.models.Annotation.label_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.Annotation.label" title="data.models.Annotation.label"><code class="xref py py-class docutils literal notranslate"><span class="pre">label</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Annotation.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.Annotation.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.models.Example">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
+<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_example</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
+<li><p><strong>content</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.0)"><em>TextField</em></a>) – Content</p></li>
+</ul>
+</dd>
+</dl>
+<p>Relationship fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.batch.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – Batch (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code>)</p></li>
+<li><p><strong>assignees</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Assignees (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Reverse relationships:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – All assignments of this example (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code>)</p></li>
+<li><p><strong>messages</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="discuss.html#discuss.models.Message" title="discuss.models.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></a>) – All messages of this example (related name of <a class="reference internal" href="discuss.html#discuss.models.Message.example" title="discuss.models.Message.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromExampleQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.Example.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.batch">
+<span class="sig-name descname"><span class="pre">batch</span></span><a class="headerlink" href="#data.models.Example.batch" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.batch.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a></p>
+<p>Batch (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.content">
+<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#data.models.Example.content" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextField</span></code></a></p>
+<p>Content</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.assignees">
+<span class="sig-name descname"><span class="pre">assignees</span></span><a class="headerlink" href="#data.models.Example.assignees" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
+<p>Assignees (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code>)</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.labels">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#data.models.Example.labels" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_disagreement">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement</span></span><a class="headerlink" href="#data.models.Example.has_disagreement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_disagreement_after_discussion">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement_after_discussion</span></span><a class="headerlink" href="#data.models.Example.has_disagreement_after_discussion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.Example.has_expert_decision">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_expert_decision</span></span><a class="headerlink" href="#data.models.Example.has_expert_decision" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.Example.get_user_annotations">
+<span class="sig-name descname"><span class="pre">get_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.get_user_annotations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.Example.set_user_annotations">
+<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.set_user_annotations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.Example.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.Example.DoesNotExist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.Example.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.Example.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.assignments">
+<span class="sig-name descname"><span class="pre">assignments</span></span><a class="headerlink" href="#data.models.Example.assignments" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
+<p>All assignments of this example (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.batch_id">
+<span class="sig-name descname"><span class="pre">batch_id</span></span><a class="headerlink" href="#data.models.Example.batch_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.Example.batch" title="data.models.Example.batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.Example.id" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
+<p>Primary key: ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.messages">
+<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#data.models.Example.messages" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="discuss.html#discuss.models.Message" title="discuss.models.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></a></p>
+<p>All messages of this example (related name of <a class="reference internal" href="discuss.html#discuss.models.Message.example" title="discuss.models.Message.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
+<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_exampleassignment</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
+<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Phase</p></li>
+<li><p><strong>order</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><em>PositiveIntegerField</em></a>) – Order</p></li>
+<li><p><strong>done</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><em>DateTimeField</em></a>) – Done</p></li>
+</ul>
+</dd>
+</dl>
+<p>Relationship fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>example</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Example" title="data.models.example.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – Example (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code>)</p></li>
+<li><p><strong>batch_assignment</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Batch assignment (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Reverse relationships:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>annotations</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All annotations of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromExampleAssignmentQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.ExampleAssignment.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.example">
+<span class="sig-name descname"><span class="pre">example</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Example" title="data.models.example.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a></p>
+<p>Example (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment">
+<span class="sig-name descname"><span class="pre">batch_assignment</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
+<p>Batch assignment (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.phase">
+<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#data.models.ExampleAssignment.phase" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
+<p>Phase</p>
+<p>Choices:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.order">
+<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#data.models.ExampleAssignment.order" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositiveIntegerField</span></code></a></p>
+<p>Order</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.done">
+<span class="sig-name descname"><span class="pre">done</span></span><a class="headerlink" href="#data.models.ExampleAssignment.done" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a></p>
+<p>Done</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.user">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#data.models.ExampleAssignment.user" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.previous">
+<span class="sig-name descname"><span class="pre">previous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_annotated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.previous" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.next">
+<span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_annotated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.next" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.set_user_annotations">
+<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.set_user_annotations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement">
+<span class="sig-name descname"><span class="pre">check_for_disagreement</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement_after_discussion">
+<span class="sig-name descname"><span class="pre">check_for_disagreement_after_discussion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement_after_discussion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.save" title="Link to this definition"></a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.DoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.ExampleAssignment.DoesNotExist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.ExampleAssignment.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.annotations">
+<span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#data.models.ExampleAssignment.annotations" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a></p>
+<p>All annotations of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment_id">
+<span class="sig-name descname"><span class="pre">batch_assignment_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.batch_assignment" title="data.models.ExampleAssignment.batch_assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch_assignment</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.example_id">
+<span class="sig-name descname"><span class="pre">example_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-class docutils literal notranslate"><span class="pre">example</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.get_phase_display">
+<span class="sig-name descname"><span class="pre">get_phase_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">phase&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.get_phase_display" title="Link to this definition"></a></dt>
+<dd><p>Shows the label of the <a class="reference internal" href="#data.models.ExampleAssignment.phase" title="data.models.ExampleAssignment.phase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">phase</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.id" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
+<p>Primary key: ID</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="data.models.Label">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Label</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hotkey</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Label" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_label</span></code></p>
@@ -115,20 +474,20 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <p>Relationship fields:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>project</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – Project (related name: <a class="reference internal" href="projects.html#projects.models.Project.labels" title="projects.models.Project.labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">labels</span></code></a>)</p>
+<dd class="field-odd"><p><strong>project</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – Project (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">labels</span></code>)</p>
 </dd>
 </dl>
 <p>Reverse relationships:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>label</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All label of this label (related name of <a class="reference internal" href="#data.models.Annotation.label" title="data.models.Annotation.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a>)</p>
+<dd class="field-odd"><p><strong>label</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All label of this label (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code>)</p>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.Label.project">
 <span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#data.models.Label.project" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a></p>
-<p>Project (related name: <a class="reference internal" href="projects.html#projects.models.Project.labels" title="projects.models.Project.labels"><code class="xref py py-attr docutils literal notranslate"><span class="pre">labels</span></code></a>)</p>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a></p>
+<p>Project (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">labels</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -172,8 +531,8 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.Label.label">
 <span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#data.models.Label.label" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a></p>
-<p>All label of this label (related name of <a class="reference internal" href="#data.models.Annotation.label" title="data.models.Annotation.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a>)</p>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a></p>
+<p>All label of this label (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -186,413 +545,6 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <span class="sig-name descname"><span class="pre">project_id</span></span><a class="headerlink" href="#data.models.Label.project_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#data.models.Label.project" title="data.models.Label.project"><code class="xref py py-class docutils literal notranslate"><span class="pre">project</span></code></a> instead.</p>
 </dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data.models.Annotation">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Annotation" title="Link to this definition"></a></dt>
-<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_annotation</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
-<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Phase</p></li>
-</ul>
-</dd>
-</dl>
-<p>Relationship fields:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>assignment</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – Assignment (related name: <a class="reference internal" href="#data.models.ExampleAssignment.annotations" title="data.models.ExampleAssignment.annotations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">annotations</span></code></a>)</p></li>
-<li><p><strong>label</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Label" title="data.models.Label"><code class="xref py py-class docutils literal notranslate"><span class="pre">Label</span></code></a>) – Label (related name: <a class="reference internal" href="#data.models.Label.label" title="data.models.Label.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a>)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py class">
-<dt class="sig sig-object py" id="data.models.Annotation.Phase">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names=&lt;not</span> <span class="pre">given&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">*values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Annotation.Phase" title="Link to this definition"></a></dt>
-<dd><dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.Phase.ANNOTATION">
-<span class="sig-name descname"><span class="pre">ANNOTATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'A'</span></em><a class="headerlink" href="#data.models.Annotation.Phase.ANNOTATION" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.Phase.DISCUSSION">
-<span class="sig-name descname"><span class="pre">DISCUSSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'D'</span></em><a class="headerlink" href="#data.models.Annotation.Phase.DISCUSSION" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.Phase.EXPERT">
-<span class="sig-name descname"><span class="pre">EXPERT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'E'</span></em><a class="headerlink" href="#data.models.Annotation.Phase.EXPERT" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.assignment">
-<span class="sig-name descname"><span class="pre">assignment</span></span><a class="headerlink" href="#data.models.Annotation.assignment" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
-<p>Assignment (related name: <a class="reference internal" href="#data.models.ExampleAssignment.annotations" title="data.models.ExampleAssignment.annotations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">annotations</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.label">
-<span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#data.models.Annotation.label" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Label" title="data.models.Label"><code class="xref py py-class docutils literal notranslate"><span class="pre">Label</span></code></a></p>
-<p>Label (related name: <a class="reference internal" href="#data.models.Label.label" title="data.models.Label.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.phase">
-<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#data.models.Annotation.phase" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
-<p>Phase</p>
-<p>Choices:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></li>
-</ul>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Annotation.sentence">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sentence</span></span><a class="headerlink" href="#data.models.Annotation.sentence" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.Annotation.DoesNotExist">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.Annotation.DoesNotExist" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.Annotation.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.Annotation.MultipleObjectsReturned" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.assignment_id">
-<span class="sig-name descname"><span class="pre">assignment_id</span></span><a class="headerlink" href="#data.models.Annotation.assignment_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.Annotation.assignment" title="data.models.Annotation.assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">assignment</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.Annotation.get_phase_display">
-<span class="sig-name descname"><span class="pre">get_phase_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">phase&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Annotation.get_phase_display" title="Link to this definition"></a></dt>
-<dd><p>Shows the label of the <a class="reference internal" href="#data.models.Annotation.phase" title="data.models.Annotation.phase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">phase</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.id">
-<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.Annotation.id" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
-<p>Primary key: ID</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.label_id">
-<span class="sig-name descname"><span class="pre">label_id</span></span><a class="headerlink" href="#data.models.Annotation.label_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.Annotation.label" title="data.models.Annotation.label"><code class="xref py py-class docutils literal notranslate"><span class="pre">label</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Annotation.objects">
-<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.Annotation.objects" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_annotated</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_discussed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
-<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_exampleassignment</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
-<li><p><strong>order</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><em>PositiveIntegerField</em></a>) – Order</p></li>
-<li><p><strong>is_annotated</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><em>BooleanField</em></a>) – Is annotated</p></li>
-<li><p><strong>is_discussed</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><em>BooleanField</em></a>) – Is discussed</p></li>
-<li><p><strong>last_updated</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><em>DateTimeField</em></a>) – Last updated</p></li>
-</ul>
-</dd>
-</dl>
-<p>Relationship fields:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>example</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – Example (related name: <a class="reference internal" href="#data.models.Example.assignments" title="data.models.Example.assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code></a>)</p></li>
-<li><p><strong>batch_assignment</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Batch assignment (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples_assignments" title="projects.models.BatchAssignment.examples_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code></a>)</p></li>
-</ul>
-</dd>
-</dl>
-<p>Reverse relationships:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>annotations</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All annotations of this example assignment (related name of <a class="reference internal" href="#data.models.Annotation.assignment" title="data.models.Annotation.assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code></a>)</p>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.example">
-<span class="sig-name descname"><span class="pre">example</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="#data.models.Example" title="data.models.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a></p>
-<p>Example (related name: <a class="reference internal" href="#data.models.Example.assignments" title="data.models.Example.assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignments</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment">
-<span class="sig-name descname"><span class="pre">batch_assignment</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
-<p>Batch assignment (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples_assignments" title="projects.models.BatchAssignment.examples_assignments"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples_assignments</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.order">
-<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#data.models.ExampleAssignment.order" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositiveIntegerField</span></code></a></p>
-<p>Order</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.is_annotated">
-<span class="sig-name descname"><span class="pre">is_annotated</span></span><a class="headerlink" href="#data.models.ExampleAssignment.is_annotated" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
-<p>Is annotated</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.is_discussed">
-<span class="sig-name descname"><span class="pre">is_discussed</span></span><a class="headerlink" href="#data.models.ExampleAssignment.is_discussed" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
-<p>Is discussed</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.last_updated">
-<span class="sig-name descname"><span class="pre">last_updated</span></span><a class="headerlink" href="#data.models.ExampleAssignment.last_updated" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a></p>
-<p>Last updated</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.user">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#data.models.ExampleAssignment.user" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.previous">
-<span class="sig-name descname"><span class="pre">previous</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_annotated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.previous" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.next">
-<span class="sig-name descname"><span class="pre">next</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">skip_annotated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.next" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.set_user_annotations">
-<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.set_user_annotations" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement">
-<span class="sig-name descname"><span class="pre">check_for_disagreement</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement_after_discussion">
-<span class="sig-name descname"><span class="pre">check_for_disagreement_after_discussion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement_after_discussion" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.save">
-<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.save" title="Link to this definition"></a></dt>
-<dd><p>Save the current instance. Override this in a subclass if you want to
-control the saving process.</p>
-<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
-that the “save” must be an SQL insert or update (or equivalent for
-non-SQL backends), respectively. Normally, they should not be set.</p>
-</dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.DoesNotExist">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.ExampleAssignment.DoesNotExist" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.ExampleAssignment.MultipleObjectsReturned" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.annotations">
-<span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#data.models.ExampleAssignment.annotations" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a></p>
-<p>All annotations of this example assignment (related name of <a class="reference internal" href="#data.models.Annotation.assignment" title="data.models.Annotation.assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.batch_assignment_id">
-<span class="sig-name descname"><span class="pre">batch_assignment_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.batch_assignment_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.batch_assignment" title="data.models.ExampleAssignment.batch_assignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch_assignment</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.example_id">
-<span class="sig-name descname"><span class="pre">example_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-class docutils literal notranslate"><span class="pre">example</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.get_next_by_last_updated">
-<span class="sig-name descname"><span class="pre">get_next_by_last_updated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.DateTimeField:</span> <span class="pre">last_updated&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.get_next_by_last_updated" title="Link to this definition"></a></dt>
-<dd><p>Finds next instance based on <a class="reference internal" href="#data.models.ExampleAssignment.last_updated" title="data.models.ExampleAssignment.last_updated"><code class="xref py py-attr docutils literal notranslate"><span class="pre">last_updated</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_next_by_FOO" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_next_by_FOO()</span></code></a> for more information.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.get_previous_by_last_updated">
-<span class="sig-name descname"><span class="pre">get_previous_by_last_updated</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.DateTimeField:</span> <span class="pre">last_updated&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_next=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">**kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.get_previous_by_last_updated" title="Link to this definition"></a></dt>
-<dd><p>Finds previous instance based on <a class="reference internal" href="#data.models.ExampleAssignment.last_updated" title="data.models.ExampleAssignment.last_updated"><code class="xref py py-attr docutils literal notranslate"><span class="pre">last_updated</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_previous_by_FOO" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_previous_by_FOO()</span></code></a> for more information.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.id">
-<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.id" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
-<p>Primary key: ID</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.objects">
-<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.ExampleAssignment.objects" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="data.models.Example">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
-<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_example</span></code></p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
-<li><p><strong>content</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.0)"><em>TextField</em></a>) – Content</p></li>
-</ul>
-</dd>
-</dl>
-<p>Relationship fields:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>batch</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – Batch (related name: <a class="reference internal" href="projects.html#projects.models.Batch.examples" title="projects.models.Batch.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p></li>
-<li><p><strong>assignees</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – Assignees (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples" title="projects.models.BatchAssignment.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p></li>
-</ul>
-</dd>
-</dl>
-<p>Reverse relationships:</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – All assignments of this example (related name of <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p></li>
-<li><p><strong>messages</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="discuss.html#discuss.models.Message" title="discuss.models.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></a>) – All messages of this example (related name of <a class="reference internal" href="discuss.html#discuss.models.Message.example" title="discuss.models.Message.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.batch">
-<span class="sig-name descname"><span class="pre">batch</span></span><a class="headerlink" href="#data.models.Example.batch" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a></p>
-<p>Batch (related name: <a class="reference internal" href="projects.html#projects.models.Batch.examples" title="projects.models.Batch.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.content">
-<span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#data.models.Example.content" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextField</span></code></a></p>
-<p>Content</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.assignees">
-<span class="sig-name descname"><span class="pre">assignees</span></span><a class="headerlink" href="#data.models.Example.assignees" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
-<p>Assignees (related name: <a class="reference internal" href="projects.html#projects.models.BatchAssignment.examples" title="projects.models.BatchAssignment.examples"><code class="xref py py-attr docutils literal notranslate"><span class="pre">examples</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Example.labels">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#data.models.Example.labels" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Example.has_expert_decision">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_expert_decision</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_expert_decision" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Example.has_disagreement">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_disagreement" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="data.models.Example.has_disagreement_after_discussion">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_disagreement_after_discussion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></em><a class="headerlink" href="#data.models.Example.has_disagreement_after_discussion" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.Example.get_user_annotations">
-<span class="sig-name descname"><span class="pre">get_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.get_user_annotations" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.Example.set_user_annotations">
-<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.set_user_annotations" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.Example.DoesNotExist">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#data.models.Example.DoesNotExist" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py exception">
-<dt class="sig sig-object py" id="data.models.Example.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#data.models.Example.MultipleObjectsReturned" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.assignments">
-<span class="sig-name descname"><span class="pre">assignments</span></span><a class="headerlink" href="#data.models.Example.assignments" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.ExampleAssignment" title="data.models.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
-<p>All assignments of this example (related name of <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.batch_id">
-<span class="sig-name descname"><span class="pre">batch_id</span></span><a class="headerlink" href="#data.models.Example.batch_id" title="Link to this definition"></a></dt>
-<dd><p>Internal field, use <a class="reference internal" href="#data.models.Example.batch" title="data.models.Example.batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">batch</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.id">
-<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#data.models.Example.id" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
-<p>Primary key: ID</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.messages">
-<span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#data.models.Example.messages" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="discuss.html#discuss.models.Message" title="discuss.models.Message"><code class="xref py py-class docutils literal notranslate"><span class="pre">Message</span></code></a></p>
-<p>All messages of this example (related name of <a class="reference internal" href="discuss.html#discuss.models.Message.example" title="discuss.models.Message.example"><code class="xref py py-attr docutils literal notranslate"><span class="pre">example</span></code></a>)</p>
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.Example.objects">
-<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.Example.objects" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 </dd></dl>
 

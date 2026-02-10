@@ -56,6 +56,8 @@ POSTGRES_USER=myuser
 POSTGRES_PASSWORD=mypassword
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
+
+REDIS_HOST=localhost
 ```
 
 ## Run tests
