@@ -27,6 +27,7 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         assignment = ExampleAssignment.objects.filter(
             example=example,
             batch_assignment__user=user,
+            phase=Batch.Phase.EXPERT,
         ).first()
         codebook = get_object_or_404(Codebook, pk=codebook_id)
         if not assignment:

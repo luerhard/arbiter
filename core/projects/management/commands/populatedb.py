@@ -138,6 +138,14 @@ class Command(BaseCommand):
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
                 assignment.set_user_annotations(labels)
+
+        # Explicitly assign experts to this batch before creating EXPERT-phase assignments.
+        for user in project.experts:
+            BatchAssignment.objects.get_or_create(
+                batch=batch,
+                user=user,
+                defaults={"role": ProjectUser.Role.EXPERT, "phase": batch.phase},
+            )
         batch.set_phase(Batch.Phase.EXPERT)
 
         batch = create_batch(project)
