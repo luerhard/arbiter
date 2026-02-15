@@ -10,6 +10,7 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
+from projects.models import BatchAssignment
 from projects.models import Project
 from projects.models import ProjectUser
 
@@ -31,10 +32,26 @@ def create_batch(project):
     )
     test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
+    annotators = list(project.annotators)
+    batch_assignments = {
+        user.id: BatchAssignment.objects.create(
+            batch=batch,
+            user=user,
+            role=ProjectUser.Role.ANNOTATOR,
+            phase=batch.phase,
+        )
+        for user in annotators
+    }
+
     for i, row in test_df.iterrows():
         ex = Example.objects.create(batch=batch, content=row["text"])
-        for user in project.annotators:
-            ExampleAssignment.objects.create(example=ex, user=user, order=i)
+        for user in annotators:
+            ExampleAssignment.objects.create(
+                example=ex,
+                batch_assignment=batch_assignments[user.id],
+                order=i,
+                phase=Batch.Phase.ANNOTATION,
+            )
 
     batch.set_phase(Batch.Phase.ANNOTATION)
     return batch
@@ -47,10 +64,10 @@ def create_project(name, description, labels, annotators, experts):
     )
 
     for u in annotators:
-        ProjectUser.objects.create(project=project, user=u, role=ProjectUser.Role.ANNOTATOR)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.ANNOTATOR)
 
     for u in experts:
-        ProjectUser.objects.create(project=project, user=u, role=ProjectUser.Role.EXPERT)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.EXPERT)
 
     for i, label in enumerate(labels, 1):
         Label.objects.create(project=project, name=label, hotkey=str(i))
@@ -96,7 +113,7 @@ class Command(BaseCommand):
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "ANNOTATION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.DISCUSSION)
 
         codebook_content = (
@@ -107,7 +124,7 @@ class Command(BaseCommand):
 
         for example in batch.examples.all():
             for assignment in example.assignments.all():
-                assignment.set_user_annotations([label_ids[0]], "ANNOTATION")
+                assignment.set_user_annotations([label_ids[0]])
         batch.set_phase(Batch.Phase.DISCUSSION)
 
         # Create a disagreement batch after discussion
@@ -117,12 +134,12 @@ class Command(BaseCommand):
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "ANNOTATION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.DISCUSSION)
-        for example in batch.examples.filter(has_disagreement=True).all():
+        for example in [e for e in batch.examples.all() if e.has_disagreement]:
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels, "DISCUSSION")
+                assignment.set_user_annotations(labels)
         batch.set_phase(Batch.Phase.EXPERT)
 
         batch = create_batch(project)

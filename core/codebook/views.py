@@ -13,6 +13,7 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
+from projects.models import Batch
 from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
@@ -28,7 +29,7 @@ class CodebookView(AnyRoleRequiredMixin, DetailView):
         context = super().get_context_data(*args, **kwargs)
         user = self.request.user
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
-        context["role"] = project_user.role
+        context["role"] = project_user.default_role
         context["content"] = context["codebook"].content
         return context
 
@@ -79,11 +80,11 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         selected_label_names = [label.name for label in selected_labels]
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.ANNOTATION,
+            assignment__phase=Batch.Phase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            phase=Annotation.Phase.DISCUSSION,
+            assignment__phase=Batch.Phase.DISCUSSION,
         )
         messages = (
             Message.objects.filter(example=current_example)

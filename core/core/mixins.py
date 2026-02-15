@@ -18,25 +18,25 @@ class RoleRequiredMixin:
             membership = ProjectUser.objects.filter(
                 project_id=project_id,
                 user=request.user,
-                role__in=self.roles,
+                default_role__in=self.roles,
             ).first()
         elif assignment_id:
             membership = ProjectUser.objects.filter(
                 project__batches__examples__assignments__id=assignment_id,
                 user=request.user,
-                role__in=self.roles,
+                default_role__in=self.roles,
             ).first()
         elif batch_id:
             membership = ProjectUser.objects.filter(
                 project__batches__id=batch_id,
                 user=request.user,
-                role__in=self.roles,
+                default_role__in=self.roles,
             ).first()
         elif codebook_id:
             membership = ProjectUser.objects.filter(
                 project__codebook__id=codebook_id,
                 user=request.user,
-                role__in=self.roles,
+                default_role__in=self.roles,
             ).first()
         else:
             return HttpResponseForbidden("Project ID not provided.")

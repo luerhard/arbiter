@@ -3,7 +3,9 @@ import logging
 
 from django.contrib import messages
 from django.http import HttpResponse
+from django.shortcuts import redirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.views.generic import DetailView
 from django.views.generic import View
 
@@ -31,10 +33,15 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             assignment = ExampleAssignment.objects.get(id=assignment_id)
         else:
             assignment = (
-                ExampleAssignment.objects.filter(user=request.user, example__batch=batch)
+                ExampleAssignment.objects.filter(
+                    batch_assignment__user=request.user, example__batch=batch
+                )
                 .order_by("order")
                 .first()
             )
+        progress = get_progress(request.user, batch)
+        if not assignment or progress["done"] >= progress["total"]:
+            return redirect("annotate-done", batch_id=batch.id)
 
         context = {}
         context["assignment_id"] = assignment.id
@@ -54,13 +61,12 @@ class EditAssignment(View):
         assignment_id = request.GET.get("assignment_id")
         if assignment_id:
             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-            batch = assignment.example.batch
             submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-            assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
+            assignment.set_user_annotations(label_ids=submitted_labels)
 
-            payload = {"assignment_id": assignment.id}
+            payload = {"assignment_id": assignment.pk}
         else:
-            msg = "ass"
+            msg = "No assignment id found in request"
             raise Exception(msg)
 
         resp = HttpResponse(status=200)
@@ -81,18 +87,40 @@ class EditAssignment(View):
         submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
         assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
 
-        payload = {"assignment_id": assignment.next().id, "batch_id": batch.id}
+        next_assignment = assignment.next()
+        if not next_assignment:
+            resp = HttpResponse(status=204)
+            resp["HX-Redirect"] = reverse("annotate-done", kwargs={"batch_id": batch.id})
+            return resp
+
+        payload = {"assignment_id": next_assignment.pk, "batch_id": batch.id}
         resp = HttpResponse(status=204)
         resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
         return resp
 
 
+class AnnotationDoneView(AnnotatorRequiredMixin, View):
+    def get(self, request, batch_id):
+        batch = Batch.objects.get(id=batch_id)
+        context = {
+            "batch": batch,
+            "project": batch.project,
+            "progress": get_progress(request.user, batch),
+        }
+        return render(request, "annotation/done.html", context)
+
+
 def get_progress(user, batch):
     """helper function to calculate current progress"""
-    done = batch.examples.filter(
-        assignments__user=user,
-        assignments__is_annotated=1,
-    ).count()
+    done = (
+        batch.examples.filter(
+            assignments__batch_assignment__user=user,
+            assignments__phase=Batch.Phase.ANNOTATION,
+            assignments__done__isnull=False,
+        )
+        .distinct()
+        .count()
+    )
     total = batch.examples.count()
     try:
         current = int(done / total * 100)
@@ -131,10 +159,8 @@ class HtmxLabels(View):
         assignment_id = request.GET.get("assignment_id")
         context = {}
         if assignment_id:
-            assignment = ExampleAssignment.objects.get(id=assignment_id)
-            previous_annotations = (
-                assignment.annotations.filter(phase="ANNOTATION").select_related("label").all()
-            )
+            assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+            previous_annotations = assignment.annotations.select_related("label").all()
 
             example = assignment.example
             labels = []

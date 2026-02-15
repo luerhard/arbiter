@@ -9,10 +9,14 @@ from data.models import Example
 def project_setup():
     # Assumes populatedb creates at least one project, batch, example, and label
     # and that the example has disagreement for the expert view to work.
-    example = Example.objects.filter(
-        has_disagreement=True,
-        has_disagreement_after_discussion=True,
-    ).first()
+    example = next(
+        (
+            e
+            for e in Example.objects.all()
+            if e.has_disagreement and e.has_disagreement_after_discussion
+        ),
+        None,
+    )
 
     return {
         "batch": example.batch,
