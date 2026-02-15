@@ -95,7 +95,6 @@ class TestViews:
         assert req.status_code == 200
 
 
-
 @pytest.mark.django_db
 class TestEditAssignmentView:
     @pytest.fixture(autouse=True)
@@ -200,6 +199,7 @@ class TestEditAssignmentView:
         self.assignment.refresh_from_db()
         # The annotations are cleared because `getlist("labels")` is empty
         assert self.assignment.annotations.count() == 0
+
     def test_annotation_view_of_finished_batch(self, client):
         url = reverse("annotate-batch", args=(1,))
         login = client.login(username="annotator1", password="123")
