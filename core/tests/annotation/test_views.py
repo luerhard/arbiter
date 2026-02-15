@@ -1,8 +1,10 @@
-from django.urls import reverse
-import pytest
 import json
 
-from data.models import ExampleAssignment, Label
+from django.urls import reverse
+import pytest
+
+from data.models import ExampleAssignment
+from data.models import Label
 
 # Update the tuples to have just the assignment id (not a tuple)
 URLS_WITH_URL_PARAMS = [
@@ -159,4 +161,3 @@ class TestEditAssignmentView:
         self.assignment.refresh_from_db()
         # The annotations are cleared because `getlist("labels")` is empty
         assert self.assignment.annotations.count() == 0
-
