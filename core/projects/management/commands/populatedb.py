@@ -85,6 +85,8 @@ class Command(BaseCommand):
         admin = User.objects.create_superuser("admin", password="123")
         annotator1 = User.objects.create_user("annotator1", password="123")
         annotator2 = User.objects.create_user("annotator2", password="123")
+        # User without any access
+        annotator3 = User.objects.create_user("annotator3", password="123")
         expert1 = User.objects.create_user("expert1", password="123")
         expert2 = User.objects.create_user("expert2", password="123")
 
