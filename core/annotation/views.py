@@ -33,9 +33,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             assignment = ExampleAssignment.objects.get(id=assignment_id)
         else:
             assignment = (
-                ExampleAssignment.objects.filter(
-                    batch_assignment__user=request.user, example__batch=batch
-                )
+                ExampleAssignment.objects
+                .filter(batch_assignment__user=request.user, example__batch=batch)
                 .order_by("order")
                 .first()
             )
@@ -85,7 +84,7 @@ class EditAssignment(View):
 
         batch = assignment.example.batch
         submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-        assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
+        assignment.set_user_annotations(label_ids=submitted_labels)
 
         next_assignment = assignment.next()
         if not next_assignment:
@@ -113,7 +112,8 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 def get_progress(user, batch):
     """helper function to calculate current progress"""
     done = (
-        batch.examples.filter(
+        batch.examples
+        .filter(
             assignments__batch_assignment__user=user,
             assignments__phase=Batch.Phase.ANNOTATION,
             assignments__done__isnull=False,

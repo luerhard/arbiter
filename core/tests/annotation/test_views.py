@@ -113,21 +113,22 @@ class TestEditAssignmentView:
         label_ids = list(labels.values_list("id", flat=True)[:2])
 
         response = client.post(
-            self.url, data={"assignment_id": self.assignment.id, "labels": label_ids}
+            self.url,
+            data={"assignment_id": self.assignment.id, "labels": label_ids},
         )
 
         assert response.status_code == 204
         self.assignment.refresh_from_db()
         assert self.assignment.annotations.count() == 2
         assert sorted(self.assignment.annotations.values_list("label_id", flat=True)) == sorted(
-            label_ids
+            label_ids,
         )
 
     def test_post_no_labels_parameter(self, client):
         # Set some annotations first to test their removal
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids, phase="ANNOTATION")
+        self.assignment.set_user_annotations(label_ids=label_ids)
         assert self.assignment.annotations.count() == 1
 
         # Should this even be legal? (referring to the MultilabelFormAnnotation)
@@ -140,7 +141,7 @@ class TestEditAssignmentView:
         # Set some annotations first to test their removal
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids, phase="ANNOTATION")
+        self.assignment.set_user_annotations(label_ids=label_ids)
         assert self.assignment.annotations.count() == 1
 
         response = client.post(self.url, data={"assignment_id": self.assignment.id, "labels": []})
@@ -156,7 +157,8 @@ class TestEditAssignmentView:
         assert self.assignment.annotations.count() == 0
         invalid_label_id = 9999
         response = client.post(
-            self.url, data={"assignment_id": self.assignment.id, "labels": [invalid_label_id]}
+            self.url,
+            data={"assignment_id": self.assignment.id, "labels": [invalid_label_id]},
         )
         assert response.status_code == 204
         self.assignment.refresh_from_db()
@@ -180,20 +182,22 @@ class TestEditAssignmentView:
         assert self.assignment.annotations.first().label.id == valid_label_id
 
     def test_post_non_integer_label_id(self, client):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError):  # noqa: PT011
             client.post(
-                self.url, data={"assignment_id": self.assignment.id, "labels": ["not-a-number"]}
+                self.url,
+                data={"assignment_id": self.assignment.id, "labels": ["not-a-number"]},
             )
 
     def test_post_wrong_parameter_name(self, client):
         # Set some annotations first to test they are not removed
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids, phase="ANNOTATION")
+        self.assignment.set_user_annotations(label_ids=label_ids)
         assert self.assignment.annotations.count() == 1
 
         response = client.post(
-            self.url, data={"assignment_id": self.assignment.id, "wrong_labels": [1, 2]}
+            self.url,
+            data={"assignment_id": self.assignment.id, "wrong_labels": [1, 2]},
         )
         assert response.status_code == 204
         self.assignment.refresh_from_db()
