@@ -282,7 +282,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             query = Annotation.objects.filter(
                 assignment__example=example,
                 assignment__batch_assignment__user__username=user,
-                assignment__phase=Batch.Phase.ANNOTATION,
+                assignment__batch_assignment__phase=Batch.Phase.ANNOTATION,
             ).select_related("label")
             label_set = {anno.label for anno in query}
 

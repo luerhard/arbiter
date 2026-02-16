@@ -19,7 +19,6 @@ class ExampleAssignment(models.Model):
         related_name="examples_assignments",
         on_delete=models.CASCADE,
     )
-    phase = models.CharField(max_length=1, choices=Batch.Phase, db_index=True)
     order = models.PositiveIntegerField(db_index=True)
     done = models.DateTimeField(null=True, blank=True)
 
@@ -32,6 +31,10 @@ class ExampleAssignment(models.Model):
         ]
 
     @property
+    def phase(self):
+        return self.batch_assignment.phase
+
+    @property
     def user(self):
         return self.batch_assignment.user
 
@@ -40,7 +43,6 @@ class ExampleAssignment(models.Model):
             example__batch=self.example.batch,
             batch_assignment=self.batch_assignment,
             order__lt=self.order,
-            phase=self.phase,
         )
 
         if skip_annotated:
@@ -53,7 +55,6 @@ class ExampleAssignment(models.Model):
             example__batch=self.example.batch,
             batch_assignment=self.batch_assignment,
             order__gt=self.order,
-            phase=self.phase,
         )
 
         if skip_annotated:

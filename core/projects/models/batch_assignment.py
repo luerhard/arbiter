@@ -45,16 +45,18 @@ class BatchAssignment(models.Model):
             BatchAssignment.objects.filter(
                 batch=self.batch,
                 role=ProjectUser.Role.ANNOTATOR,
+                phase=phase,
             ).values_list("user_id", flat=True),
         )
         if not annotator_ids:
             return Example.objects.none()
 
         assignments = (
-            ExampleAssignment.objects.filter(
+            ExampleAssignment.objects
+            .filter(
                 example__batch=self.batch,
-                phase=phase,
                 batch_assignment__user_id__in=annotator_ids,
+                batch_assignment__phase=phase,
             )
             .select_related("example", "batch_assignment")
             .prefetch_related("annotations")
@@ -80,5 +82,8 @@ class BatchAssignment(models.Model):
 
     class Meta:
         constraints = [
-            models.UniqueConstraint(fields=("batch", "user"), name="unique_batch_user"),
+            models.UniqueConstraint(
+                fields=("batch", "user", "phase"),
+                name="unique_batch_user_phase",
+            ),
         ]

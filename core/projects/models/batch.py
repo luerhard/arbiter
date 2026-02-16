@@ -2,6 +2,15 @@ from django.apps import apps
 from django.db import models
 
 
+class BatchQuerySet(models.QuerySet):
+    def example_assignments(self, user, phase):
+        return apps.get_model("data", "ExampleAssignment").objects.filter(
+            batch_assignment__batch__in=self,
+            batch_assignment__user=user,
+            batch_assignment__phase=phase,
+        )
+
+
 class Batch(models.Model):
     class Phase(models.TextChoices):
         SETUP = "S", "Setup"
@@ -10,6 +19,7 @@ class Batch(models.Model):
         EXPERT = "E", "ExpertDecision"
         FINAL = "F", "Finalized"
 
+    objects = BatchQuerySet.as_manager()
     project = models.ForeignKey("Project", related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
     phase = models.CharField(
@@ -27,7 +37,8 @@ class Batch(models.Model):
     @property
     def max_batch_number(self):
         max_batch_number = (
-            Batch.objects.filter(project=self.project)
+            Batch.objects
+            .filter(project=self.project)
             .aggregate(models.Max("batch_number"))
             .get("batch_number__max", 0)
         )
@@ -84,11 +95,15 @@ class Batch(models.Model):
             projectuser__project=self.project,
             projectuser__default_role=role,
         ):
-            BatchAssignment.objects.get_or_create(
+            batch_assignment, _ = BatchAssignment.objects.get_or_create(
                 batch=self,
                 user=user,
-                defaults={"role": role, "phase": self.phase},
+                phase=target_phase,
+                defaults={"role": role},
             )
+            if batch_assignment.role != role:
+                batch_assignment.role = role
+                batch_assignment.save(update_fields=["role"])
 
         examples = list(
             Example.objects.filter(batch=self).disagreements(phase=source_phase).order_by("id"),
@@ -96,11 +111,14 @@ class Batch(models.Model):
         if not examples:
             return
 
-        for batch_assignment in BatchAssignment.objects.filter(batch=self, role=role):
+        for batch_assignment in BatchAssignment.objects.filter(
+            batch=self,
+            role=role,
+            phase=target_phase,
+        ):
             for idx, example in enumerate(examples, 1):
                 ExampleAssignment.objects.get_or_create(
                     example=example,
                     batch_assignment=batch_assignment,
-                    phase=target_phase,
                     defaults={"order": idx},
                 )

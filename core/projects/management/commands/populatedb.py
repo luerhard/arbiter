@@ -50,7 +50,6 @@ def create_batch(project):
                 example=ex,
                 batch_assignment=batch_assignments[user.id],
                 order=i,
-                phase=Batch.Phase.ANNOTATION,
             )
 
     batch.set_phase(Batch.Phase.ANNOTATION)

@@ -37,7 +37,6 @@ def _setup_example_assignment():
     assignment = ExampleAssignment.objects.create(
         example=example,
         batch_assignment=batch_assignment,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
     return {
@@ -91,7 +90,7 @@ def test_example_set_user_annotations_uses_user_assignment():
     label1, _label2 = data["labels"]
     assignment = data["assignment"]
 
-    example.set_user_annotations(user=user, label_ids=[label1.id], phase="ANNOTATION")
+    assignment.set_user_annotations(label_ids=[label1.id])
 
     annotations = Annotation.objects.filter(assignment=assignment)
     assert annotations.count() == 1

@@ -64,25 +64,21 @@ def _create_project_with_batch():
     a11 = ExampleAssignment.objects.create(
         example=ex1,
         batch_assignment=ba1,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
     a12 = ExampleAssignment.objects.create(
         example=ex1,
         batch_assignment=ba2,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
     a21 = ExampleAssignment.objects.create(
         example=ex2,
         batch_assignment=ba1,
-        phase=Batch.Phase.ANNOTATION,
         order=2,
     )
     a22 = ExampleAssignment.objects.create(
         example=ex2,
         batch_assignment=ba2,
-        phase=Batch.Phase.ANNOTATION,
         order=2,
     )
 
@@ -112,11 +108,11 @@ def test_batch_set_phase_discussion_creates_assignments_for_disagreements():
 
     discussion_ex1 = ExampleAssignment.objects.filter(
         example=ex1,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     )
     discussion_ex2 = ExampleAssignment.objects.filter(
         example=ex2,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     )
 
     assert discussion_ex1.count() == 2
@@ -135,11 +131,11 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     # create discussion labels (disagreement on ex1 only)
     disc_ex1 = ExampleAssignment.objects.filter(
         example=ex1,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     ).order_by("id")
     disc_ex2 = ExampleAssignment.objects.filter(
         example=ex2,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     ).order_by("id")
 
     assert disc_ex1.count() == 2
@@ -151,7 +147,7 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     batch.set_phase(Batch.Phase.EXPERT)
 
     expert_assignments = ExampleAssignment.objects.filter(
-        phase=Batch.Phase.EXPERT,
+        batch_assignment__phase=Batch.Phase.EXPERT,
         example__batch=batch,
     )
     assert expert_assignments.count() == 1

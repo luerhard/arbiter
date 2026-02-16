@@ -70,7 +70,6 @@ class TestViews:
         ExampleAssignment.objects.filter(
             example__batch_id=1,
             batch_assignment__user__username="annotator1",
-            phase=Batch.Phase.ANNOTATION,
         ).update(done=None)
 
         url = reverse("annotate-batch", args=(1,))

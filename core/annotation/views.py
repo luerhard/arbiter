@@ -118,17 +118,11 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 
 def get_progress(user, batch):
     """helper function to calculate current progress"""
-    done = (
-        batch.examples
-        .filter(
-            assignments__batch_assignment__user=user,
-            assignments__phase=Batch.Phase.ANNOTATION,
-            assignments__done__isnull=False,
-        )
-        .distinct()
-        .count()
+    all_assignments = Batch.objects.filter(pk=batch.pk).example_assignments(
+        user=user, phase=Batch.Phase.ANNOTATION,
     )
-    total = batch.examples.count()
+    done = all_assignments.filter(done__isnull=False).count()
+    total = all_assignments.count()
     try:
         current = int(done / total * 100)
     except ZeroDivisionError:

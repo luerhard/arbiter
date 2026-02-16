@@ -83,19 +83,27 @@ def discussion_with_disagreement(db):
     batch = Batch.objects.create(project=project, phase=Batch.Phase.DISCUSSION)
     ex = Example.objects.create(batch=batch, content="Example with disagreement")
 
-    ba1 = BatchAssignment.objects.create(batch=batch, user=user1, role=ProjectUser.Role.ANNOTATOR)
-    ba2 = BatchAssignment.objects.create(batch=batch, user=user2, role=ProjectUser.Role.ANNOTATOR)
+    ba1 = BatchAssignment.objects.create(
+        batch=batch,
+        user=user1,
+        role=ProjectUser.Role.ANNOTATOR,
+        phase=Batch.Phase.ANNOTATION,
+    )
+    ba2 = BatchAssignment.objects.create(
+        batch=batch,
+        user=user2,
+        role=ProjectUser.Role.ANNOTATOR,
+        phase=Batch.Phase.ANNOTATION,
+    )
 
     a1 = ExampleAssignment.objects.create(
         example=ex,
         batch_assignment=ba1,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
     a2 = ExampleAssignment.objects.create(
         example=ex,
         batch_assignment=ba2,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
 

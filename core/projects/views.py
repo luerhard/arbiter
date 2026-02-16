@@ -34,7 +34,8 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects.filter(user=self.request.user)
+            ProjectUser.objects
+            .filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
@@ -106,19 +107,21 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             disagr_ids = [e.id for e in disagr_ex]
             for annotator in context["annotators"]:
                 annotated = (
-                    ExampleAssignment.objects.filter(
+                    ExampleAssignment.objects
+                    .filter(
                         batch_assignment__user=annotator,
                         example__batch=batch,
-                        phase=Batch.Phase.ANNOTATION,
+                        batch_assignment__phase=Batch.Phase.ANNOTATION,
                         done__isnull=False,
                     )
                     .distinct()
                     .count()
                 )
                 discussed = (
-                    ExampleAssignment.objects.filter(
+                    ExampleAssignment.objects
+                    .filter(
                         batch_assignment__user=annotator,
-                        phase=Batch.Phase.DISCUSSION,
+                        batch_assignment__phase=Batch.Phase.DISCUSSION,
                         done__isnull=False,
                         example_id__in=disagr_ids,
                     )
@@ -160,9 +163,10 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         for batch in batches:
             batch_data = {
                 "batch": batch,
-                "done": batch.examples.filter(
+                "done": batch.examples
+                .filter(
                     assignments__batch_assignment__user=self.request.user,
-                    assignments__phase=Batch.Phase.ANNOTATION,
+                    assignments__batch_assignment__phase=Batch.Phase.ANNOTATION,
                     assignments__done__isnull=False,
                 )
                 .distinct()
