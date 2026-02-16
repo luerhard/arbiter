@@ -26,12 +26,12 @@ def _setup_example_assignment():
     )
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.ANNOTATION)
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.ANNOTATION)
     batch_assignment = BatchAssignment.objects.create(
         batch=batch,
         user=user,
         role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
+        phase=batch.current_phase,
     )
     example = Example.objects.create(batch=batch, content="Example")
     assignment = ExampleAssignment.objects.create(

@@ -56,7 +56,7 @@ def discussion_setup(db):
         user=user,
         defaults={"default_role": ProjectUser.Role.ANNOTATOR},
     )
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
     return user, batch
 
 
@@ -80,7 +80,7 @@ def discussion_with_disagreement(db):
     label1 = Label.objects.create(project=project, name="Label A")
     label2 = Label.objects.create(project=project, name="Label B")
 
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
     ex = Example.objects.create(batch=batch, content="Example with disagreement")
 
     ba1 = BatchAssignment.objects.create(

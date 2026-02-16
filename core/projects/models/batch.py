@@ -22,7 +22,7 @@ class Batch(models.Model):
     objects = BatchQuerySet.as_manager()
     project = models.ForeignKey("Project", related_name="batches", on_delete=models.CASCADE)
     batch_number = models.SmallIntegerField()
-    phase = models.CharField(
+    current_phase = models.CharField(
         default=Phase.SETUP,
         null=False,
         blank=False,
@@ -64,17 +64,17 @@ class Batch(models.Model):
         ).count()
 
     def set_phase(self, phase):
-        self.phase = phase
-        if self.phase == Batch.Phase.ANNOTATION:
+        self.current_phase = phase
+        if self.current_phase == Batch.Phase.ANNOTATION:
             codebook = self.project.codebook.get()
             codebook.tag_version(self.batch_number)
-        elif self.phase == Batch.Phase.DISCUSSION:
+        elif self.current_phase == Batch.Phase.DISCUSSION:
             self._create_phase_assignments(
                 source_phase=Batch.Phase.ANNOTATION,
                 target_phase=Batch.Phase.DISCUSSION,
                 role_key="ANNOTATOR",
             )
-        elif self.phase == Batch.Phase.EXPERT:
+        elif self.current_phase == Batch.Phase.EXPERT:
             self._create_phase_assignments(
                 source_phase=Batch.Phase.DISCUSSION,
                 target_phase=Batch.Phase.EXPERT,

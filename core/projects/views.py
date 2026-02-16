@@ -184,8 +184,8 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
         form = BatchPhaseForm(request.POST, instance=batch)
         if form.is_valid():
             new = form.save(commit=False)
-            batch.set_phase(new.phase)
-            phase = batch.get_phase_display()
+            batch.set_phase(new.current_phase)
+            phase = batch.get_current_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
             return HttpResponse(status=204)
         else:

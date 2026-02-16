@@ -61,7 +61,7 @@ class TestViews:
         url = reverse("change-batch-phase", args=(1,))
         login = client.login(username="annotator1", password="123")
         assert login == True
-        data = {"phase": "A"}
+        data = {"current_phase": "A"}
         req = client.post(url, data)
         assert req.status_code == 403
 
@@ -69,7 +69,7 @@ class TestViews:
         url = reverse("change-batch-phase", args=(1,))
         login = client.login(username="expert1", password="123")
         assert login == True
-        data = {"phase": "A"}
+        data = {"current_phase": "A"}
         req = client.post(url, data)
         assert req.status_code == 204
 

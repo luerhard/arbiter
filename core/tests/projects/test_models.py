@@ -44,18 +44,18 @@ def _create_project_with_batch():
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
 
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.ANNOTATION)
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.ANNOTATION)
     ba1 = BatchAssignment.objects.create(
         batch=batch,
         user=annotator1,
         role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
+        phase=batch.current_phase,
     )
     ba2 = BatchAssignment.objects.create(
         batch=batch,
         user=annotator2,
         role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
+        phase=batch.current_phase,
     )
 
     ex1 = Example.objects.create(batch=batch, content="Example 1")

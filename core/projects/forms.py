@@ -106,7 +106,7 @@ class BatchForm(forms.ModelForm):
                 batch=batch,
                 user=annotator,
                 role=ProjectUser.Role.ANNOTATOR,
-                phase=batch.phase,
+                phase=batch.current_phase,
             )
             for annotator in default_annotators
         }
@@ -126,4 +126,4 @@ class BatchForm(forms.ModelForm):
 class BatchPhaseForm(forms.ModelForm):
     class Meta:
         model = Batch
-        fields = ["phase"]
+        fields = ["current_phase"]
