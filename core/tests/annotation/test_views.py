@@ -5,7 +5,6 @@ import pytest
 
 from data.models import ExampleAssignment
 from data.models import Label
-from projects.models import Batch
 
 # Update the tuples to have just the assignment id (not a tuple)
 URLS_WITH_URL_PARAMS = [

@@ -36,8 +36,9 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 return HttpResponseForbidden()
         else:
             assignment = (
-                ExampleAssignment.objects
-                .filter(batch_assignment__user=request.user, example__batch=batch)
+                ExampleAssignment.objects.filter(
+                    batch_assignment__user=request.user, example__batch=batch
+                )
                 .order_by("order")
                 .first()
             )
@@ -119,7 +120,8 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 def get_progress(user, batch):
     """helper function to calculate current progress"""
     all_assignments = Batch.objects.filter(pk=batch.pk).example_assignments(
-        user=user, phase=Batch.Phase.ANNOTATION,
+        user=user,
+        phase=Batch.Phase.ANNOTATION,
     )
     done = all_assignments.filter(done__isnull=False).count()
     total = all_assignments.count()

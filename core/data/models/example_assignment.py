@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 
 from .models import Annotation
-from projects.models import Batch
 from projects.models import BatchAssignment
 
 
