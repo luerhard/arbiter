@@ -1,5 +1,3 @@
-from collections import defaultdict
-
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
