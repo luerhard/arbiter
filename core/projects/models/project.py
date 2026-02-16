@@ -58,7 +58,8 @@ class Project(models.Model):
     def max_batch_number(self):
         Batch = apps.get_model("projects", "Batch")
         max_batch_number = (
-            Batch.objects.filter(project=self)
+            Batch.objects
+            .filter(project=self)
             .aggregate(models.Max("batch_number"))
             .get("batch_number__max", 0)
         )
