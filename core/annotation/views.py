@@ -36,9 +36,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 return HttpResponseForbidden()
         else:
             assignment = (
-                ExampleAssignment.objects.filter(
-                    batch_assignment__user=request.user, example__batch=batch
-                )
+                ExampleAssignment.objects
+                .filter(batch_assignment__user=request.user, example__batch=batch)
                 .order_by("order")
                 .first()
             )
@@ -185,7 +184,7 @@ class HtmxLabels(View):
                 labels.append(new)
             context["labels"] = labels
 
-            form = MultiLabelFormAnnotation(assignment=assignment)
+            form = MultiLabelForm(phase=Batch.Phase.ANNOTATION, assignment=assignment)
             context["label_form"] = form
 
         return render(request, "annotation/partials/labels.html", context)
