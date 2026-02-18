@@ -132,6 +132,11 @@ docker<span class="w"> </span>compose<span class="w"> </span>down
 docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>annotationtool_pgdata
 </pre></div>
 </div>
+<p>To undo changes in the database and reset to the test data (created by populatedb), without deleting the docker volume</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># reset </span>
+docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>resetdb<span class="w"> </span>--noinput
+</pre></div>
+</div>
 </section>
 <section id="the-env">
 <h2>The .env<a class="headerlink" href="#the-env" title="Link to this heading"></a></h2>
