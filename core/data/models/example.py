@@ -19,8 +19,7 @@ class ExampleQuerySet(models.QuerySet):
             return self.none()
 
         assignments = (
-            ExampleAssignment.objects
-            .filter(
+            ExampleAssignment.objects.filter(
                 example_id__in=example_ids,
                 batch_assignment__phase=phase,
             )

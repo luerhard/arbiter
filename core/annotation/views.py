@@ -36,8 +36,9 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 return HttpResponseForbidden()
         else:
             assignment = (
-                ExampleAssignment.objects
-                .filter(batch_assignment__user=request.user, example__batch=batch)
+                ExampleAssignment.objects.filter(
+                    batch_assignment__user=request.user, example__batch=batch
+                )
                 .order_by("order")
                 .first()
             )
