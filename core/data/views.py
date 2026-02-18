@@ -10,10 +10,7 @@ from django.views.generic.edit import UpdateView
 from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
-from data.models import ExampleAssignment
 from projects.models import Batch
-from projects.models import BatchAssignment
-from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
 
@@ -23,32 +20,7 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
         user = request.user
         batch = get_object_or_404(Batch, pk=batch_id)
         example = get_object_or_404(Example, pk=example_id, batch=batch_id)
-        assignment = ExampleAssignment.objects.filter(
-            example=example,
-            batch_assignment__user=user,
-            batch_assignment__phase=Batch.Phase.EXPERT,
-        ).first()
         codebook = get_object_or_404(Codebook, pk=codebook_id)
-        if not assignment:
-            batch_assignment, _ = BatchAssignment.objects.get_or_create(
-                batch=batch,
-                user=user,
-                phase=Batch.Phase.EXPERT,
-                defaults={"role": ProjectUser.Role.EXPERT},
-            )
-            if batch_assignment.role != ProjectUser.Role.EXPERT:
-                batch_assignment.role = ProjectUser.Role.EXPERT
-                batch_assignment.save(update_fields=["role"])
-            max_order = ExampleAssignment.objects.filter(
-                batch_assignment__user=user,
-                example__batch=example.batch,
-                batch_assignment__phase=Batch.Phase.EXPERT,
-            ).aggregate(models.Max("order", default=0))["order__max"]
-            assignment = ExampleAssignment.objects.create(
-                example=example,
-                batch_assignment=batch_assignment,
-                order=max_order + 1,
-            )
         form = MultiLabelFormExpert(request.POST, codebook=codebook, example=example, user=user)
         if form.is_valid():
             form.save()
