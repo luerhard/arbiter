@@ -21,7 +21,7 @@ class Project(models.Model):
         Batch = apps.get_model("projects", "Batch")
         return Batch.objects.filter(
             project=self,
-            phase__in=[Batch.Phase.ANNOTATION, Batch.Phase.DISCUSSION],
+            current_phase__in=[Batch.Phase.ANNOTATION, Batch.Phase.DISCUSSION],
         ).count()
 
     @property
@@ -29,7 +29,7 @@ class Project(models.Model):
         Batch = apps.get_model("projects", "Batch")
         return Batch.objects.filter(
             project=self,
-            phase__in=[Batch.Phase.ANNOTATION],
+            current_phase__in=[Batch.Phase.ANNOTATION],
         ).exists()
 
     @property
@@ -37,7 +37,7 @@ class Project(models.Model):
         Batch = apps.get_model("projects", "Batch")
         return Batch.objects.filter(
             project=self,
-            phase__in=[Batch.Phase.DISCUSSION],
+            current_phase__in=[Batch.Phase.DISCUSSION],
         ).exists()
 
     @property

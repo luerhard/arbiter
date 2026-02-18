@@ -21,7 +21,7 @@ class ExampleQuerySet(models.QuerySet):
         assignments = (
             ExampleAssignment.objects.filter(
                 example_id__in=example_ids,
-                phase=phase,
+                batch_assignment__phase=phase,
             )
             .select_related("example", "batch_assignment")
             .prefetch_related("annotations")
@@ -87,7 +87,7 @@ class Example(models.Model):
     def has_expert_decision(self):
         return Annotation.objects.filter(
             assignment__example=self,
-            assignment__phase=Batch.Phase.EXPERT,
+            assignment__batch_assignment__phase=Batch.Phase.EXPERT,
         ).exists()
 
     def get_user_annotations(self, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"], user=None):
@@ -95,7 +95,7 @@ class Example(models.Model):
 
         qs = Annotation.objects.filter(
             assignment__example=self,
-            assignment__phase=phase,
+            assignment__batch_assignment__phase=phase,
         )
         if user is not None:
             qs = qs.filter(assignment__batch_assignment__user=user)
@@ -105,11 +105,13 @@ class Example(models.Model):
         self,
         user,
         label_ids: list[int],
-        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"],
+        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"] | None = None,
     ):
-        assignment = ExampleAssignment.objects.get(
+        assignments = ExampleAssignment.objects.filter(
             example=self,
             batch_assignment__user=user,
-            phase=getattr(Batch.Phase, phase),
         )
+        if phase is not None:
+            assignments = assignments.filter(batch_assignment__phase=getattr(Batch.Phase, phase))
+        assignment = assignments.get()
         assignment.set_user_annotations(label_ids=label_ids)

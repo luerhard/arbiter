@@ -1,3 +1,4 @@
+from collections import defaultdict
 import uuid
 
 from django.contrib.auth import get_user_model
@@ -44,47 +45,23 @@ def _create_project_with_batch():
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
 
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.ANNOTATION)
-    ba1 = BatchAssignment.objects.create(
-        batch=batch,
-        user=annotator1,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
-    )
-    ba2 = BatchAssignment.objects.create(
-        batch=batch,
-        user=annotator2,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
-    )
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.ANNOTATION)
 
     ex1 = Example.objects.create(batch=batch, content="Example 1")
     ex2 = Example.objects.create(batch=batch, content="Example 2")
 
-    a11 = ExampleAssignment.objects.create(
-        example=ex1,
-        batch_assignment=ba1,
-        phase=Batch.Phase.ANNOTATION,
-        order=1,
+    batch.set_phase(
+        Batch.Phase.ANNOTATION,
+        user_role_mapping={
+            annotator1: ProjectUser.Role.ANNOTATOR,
+            annotator2: ProjectUser.Role.ANNOTATOR,
+        },
     )
-    a12 = ExampleAssignment.objects.create(
-        example=ex1,
-        batch_assignment=ba2,
-        phase=Batch.Phase.ANNOTATION,
-        order=1,
-    )
-    a21 = ExampleAssignment.objects.create(
-        example=ex2,
-        batch_assignment=ba1,
-        phase=Batch.Phase.ANNOTATION,
-        order=2,
-    )
-    a22 = ExampleAssignment.objects.create(
-        example=ex2,
-        batch_assignment=ba2,
-        phase=Batch.Phase.ANNOTATION,
-        order=2,
-    )
+
+    a11 = ExampleAssignment.objects.filter(example=ex1, batch_assignment__user=annotator1).get()
+    a12 = ExampleAssignment.objects.filter(example=ex1, batch_assignment__user=annotator2).get()
+    a21 = ExampleAssignment.objects.filter(example=ex2, batch_assignment__user=annotator1).get()
+    a22 = ExampleAssignment.objects.filter(example=ex2, batch_assignment__user=annotator2).get()
 
     # disagreement on ex1, agreement on ex2
     Annotation.objects.create(assignment=a11, label=label1)
@@ -103,20 +80,60 @@ def _create_project_with_batch():
 
 
 @pytest.mark.django_db
+def test_batch_set_phase_annotation_creates_assignments():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    annotator1, annotator2 = data["annotators"]
+
+    ba = BatchAssignment.objects.filter(batch=batch, phase=Batch.Phase.ANNOTATION)
+    assert ba.count() == 2
+    users = {a.user for a in ba}
+    assert users == {annotator1, annotator2}
+
+    ea = ExampleAssignment.objects.filter(
+        batch_assignment__batch=batch,
+        batch_assignment__phase=Batch.Phase.ANNOTATION,
+    )
+    assert ea.count() == 4
+    counter = defaultdict(int)
+    for assignment in ea:
+        counter[assignment.user.id] += 1
+    assert counter == {annotator1.id: 2, annotator2.id: 2}
+
+
+@pytest.mark.django_db
 def test_batch_set_phase_discussion_creates_assignments_for_disagreements():
     data = _create_project_with_batch()
     batch = data["batch"]
     ex1, ex2 = data["examples"]
+    annotator1, annotator2 = data["annotators"]
 
     batch.set_phase(Batch.Phase.DISCUSSION)
+    disagreements = batch.disagreements(phase=Batch.Phase.ANNOTATION).count()
+    assert disagreements == 1
+
+    ba = BatchAssignment.objects.filter(batch=batch, phase=Batch.Phase.DISCUSSION)
+    assert ba.count() == 2
+    users = {a.user for a in ba}
+    assert users == {annotator1, annotator2}
+
+    ea = ExampleAssignment.objects.filter(
+        batch_assignment__batch=batch,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
+    )
+    assert ea.count() == 2
+    counter = defaultdict(int)
+    for assignment in ea:
+        counter[assignment.user.id] += 1
+    assert counter == {annotator1.id: 1, annotator2.id: 1}
 
     discussion_ex1 = ExampleAssignment.objects.filter(
         example=ex1,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     )
     discussion_ex2 = ExampleAssignment.objects.filter(
         example=ex2,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     )
 
     assert discussion_ex1.count() == 2
@@ -130,16 +147,17 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     ex1, ex2 = data["examples"]
     label1, label2 = data["labels"]
 
-    batch.set_phase(Batch.Phase.DISCUSSION)
+    assert batch.disagreements(Batch.Phase.ANNOTATION).count() == 1
+    batch.set_phase(phase=Batch.Phase.DISCUSSION)
 
     # create discussion labels (disagreement on ex1 only)
     disc_ex1 = ExampleAssignment.objects.filter(
         example=ex1,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     ).order_by("id")
     disc_ex2 = ExampleAssignment.objects.filter(
         example=ex2,
-        phase=Batch.Phase.DISCUSSION,
+        batch_assignment__phase=Batch.Phase.DISCUSSION,
     ).order_by("id")
 
     assert disc_ex1.count() == 2
@@ -151,7 +169,7 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     batch.set_phase(Batch.Phase.EXPERT)
 
     expert_assignments = ExampleAssignment.objects.filter(
-        phase=Batch.Phase.EXPERT,
+        batch_assignment__phase=Batch.Phase.EXPERT,
         example__batch=batch,
     )
     assert expert_assignments.count() == 1
@@ -163,3 +181,14 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
         user=data["expert"],
         role=ProjectUser.Role.EXPERT,
     ).exists()
+
+
+@pytest.mark.django_db
+def test_batch_assignment_get_disagreements_for_phase():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1, _ = data["examples"]
+
+    disagreements = batch.disagreements(Batch.Phase.ANNOTATION)
+
+    assert list(disagreements.values_list("id", flat=True)) == [ex1.id]

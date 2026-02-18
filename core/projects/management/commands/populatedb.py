@@ -28,7 +28,7 @@ def uniform_choices(elementary_events: list):
 def create_batch(project):
     batch = Batch.objects.create(
         project=project,
-        phase=Batch.Phase.ANNOTATION,
+        current_phase=Batch.Phase.ANNOTATION,
     )
     test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
@@ -38,7 +38,7 @@ def create_batch(project):
             batch=batch,
             user=user,
             role=ProjectUser.Role.ANNOTATOR,
-            phase=batch.phase,
+            phase=batch.current_phase,
         )
         for user in annotators
     }
@@ -50,7 +50,6 @@ def create_batch(project):
                 example=ex,
                 batch_assignment=batch_assignments[user.id],
                 order=i,
-                phase=Batch.Phase.ANNOTATION,
             )
 
     batch.set_phase(Batch.Phase.ANNOTATION)

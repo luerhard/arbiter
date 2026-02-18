@@ -80,11 +80,11 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         selected_label_names = [label.name for label in selected_labels]
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            assignment__phase=Batch.Phase.ANNOTATION,
+            assignment__batch_assignment__phase=Batch.Phase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            assignment__phase=Batch.Phase.DISCUSSION,
+            assignment__batch_assignment__phase=Batch.Phase.DISCUSSION,
         )
         messages = (
             Message.objects.filter(example=current_example)

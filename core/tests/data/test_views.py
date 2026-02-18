@@ -5,6 +5,10 @@ import pytest
 
 from data.models import Annotation
 from data.models import Example
+from data.models import ExampleAssignment
+from projects.models import Batch
+from projects.models import BatchAssignment
+from projects.models import ProjectUser
 
 User = get_user_model()
 
@@ -18,7 +22,7 @@ def data_setup():
     example = next(
         (
             e
-            for e in Example.objects.all()
+            for e in Example.objects.select_related("batch", "batch__project").order_by("id")
             if e.has_disagreement
             and e.has_disagreement_after_discussion
             and not e.has_expert_decision
@@ -53,6 +57,24 @@ class TestDataViews:
     def test_save_labels_expert_view(self, client, data_setup):
         client.login(username="expert1", password="123")
         example = data_setup["example"]
+        expert = User.objects.get(username="expert1")
+        batch_assignment, _ = BatchAssignment.objects.get_or_create(
+            batch=data_setup["batch"],
+            user=expert,
+            phase=Batch.Phase.EXPERT,
+            defaults={
+                "role": ProjectUser.Role.EXPERT,
+            },
+        )
+        if batch_assignment.phase != Batch.Phase.EXPERT:
+            batch_assignment.phase = Batch.Phase.EXPERT
+            batch_assignment.role = ProjectUser.Role.EXPERT
+            batch_assignment.save(update_fields=["phase", "role"])
+        ExampleAssignment.objects.get_or_create(
+            example=example,
+            batch_assignment=batch_assignment,
+            defaults={"order": 1},
+        )
         assert example.has_expert_decision is False
 
         url = reverse(

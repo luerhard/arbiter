@@ -3,6 +3,7 @@ import logging
 
 from django.contrib import messages
 from django.http import HttpResponse
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -31,6 +32,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
         if assignment_id:
             assignment = ExampleAssignment.objects.get(id=assignment_id)
+            if assignment.user != request.user:
+                return HttpResponseForbidden()
         else:
             assignment = (
                 ExampleAssignment.objects.filter(
@@ -61,6 +64,8 @@ class EditAssignment(View):
         assignment_id = request.GET.get("assignment_id")
         if assignment_id:
             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+            if assignment.user != request.user:
+                return HttpResponseForbidden()
             submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
             assignment.set_user_annotations(label_ids=submitted_labels)
 
@@ -76,6 +81,8 @@ class EditAssignment(View):
     def post(self, request, *args, **kwargs):  # noqa: ARG002
         assignment_id = request.POST.get("assignment_id")
         assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+        if assignment.user != request.user:
+            return HttpResponseForbidden()
         form = MultiLabelFormAnnotation(request.POST, assignment=assignment)
         if form.is_valid():
             form.save()
@@ -85,7 +92,7 @@ class EditAssignment(View):
 
         batch = assignment.example.batch
         submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-        assignment.set_user_annotations(label_ids=submitted_labels, phase="ANNOTATION")
+        assignment.set_user_annotations(label_ids=submitted_labels)
 
         next_assignment = assignment.next()
         if not next_assignment:
@@ -112,16 +119,12 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 
 def get_progress(user, batch):
     """helper function to calculate current progress"""
-    done = (
-        batch.examples.filter(
-            assignments__batch_assignment__user=user,
-            assignments__phase=Batch.Phase.ANNOTATION,
-            assignments__done__isnull=False,
-        )
-        .distinct()
-        .count()
+    all_assignments = Batch.objects.filter(pk=batch.pk).example_assignments(
+        user=user,
+        phase=Batch.Phase.ANNOTATION,
     )
-    total = batch.examples.count()
+    done = all_assignments.filter(done__isnull=False).count()
+    total = all_assignments.count()
     try:
         current = int(done / total * 100)
     except ZeroDivisionError:
@@ -135,6 +138,8 @@ class HtmxPbar(View):
         assignment_id = request.GET.get("assignment_id")
         if assignment_id:
             assignment = ExampleAssignment.objects.get(id=assignment_id)
+            if assignment.user != request.user:
+                return HttpResponseForbidden()
             ctx = {
                 "progress": get_progress(request.user, assignment.example.batch),
             }
@@ -149,6 +154,8 @@ class HtmxSentence(View):
         context = {}
         if assignment_id:
             assignment = ExampleAssignment.objects.get(id=assignment_id)
+            if assignment.user != request.user:
+                return HttpResponseForbidden()
             context["example"] = assignment.example
 
         return render(request, "annotation/partials/sentence.html", context)
@@ -160,6 +167,8 @@ class HtmxLabels(View):
         context = {}
         if assignment_id:
             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+            if assignment.user != request.user:
+                return HttpResponseForbidden()
             previous_annotations = assignment.annotations.select_related("label").all()
 
             example = assignment.example
@@ -188,6 +197,8 @@ class HtmxNavBlock(View):
         context = {}
         if assignment_id:
             a = ExampleAssignment.objects.get(id=assignment_id)
+            if a.user != request.user:
+                return HttpResponseForbidden()
             ctx = {
                 "assignment_id": a.id,
                 "has_prev": bool(a.previous()),

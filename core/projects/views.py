@@ -109,7 +109,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                     ExampleAssignment.objects.filter(
                         batch_assignment__user=annotator,
                         example__batch=batch,
-                        phase=Batch.Phase.ANNOTATION,
+                        batch_assignment__phase=Batch.Phase.ANNOTATION,
                         done__isnull=False,
                     )
                     .distinct()
@@ -118,7 +118,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 discussed = (
                     ExampleAssignment.objects.filter(
                         batch_assignment__user=annotator,
-                        phase=Batch.Phase.DISCUSSION,
+                        batch_assignment__phase=Batch.Phase.DISCUSSION,
                         done__isnull=False,
                         example_id__in=disagr_ids,
                     )
@@ -162,7 +162,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
                 "batch": batch,
                 "done": batch.examples.filter(
                     assignments__batch_assignment__user=self.request.user,
-                    assignments__phase=Batch.Phase.ANNOTATION,
+                    assignments__batch_assignment__phase=Batch.Phase.ANNOTATION,
                     assignments__done__isnull=False,
                 )
                 .distinct()
@@ -180,8 +180,8 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
         form = BatchPhaseForm(request.POST, instance=batch)
         if form.is_valid():
             new = form.save(commit=False)
-            batch.set_phase(new.phase)
-            phase = batch.get_phase_display()
+            batch.set_phase(new.current_phase)
+            phase = batch.get_current_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
             return HttpResponse(status=204)
         else:

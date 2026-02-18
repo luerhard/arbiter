@@ -26,18 +26,17 @@ def _setup_example_assignment():
     )
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
-    batch = Batch.objects.create(project=project, phase=Batch.Phase.ANNOTATION)
+    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.ANNOTATION)
     batch_assignment = BatchAssignment.objects.create(
         batch=batch,
         user=user,
         role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.phase,
+        phase=batch.current_phase,
     )
     example = Example.objects.create(batch=batch, content="Example")
     assignment = ExampleAssignment.objects.create(
         example=example,
         batch_assignment=batch_assignment,
-        phase=Batch.Phase.ANNOTATION,
         order=1,
     )
     return {
@@ -91,7 +90,7 @@ def test_example_set_user_annotations_uses_user_assignment():
     label1, _label2 = data["labels"]
     assignment = data["assignment"]
 
-    example.set_user_annotations(user=user, label_ids=[label1.id], phase="ANNOTATION")
+    assignment.set_user_annotations(label_ids=[label1.id])
 
     annotations = Annotation.objects.filter(assignment=assignment)
     assert annotations.count() == 1
