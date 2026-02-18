@@ -24,7 +24,7 @@ class ExampleAssignment(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=("example", "batch_assignment", "phase"),
+                fields=("example", "batch_assignment"),
                 name="unique_example_batch_assignment",
             ),
         ]
