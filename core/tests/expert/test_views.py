@@ -2,7 +2,9 @@ from codebook.models import Codebook
 from django.shortcuts import reverse
 import pytest
 
-from data.models import Example, Label, ExampleAssignment
+from data.models import Example
+from data.models import ExampleAssignment
+from data.models import Label
 from projects.models import Batch
 
 
@@ -14,7 +16,9 @@ def project_setup():
         (
             e
             for e in Example.objects.all()
-            if e.has_disagreement and e.has_disagreement_after_discussion and not e.has_expert_decision
+            if e.has_disagreement
+            and e.has_disagreement_after_discussion
+            and not e.has_expert_decision
         ),
         None,
     )
@@ -62,6 +66,7 @@ class TestExpertViews:
         response = client.get(url)
 
         assert response.status_code == 403
+
 
 @pytest.mark.django_db
 class TestSaveLabelsExpertView:
