@@ -11,7 +11,7 @@ from django.views.generic import DetailView
 from django.views.generic import View
 
 from core.mixins import AnnotatorRequiredMixin
-from data.forms import MultiLabelFormAnnotation
+from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
 
@@ -83,7 +83,7 @@ class EditAssignment(View):
         assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
         if assignment.user != request.user:
             return HttpResponseForbidden()
-        form = MultiLabelFormAnnotation(request.POST, assignment=assignment)
+        form = MultiLabelForm(request.POST, assignment=assignment, phase="ANNOTATION")
         if form.is_valid():
             form.save()
             messages.success(self.request, "Saved.")

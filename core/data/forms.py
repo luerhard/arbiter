@@ -9,10 +9,10 @@ from projects.models import Batch
 log = logging.getLogger(__name__)
 
 
-class MultiLabelFormAnnotation(forms.Form):
+class MultiLabelForm(forms.Form):
     labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
-    def __init__(self, *args, assignment, **kwargs):
+    def __init__(self, *args, assignment, phase, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.assignment = assignment
@@ -22,7 +22,7 @@ class MultiLabelFormAnnotation(forms.Form):
             annotation.label
             for annotation in self.example.get_user_annotations(
                 user=assignment.user,
-                phase="ANNOTATION",
+                phase=phase,
             ).select_related("label")
         }
 
@@ -61,11 +61,13 @@ class MultiLabelFormExpert(forms.Form):
             batch_assignment__user=self.user,
             batch_assignment__phase=Batch.Phase.EXPERT,
         ).get()
+        log.debug(f"{self.fields['labels'].choices = }")
         labels_queryset = Label.objects.filter(project_id=codebook.project.id)
         labels_choices = [(label.id, label.name) for label in labels_queryset]
+        log.debug(f"{labels_choices = }")
         self.fields["labels"].choices = labels_choices
 
     def save(self):
-        data = self.cleaned_data["labels"]
-        labels = [int(i) for i in data if i.strip()]
+        data = self.cleaned_data
+        labels = [int(i) for i in data["labels"] if i.strip()]
         self.assignment.set_user_annotations(label_ids=labels)
