@@ -5,7 +5,6 @@ from django.db import models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("data", "0007_alter_exampleassignment_phase"),
         ("projects", "0006_rename_batch_phase_to_current_phase"),
@@ -31,6 +30,8 @@ class Migration(migrations.Migration):
         ),
         migrations.AddConstraint(
             model_name="exampleassignment",
-            constraint=models.UniqueConstraint(fields=("example", "batch_assignment"), name="unique_example_batch_assignment"),
+            constraint=models.UniqueConstraint(
+                fields=("example", "batch_assignment"), name="unique_example_batch_assignment"
+            ),
         ),
     ]
