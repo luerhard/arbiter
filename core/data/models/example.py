@@ -19,7 +19,8 @@ class ExampleQuerySet(models.QuerySet):
             return self.none()
 
         assignments = (
-            ExampleAssignment.objects.filter(
+            ExampleAssignment.objects
+            .filter(
                 example_id__in=example_ids,
                 batch_assignment__phase=phase,
             )
@@ -90,9 +91,7 @@ class Example(models.Model):
             assignment__batch_assignment__phase=Batch.Phase.EXPERT,
         ).exists()
 
-    def get_user_annotations(self, phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"], user=None):
-        phase = getattr(Batch.Phase, phase)
-
+    def get_user_annotations(self, phase: Batch.Phase, user=None):
         qs = Annotation.objects.filter(
             assignment__example=self,
             assignment__batch_assignment__phase=phase,
