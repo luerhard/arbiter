@@ -177,9 +177,9 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.objects"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.example"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.example</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.batch_assignment"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.batch_assignment</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.phase"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.phase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.order"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.order</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.done"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.done</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.phase"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.phase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.user"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.user</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.previous"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.previous()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.next"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.next()</span></code></a></li>
@@ -192,7 +192,6 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.annotations"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.annotations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.batch_assignment_id"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.batch_assignment_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.example_id"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.example_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.get_phase_display"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.get_phase_display()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.id"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.id</span></code></a></li>
 </ul>
 </li>
@@ -320,21 +319,22 @@
 <li class="toctree-l5"><a class="reference internal" href="projects.html#projects.models.Batch.Phase.FINAL"><code class="docutils literal notranslate"><span class="pre">Batch.Phase.FINAL</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.objects"><code class="docutils literal notranslate"><span class="pre">Batch.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.project"><code class="docutils literal notranslate"><span class="pre">Batch.project</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.batch_number"><code class="docutils literal notranslate"><span class="pre">Batch.batch_number</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.phase"><code class="docutils literal notranslate"><span class="pre">Batch.phase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.current_phase"><code class="docutils literal notranslate"><span class="pre">Batch.current_phase</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.labels"><code class="docutils literal notranslate"><span class="pre">Batch.labels</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.max_batch_number"><code class="docutils literal notranslate"><span class="pre">Batch.max_batch_number</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.save"><code class="docutils literal notranslate"><span class="pre">Batch.save()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.labels"><code class="docutils literal notranslate"><span class="pre">Batch.labels</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.already_annotated_count"><code class="docutils literal notranslate"><span class="pre">Batch.already_annotated_count()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.assignees"><code class="docutils literal notranslate"><span class="pre">Batch.assignees()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.disagreements"><code class="docutils literal notranslate"><span class="pre">Batch.disagreements()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.set_phase"><code class="docutils literal notranslate"><span class="pre">Batch.set_phase()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Batch.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Batch.MultipleObjectsReturned</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.batch_assignments"><code class="docutils literal notranslate"><span class="pre">Batch.batch_assignments</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.examples"><code class="docutils literal notranslate"><span class="pre">Batch.examples</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.get_phase_display"><code class="docutils literal notranslate"><span class="pre">Batch.get_phase_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.get_current_phase_display"><code class="docutils literal notranslate"><span class="pre">Batch.get_current_phase_display()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.id"><code class="docutils literal notranslate"><span class="pre">Batch.id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.objects"><code class="docutils literal notranslate"><span class="pre">Batch.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.project_id"><code class="docutils literal notranslate"><span class="pre">Batch.project_id</span></code></a></li>
 </ul>
 </li>
@@ -343,8 +343,7 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.user"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.user</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.role"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.role</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.phase"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.phase</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.create_example_assignments"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.create_example_assignments()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.get_disagreements_for_phase"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.get_disagreements_for_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.save"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.MultipleObjectsReturned</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchAssignment.batch_id"><code class="docutils literal notranslate"><span class="pre">BatchAssignment.batch_id</span></code></a></li>

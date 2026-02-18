@@ -254,7 +254,7 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 
 <dl class="py method">
 <dt class="sig sig-object py" id="data.models.Example.set_user_annotations">
-<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.set_user_annotations" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_user_annotations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Literal" title="(in Python v3.14)"><span class="pre">Literal</span></a><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'ANNOTATION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'DISCUSSION'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'EXPERT'</span></span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example.set_user_annotations" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
@@ -298,13 +298,12 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phase</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">ExampleAssignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_assignment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">order</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">done</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_exampleassignment</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.0)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
-<li><p><strong>phase</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><em>CharField</em></a>) – Phase</p></li>
 <li><p><strong>order</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><em>PositiveIntegerField</em></a>) – Order</p></li>
 <li><p><strong>done</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><em>DateTimeField</em></a>) – Done</p></li>
 </ul>
@@ -345,21 +344,6 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.phase">
-<span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#data.models.ExampleAssignment.phase" title="Link to this definition"></a></dt>
-<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
-<p>Phase</p>
-<p>Choices:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">S</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">D</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">E</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">F</span></code></p></li>
-</ul>
-</dd></dl>
-
-<dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.order">
 <span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#data.models.ExampleAssignment.order" title="Link to this definition"></a></dt>
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositiveIntegerField</span></code></a></p>
@@ -372,6 +356,11 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a></p>
 <p>Done</p>
 </dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.phase">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">phase</span></span><a class="headerlink" href="#data.models.ExampleAssignment.phase" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.user">
@@ -440,12 +429,6 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.example_id">
 <span class="sig-name descname"><span class="pre">example_id</span></span><a class="headerlink" href="#data.models.ExampleAssignment.example_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#data.models.ExampleAssignment.example" title="data.models.ExampleAssignment.example"><code class="xref py py-class docutils literal notranslate"><span class="pre">example</span></code></a> instead.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="data.models.ExampleAssignment.get_phase_display">
-<span class="sig-name descname"><span class="pre">get_phase_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">phase&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.get_phase_display" title="Link to this definition"></a></dt>
-<dd><p>Shows the label of the <a class="reference internal" href="#data.models.ExampleAssignment.phase" title="data.models.ExampleAssignment.phase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">phase</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.0)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
 </dd></dl>
 
 <dl class="py attribute">
