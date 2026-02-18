@@ -35,14 +35,26 @@ This should spawn a webserver that is accessible in the browser via [http://127.
 To delete to everything, including the database:
 
 ```bash
-# stop all ccontainers
+# stop all containers
 docker compose down
 
 # remove the docker volume that contains the database data
 docker volume rm annotationtool_pgdata
 ```
 
-To undo changes in the database and reset to the test data (created by populatedb), without deleting the docker volume
+To start fresh:
+```bash
+# stop all containers
+docker compose down
+
+# remove all volumes
+docker compose down --volumes
+
+# start fresh
+docker compose up --build
+```
+
+To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume. 
 
 ```bash
 # reset 

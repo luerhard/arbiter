@@ -125,14 +125,25 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 </div>
 <p>This should spawn a webserver that is accessible in the browser via <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
 <p>To delete to everything, including the database:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all ccontainers</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all containers</span>
 docker<span class="w"> </span>compose<span class="w"> </span>down
 
 <span class="c1"># remove the docker volume that contains the database data</span>
 docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>annotationtool_pgdata
 </pre></div>
 </div>
-<p>To undo changes in the database and reset to the test data (created by populatedb), without deleting the docker volume</p>
+<p>To start fresh:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all containers</span>
+docker<span class="w"> </span>compose<span class="w"> </span>down
+
+<span class="c1"># remove all volumes</span>
+docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>--volumes
+
+<span class="c1"># start fresh</span>
+docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
+</pre></div>
+</div>
+<p>To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># reset </span>
 docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>resetdb<span class="w"> </span>--noinput
 </pre></div>
