@@ -29,6 +29,9 @@ class ExampleAssignment(models.Model):
             ),
         ]
 
+    def __str__(self):
+        return f"id: {self.id}, batch_assignment: {self.batch_assignment.id}, done: {self.done}"
+
     @property
     def phase(self):
         return self.batch_assignment.phase

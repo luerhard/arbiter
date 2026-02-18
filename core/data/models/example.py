@@ -86,9 +86,10 @@ class Example(models.Model):
 
     @property
     def has_expert_decision(self):
-        return Annotation.objects.filter(
-            assignment__example=self,
-            assignment__batch_assignment__phase=Batch.Phase.EXPERT,
+        return ExampleAssignment.objects.filter(
+            example=self,
+            batch_assignment__phase=Batch.Phase.EXPERT,
+            done__isnull=False,
         ).exists()
 
     def get_user_annotations(self, phase: Batch.Phase, user=None):
