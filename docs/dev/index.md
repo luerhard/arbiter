@@ -27,6 +27,7 @@ docker exec annotationtool-web-1 uv run manage.py migrate
 
 # populate the DB with test data
 docker exec annotationtool-web-1 uv run manage.py populatedb
+
 ```
 
 This should spawn a webserver that is accessible in the browser via [http://127.0.0.1:8000](http://127.0.0.1:8000).
@@ -39,6 +40,13 @@ docker compose down
 
 # remove the docker volume that contains the database data
 docker volume rm annotationtool_pgdata
+```
+
+To undo changes in the database and reset to the test data (created by populatedb), without deleting the docker volume
+
+```bash
+# reset 
+docker exec annotationtool-web-1 uv run manage.py resetdb --noinput
 ```
 
 ## The .env
