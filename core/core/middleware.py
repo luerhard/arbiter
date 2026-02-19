@@ -10,8 +10,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
             return response
 
         messages = [
-            {"message": message.message, "tags": message.tags}
-            for message in get_messages(request)
+            {"message": message.message, "tags": message.tags} for message in get_messages(request)
         ]
         if not messages:
             return response
@@ -24,9 +23,7 @@ class HtmxMessageMiddleware(MiddlewareMixin):
                     triggers = {}
             except json.JSONDecodeError:
                 triggers = {
-                    key.strip(): True
-                    for key in existing_triggers_raw.split(",")
-                    if key.strip()
+                    key.strip(): True for key in existing_triggers_raw.split(",") if key.strip()
                 }
         else:
             triggers = {}

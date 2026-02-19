@@ -9,7 +9,6 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
-from projects.models import BatchAssignment
 from projects.models import Project
 from projects.models import ProjectUser
 from users.models import User
@@ -88,8 +87,7 @@ def project_discussion(project_annotation):
     batch = data["batch"]
 
     ea_a1 = (
-        ExampleAssignment.objects
-        .from_project(project=project)
+        ExampleAssignment.objects.from_project(project=project)
         .filter(
             batch_assignment__user=a1,
             example=example,
@@ -99,8 +97,7 @@ def project_discussion(project_annotation):
     )
     ea_a1.set_user_annotations(label_ids=[label1.id])
     ea_a2 = (
-        ExampleAssignment.objects
-        .from_project(project=project)
+        ExampleAssignment.objects.from_project(project=project)
         .filter(
             batch_assignment__user=a2,
             example=example,
@@ -123,8 +120,7 @@ def project_expert(project_discussion):
     batch = data["batch"]
 
     ea_a1 = (
-        ExampleAssignment.objects
-        .from_project(project=project)
+        ExampleAssignment.objects.from_project(project=project)
         .filter(
             batch_assignment__user=a1,
             example=example,
@@ -134,8 +130,7 @@ def project_expert(project_discussion):
     )
     ea_a1.set_user_annotations(label_ids=[label1.id])
     ea_a2 = (
-        ExampleAssignment.objects
-        .from_project(project=project)
+        ExampleAssignment.objects.from_project(project=project)
         .filter(
             batch_assignment__user=a2,
             example=example,
