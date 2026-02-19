@@ -39,10 +39,16 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         project = batch.project
         context["codebook"] = project.codebook.get()
 
-        disagreements = batch.disagreements(phase=Batch.Phase.DISCUSSION)
+        open_assignments = ExampleAssignment.objects.filter(
+            example__in=batch.disagreements(Batch.Phase.DISCUSSION),
+            batch_assignment__user=self.request.user,
+            batch_assignment__phase=Batch.Phase.EXPERT,
+            done__isnull=True,
+        ).select_related("example")
 
-        n_disagreements = disagreements.count()
-        current_example = disagreements.first()
+        n_disagreements = open_assignments.count()
+        current_assignment = open_assignments.first()
+        current_example = current_assignment.example if current_assignment else None
         current_assignment = ExampleAssignment.objects.filter(
             example=current_example,
             batch_assignment__user=self.request.user,
@@ -77,8 +83,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context["prev_label_ids"] = prev_label_ids
         context["labels"] = project.labels.all()
 
-        log.debug("Providing the following context for the expert resolution")
-        log.debug(context)
         return context
 
 
