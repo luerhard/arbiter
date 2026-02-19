@@ -180,7 +180,6 @@
 
             if (isEdit) {
                 if (rationaleEmpty) {
-                    lib.expert.notify("Please add a rationale.", "x-circle");
                     return;
                 };
                 const res = await fetch(codebookForm.action, {
@@ -192,19 +191,12 @@
                 });
 
                 if (!res.ok) {
-                    lib.expert.notify("Codebook update failed.", "x-circle");
                     return;
                 };
 
-                lib.expert.notify("Disagreement resolution saved.");
-                setTimeout(() => {
-                    labelsForm.submit();
-                }, 3000);
+                labelsForm.submit();
             } else {
-                lib.expert.notify("Disagreement resolution saved.");
-                setTimeout(() => {
-                    labelsForm.submit();
-                }, 3000);
+                labelsForm.submit();
             };
         };
 
