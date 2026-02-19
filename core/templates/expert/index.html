@@ -8,8 +8,7 @@
     <div id="expert-dialog-content"
          hx-get="{% url 'expert-dialogue-content' batch_id %}"
          hx-trigger="load"
-         hx-swap="outerHTML">
-    </div>
+         hx-swap="outerHTML"></div>
     <script>
         function getDialogElements() {
             return {
@@ -67,7 +66,13 @@
         };
 
         function toggleEdit() {
-            const { textarea, rendered, editButton, cancelButton, rationaleDiv } = getDialogElements();
+            const {
+                textarea,
+                rendered,
+                editButton,
+                cancelButton,
+                rationaleDiv
+            } = getDialogElements();
             if (!textarea || !rendered || !editButton || !cancelButton || !rationaleDiv) return;
             if (textarea.classList.contains('hidden')) {
                 rendered.classList.add('hidden')
@@ -81,7 +86,14 @@
         };
 
         function toggleUndo() {
-            const { textarea, rendered, editButton, cancelButton, buttonsDiv, rationaleDiv } = getDialogElements();
+            const {
+                textarea,
+                rendered,
+                editButton,
+                cancelButton,
+                buttonsDiv,
+                rationaleDiv
+            } = getDialogElements();
             if (!textarea || !rendered || !editButton || !cancelButton || !buttonsDiv || !rationaleDiv) return;
             if (!textarea.readOnly) {
                 textarea.value = rendered.getAttribute("data-codebook-content") || "";
