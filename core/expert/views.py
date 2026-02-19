@@ -1,6 +1,5 @@
 import logging
 
-from codebook.models import Codebook
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -11,7 +10,6 @@ from django.views.generic.edit import UpdateView
 from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
-from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
@@ -58,8 +56,7 @@ def build_dialog_context(batch, user):
         assignment__batch_assignment__phase=Batch.Phase.DISCUSSION,
     )
     chat_messages = (
-        Message.objects
-        .filter(example=current_example)
+        Message.objects.filter(example=current_example)
         .exclude(user="system")
         .order_by("created_at")
     )
