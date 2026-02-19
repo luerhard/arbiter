@@ -9,6 +9,9 @@ class ExampleAssignmentQuerySet(models.QuerySet):
     def done(self):
         return self.filter(done__isnull=False)
 
+    def from_project(self, project):
+        return self.filter(batch_assignment__batch__project=project)
+
 
 class ExampleAssignment(models.Model):
     objects = ExampleAssignmentQuerySet.as_manager()
