@@ -50,6 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-env">The .env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run-tests">Run tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#debugging-with-vs-code">Debugging with VS Code</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#build-documentation-locally">Build documentation locally</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#overview-and-starting-point">Overview and starting point</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#django-web-app">Django web app</a></li>
@@ -187,6 +188,13 @@ docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </spa
 <li><p>make sure the virtual environment is installed (run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> to make sure)</p></li>
 <li><p>now, either run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">pytest</span></code> from the command-line or use the built-in test runner in VSCode.</p></li>
 </ol>
+</section>
+<section id="debugging-with-vs-code">
+<h2>Debugging with VS Code<a class="headerlink" href="#debugging-with-vs-code" title="Link to this heading"></a></h2>
+<p>You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables.
+To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says “Attach to Django in Docker”.
+You can then place breakpoints in the code.
+When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting.</p>
 </section>
 <section id="build-documentation-locally">
 <h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
