@@ -90,7 +90,7 @@
                                                 Export
                                             </a>
                                             {% if batch.batch.current_phase == "E" %}
-                                                <a href="{% url 'expert-dialogue' codebook_id=codebook.id batch_id=batch.batch.id example_id=batch.disagreement_first_id %}"
+                                                <a href="{% url 'expert-dialogue' batch.batch.id %}"
                                                    class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
                                                     Resolve
                                                 </a>
