@@ -8,6 +8,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
 from django.views.generic import DetailView
+from django.views.generic import FormView
 from django.views.generic import ListView
 from django.views.generic import RedirectView
 from django.views.generic import View
@@ -50,17 +51,16 @@ class ProjectListView(ListView):
         return context
 
 
-class ProjectCreateView(View):
-    def get(self, request):
-        form = ProjectCreateForm()
-        return render(request, "projects/project_create.html", {"form": form})
+class ProjectCreateView(FormView):
+    template_name = "projects/project_create.html"
+    form_class = ProjectCreateForm
 
-    def post(self, request):
-        form = ProjectCreateForm(request.POST)
-        if not form.is_valid():
-            return render(request, "projects/project_create.html", {"form": form})
+    def get_success_url(self):
+        return reverse("project-detail", kwargs={"project_id": self.project.id})
 
-        project = Project.objects.create(
+    def form_valid(self, form):
+
+        self.project = Project.objects.create(
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
         )
@@ -69,7 +69,7 @@ class ProjectCreateView(View):
         for user in form.cleaned_data["annotators"]:
             project_users.append(
                 ProjectUser(
-                    project=project,
+                    project=self.project,
                     user=user,
                     default_role=ProjectUser.Role.ANNOTATOR,
                 ),
@@ -77,7 +77,7 @@ class ProjectCreateView(View):
         for user in form.cleaned_data["experts"]:
             project_users.append(
                 ProjectUser(
-                    project=project,
+                    project=self.project,
                     user=user,
                     default_role=ProjectUser.Role.EXPERT,
                 ),
@@ -85,9 +85,9 @@ class ProjectCreateView(View):
         if project_users:
             ProjectUser.objects.bulk_create(project_users)
 
-        label_names = request.POST.getlist("label_name")
-        label_colors = request.POST.getlist("label_color")
-        label_hotkeys = request.POST.getlist("label_hotkey")
+        label_names = self.request.POST.getlist("label_name")
+        label_colors = self.request.POST.getlist("label_color")
+        label_hotkeys = self.request.POST.getlist("label_hotkey")
 
         labels = []
         seen_names = set()
@@ -114,7 +114,7 @@ class ProjectCreateView(View):
             Label.objects.bulk_create(
                 [
                     Label(
-                        project=project,
+                        project=self.project,
                         name=label["name"],
                         color=label["color"] or Label._meta.get_field("color").default,
                         hotkey=label["hotkey"],
@@ -123,7 +123,7 @@ class ProjectCreateView(View):
                 ],
             )
 
-        return redirect("project-detail", project_id=project.id)
+        return super().form_valid(form)
 
 
 class ProjectBatchCreateView(ExpertRequiredMixin, View):
