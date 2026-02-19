@@ -129,7 +129,7 @@ class Command(BaseCommand):
         # Create a disagreement batch after discussion
         batch = create_batch(project)
         label_ids = [label.id for label in project.labels.all()]
-        random.seed(42)
+        random.seed(43)
         for example in batch.examples.all():
             for assignment in example.assignments.all():
                 labels = uniform_choices(label_ids)
