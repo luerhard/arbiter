@@ -168,5 +168,5 @@ node_modules/**
 
 # VSCode specific files
 *.code-workspace
-media/
-assets/
+media/**
+assets/**
