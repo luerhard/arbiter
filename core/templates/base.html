@@ -34,10 +34,8 @@
                 </main>
             </div>
         </div>
-        {% comment %} {% include "navbar.html" %}
-        <main>
-                {% block content %}
-                {% endblock content %}
-        </main> {% endcomment %}
+        <c-toasts>
+        {% for message in messages %}<c-toasts.toast :tags="message.tags", :message="message.message" />{% endfor %}
+        </c-toasts>
     </body>
 </html>
