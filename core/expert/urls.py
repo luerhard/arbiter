@@ -10,7 +10,12 @@ urlpatterns = [
     ),
     path(
         "dialogue/<int:batch_id>",
-        views.ExpertDialogue.as_view(),
+        views.ExpertDialog.as_view(),
         name="expert-dialogue",
+    ),
+    path(
+        "dialogue/<int:batch_id>/content",
+        views.ExpertDialogueContent.as_view(),
+        name="expert-dialogue-content",
     ),
 ]
