@@ -7,7 +7,6 @@
                 Upload a CSV or XLSX file with a <code class="px-1">text</code> column.
             </p>
         </div>
-
         <form method="post"
               enctype="multipart/form-data"
               class="mt-6 space-y-6 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10">
@@ -17,17 +16,11 @@
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
-
             <div>
                 <label class="block text-sm font-medium text-gray-900 dark:text-white">Data file</label>
-                <div class="mt-2">
-                    {{ form.file }}
-                </div>
-                {% if form.file.errors %}
-                    <p class="mt-1 text-sm text-rose-600">{{ form.file.errors }}</p>
-                {% endif %}
+                <div class="mt-2">{{ form.file }}</div>
+                {% if form.file.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.file.errors }}</p>{% endif %}
             </div>
-
             <div class="flex items-center gap-3">
                 <button type="submit"
                         class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500">

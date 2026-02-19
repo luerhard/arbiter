@@ -42,10 +42,12 @@ class ProjectCreateForm(forms.Form):
             "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "
             "dark:border-white/10 dark:bg-gray-900 dark:text-white"
         )
-        self.fields["name"].widget.attrs.update({
-            "class": base_input,
-            "placeholder": "Project title",
-        })
+        self.fields["name"].widget.attrs.update(
+            {
+                "class": base_input,
+                "placeholder": "Project title",
+            }
+        )
         self.fields["description"].widget.attrs.update(
             {"class": base_input, "rows": 4, "placeholder": "What is this project about?"},
         )
