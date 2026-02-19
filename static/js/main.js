@@ -15,18 +15,14 @@ import { navBlock, labelButton } from "./annotation.js";
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 
-import { notification } from "./expert.js";
-Alpine.data("notification", notification);
-
 Alpine.start();
 
 // Your modules
 import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
-import * as expert from "./expert.js";
 
-window.lib = { funcs, discuss, expert };
-export { funcs, discuss, expert };
+window.lib = { funcs, discuss };
+export { funcs, discuss };
 
 // Debugging
 htmx.logger = (elt, event, data) => console?.log?.(event, elt, data);
