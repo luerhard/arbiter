@@ -100,6 +100,12 @@ So to do this
 2. make sure the virtual environment is installed (run `uv sync` to make sure)
 3. now, either run `uv run pytest` from the command-line or use the built-in test runner in VSCode.
 
+## Debugging with VS Code 
+You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables. 
+To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says "Attach to Django in Docker". 
+You can then place breakpoints in the code. 
+When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting. 
+
 ## Build documentation locally
 
 ```bash
