@@ -12,6 +12,7 @@ from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
+from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
 
@@ -19,10 +20,9 @@ log = logging.getLogger(__name__)
 
 
 class ExpertDialogue(ExpertRequiredMixin, DetailView):
-    pk_url_kwarg = "codebook_id"
-    model = Codebook
-    context_object_name = "codebook"
-    template_name = "expert/dialogue.html"
+    pk_url_kwarg = "batch_id"
+    model = Batch
+    template_name = "expert/index.html"
 
     def get(self, request, *args, **kwargs):  # noqa: ARG002
         self.object = self.get_object()
@@ -35,45 +35,22 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        codebook = self.object
-        project = codebook.project
-        context["codebook"] = codebook
-        batch_id = self.kwargs.get("batch_id")
-        context["batch_id"] = batch_id
+        batch = self.object
+        project = batch.project
+        context["codebook"] = project.codebook.get()
 
-        current_example_id = self.kwargs.get("example_id")
-        all_examples = [
-            e
-            for e in Example.objects.filter(
-                batch_id=batch_id,
-                batch__project_id=project.id,
-            ).order_by("id")
-            if e.has_disagreement
-            and e.has_disagreement_after_discussion
-            and not e.has_expert_decision
-        ]
+        disagreements = batch.disagreements(phase=Batch.Phase.DISCUSSION)
 
-        if not all_examples:
-            return None
-        if current_example_id:
-            current_example = get_object_or_404(
-                Example,
-                pk=current_example_id,
-                batch__project_id=project.id,
-            )
-            if not (
-                current_example.has_disagreement_after_discussion
-                and not current_example.has_expert_decision
-            ):
-                current_example = all_examples[0]
-        else:
-            current_example = all_examples[0]
+        n_disagreements = disagreements.count()
+        current_example = disagreements.first()
+        current_assignment = ExampleAssignment.objects.filter(
+            example=current_example,
+            batch_assignment__user=self.request.user,
+        ).get()
 
-        next_example = next((e for e in all_examples if e.id > current_example.id), None)
-        context["example_id"] = current_example_id
+        context["example_id"] = current_example.id
         context["sentence"] = current_example
-        context["next_example"] = next_example
-        context["all_examples"] = all_examples
+        context["assignment"] = current_assignment
 
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
@@ -93,7 +70,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         )
 
         prev_label_ids = [a.label.id for a in annotations_after_discussion]
-        context["disagreements_remaining"] = len(all_examples)
+        context["disagreements_remaining"] = n_disagreements
         context["prev_annotations"] = annotations_before_discussion
         context["post_annotations"] = annotations_after_discussion
         context["chat_messages"] = messages
@@ -106,32 +83,42 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
 
 class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
-    def post(self, request, codebook_id, batch_id, example_id):
-        user = request.user
-        batch = get_object_or_404(Batch, pk=batch_id)
-        example = get_object_or_404(Example, pk=example_id, batch=batch_id)
-        codebook = get_object_or_404(Codebook, pk=codebook_id)
-        form = MultiLabelFormExpert(request.POST, codebook=codebook, example=example, user=user)
+    def post(self, *args, **kwargs):  # noqa: ARG002
+        assignment_id = kwargs.get("assignment_id")
+        assignment = get_object_or_404(
+            ExampleAssignment.objects.select_related(
+                "example__batch__project",
+                "batch_assignment",
+            ),
+            pk=assignment_id,
+        )
+
+        user = self.request.user
+        example = assignment.example
+        batch = example.batch
+        project = batch.project
+        codebook = project.codebook.get()
+
+        form = MultiLabelFormExpert(
+            self.request.POST,
+            codebook=codebook,
+            example=example,
+            user=user,
+        )
         if form.is_valid():
             form.save()
             messages.success(self.request, "Saved.")
         else:
             messages.error(self.request, f"Something was invalid: {form}")
 
-        all_examples = [
-            e
-            for e in Example.objects.filter(
-                batch_id=batch_id,
-                batch__project_id=codebook.project.id,
-            ).order_by("id")
-            if e.has_disagreement
-            and e.has_disagreement_after_discussion
-            and not e.has_expert_decision
-        ]
-        next_example = next((e for e in all_examples if e.id > example.id), None)
-        if next_example:
-            return redirect("expert-dialogue", codebook_id, batch_id, next_example.id)
-        else:
-            batch.set_phase(Batch.Phase.FINAL)
+        any_remaining = any(
+            e.has_disagreement and e.has_disagreement_after_discussion and not e.has_expert_decision
+            for e in Example.objects.filter(batch=batch).order_by("id")
+        )
 
-            return redirect("project-detail", codebook.project.id)
+        if any_remaining:
+            return redirect("expert-dialogue", batch_id=batch.id)
+
+        batch.set_phase(Batch.Phase.FINAL)
+        batch.save(update_fields=["current_phase"])
+        return redirect("project-detail", project_id=project.id)
