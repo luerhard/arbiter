@@ -74,5 +74,4 @@ class Project(models.Model):
         is_new = self._state.adding is True
         super().save(*args, **kwargs)
         if is_new:
-            print("adding codebook")
             Codebook.objects.get_or_create(project=self)
