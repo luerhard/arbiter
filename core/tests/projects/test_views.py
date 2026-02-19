@@ -1,5 +1,15 @@
+import uuid
+
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 import pytest
+
+from data.models import ExampleAssignment
+from projects.models import Batch
+from projects.models import BatchAssignment
+from projects.models import Project
+from projects.models import ProjectUser
+from users.models import User
 
 URLS_ANYROLE = [("project-list", None)]
 URLS_EXPERT = [
@@ -8,8 +18,100 @@ URLS_EXPERT = [
 ]
 URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 
-# TODO: write test for change batch phase
-# TODO: write test for download batch results
+
+@pytest.mark.django_db
+class TestProjectAndBatchCreationViews:
+    def test_create_project_creates_project_users(self, client):
+        suffix = uuid.uuid4().hex[:8]
+        annotator_1 = User.objects.create_user(username=f"ann_{suffix}", password="123")
+        annotator_2 = User.objects.create_user(username=f"ann2_{suffix}", password="123")
+        expert = User.objects.create_user(username=f"exp_{suffix}", password="123")
+
+        login = client.login(username="expert1", password="123")
+        assert login == True
+
+        url = reverse("project-create")
+        data = {
+            "name": f"Created Project {suffix}",
+            "description": "Created in test",
+            "annotators": [annotator_1.id, annotator_2.id],
+            "experts": [expert.id],
+            "label_name": ["Label A"],
+            "label_color": ["#111111"],
+            "label_hotkey": ["a"],
+        }
+        response = client.post(url, data)
+
+        assert response.status_code == 302
+        project = Project.objects.get(name=f"Created Project {suffix}")
+        assert (
+            ProjectUser.objects.filter(
+                project=project,
+                default_role=ProjectUser.Role.ANNOTATOR,
+            ).count()
+            == 2
+        )
+        assert (
+            ProjectUser.objects.filter(
+                project=project,
+                default_role=ProjectUser.Role.EXPERT,
+            ).count()
+            == 1
+        )
+
+    def test_create_batch_creates_batch_and_assignments(self, client):
+        suffix = uuid.uuid4().hex[:8]
+        annotator_1 = User.objects.create_user(username=f"batch_ann_{suffix}", password="123")
+        annotator_2 = User.objects.create_user(username=f"batch_ann2_{suffix}", password="123")
+        expert = User.objects.create_user(username=f"batch_exp_{suffix}", password="123")
+
+        project = Project.objects.create(
+            name=f"Batch Project {suffix}",
+            description="For batch test",
+        )
+        ProjectUser.objects.create(
+            project=project,
+            user=annotator_1,
+            default_role=ProjectUser.Role.ANNOTATOR,
+        )
+        ProjectUser.objects.create(
+            project=project,
+            user=annotator_2,
+            default_role=ProjectUser.Role.ANNOTATOR,
+        )
+        ProjectUser.objects.create(
+            project=project,
+            user=expert,
+            default_role=ProjectUser.Role.EXPERT,
+        )
+
+        login = client.login(username=expert.username, password="123")
+        assert login == True
+
+        upload = SimpleUploadedFile(
+            "examples.csv",
+            b"text\nFirst example\nSecond example\n",
+            content_type="text/csv",
+        )
+        url = reverse("project-batch-create", args=(project.id,))
+        response = client.post(url, {"file": upload})
+
+        assert response.status_code == 302
+
+        batch = Batch.objects.get(project=project)
+        batch_assignments = BatchAssignment.objects.filter(batch=batch)
+        assert batch_assignments.count() == 2
+        assert set(batch_assignments.values_list("user_id", flat=True)) == {
+            annotator_1.id,
+            annotator_2.id,
+        }
+
+        example_assignments = ExampleAssignment.objects.filter(example__batch=batch)
+        assert example_assignments.count() == 4
+        assert set(example_assignments.values_list("batch_assignment__user_id", flat=True)) == {
+            annotator_1.id,
+            annotator_2.id,
+        }
 
 
 @pytest.mark.django_db
