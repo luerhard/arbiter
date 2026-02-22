@@ -13,6 +13,7 @@ import focus from "@alpinejs/focus";
 window.Alpine = Alpine;
 Alpine.plugin(focus);
 
+import { navBlock, labelButton } from "./annotation.js";
 import * as ui from "./ui.js";
 import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
@@ -22,6 +23,8 @@ window.lib.ui = ui;
 window.lib.funcs = funcs;
 window.lib.discuss = discuss;
 
+Alpine.data("labelButton", labelButton);
+Alpine.data("navBlock", navBlock);
 Alpine.start();
 
 // Debugging
