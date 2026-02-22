@@ -9,20 +9,20 @@ import "htmx-ext-ws";
 import Mousetrap from "mousetrap";
 
 import Alpine from 'alpinejs';
+import focus from "@alpinejs/focus";
 window.Alpine = Alpine;
+Alpine.plugin(focus);
 
-import { navBlock, labelButton } from "./annotation.js";
-Alpine.data("labelButton", labelButton);
-Alpine.data("navBlock", navBlock);
-
-Alpine.start();
-
-// Your modules
+import * as ui from "./ui.js";
 import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
 
-window.lib = { funcs, discuss };
-export { funcs, discuss };
+window.lib = window.lib || {};
+window.lib.ui = ui;
+window.lib.funcs = funcs;
+window.lib.discuss = discuss;
+
+Alpine.start();
 
 // Debugging
 htmx.logger = (elt, event, data) => console?.log?.(event, elt, data);

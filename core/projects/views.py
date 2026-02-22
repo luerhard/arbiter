@@ -410,3 +410,18 @@ class ExportBatch(ExpertRequiredMixin, View):
         response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
 
         return response
+
+
+class HtmxUserSearch(View):
+    def get(self, request, **kwargs):  # noqa: ARG002
+        query = (request.GET.get("q") or "").strip()
+
+        if query:
+            users = User.objects.filter(username__icontains=query).order_by("username")[:5]
+        else:
+            users = User.objects.all()[:5]
+        return render(
+            request,
+            "projects/partials/user_search_results.html",
+            {"users": users},
+        )
