@@ -3,9 +3,12 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
 
-from .project_user import ProjectUser
-
 User = get_user_model()
+
+
+class ProjectRole(models.TextChoices):
+    ANNOTATOR = "A", "Annotator"
+    EXPERT = "E", "Expert"
 
 
 class Project(models.Model):
@@ -15,6 +18,7 @@ class Project(models.Model):
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
 
     def user_role(self, user):
+        ProjectUser = apps.get_model("projects", "ProjectUser")
         return ProjectUser.objects.filter(project=self, user=user)
 
     @property
@@ -43,6 +47,7 @@ class Project(models.Model):
 
     @property
     def annotators(self):
+        ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
             projectuser__default_role=ProjectUser.Role.ANNOTATOR,
@@ -50,6 +55,7 @@ class Project(models.Model):
 
     @property
     def experts(self):
+        ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
             projectuser__default_role=ProjectUser.Role.EXPERT,

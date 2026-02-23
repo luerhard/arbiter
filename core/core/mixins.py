@@ -1,5 +1,6 @@
 from django.http import HttpResponseForbidden
 
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 
@@ -48,12 +49,12 @@ class RoleRequiredMixin:
 
 
 class AnnotatorRequiredMixin(RoleRequiredMixin):
-    roles = (ProjectUser.Role.ANNOTATOR,)
+    roles = (ProjectRole.ANNOTATOR,)
 
 
 class ExpertRequiredMixin(RoleRequiredMixin):
-    roles = (ProjectUser.Role.EXPERT,)
+    roles = (ProjectRole.EXPERT,)
 
 
 class AnyRoleRequiredMixin(RoleRequiredMixin):
-    roles = (ProjectUser.Role.ANNOTATOR, ProjectUser.Role.EXPERT)
+    roles = (ProjectRole.ANNOTATOR, ProjectRole.EXPERT)

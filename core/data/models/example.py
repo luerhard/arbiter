@@ -7,12 +7,13 @@ from .example_assignment import ExampleAssignment
 from .models import Annotation
 from projects.models import Batch
 from projects.models import BatchAssignment
+from projects.models import BatchPhase
 
 
 class ExampleQuerySet(models.QuerySet):
     def disagreements(self, phase):
         if isinstance(phase, str) and len(phase) > 1:
-            phase = getattr(Batch.Phase, phase)
+            phase = getattr(BatchPhase, phase)
 
         example_ids = list(self.values_list("id", flat=True))
         if not example_ids:
@@ -74,24 +75,24 @@ class Example(models.Model):
     @property
     def has_disagreement(self):
         return (
-            Example.objects.filter(id=self.id).disagreements(phase=Batch.Phase.ANNOTATION).exists()
+            Example.objects.filter(id=self.id).disagreements(phase=BatchPhase.ANNOTATION).exists()
         )
 
     @property
     def has_disagreement_after_discussion(self):
         return (
-            Example.objects.filter(id=self.id).disagreements(phase=Batch.Phase.DISCUSSION).exists()
+            Example.objects.filter(id=self.id).disagreements(phase=BatchPhase.DISCUSSION).exists()
         )
 
     @property
     def has_expert_decision(self):
         return ExampleAssignment.objects.filter(
             example=self,
-            batch_assignment__phase=Batch.Phase.EXPERT,
+            batch_assignment__phase=BatchPhase.EXPERT,
             done__isnull=False,
         ).exists()
 
-    def get_user_annotations(self, phase: Batch.Phase, user=None):
+    def get_user_annotations(self, phase: BatchPhase, user=None):
         qs = Annotation.objects.filter(
             assignment__example=self,
             assignment__batch_assignment__phase=phase,
@@ -111,6 +112,6 @@ class Example(models.Model):
             batch_assignment__user=user,
         )
         if phase is not None:
-            assignments = assignments.filter(batch_assignment__phase=getattr(Batch.Phase, phase))
+            assignments = assignments.filter(batch_assignment__phase=getattr(BatchPhase, phase))
         assignment = assignments.get()
         assignment.set_user_annotations(label_ids=label_ids)

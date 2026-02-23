@@ -3,12 +3,21 @@ from collections.abc import Mapping
 from typing import TYPE_CHECKING
 
 from django.apps import apps
+from django.contrib.auth import get_user_model
 from django.db import models
 
+from .project_user import ProjectRole
 from .project_user import ProjectUser
 
-if TYPE_CHECKING:
-    User = apps.get_model("users", "User")
+User = get_user_model()
+
+
+class BatchPhase(models.TextChoices):
+    SETUP = "S", "Setup"
+    ANNOTATION = "A", "Annotation"
+    DISCUSSION = "D", "Discussion"
+    EXPERT = "E", "ExpertDecision"
+    FINAL = "F", "Finalized"
 
 
 class BatchQuerySet(models.QuerySet):
@@ -21,23 +30,30 @@ class BatchQuerySet(models.QuerySet):
         )
 
 
-class Batch(models.Model):
-    class Phase(models.TextChoices):
-        SETUP = "S", "Setup"
-        ANNOTATION = "A", "Annotation"
-        DISCUSSION = "D", "Discussion"
-        EXPERT = "E", "ExpertDecision"
-        FINAL = "F", "Finalized"
-
-    objects = BatchQuerySet.as_manager()
-    project = models.ForeignKey("Project", related_name="batches", on_delete=models.CASCADE)
-    batch_number = models.SmallIntegerField()
-    current_phase = models.CharField(
-        default=Phase.SETUP,
+class BatchUser(models.Model):
+    batch = models.ForeignKey("Batch", on_delete=models.CASCADE, db_index=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
+    role = models.CharField(
+        default=ProjectRole.ANNOTATOR,
         null=False,
         blank=False,
         max_length=1,
-        choices=Phase,
+        choices=ProjectRole,
+        db_index=True,
+    )
+
+
+class Batch(models.Model):
+    objects = BatchQuerySet.as_manager()
+    project = models.ForeignKey("Project", related_name="batches", on_delete=models.CASCADE)
+    users = models.ManyToManyField(User, through="BatchUser")
+    batch_number = models.SmallIntegerField()
+    current_phase = models.CharField(
+        default=BatchPhase.SETUP,
+        null=False,
+        blank=False,
+        max_length=1,
+        choices=BatchPhase,
         db_index=True,
     )
 
@@ -110,8 +126,8 @@ class Batch(models.Model):
 
     def set_phase(
         self,
-        phase: Phase,
-        user_role_mapping: Mapping["User", ProjectUser.Role] | None = None,
+        phase: BatchPhase,
+        user_role_mapping: Mapping["User", ProjectRole] | None = None,
     ):
         self.current_phase = phase
 
@@ -125,8 +141,8 @@ class Batch(models.Model):
 
     def _create_batch_assignments(
         self,
-        phase: Phase,
-        user_role_mapping: Mapping["User", ProjectUser.Role] | None = None,
+        phase: BatchPhase,
+        user_role_mapping: Mapping["User", ProjectRole] | None = None,
     ):
         BatchAssignment = apps.get_model("projects", "BatchAssignment")
 
@@ -161,7 +177,7 @@ class Batch(models.Model):
             unique_fields=("batch", "user", "phase"),
         )
 
-    def _create_example_assignments(self, phase: Phase):
+    def _create_example_assignments(self, phase: BatchPhase):
         ExampleAssignment = apps.get_model("data", "ExampleAssignment")
 
         if phase == Batch.Phase.ANNOTATION:
