@@ -94,7 +94,14 @@ class TestProjectAndBatchCreationViews:
             content_type="text/csv",
         )
         url = reverse("project-batch-create", args=(project.id,))
-        response = client.post(url, {"file": upload})
+        response = client.post(
+            url,
+            {
+                "file": upload,
+                "annotators": [annotator_1.id, annotator_2.id],
+                "experts": [expert.id],
+            },
+        )
 
         assert response.status_code == 302
 
@@ -112,6 +119,47 @@ class TestProjectAndBatchCreationViews:
             annotator_1.id,
             annotator_2.id,
         }
+
+    def test_batch_create_invalid_keeps_selected_users_context(self, client):
+        suffix = uuid.uuid4().hex[:8]
+        annotator = User.objects.create_user(username=f"batch_ann_ctx_{suffix}", password="123")
+        expert = User.objects.create_user(username=f"batch_exp_ctx_{suffix}", password="123")
+
+        project = Project.objects.create(
+            name=f"Batch Project Context {suffix}",
+            description="For batch context test",
+        )
+        ProjectUser.objects.create(
+            project=project,
+            user=annotator,
+            default_role=ProjectUser.Role.ANNOTATOR,
+        )
+        ProjectUser.objects.create(
+            project=project,
+            user=expert,
+            default_role=ProjectUser.Role.EXPERT,
+        )
+
+        login = client.login(username=expert.username, password="123")
+        assert login == True
+
+        url = reverse("project-batch-create", args=(project.id,))
+        response = client.post(
+            url,
+            {
+                # Deliberately omit file to keep the form invalid.
+                "annotators": [annotator.id],
+                "experts": [expert.id],
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.context["annotators_selected_users"] == (
+            f'[{{"id": {annotator.id}, "username": "{annotator.username}"}}]'
+        )
+        assert response.context["experts_selected_users"] == (
+            f'[{{"id": {expert.id}, "username": "{expert.username}"}}]'
+        )
 
 
 @pytest.mark.django_db

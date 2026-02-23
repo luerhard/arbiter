@@ -1,3 +1,4 @@
+import json
 import logging
 
 from django.contrib import messages
@@ -50,6 +51,13 @@ class ProjectListView(ListView):
         context["create_url"] = reverse("project-create") if self.request.user.is_staff else None
         return context
 
+    @staticmethod
+    def _jsonify_users(users):
+        out = []
+        for user in users:
+            out.append({"id": user.id, "username": user.username})
+        return json.dumps(out)
+
 
 class ProjectCreateView(FormView):
     template_name = "projects/project_create.html"
@@ -57,6 +65,13 @@ class ProjectCreateView(FormView):
 
     def get_success_url(self):
         return reverse("project-detail", kwargs={"project_id": self.project.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = context.get("form")
+        if form is not None:
+            context["form"] = form
+        return context
 
     def form_valid(self, form):
 
@@ -126,25 +141,32 @@ class ProjectCreateView(FormView):
         return super().form_valid(form)
 
 
-class ProjectBatchCreateView(ExpertRequiredMixin, View):
-    def get(self, request, project_id):
-        project = get_object_or_404(Project, id=project_id)
-        form = BatchCreateForm()
-        return render(
-            request,
-            "projects/batch_create.html",
-            {"project": project, "form": form},
-        )
+class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
+    template_name = "projects/batch_create.html"
+    form_class = BatchCreateForm
 
-    def post(self, request, project_id):
+    def get_success_url(self):
+        return reverse("project-detail", kwargs={"project_id": self.kwargs.get("project_id")})
+
+    @staticmethod
+    def _jsonify_users(users):
+        out = []
+        for user in users:
+            out.append({"id": user.id, "username": user.username})
+        return json.dumps(out)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = context.get("form")
+        project_id = self.kwargs.get("project_id")
         project = get_object_or_404(Project, id=project_id)
-        form = BatchCreateForm(request.POST, request.FILES)
-        if not form.is_valid():
-            return render(
-                request,
-                "projects/batch_create.html",
-                {"project": project, "form": form},
-            )
+        if form is not None:
+            context["project"] = project
+            context["annotators_selected_users"] = self._jsonify_users(project.annotators.all())
+            context["experts_selected_users"] = self._jsonify_users(project.experts.all())
+        return context
+
+    def form_valid(self, form):
 
         file = form.cleaned_data["file"]
         if file.name.endswith(".csv"):
@@ -153,19 +175,16 @@ class ProjectBatchCreateView(ExpertRequiredMixin, View):
             df = pd.read_excel(file)
         else:
             form.add_error("file", "Unsupported file type.")
-            return render(
-                request,
-                "projects/batch_create.html",
-                {"project": project, "form": form},
-            )
         if "text" not in df.columns:
             form.add_error("file", "Missing required 'text' column.")
-            return render(
-                request,
-                "projects/batch_create.html",
-                {"project": project, "form": form},
-            )
 
+        self.df = df
+
+        return super().form_valid(form)
+
+    def save(self):
+        project_id = self.kwargs.get("project_id")
+        project = get_object_or_404(Project, id=project_id)
         batch = Batch(project=project)
         batch.save()
 
@@ -179,7 +198,7 @@ class ProjectBatchCreateView(ExpertRequiredMixin, View):
             )
             for annotator in default_annotators
         }
-        for _, row in df.iterrows():
+        for _, row in self.df.iterrows():
             example = Example(batch=batch, content=row["text"])
             example.save()
             for annotator in default_annotators:
@@ -187,8 +206,6 @@ class ProjectBatchCreateView(ExpertRequiredMixin, View):
                     example=example,
                     batch_assignment=batch_assignments[annotator.id],
                 )
-
-        return redirect("project-detail", project_id=project.id)
 
 
 class ProjectLabelRowView(View):

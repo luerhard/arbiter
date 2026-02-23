@@ -23,16 +23,16 @@ class ProjectForm(forms.ModelForm):
 
 class ProjectCreateForm(forms.Form):
     name = forms.CharField(max_length=100, label="Project title")
-    description = forms.CharField(widget=forms.Textarea, required=True)
+    description = forms.CharField(widget=forms.Textarea, required=False)
     annotators = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        required=False,
+        required=True,
     )
     experts = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        required=False,
+        required=True,
     )
 
     def __init__(self, *args, **kwargs):
@@ -46,7 +46,7 @@ class ProjectCreateForm(forms.Form):
             {
                 "class": base_input,
                 "placeholder": "Project title",
-            }
+            },
         )
         self.fields["description"].widget.attrs.update(
             {"class": base_input, "rows": 4, "placeholder": "What is this project about?"},
@@ -116,8 +116,23 @@ class ProjectAssignmentForm(forms.ModelForm):
             ProjectUser.objects.bulk_update(new, fields=["role"])
 
 
-class BatchCreateForm(forms.Form):
+class BatchCreateForm(forms.ModelForm):
+    class Meta:
+        model = Batch
+        fields = ("file",)
+
     file = forms.FileField(required=True)
+
+    annotators = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+    )
+    experts = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=True,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -129,6 +144,21 @@ class BatchCreateForm(forms.Form):
                 "accept": ".csv,.xlsx",
             },
         )
+        for field in ("annotators", "experts"):
+            self.fields[field].widget.attrs.update(
+                {"class": "space-y-2 text-sm text-gray-700 dark:text-gray-300"},
+            )
+
+    def clean(self):
+        cleaned = super().clean()
+        annotators = set(cleaned.get("annotators") or [])
+        experts = set(cleaned.get("experts") or [])
+        overlap = annotators & experts
+        if overlap:
+            names = ", ".join(sorted(u.username for u in overlap))
+            msg = f"Users cannot be both annotator and expert: {names}"
+            raise ValidationError(msg)
+        return cleaned
 
     def clean_file(self):
         file = self.cleaned_data["file"]

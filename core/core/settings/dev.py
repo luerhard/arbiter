@@ -25,9 +25,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-INTERNAL_IPS = ["127.0.0.1"]
+INTERNAL_IPS = ["127.0.0.1", "localhost"]
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "193.196.54.251"]
+
+DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}  # noqa: ARG005
 
 CSRF_TRUSTED_ORIGINS = ["http://193.196.54.251"]
 

@@ -1,7 +1,7 @@
-<c-vars name search_url selected_ids placeholder />
-<div x-data="window.lib.ui.userPicker('{{ name }}', {{ selected_ids|default:'[]'|safe }})"
-     @click.outside="open = false"
-     class="space-y-2">
+<c-vars name search_url selected_users placeholder />
+<div x-data="window.lib.ui.userPicker('{{ name }}', {{ selected_users }})"
+     class="space-y-2"
+     @click.outside="open = false">
     <div class="relative"
          x-ref="searchArea"
          @focusout="$nextTick(() => { if (!$refs.searchArea.contains(document.activeElement)) open = false })">
@@ -30,7 +30,7 @@
             </span>
         </template>
     </div>
-    <template x-for="id in selectedIds" :key="id">
-        <input type="hidden" :name="name" :value="id">
+    <template x-for="u in selectedUsers" :key="u.id">
+        <input type="hidden" :name="name" :value="u.id">
     </template>
 </div>

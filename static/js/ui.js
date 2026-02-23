@@ -1,23 +1,38 @@
-export function userPicker(name, initialIds) {
+export function userPicker(name, initialUsers = []) {
+    const normalizedUsers = (initialUsers || [])
+        .map((u) => ({
+            id: Number(u.id),
+            username: u.username,
+        }))
+        .filter((u) => !Number.isNaN(u.id));
+
     return {
         name,
         query: "",
         open: false,
-        selectedIds: (initialIds || []).map(Number),
-        selectedUsers: [],
+        selectedUsers: normalizedUsers,
+
+        // Derived data (not stored separately)
+        get selectedIds() {
+            return this.selectedUsers.map((u) => u.id);
+        },
+
         add(user) {
             const id = Number(user.id);
-            if (!this.selectedIds.includes(id)) {
-                this.selectedIds.push(id);
+            if (Number.isNaN(id)) return;
+
+            const exists = this.selectedUsers.some((u) => u.id === id);
+            if (!exists) {
                 this.selectedUsers.push({ id, username: user.username });
             }
+
             this.query = "";
             this.open = false;
         },
+
         remove(id) {
             id = Number(id);
-            this.selectedIds = this.selectedIds.filter((x) => x !== id);
-            this.selectedUsers = this.selectedUsers.filter((x) => Number(x.id) !== id);
+            this.selectedUsers = this.selectedUsers.filter((u) => u.id !== id);
         },
     };
 }
