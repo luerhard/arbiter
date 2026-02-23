@@ -18,19 +18,15 @@ class ExampleQuerySet(models.QuerySet):
         if not example_ids:
             return self.none()
 
-        assignments = (
-            ExampleAssignment.objects.filter(
-                example_id__in=example_ids,
-                batch_assignment__phase=phase,
-            )
-            .select_related("example", "batch_assignment")
-            .prefetch_related("annotations")
-        )
+        assignments = ExampleAssignment.objects.filter(
+            example_id__in=example_ids,
+            phase=phase,
+        ).prefetch_related("annotations")
 
         expected_users = defaultdict(set)
         labels_by_example = defaultdict(dict)
         for assignment in assignments:
-            user_id = assignment.batch_assignment.user_id
+            user_id = assignment.user.id
             expected_users[assignment.example_id].add(user_id)
             label_ids = set(assignment.annotations.values_list("label_id", flat=True))
             if label_ids:
@@ -81,17 +77,14 @@ class Example(models.Model):
     def has_expert_decision(self):
         return ExampleAssignment.objects.filter(
             example=self,
-            batch_assignment__phase=BatchPhase.EXPERT,
+            phase=BatchPhase.EXPERT,
             done__isnull=False,
         ).exists()
 
     def get_user_annotations(self, phase: BatchPhase, user=None):
-        qs = Annotation.objects.filter(
-            assignment__example=self,
-            assignment__batch_assignment__phase=phase,
-        )
+        qs = Annotation.objects.filter(assignment__example=self, assignment__phase=phase)
         if user is not None:
-            qs = qs.filter(assignment__batch_assignment__user=user)
+            qs = qs.filter(assignment__user=user)
         return qs
 
     def set_user_annotations(
@@ -100,10 +93,7 @@ class Example(models.Model):
         label_ids: list[int],
         phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"] | None = None,
     ):
-        assignments = ExampleAssignment.objects.filter(
-            example=self,
-            batch_assignment__user=user,
-        )
+        assignments = ExampleAssignment.objects.filter(example=self, assignment__user=user)
         if phase is not None:
             assignments = assignments.filter(batch_assignment__phase=getattr(BatchPhase, phase))
         assignment = assignments.get()

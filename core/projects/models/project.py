@@ -17,40 +17,12 @@ class Project(models.Model):
     owner = models.ForeignKey(User, related_name="owned_projects", on_delete=models.CASCADE)
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
 
-    def user_role(self, user):
-        ProjectUser = apps.get_model("projects", "ProjectUser")
-        return ProjectUser.objects.filter(project=self, user=user)
-
-    @property
-    def annotator_n_active_batches(self):
-        Batch = apps.get_model("projects", "Batch")
-        return Batch.objects.filter(
-            project=self,
-            current_phase__in=[Batch.Phase.ANNOTATION, Batch.Phase.DISCUSSION],
-        ).count()
-
-    @property
-    def annotator_any_annotation_batches(self):
-        Batch = apps.get_model("projects", "Batch")
-        return Batch.objects.filter(
-            project=self,
-            current_phase__in=[Batch.Phase.ANNOTATION],
-        ).exists()
-
-    @property
-    def annotator_any_discussion_batches(self):
-        Batch = apps.get_model("projects", "Batch")
-        return Batch.objects.filter(
-            project=self,
-            current_phase__in=[Batch.Phase.DISCUSSION],
-        ).exists()
-
     @property
     def annotators(self):
         ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
-            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectRole.ANNOTATOR,
         )
 
     @property
@@ -58,7 +30,7 @@ class Project(models.Model):
         ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
-            projectuser__default_role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectRole.EXPERT,
         )
 
     @property

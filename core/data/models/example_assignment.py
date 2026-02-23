@@ -1,7 +1,12 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils import timezone
 
 from .models import Annotation
+from projects.models import Batch
+from projects.models import BatchPhase
+
+User = get_user_model()
 
 
 class ExampleAssignmentQuerySet(models.QuerySet):
@@ -9,38 +14,44 @@ class ExampleAssignmentQuerySet(models.QuerySet):
         return self.filter(done__isnull=False)
 
     def from_project(self, project):
-        return self.filter(batch_assignment__batch__project=project)
+        return self.filter(batch__project=project)
 
 
 class ExampleAssignment(models.Model):
     objects = ExampleAssignmentQuerySet.as_manager()
+    batch = models.ForeignKey(Batch, related_name="assignments", on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     example = models.ForeignKey("Example", related_name="assignments", on_delete=models.CASCADE)
+    phase = models.CharField(
+        default=BatchPhase.SETUP,
+        null=False,
+        blank=False,
+        max_length=1,
+        choices=BatchPhase,
+        db_index=True,
+    )
     order = models.PositiveIntegerField(db_index=True)
     done = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=("example", "batch_assignment"),
-                name="unique_example_batch_assignment",
+                fields=("batch", "user", "phase", "example"),
+                name="unique_example_assignment",
             ),
         ]
 
     def __str__(self):
-        return f"id: {self.id}, batch_assignment: {self.batch_assignment.id}, done: {self.done}"
+        return f"id: {self.id}, user: {self.user.usernam}, ex: {self.example.id} done: {self.done}"
 
-    @property
-    def phase(self):
-        return self.batch_assignment.phase
-
-    @property
-    def user(self):
-        return self.batch_assignment.user
+    def __repr__(self):
+        return f"id: {self.id}, user: {self.user.username}, ex: {self.example.id} done: {self.done}"
 
     def previous(self, skip_annotated: bool = False):
         query = ExampleAssignment.objects.filter(
-            example__batch=self.example.batch,
-            batch_assignment=self.batch_assignment,
+            batch=self.batch,
+            user=self.user,
+            phase=self.phase,
             order__lt=self.order,
         )
 
@@ -51,8 +62,9 @@ class ExampleAssignment(models.Model):
 
     def next(self, skip_annotated: bool = False):
         query = ExampleAssignment.objects.filter(
-            example__batch=self.example.batch,
-            batch_assignment=self.batch_assignment,
+            batch=self.batch,
+            user=self.user,
+            phase=self.phase,
             order__gt=self.order,
         )
 

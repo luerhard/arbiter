@@ -6,8 +6,8 @@ import pytest
 
 from data.models import ExampleAssignment
 from projects.models import Batch
-from projects.models import BatchAssignment
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 from users.models import User
 
@@ -43,7 +43,7 @@ class TestProjectAndBatchCreationViews:
         response = client.post(url, data)
 
         assert response.status_code == 302
-        project = Project.objects.get(name=f"Created Project {suffix}")
+        project = Project.objects.get(name=f"Created Project {suffix}", owner=expert)
         assert (
             ProjectUser.objects.filter(
                 project=project,
@@ -68,21 +68,22 @@ class TestProjectAndBatchCreationViews:
         project = Project.objects.create(
             name=f"Batch Project {suffix}",
             description="For batch test",
+            owner=expert,
         )
         ProjectUser.objects.create(
             project=project,
             user=annotator_1,
-            default_role=ProjectUser.Role.ANNOTATOR,
+            default_role=ProjectRole.ANNOTATOR,
         )
         ProjectUser.objects.create(
             project=project,
             user=annotator_2,
-            default_role=ProjectUser.Role.ANNOTATOR,
+            default_role=ProjectRole.ANNOTATOR,
         )
         ProjectUser.objects.create(
             project=project,
             user=expert,
-            default_role=ProjectUser.Role.EXPERT,
+            default_role=ProjectRole.EXPERT,
         )
 
         login = client.login(username=expert.username, password="123")

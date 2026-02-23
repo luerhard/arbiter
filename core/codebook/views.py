@@ -14,6 +14,7 @@ from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
 from projects.models import Batch
+from projects.models import BatchPhase
 from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
@@ -80,11 +81,11 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         selected_label_names = [label.name for label in selected_labels]
         annotations_before_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            assignment__batch_assignment__phase=Batch.Phase.ANNOTATION,
+            assignment__phase=BatchPhase.ANNOTATION,
         )
         annotations_after_discussion = Annotation.objects.filter(
             assignment__example=current_example,
-            assignment__batch_assignment__phase=Batch.Phase.DISCUSSION,
+            assignment__phase=BatchPhase.DISCUSSION,
         )
         messages = (
             Message.objects.filter(example=current_example)

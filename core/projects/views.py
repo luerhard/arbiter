@@ -24,7 +24,9 @@ from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 User = get_user_model()
@@ -208,9 +210,9 @@ class ProjectDetailView(RedirectView):
         project = get_object_or_404(Project, id=project_id)
         project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
 
-        if project_user.default_role == ProjectUser.Role.ANNOTATOR:
+        if project_user.default_role == ProjectRole.ANNOTATOR:
             return reverse("project-detail-annotator", kwargs={"project_id": project_id})
-        elif project_user.default_role == ProjectUser.Role.EXPERT:
+        elif project_user.default_role == ProjectRole.EXPERT:
             return reverse("project-detail-expert", kwargs={"project_id": project_id})
         else:
             return reverse("home")
@@ -229,11 +231,11 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectRole.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__default_role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectRole.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
@@ -306,11 +308,11 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         # get assigned users
         context["annotators"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__default_role=ProjectUser.Role.ANNOTATOR,
+            projectuser__default_role=ProjectRole.ANNOTATOR,
         )
         context["experts"] = all_project_users.filter(
             projectuser__project=project,
-            projectuser__default_role=ProjectUser.Role.EXPERT,
+            projectuser__default_role=ProjectRole.EXPERT,
         )
         context["codebook"] = project.codebook.get()
 
@@ -321,8 +323,8 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
             batch_data = {
                 "batch": batch,
                 "done": batch.examples.filter(
-                    assignments__batch_assignment__user=self.request.user,
-                    assignments__batch_assignment__phase=Batch.Phase.ANNOTATION,
+                    assignments__user=self.request.user,
+                    assignments__phase=BatchPhase.ANNOTATION,
                     assignments__done__isnull=False,
                 )
                 .distinct()

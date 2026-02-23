@@ -16,8 +16,9 @@ from data.models.models import Label
 from discuss import room_state
 from discuss.models import Message
 from projects.models import Batch
-from projects.models import BatchAssignment
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 User = get_user_model()
@@ -56,7 +57,7 @@ def discussion_setup(db):
         user=user,
         defaults={"default_role": ProjectUser.Role.ANNOTATOR},
     )
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.DISCUSSION)
     return user, batch
 
 
@@ -80,30 +81,21 @@ def discussion_with_disagreement(db):
     label1 = Label.objects.create(project=project, name="Label A")
     label2 = Label.objects.create(project=project, name="Label B")
 
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.DISCUSSION)
     ex = Example.objects.create(batch=batch, content="Example with disagreement")
 
-    ba1 = BatchAssignment.objects.create(
-        batch=batch,
-        user=user1,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=Batch.Phase.ANNOTATION,
-    )
-    ba2 = BatchAssignment.objects.create(
-        batch=batch,
-        user=user2,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=Batch.Phase.ANNOTATION,
-    )
-
     a1 = ExampleAssignment.objects.create(
+        batch=batch,
         example=ex,
-        batch_assignment=ba1,
+        user=user1,
+        phase=BatchPhase.DISCUSSION,
         order=1,
     )
     a2 = ExampleAssignment.objects.create(
+        batch=batch,
         example=ex,
-        batch_assignment=ba2,
+        user=user2,
+        phase=BatchPhase.DISCUSSION,
         order=1,
     )
 

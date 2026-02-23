@@ -4,7 +4,7 @@ from django import forms
 
 from data.models import ExampleAssignment
 from data.models import Label
-from projects.models import Batch
+from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
 
@@ -18,10 +18,9 @@ class MultiLabelFormExpert(forms.Form):
         self.user = user
         self.assignment = ExampleAssignment.objects.filter(
             example=self.example,
-            batch_assignment__user=self.user,
-            batch_assignment__phase=Batch.Phase.EXPERT,
+            user=self.user,
+            phase=BatchPhase.EXPERT,
         ).get()
-        log.debug(f"{self.fields['labels'].choices =}")
         labels_queryset = Label.objects.filter(project_id=codebook.project.id)
         labels_choices = [(label.id, label.name) for label in labels_queryset]
         log.debug(f"{labels_choices =}")

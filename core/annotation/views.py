@@ -14,6 +14,7 @@ from core.mixins import AnnotatorRequiredMixin
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
+from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +38,7 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         else:
             assignment = (
                 ExampleAssignment.objects.filter(
-                    batch_assignment__user=request.user,
+                    user=request.user,
                     example__batch=batch,
                 )
                 .order_by("order")
@@ -120,10 +121,7 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
 
 def get_progress(user, batch):
     """helper function to calculate current progress"""
-    all_assignments = Batch.objects.filter(pk=batch.pk).example_assignments(
-        user=user,
-        phase=Batch.Phase.ANNOTATION,
-    )
+    all_assignments = batch.assignments.filter(user=user, phase=BatchPhase.ANNOTATION)
     done = all_assignments.filter(done__isnull=False).count()
     total = all_assignments.count()
     try:
@@ -186,7 +184,7 @@ class HtmxLabels(View):
                 labels.append(new)
             context["labels"] = labels
 
-            form = MultiLabelForm(phase=Batch.Phase.ANNOTATION, assignment=assignment)
+            form = MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment)
             context["label_form"] = form
 
         return render(request, "annotation/partials/labels.html", context)
