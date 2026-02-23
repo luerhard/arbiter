@@ -11,6 +11,7 @@ User = get_user_model()
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    owner = models.ForeignKey(User, related_name="owned_projects", on_delete=models.CASCADE)
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
 
     def user_role(self, user):
