@@ -169,9 +169,12 @@ User model, profile views etc.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>logentry</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.models.LogEntry" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a>) – All log entries of this user (related name of <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.models.LogEntry.user" title="(in Django v6.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code></a>)</p></li>
-<li><p><strong>projectuser</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.ProjectUser" title="projects.models.project_user.ProjectUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectUser</span></code></a>) – All project users of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p></li>
-<li><p><strong>batch_assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a>) – All batch assignments of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p></li>
+<li><p><strong>exampleassignment</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – All example assignments of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p></li>
+<li><p><strong>owned_projects</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – All owned projects of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">owner</span></code>)</p></li>
 <li><p><strong>projects</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> from <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – All projects of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">users</span></code>)</p></li>
+<li><p><strong>projectuser</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.ProjectUser" title="projects.models.project_user.ProjectUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProjectUser</span></code></a>) – All project users of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p></li>
+<li><p><strong>batchuser</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchUser</span></code>) – All batch users of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p></li>
+<li><p><strong>batch</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> from <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.batch.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a>) – All batchs of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">users</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -197,16 +200,6 @@ User model, profile views etc.</p>
 <span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;users.models.UserManager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#users.models.User.objects" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
-<dl class="py property">
-<dt class="sig sig-object py" id="users.models.User.assigned_projects">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">assigned_projects</span></span><a class="headerlink" href="#users.models.User.assigned_projects" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="users.models.User.discuss_batches">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">discuss_batches</span></span><a class="headerlink" href="#users.models.User.discuss_batches" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py exception">
 <dt class="sig sig-object py" id="users.models.User.DoesNotExist">
 <em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#users.models.User.DoesNotExist" title="Link to this definition"></a></dt>
@@ -218,10 +211,17 @@ User model, profile views etc.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="users.models.User.batch_assignments">
-<span class="sig-name descname"><span class="pre">batch_assignments</span></span><a class="headerlink" href="#users.models.User.batch_assignments" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.BatchAssignment" title="projects.models.batch_assignment.BatchAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchAssignment</span></code></a></p>
-<p>All batch assignments of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p>
+<dt class="sig sig-object py" id="users.models.User.batch_set">
+<span class="sig-name descname"><span class="pre">batch_set</span></span><a class="headerlink" href="#users.models.User.batch_set" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> from <a class="reference internal" href="projects.html#projects.models.Batch" title="projects.models.batch.Batch"><code class="xref py py-class docutils literal notranslate"><span class="pre">Batch</span></code></a></p>
+<p>All batchs of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">users</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="users.models.User.batchuser_set">
+<span class="sig-name descname"><span class="pre">batchuser_set</span></span><a class="headerlink" href="#users.models.User.batchuser_set" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchUser</span></code></p>
+<p>All batch users of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -229,6 +229,13 @@ User model, profile views etc.</p>
 <span class="sig-name descname"><span class="pre">date_joined</span></span><a class="headerlink" href="#users.models.User.date_joined" title="Link to this definition"></a></dt>
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.DateTimeField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a></p>
 <p>Date joined</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="users.models.User.exampleassignment_set">
+<span class="sig-name descname"><span class="pre">exampleassignment_set</span></span><a class="headerlink" href="#users.models.User.exampleassignment_set" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a></p>
+<p>All example assignments of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -304,6 +311,13 @@ User model, profile views etc.</p>
 <span class="sig-name descname"><span class="pre">logentry_set</span></span><a class="headerlink" href="#users.models.User.logentry_set" title="Link to this definition"></a></dt>
 <dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.models.LogEntry" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogEntry</span></code></a></p>
 <p>All log entries of this user (related name of <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/contrib/admin/#django.contrib.admin.models.LogEntry.user" title="(in Django v6.0)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code></a>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="users.models.User.owned_projects">
+<span class="sig-name descname"><span class="pre">owned_projects</span></span><a class="headerlink" href="#users.models.User.owned_projects" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a></p>
+<p>All owned projects of this user (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">owner</span></code>)</p>
 </dd></dl>
 
 <dl class="py attribute">

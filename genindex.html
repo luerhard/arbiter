@@ -101,7 +101,7 @@
 </li>
       <li><a href="api/data.html#data.models.Annotation">Annotation (class in data.models)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.Batch.Phase.ANNOTATION">ANNOTATION (projects.models.Batch.Phase attribute)</a>
+      <li><a href="api/projects.html#projects.models.BatchPhase.ANNOTATION">ANNOTATION (projects.models.BatchPhase attribute)</a>
 </li>
       <li><a href="api/data.html#data.models.Annotation.DoesNotExist">Annotation.DoesNotExist</a>
 </li>
@@ -116,23 +116,13 @@
       </ul></li>
       <li><a href="api/annotation.html#annotation.views.AnnotationDoneView">AnnotationDoneView (class in annotation.views)</a>
 </li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.annotations">annotations (data.models.ExampleAssignment attribute)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.ProjectUser.Role.ANNOTATOR">ANNOTATOR (projects.models.ProjectUser.Role attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/projects.html#projects.models.Project.annotator_any_annotation_batches">annotator_any_annotation_batches (projects.models.Project property)</a>
+      <li><a href="api/data.html#data.models.ExampleAssignment.annotations">annotations (data.models.ExampleAssignment attribute)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.Project.annotator_any_discussion_batches">annotator_any_discussion_batches (projects.models.Project property)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.Project.annotator_n_active_batches">annotator_n_active_batches (projects.models.Project property)</a>
+      <li><a href="api/projects.html#projects.models.ProjectRole.ANNOTATOR">ANNOTATOR (projects.models.ProjectRole attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Project.annotators">annotators (projects.models.Project property)</a>
-</li>
-      <li><a href="api/users.html#users.models.User.assigned_projects">assigned_projects (users.models.User property)</a>
-</li>
-      <li><a href="api/data.html#data.models.Example.assignees">assignees (data.models.Example attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Batch.assignees">assignees() (projects.models.Batch method)</a>
 </li>
@@ -141,7 +131,11 @@
       <li><a href="api/data.html#data.models.Annotation.assignment_id">assignment_id (data.models.Annotation attribute)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.assignments">assignments (data.models.Example attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.models.Batch.assignments">(projects.models.Batch attribute)</a>
 </li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -153,43 +147,35 @@
       <li><a href="api/data.html#data.models.Example.batch">batch (data.models.Example attribute)</a>
 
       <ul>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.batch">(projects.models.BatchAssignment attribute)</a>
+        <li><a href="api/data.html#data.models.ExampleAssignment.batch">(data.models.ExampleAssignment attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/projects.html#projects.models.Batch.DoesNotExist">Batch.DoesNotExist</a>
 </li>
       <li><a href="api/projects.html#projects.models.Batch.MultipleObjectsReturned">Batch.MultipleObjectsReturned</a>
 </li>
-      <li><a href="api/projects.html#projects.models.Batch.Phase">Batch.Phase (class in projects.models)</a>
-</li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.batch_assignment">batch_assignment (data.models.ExampleAssignment attribute)</a>
-</li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.batch_assignment_id">batch_assignment_id (data.models.ExampleAssignment attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/projects.html#projects.models.Batch.batch_assignments">batch_assignments (projects.models.Batch attribute)</a>
-
-      <ul>
-        <li><a href="api/users.html#users.models.User.batch_assignments">(users.models.User attribute)</a>
-</li>
-      </ul></li>
       <li><a href="api/data.html#data.models.Example.batch_id">batch_id (data.models.Example attribute)</a>
 
       <ul>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.batch_id">(projects.models.BatchAssignment attribute)</a>
+        <li><a href="api/data.html#data.models.ExampleAssignment.batch_id">(data.models.ExampleAssignment attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Batch.batch_number">batch_number (projects.models.Batch attribute)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment">BatchAssignment (class in projects.models)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.DoesNotExist">BatchAssignment.DoesNotExist</a>
-</li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.MultipleObjectsReturned">BatchAssignment.MultipleObjectsReturned</a>
+      <li><a href="api/users.html#users.models.User.batch_set">batch_set (users.models.User attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Project.batches">batches (projects.models.Project attribute)</a>
 </li>
+      <li><a href="api/projects.html#projects.models.BatchPhase">BatchPhase (class in projects.models)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Batch.batchuser_set">batchuser_set (projects.models.Batch attribute)</a>
+
+      <ul>
+        <li><a href="api/users.html#users.models.User.batchuser_set">(users.models.User attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -283,9 +269,7 @@
         <li><a href="api/discuss.html#module-discuss.views">module</a>
 </li>
       </ul></li>
-      <li><a href="api/users.html#users.models.User.discuss_batches">discuss_batches (users.models.User property)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.Batch.Phase.DISCUSSION">DISCUSSION (projects.models.Batch.Phase attribute)</a>
+      <li><a href="api/projects.html#projects.models.BatchPhase.DISCUSSION">DISCUSSION (projects.models.BatchPhase attribute)</a>
 </li>
       <li><a href="api/discuss.html#discuss.views.DiscussView">DiscussView (class in discuss.views)</a>
 </li>
@@ -327,18 +311,14 @@
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.MultipleObjectsReturned">ExampleAssignment.MultipleObjectsReturned</a>
 </li>
+      <li><a href="api/users.html#users.models.User.exampleassignment_set">exampleassignment_set (users.models.User attribute)</a>
+</li>
       <li><a href="api/projects.html#projects.models.Batch.examples">examples (projects.models.Batch attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.BatchPhase.EXPERT">EXPERT (projects.models.BatchPhase attribute)</a>
 
       <ul>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.examples">(projects.models.BatchAssignment attribute)</a>
-</li>
-      </ul></li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.examples_assignments">examples_assignments (projects.models.BatchAssignment attribute)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.Batch.Phase.EXPERT">EXPERT (projects.models.Batch.Phase attribute)</a>
-
-      <ul>
-        <li><a href="api/projects.html#projects.models.ProjectUser.Role.EXPERT">(projects.models.ProjectUser.Role attribute)</a>
+        <li><a href="api/projects.html#projects.models.ProjectRole.EXPERT">(projects.models.ProjectRole attribute)</a>
 </li>
       </ul></li>
       <li><a href="api/projects.html#projects.models.Project.experts">experts (projects.models.Project property)</a>
@@ -351,12 +331,24 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/projects.html#projects.models.Batch.Phase.FINAL">FINAL (projects.models.Batch.Phase attribute)</a>
+      <li><a href="api/projects.html#projects.models.BatchPhase.FINAL">FINAL (projects.models.BatchPhase attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.first_name">first_name (users.models.User attribute)</a>
 </li>
+      <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.form_class">form_class (projects.views.ProjectBatchCreateView attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectCreateView.form_class">(projects.views.ProjectCreateView attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.form_valid">form_valid() (projects.views.ProjectBatchCreateView method)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectCreateView.form_valid">(projects.views.ProjectCreateView method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -386,21 +378,31 @@
 </li>
         <li><a href="api/projects.html#projects.views.ExportBatch.get">(projects.views.ExportBatch method)</a>
 </li>
+        <li><a href="api/projects.html#projects.views.HtmxUserSearch.get">(projects.views.HtmxUserSearch method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectLabelRowView.get">(projects.views.ProjectLabelRowView method)</a>
+</li>
       </ul></li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_assigned_annotators">get_assigned_annotators() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.get_context_data">get_context_data() (projects.views.ProjectAnnotatorDetailView method)</a>
 
       <ul>
+        <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.get_context_data">(projects.views.ProjectBatchCreateView method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectCreateView.get_context_data">(projects.views.ProjectCreateView method)</a>
+</li>
         <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.get_context_data">(projects.views.ProjectExpertDetailView method)</a>
 </li>
+        <li><a href="api/projects.html#projects.views.ProjectListView.get_context_data">(projects.views.ProjectListView method)</a>
+</li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Batch.get_current_phase_display">get_current_phase_display() (projects.models.Batch method)</a>
 </li>
       <li><a href="api/projects.html#projects.models.ProjectUser.get_default_role_display">get_default_role_display() (projects.models.ProjectUser method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_example">get_example() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.models.Message.get_next_by_created_at">get_next_by_created_at() (discuss.models.Message method)</a>
@@ -413,7 +415,7 @@
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_or_create_room">get_or_create_room() (discuss.consumers.ChatConsumer method)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.get_phase_display">get_phase_display() (projects.models.BatchAssignment method)</a>
+      <li><a href="api/data.html#data.models.ExampleAssignment.get_phase_display">get_phase_display() (data.models.ExampleAssignment method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.models.Message.get_previous_by_created_at">get_previous_by_created_at() (discuss.models.Message method)</a>
 
@@ -429,8 +431,12 @@
 </li>
       <li><a href="api/projects.html#projects.views.ProjectDetailView.get_redirect_url">get_redirect_url() (projects.views.ProjectDetailView method)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.get_role_display">get_role_display() (projects.models.BatchAssignment method)</a>
+      <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.get_success_url">get_success_url() (projects.views.ProjectBatchCreateView method)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.views.ProjectCreateView.get_success_url">(projects.views.ProjectCreateView method)</a>
 </li>
+      </ul></li>
       <li><a href="api/data.html#data.models.Example.get_user_annotations">get_user_annotations() (data.models.Example method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.group_send_state">group_send_state() (discuss.consumers.ChatConsumer method)</a>
@@ -461,6 +467,8 @@
 </li>
       <li><a href="api/annotation.html#annotation.views.HtmxSentence">HtmxSentence (class in annotation.views)</a>
 </li>
+      <li><a href="api/projects.html#projects.views.HtmxUserSearch">HtmxUserSearch (class in projects.views)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -481,8 +489,6 @@
         <li><a href="api/discuss.html#discuss.models.Room.id">(discuss.models.Room attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.models.Batch.id">(projects.models.Batch attribute)</a>
-</li>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.id">(projects.models.BatchAssignment attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.models.Project.id">(projects.models.Project attribute)</a>
 </li>
@@ -641,8 +647,6 @@
 </li>
         <li><a href="api/projects.html#projects.models.Batch.objects">(projects.models.Batch attribute)</a>
 </li>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.objects">(projects.models.BatchAssignment attribute)</a>
-</li>
         <li><a href="api/projects.html#projects.models.Project.objects">(projects.models.Project attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.models.ProjectUser.objects">(projects.models.ProjectUser attribute)</a>
@@ -654,6 +658,12 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.ExampleAssignment.order">order (data.models.ExampleAssignment attribute)</a>
 </li>
+      <li><a href="api/users.html#users.models.User.owned_projects">owned_projects (users.models.User attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Project.owner">owner (projects.models.Project attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Project.owner_id">owner_id (projects.models.Project attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -662,12 +672,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.password">password (users.models.User attribute)</a>
 </li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.phase">phase (data.models.ExampleAssignment property)</a>
-
-      <ul>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.phase">(projects.models.BatchAssignment attribute)</a>
+      <li><a href="api/data.html#data.models.ExampleAssignment.phase">phase (data.models.ExampleAssignment attribute)</a>
 </li>
-      </ul></li>
       <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.pk_url_kwarg">pk_url_kwarg (projects.views.ProjectAnnotatorDetailView attribute)</a>
 
       <ul>
@@ -714,11 +720,19 @@
 </li>
       <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView">ProjectAnnotatorDetailView (class in projects.views)</a>
 </li>
+      <li><a href="api/projects.html#projects.views.ProjectBatchCreateView">ProjectBatchCreateView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectCreateView">ProjectCreateView (class in projects.views)</a>
+</li>
       <li><a href="api/projects.html#projects.views.ProjectDetailView">ProjectDetailView (class in projects.views)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectExpertDetailView">ProjectExpertDetailView (class in projects.views)</a>
 </li>
+      <li><a href="api/projects.html#projects.views.ProjectLabelRowView">ProjectLabelRowView (class in projects.views)</a>
+</li>
       <li><a href="api/projects.html#projects.views.ProjectListView">ProjectListView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.ProjectRole">ProjectRole (class in projects.models)</a>
 </li>
       <li><a href="api/users.html#users.models.User.projects">projects (users.models.User attribute)</a>
 </li>
@@ -742,8 +756,6 @@
 </li>
       <li><a href="api/projects.html#projects.models.ProjectUser.MultipleObjectsReturned">ProjectUser.MultipleObjectsReturned</a>
 </li>
-      <li><a href="api/projects.html#projects.models.ProjectUser.Role">ProjectUser.Role (class in projects.models)</a>
-</li>
       <li><a href="api/users.html#users.models.User.projectuser_set">projectuser_set (users.models.User attribute)</a>
 </li>
   </ul></td>
@@ -755,8 +767,6 @@
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.receive">receive() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/users.html#users.models.User.REQUIRED_FIELDS">REQUIRED_FIELDS (users.models.User attribute)</a>
-</li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.role">role (projects.models.BatchAssignment attribute)</a>
 </li>
       <li><a href="api/discuss.html#discuss.models.Room">Room (class in discuss.models)</a>
 </li>
@@ -781,8 +791,6 @@
       <ul>
         <li><a href="api/projects.html#projects.models.Batch.save">(projects.models.Batch method)</a>
 </li>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.save">(projects.models.BatchAssignment method)</a>
-</li>
         <li><a href="api/projects.html#projects.models.Project.save">(projects.models.Project method)</a>
 </li>
       </ul></li>
@@ -804,7 +812,7 @@
         <li><a href="api/data.html#data.models.ExampleAssignment.set_user_annotations">(data.models.ExampleAssignment method)</a>
 </li>
       </ul></li>
-      <li><a href="api/projects.html#projects.models.Batch.Phase.SETUP">SETUP (projects.models.Batch.Phase attribute)</a>
+      <li><a href="api/projects.html#projects.models.BatchPhase.SETUP">SETUP (projects.models.BatchPhase attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -819,6 +827,10 @@
 </li>
         <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.template_name">(projects.views.ProjectAnnotatorDetailView attribute)</a>
 </li>
+        <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.template_name">(projects.views.ProjectBatchCreateView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectCreateView.template_name">(projects.views.ProjectCreateView attribute)</a>
+</li>
         <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.template_name">(projects.views.ProjectExpertDetailView attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ProjectListView.template_name">(projects.views.ProjectListView attribute)</a>
@@ -832,12 +844,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User">User (class in users.models)</a>
 </li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.user">user (data.models.ExampleAssignment property)</a>
+      <li><a href="api/data.html#data.models.ExampleAssignment.user">user (data.models.ExampleAssignment attribute)</a>
 
       <ul>
         <li><a href="api/discuss.html#discuss.models.Message.user">(discuss.models.Message attribute)</a>
-</li>
-        <li><a href="api/projects.html#projects.models.BatchAssignment.user">(projects.models.BatchAssignment attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.models.ProjectUser.user">(projects.models.ProjectUser attribute)</a>
 </li>
@@ -846,7 +856,7 @@
 </li>
       <li><a href="api/users.html#users.models.User.MultipleObjectsReturned">User.MultipleObjectsReturned</a>
 </li>
-      <li><a href="api/projects.html#projects.models.BatchAssignment.user_id">user_id (projects.models.BatchAssignment attribute)</a>
+      <li><a href="api/data.html#data.models.ExampleAssignment.user_id">user_id (data.models.ExampleAssignment attribute)</a>
 
       <ul>
         <li><a href="api/projects.html#projects.models.ProjectUser.user_id">(projects.models.ProjectUser attribute)</a>
@@ -862,16 +872,18 @@
 </li>
       <li><a href="api/users.html#users.views.user_profile">user_profile() (in module users.views)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.Project.user_role">user_role() (projects.models.Project method)</a>
-</li>
       <li><a href="api/users.html#users.models.UserManager">UserManager (class in users.models)</a>
 </li>
       <li><a href="api/users.html#users.models.User.username">username (users.models.User attribute)</a>
 </li>
       <li><a href="api/users.html#users.models.User.USERNAME_FIELD">USERNAME_FIELD (users.models.User attribute)</a>
 </li>
-      <li><a href="api/projects.html#projects.models.Project.users">users (projects.models.Project attribute)</a>
+      <li><a href="api/projects.html#projects.models.Batch.users">users (projects.models.Batch attribute)</a>
+
+      <ul>
+        <li><a href="api/projects.html#projects.models.Project.users">(projects.models.Project attribute)</a>
 </li>
+      </ul></li>
       <li>
     users.models
 
