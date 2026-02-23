@@ -13,6 +13,7 @@ from data.models import Annotation
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
+from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
 
@@ -26,11 +27,11 @@ def build_dialog_context(batch, user):
     }
 
     open_assignments = ExampleAssignment.objects.filter(
-        example__in=batch.disagreements(Batch.Phase.DISCUSSION),
-        batch_assignment__user=user,
-        batch_assignment__phase=Batch.Phase.EXPERT,
+        example__in=batch.disagreements(BatchPhase.DISCUSSION),
+        user=user,
+        phase=BatchPhase.EXPERT,
         done__isnull=True,
-    ).select_related("example", "batch_assignment")
+    ).select_related("example")
 
     current_assignment = open_assignments.first()
     if not current_assignment:
@@ -49,11 +50,11 @@ def build_dialog_context(batch, user):
 
     annotations_before_discussion = Annotation.objects.filter(
         assignment__example=current_example,
-        assignment__batch_assignment__phase=Batch.Phase.ANNOTATION,
+        assignment__phase=BatchPhase.ANNOTATION,
     )
     annotations_after_discussion = Annotation.objects.filter(
         assignment__example=current_example,
-        assignment__batch_assignment__phase=Batch.Phase.DISCUSSION,
+        assignment__phase=BatchPhase.DISCUSSION,
     )
     chat_messages = (
         Message.objects.filter(example=current_example)
@@ -99,10 +100,7 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
     def post(self, request, **kwargs):
         assignment_id = kwargs.get("assignment_id")
         assignment = get_object_or_404(
-            ExampleAssignment.objects.select_related(
-                "example__batch__project",
-                "batch_assignment",
-            ),
+            ExampleAssignment.objects.select_related("example"),
             pk=assignment_id,
         )
 
@@ -125,13 +123,13 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
             messages.error(request, f"Something was invalid: {form}")
 
         has_open_assignments = ExampleAssignment.objects.filter(
-            example__batch=batch,
-            batch_assignment__user=user,
-            batch_assignment__phase=Batch.Phase.EXPERT,
+            batch=batch,
+            user=user,
+            phase=BatchPhase.EXPERT,
             done__isnull=True,
         ).exists()
-        if not has_open_assignments and batch.current_phase != Batch.Phase.FINAL:
-            batch.set_phase(Batch.Phase.FINAL)
+        if not has_open_assignments and batch.current_phase != BatchPhase.FINAL:
+            batch.set_phase(BatchPhase.FINAL)
 
         if request.htmx:
             context = build_dialog_context(batch=batch, user=user)

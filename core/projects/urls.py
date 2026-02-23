@@ -4,6 +4,12 @@ from . import views
 
 urlpatterns = [
     path("", views.ProjectListView.as_view(), name="project-list"),
+    path("create/", views.ProjectCreateView.as_view(), name="project-create"),
+    path(
+        "<int:project_id>/batches/create",
+        views.ProjectBatchCreateView.as_view(),
+        name="project-batch-create",
+    ),
     path("<int:project_id>", views.ProjectDetailView.as_view(), name="project-detail"),
     path(
         "<int:project_id>/expert",
@@ -19,7 +25,9 @@ urlpatterns = [
 ]
 
 htmx_patterns = [
+    path("htmx/label-row", views.ProjectLabelRowView.as_view(), name="project-label-row"),
     path("edit/<int:batch_id>", views.ChangeBatchPhase.as_view(), name="change-batch-phase"),
+    path("htmx/user-search", views.HtmxUserSearch.as_view(), name="project-user-search"),
 ]
 
 urlpatterns += htmx_patterns

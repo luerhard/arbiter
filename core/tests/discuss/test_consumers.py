@@ -16,8 +16,9 @@ from data.models.models import Label
 from discuss import room_state
 from discuss.models import Message
 from projects.models import Batch
-from projects.models import BatchAssignment
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 User = get_user_model()
@@ -49,14 +50,14 @@ def discussion_setup(db):
 
     project = Project.objects.filter(name="Test Project").first()
     if project is None:
-        project = Project.objects.create(name="Test Project", description="Test Desc")
+        project = Project.objects.create(name="Test Project", description="Test Desc", owner=user)
 
     ProjectUser.objects.get_or_create(
         project=project,
         user=user,
-        defaults={"default_role": ProjectUser.Role.ANNOTATOR},
+        defaults={"default_role": ProjectRole.ANNOTATOR},
     )
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.DISCUSSION)
     return user, batch
 
 
@@ -65,47 +66,43 @@ def discussion_with_disagreement(db):
     user1, _ = User.objects.get_or_create(username="discuss_annotator_1")
     user2, _ = User.objects.get_or_create(username="discuss_annotator_2")
 
-    project = Project.objects.create(name="Discuss Project", description="Discuss Desc")
+    project = Project.objects.create(
+        name="Discuss Project",
+        description="Discuss Desc",
+        owner=user1,
+    )
     ProjectUser.objects.create(
         project=project,
         user=user1,
-        default_role=ProjectUser.Role.ANNOTATOR,
+        default_role=ProjectRole.ANNOTATOR,
     )
     ProjectUser.objects.create(
         project=project,
         user=user2,
-        default_role=ProjectUser.Role.ANNOTATOR,
+        default_role=ProjectRole.ANNOTATOR,
     )
 
     label1 = Label.objects.create(project=project, name="Label A")
     label2 = Label.objects.create(project=project, name="Label B")
 
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.DISCUSSION)
+    batch = Batch.objects.create(project=project)
+    batch.users.add(user1, user2, through_defaults={"role": ProjectRole.ANNOTATOR})
     ex = Example.objects.create(batch=batch, content="Example with disagreement")
 
-    ba1 = BatchAssignment.objects.create(
-        batch=batch,
-        user=user1,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=Batch.Phase.ANNOTATION,
-    )
-    ba2 = BatchAssignment.objects.create(
-        batch=batch,
-        user=user2,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=Batch.Phase.ANNOTATION,
-    )
+    batch.set_phase(BatchPhase.ANNOTATION)
 
-    a1 = ExampleAssignment.objects.create(
+    a1 = ExampleAssignment.objects.filter(
+        batch=batch,
         example=ex,
-        batch_assignment=ba1,
-        order=1,
-    )
-    a2 = ExampleAssignment.objects.create(
+        user=user1,
+        phase=BatchPhase.ANNOTATION,
+    ).get()
+    a2 = ExampleAssignment.objects.filter(
+        batch=batch,
         example=ex,
-        batch_assignment=ba2,
-        order=1,
-    )
+        user=user2,
+        phase=BatchPhase.ANNOTATION,
+    ).get()
 
     Annotation.objects.create(assignment=a1, label=label1)
     Annotation.objects.create(assignment=a2, label=label2)

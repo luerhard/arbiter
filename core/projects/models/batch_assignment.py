@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from django.db import models
 
 from .batch import Batch
-from .project_user import ProjectUser
+from .batch import BatchPhase
+from .project import ProjectRole
 
 User = get_user_model()
 
@@ -11,14 +12,14 @@ User = get_user_model()
 class BatchAssignment(models.Model):
     batch = models.ForeignKey(Batch, related_name="batch_assignments", on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name="batch_assignments", on_delete=models.CASCADE)
-    role = models.CharField(max_length=1, choices=ProjectUser.Role, blank=False)
+    role = models.CharField(max_length=1, choices=ProjectRole, blank=False)
 
     phase = models.CharField(
-        default=Batch.Phase.SETUP,
+        default=BatchPhase.SETUP,
         null=False,
         blank=False,
         max_length=1,
-        choices=Batch.Phase,
+        choices=BatchPhase,
         db_index=True,
     )
 

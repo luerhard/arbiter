@@ -104,6 +104,12 @@
                             <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Batches will appear here when created.</p>
                         </div>
                     {% endif %}
+                    <div class="flex justify-end px-6 py-4">
+                        <a href="{% url 'project-batch-create' project.id %}"
+                           class="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                            Create batch
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>

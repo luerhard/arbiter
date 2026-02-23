@@ -9,7 +9,9 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 from users.models import User
 
@@ -50,23 +52,29 @@ def project_annotation():
     annotator1 = User.objects.create_user(username=f"user_{suffix}", password="123")
     annotator2 = User.objects.create_user(username=f"user2_{suffix}", password="123")
     expert = User.objects.create_user(username=f"user3_{suffix}", password="123")
-    project = Project.objects.create(name=f"Project {suffix}", description="Test project")
+    project = Project.objects.create(
+        name=f"Project {suffix}",
+        description="Test project",
+        owner=expert,
+    )
     for user in (annotator1, annotator2):
         ProjectUser.objects.create(
             project=project,
             user=user,
-            default_role=ProjectUser.Role.ANNOTATOR,
+            default_role=ProjectRole.ANNOTATOR,
         )
     ProjectUser.objects.create(
         project=project,
         user=expert,
-        default_role=ProjectUser.Role.EXPERT,
+        default_role=ProjectRole.EXPERT,
     )
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.SETUP)
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.SETUP)
+    batch.users.add(annotator1, annotator2, through_defaults={"role": ProjectRole.ANNOTATOR})
+    batch.users.add(expert, through_defaults={"role": ProjectRole.EXPERT})
     example = Example.objects.create(batch=batch, content="Example")
-    batch.set_phase(Batch.Phase.ANNOTATION)
+    batch.set_phase(BatchPhase.ANNOTATION)
     return {
         "annotators": [annotator1, annotator2],
         "expert": expert,
@@ -88,25 +96,17 @@ def project_discussion(project_annotation):
 
     ea_a1 = (
         ExampleAssignment.objects.from_project(project=project)
-        .filter(
-            batch_assignment__user=a1,
-            example=example,
-            batch_assignment__phase=Batch.Phase.ANNOTATION,
-        )
+        .filter(user=a1, example=example, phase=BatchPhase.ANNOTATION)
         .first()
     )
     ea_a1.set_user_annotations(label_ids=[label1.id])
     ea_a2 = (
         ExampleAssignment.objects.from_project(project=project)
-        .filter(
-            batch_assignment__user=a2,
-            example=example,
-            batch_assignment__phase=Batch.Phase.ANNOTATION,
-        )
+        .filter(user=a2, example=example, phase=BatchPhase.ANNOTATION)
         .first()
     )
     ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
-    batch.set_phase(Batch.Phase.DISCUSSION)
+    batch.set_phase(BatchPhase.DISCUSSION)
     return data
 
 
@@ -121,23 +121,15 @@ def project_expert(project_discussion):
 
     ea_a1 = (
         ExampleAssignment.objects.from_project(project=project)
-        .filter(
-            batch_assignment__user=a1,
-            example=example,
-            batch_assignment__phase=Batch.Phase.DISCUSSION,
-        )
+        .filter(user=a1, example=example, phase=BatchPhase.DISCUSSION)
         .first()
     )
     ea_a1.set_user_annotations(label_ids=[label1.id])
     ea_a2 = (
         ExampleAssignment.objects.from_project(project=project)
-        .filter(
-            batch_assignment__user=a2,
-            example=example,
-            batch_assignment__phase=Batch.Phase.DISCUSSION,
-        )
+        .filter(user=a1, example=example, phase=BatchPhase.DISCUSSION)
         .first()
     )
     ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
-    batch.set_phase(Batch.Phase.EXPERT)
+    batch.set_phase(BatchPhase.EXPERT)
     return data

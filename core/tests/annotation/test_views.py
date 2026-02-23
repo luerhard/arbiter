@@ -66,10 +66,9 @@ class TestViews:
         assert login is True
 
         # Ensure batch 1 is treated as unfinished for this user.
-        ExampleAssignment.objects.filter(
-            example__batch_id=1,
-            batch_assignment__user__username="annotator1",
-        ).update(done=None)
+        ExampleAssignment.objects.filter(example__batch_id=1, user__username="annotator1").update(
+            done=None,
+        )
 
         url = reverse("annotate-batch", args=(1,))
         req = client.get(url)

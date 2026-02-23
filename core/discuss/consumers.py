@@ -15,6 +15,7 @@ from .room_state import update_state
 from data.models import Annotation
 from data.models import Example
 from projects.models import Batch
+from projects.models import BatchPhase
 
 # logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -26,6 +27,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.route = self.scope["url_route"]
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
+        self.batch = await database_sync_to_async(Batch.objects.get)(id=self.batch_id)
         self.room_group_name = f"chat_{self.batch_id}"
         self.user = self.scope["user"]
         self.username = getattr(self.user, "username", str(self.user))
@@ -261,9 +263,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     def get_example(self, state):
         log.debug("Getting example")
-        examples = [
-            e for e in Example.objects.filter(batch=self.batch_id).distinct() if e.has_disagreement
-        ]
+        examples = self.batch.disagreements(BatchPhase.ANNOTATION)
         log.debug(f"{examples =}")
         paginator = Paginator(examples, 1)
         page_obj = paginator.get_page(state["page"])
@@ -281,8 +281,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         for user in state["required_users"]:
             query = Annotation.objects.filter(
                 assignment__example=example,
-                assignment__batch_assignment__user__username=user,
-                assignment__batch_assignment__phase=Batch.Phase.ANNOTATION,
+                assignment__user__username=user,
+                assignment__phase=BatchPhase.ANNOTATION,
             ).select_related("label")
             label_set = {anno.label for anno in query}
 

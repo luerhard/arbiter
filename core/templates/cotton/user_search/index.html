@@ -1,0 +1,36 @@
+<c-vars name search_url selected_users placeholder />
+<div x-data="window.lib.ui.userPicker('{{ name }}', {{ selected_users }})"
+     class="space-y-2"
+     @click.outside="open = false">
+    <div class="relative"
+         x-ref="searchArea"
+         @focusout="$nextTick(() => { if (!$refs.searchArea.contains(document.activeElement)) open = false })">
+        <input type="text"
+               x-ref="searchInput"
+               x-model="query"
+               @focus="open = true"
+               @input="open = true"
+               placeholder="{{ placeholder|default:'Search users...' }}"
+               class="block w-full rounded-md border px-3 py-2 text-sm"
+               hx-get="{{ search_url }}"
+               hx-trigger="focus, input changed delay:200ms"
+               hx-target="#{{ name }}-results"
+               hx-swap="innerHTML"
+               hx-vals='js:{ q: this.value, field: "{{ name }}" }'>
+        <div id="{{ name }}-results"
+             x-show="open"
+             x-cloak
+             class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border bg-white"></div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+        <template x-for="u in selectedUsers" :key="u.id">
+            <span class="inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs">
+                <span x-text="u.username"></span>
+                <button type="button" @click="remove(u.id)">×</button>
+            </span>
+        </template>
+    </div>
+    <template x-for="u in selectedUsers" :key="u.id">
+        <input type="hidden" :name="name" :value="u.id">
+    </template>
+</div>

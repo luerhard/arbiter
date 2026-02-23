@@ -8,8 +8,9 @@ from data.models.example_assignment import ExampleAssignment
 from data.models.models import Annotation
 from data.models.models import Label
 from projects.models import Batch
-from projects.models import BatchAssignment
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 User = get_user_model()
@@ -18,25 +19,26 @@ User = get_user_model()
 def _setup_example_assignment():
     suffix = uuid.uuid4().hex[:8]
     user = User.objects.create_user(username=f"user_{suffix}", password="123")
-    project = Project.objects.create(name=f"Project {suffix}", description="Test project")
+    project = Project.objects.create(
+        name=f"Project {suffix}",
+        description="Test project",
+        owner=user,
+    )
     ProjectUser.objects.create(
         project=project,
         user=user,
-        default_role=ProjectUser.Role.ANNOTATOR,
+        default_role=ProjectRole.ANNOTATOR,
     )
     label1 = Label.objects.create(project=project, name=f"Label A {suffix}")
     label2 = Label.objects.create(project=project, name=f"Label B {suffix}")
-    batch = Batch.objects.create(project=project, current_phase=Batch.Phase.ANNOTATION)
-    batch_assignment = BatchAssignment.objects.create(
-        batch=batch,
-        user=user,
-        role=ProjectUser.Role.ANNOTATOR,
-        phase=batch.current_phase,
-    )
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.ANNOTATION)
+    batch.users.add(user, through_defaults={"role": ProjectRole.ANNOTATOR})
     example = Example.objects.create(batch=batch, content="Example")
     assignment = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
         example=example,
-        batch_assignment=batch_assignment,
+        phase=BatchPhase.ANNOTATION,
         order=1,
     )
     return {
@@ -78,7 +80,7 @@ def test_example_assignment_set_user_annotations_replaces_labels_only():
         Annotation.objects.filter(assignment=assignment).values_list("label_id", flat=True),
     )
     assert labels == [label2.id]
-    assert assignment.phase == Batch.Phase.ANNOTATION
+    assert assignment.phase == BatchPhase.ANNOTATION
     assert assignment.done is not None
 
 

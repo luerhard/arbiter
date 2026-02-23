@@ -10,8 +10,9 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
-from projects.models import BatchAssignment
+from projects.models import BatchPhase
 from projects.models import Project
+from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 
@@ -28,31 +29,27 @@ def uniform_choices(elementary_events: list):
 def create_batch(project):
     batch = Batch.objects.create(
         project=project,
-        current_phase=Batch.Phase.ANNOTATION,
+        current_phase=BatchPhase.ANNOTATION,
     )
     test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
     annotators = list(project.annotators)
-    batch_assignments = {
-        user.id: BatchAssignment.objects.create(
-            batch=batch,
-            user=user,
-            role=ProjectUser.Role.ANNOTATOR,
-            phase=batch.current_phase,
-        )
-        for user in annotators
-    }
+
+    for user in annotators:
+        batch.users.add(user, through_defaults={"role": ProjectRole.ANNOTATOR})
 
     for i, row in test_df.iterrows():
         ex = Example.objects.create(batch=batch, content=row["text"])
         for user in annotators:
             ExampleAssignment.objects.create(
                 example=ex,
-                batch_assignment=batch_assignments[user.id],
+                user=user,
+                batch=batch,
+                phase=BatchPhase.ANNOTATION,
                 order=i,
             )
 
-    batch.set_phase(Batch.Phase.ANNOTATION)
+    batch.set_phase(BatchPhase.ANNOTATION)
     return batch
 
 
@@ -60,13 +57,14 @@ def create_project(name, description, labels, annotators, experts):
     project = Project.objects.create(
         name=name,
         description=description,
+        owner=experts[0],
     )
 
     for u in annotators:
-        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.ANNOTATOR)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectRole.ANNOTATOR)
 
     for u in experts:
-        ProjectUser.objects.create(project=project, user=u, default_role=ProjectUser.Role.EXPERT)
+        ProjectUser.objects.create(project=project, user=u, default_role=ProjectRole.EXPERT)
 
     for i, label in enumerate(labels, 1):
         Label.objects.create(project=project, name=label, hotkey=str(i))
@@ -106,42 +104,46 @@ class Command(BaseCommand):
         ).read_text()
         codebook.save(content=codebook_content)
 
+        # create populism batch 1, annotate, and change codebook
         batch = create_batch(project)
         label_ids = [label.id for label in project.labels.all()]
         random.seed(123)
-        for example in batch.examples.all():
-            for assignment in example.assignments.all():
-                labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels)
-        batch.set_phase(Batch.Phase.DISCUSSION)
+        for assignment in batch.assignments.all():
+            labels = uniform_choices(label_ids)
+            assignment.set_user_annotations(labels)
+        batch.set_phase(BatchPhase.DISCUSSION)
 
+        # change codebook
         codebook_content = (
             settings.BASE_DIR / "core/tests/testdata/codebook_populism_long_v2.md"
         ).read_text()
         codebook.save(content=codebook_content)
+
+        # create populism batch 2
         batch = create_batch(project)
+        for assignment in batch.assignments.all():
+            assignment.set_user_annotations([label_ids[0]])
+        batch.set_phase(BatchPhase.DISCUSSION)
 
-        for example in batch.examples.all():
-            for assignment in example.assignments.all():
-                assignment.set_user_annotations([label_ids[0]])
-        batch.set_phase(Batch.Phase.DISCUSSION)
-
-        # Create a disagreement batch after discussion
+        # create populism batch 3 with disagreement after discussion
         batch = create_batch(project)
         label_ids = [label.id for label in project.labels.all()]
         random.seed(43)
-        for example in batch.examples.all():
-            for assignment in example.assignments.all():
-                labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels)
-        batch.set_phase(Batch.Phase.DISCUSSION)
-        for example in [e for e in batch.examples.all() if e.has_disagreement]:
-            for assignment in example.assignments.all():
-                labels = uniform_choices(label_ids)
-                assignment.set_user_annotations(labels)
-        batch.set_phase(Batch.Phase.EXPERT)
+        assignments = batch.assignments.all()
+        for assignment in assignments:
+            labels = uniform_choices(label_ids)
+            assignment.set_user_annotations(labels)
+        batch.set_phase(BatchPhase.DISCUSSION)
 
-        batch = create_batch(project)
+        examples_disagreement = batch.disagreements(phase=BatchPhase.ANNOTATION)
+        assignments = batch.assignments.filter(
+            phase=BatchPhase.DISCUSSION,
+            example__in=examples_disagreement,
+        ).select_related("example", "user")
+        for assignment in assignments:
+            labels = uniform_choices(label_ids)
+            assignment.set_user_annotations(labels)
+        batch.set_phase(BatchPhase.EXPERT)
 
         # too many labels project
         project = create_project(

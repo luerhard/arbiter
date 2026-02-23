@@ -4,7 +4,7 @@ from django.shortcuts import reverse
 import pytest
 
 from data.models import ExampleAssignment
-from projects.models import Batch
+from projects.models import BatchPhase
 
 
 @pytest.mark.django_db
@@ -16,10 +16,7 @@ class TestExpertViews:
         self.client.login(username=self.data["expert"].username, password="123")
         self.assignment = (
             ExampleAssignment.objects.from_project(project=self.data["batch"].project)
-            .filter(
-                batch_assignment__user=self.data["expert"],
-                batch_assignment__phase=Batch.Phase.EXPERT,
-            )
+            .filter(user=self.data["expert"], phase=BatchPhase.EXPERT)
             .first()
         )
         self.shell_url = reverse("expert-dialogue", args=[self.data["batch"].id])
@@ -61,10 +58,10 @@ class TestSaveLabelsExpertView:
         self.data = project_expert
         self.client.login(username=self.data["expert"].username, password="123")
         self.assignment = (
-            ExampleAssignment.objects.from_project(project=self.data["batch"].project)
+            ExampleAssignment.objects.from_project(project=self.data["project"])
             .filter(
-                batch_assignment__user=self.data["expert"],
-                batch_assignment__phase=Batch.Phase.EXPERT,
+                user=self.data["expert"],
+                phase=BatchPhase.EXPERT,
             )
             .first()
         )
