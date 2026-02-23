@@ -78,6 +78,7 @@ class ProjectCreateView(FormView):
         self.project = Project.objects.create(
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
+            owner=self.request.user,
         )
 
         project_users = []
@@ -86,7 +87,7 @@ class ProjectCreateView(FormView):
                 ProjectUser(
                     project=self.project,
                     user=user,
-                    default_role=ProjectUser.Role.ANNOTATOR,
+                    default_role=ProjectRole.ANNOTATOR,
                 ),
             )
         for user in form.cleaned_data["experts"]:
@@ -94,7 +95,7 @@ class ProjectCreateView(FormView):
                 ProjectUser(
                     project=self.project,
                     user=user,
-                    default_role=ProjectUser.Role.EXPERT,
+                    default_role=ProjectRole.EXPERT,
                 ),
             )
         if project_users:
@@ -181,16 +182,20 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
         if "text" not in df.columns:
             form.add_error("file", "Missing required 'text' column.")
 
-        batch = Batch(project=project)
-        batch.save()
+        batch = Batch.objects.create(project=project)
 
-        user_role_mapping = {}
-        for user in form.cleaned_data["annotators"]:
-            user_role_mapping[user] = ProjectUser.Role.ANNOTATOR
-        for user in form.cleaned_data["experts"]:
-            user_role_mapping[user] = ProjectUser.Role.EXPERT
+        examples = []
+        for _, row in df.iterrows():
+            examples.append(Example(batch=batch, content=row["text"]))
+        Example.objects.bulk_create(examples)
 
-        batch.set_phase(Batch.Phase.ANNOTATION, user_role_mapping)
+        annotators = form.cleaned_data["annotators"]
+        batch.users.add(*annotators, through_defaults={"role": ProjectRole.ANNOTATOR})
+
+        experts = form.cleaned_data["experts"]
+        batch.users.add(*experts, through_defaults={"role": ProjectRole.EXPERT})
+
+        batch.set_phase(BatchPhase.ANNOTATION)
 
         return super().form_valid(form)
 
@@ -268,9 +273,9 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             for annotator in context["annotators"]:
                 annotated = (
                     ExampleAssignment.objects.filter(
-                        batch_assignment__user=annotator,
-                        example__batch=batch,
-                        batch_assignment__phase=Batch.Phase.ANNOTATION,
+                        user=annotator,
+                        batch=batch,
+                        phase=BatchPhase.ANNOTATION,
                         done__isnull=False,
                     )
                     .distinct()
@@ -278,8 +283,8 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 )
                 discussed = (
                     ExampleAssignment.objects.filter(
-                        batch_assignment__user=annotator,
-                        batch_assignment__phase=Batch.Phase.DISCUSSION,
+                        user=annotator,
+                        phase=BatchPhase.DISCUSSION,
                         done__isnull=False,
                         example_id__in=disagr_ids,
                     )

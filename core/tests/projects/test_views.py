@@ -6,6 +6,7 @@ import pytest
 
 from data.models import ExampleAssignment
 from projects.models import Batch
+from projects.models import BatchPhase
 from projects.models import Project
 from projects.models import ProjectRole
 from projects.models import ProjectUser
@@ -43,19 +44,13 @@ class TestProjectAndBatchCreationViews:
         response = client.post(url, data)
 
         assert response.status_code == 302
-        project = Project.objects.get(name=f"Created Project {suffix}", owner=expert)
+        project = Project.objects.get(name=f"Created Project {suffix}")
         assert (
-            ProjectUser.objects.filter(
-                project=project,
-                default_role=ProjectUser.Role.ANNOTATOR,
-            ).count()
+            ProjectUser.objects.filter(project=project, default_role=ProjectRole.ANNOTATOR).count()
             == 2
         )
         assert (
-            ProjectUser.objects.filter(
-                project=project,
-                default_role=ProjectUser.Role.EXPERT,
-            ).count()
+            ProjectUser.objects.filter(project=project, default_role=ProjectRole.EXPERT).count()
             == 1
         )
 
@@ -107,16 +102,10 @@ class TestProjectAndBatchCreationViews:
         assert response.status_code == 302
 
         batch = Batch.objects.get(project=project)
-        batch_assignments = BatchAssignment.objects.filter(batch=batch)
-        assert batch_assignments.count() == 2
-        assert set(batch_assignments.values_list("user_id", flat=True)) == {
-            annotator_1.id,
-            annotator_2.id,
-        }
-
-        example_assignments = ExampleAssignment.objects.filter(example__batch=batch)
+        batch.set_phase(BatchPhase.ANNOTATION)
+        example_assignments = ExampleAssignment.objects.filter(batch=batch)
         assert example_assignments.count() == 4
-        assert set(example_assignments.values_list("batch_assignment__user_id", flat=True)) == {
+        assert set(example_assignments.values_list("user_id", flat=True)) == {
             annotator_1.id,
             annotator_2.id,
         }
@@ -129,16 +118,17 @@ class TestProjectAndBatchCreationViews:
         project = Project.objects.create(
             name=f"Batch Project Context {suffix}",
             description="For batch context test",
+            owner=expert,
         )
         ProjectUser.objects.create(
             project=project,
             user=annotator,
-            default_role=ProjectUser.Role.ANNOTATOR,
+            default_role=ProjectRole.ANNOTATOR,
         )
         ProjectUser.objects.create(
             project=project,
             user=expert,
-            default_role=ProjectUser.Role.EXPERT,
+            default_role=ProjectRole.EXPERT,
         )
 
         login = client.login(username=expert.username, password="123")
