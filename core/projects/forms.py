@@ -1,15 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Max
-from django.shortcuts import get_object_or_404
-import pandas as pd
 
-from data.models import Example
-from data.models import ExampleAssignment
 from projects.models import Batch
-from projects.models import BatchAssignment
-from projects.models import Project
-from projects.models import ProjectUser
 from users.models import User
 
 

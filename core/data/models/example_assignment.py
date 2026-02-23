@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 
 from .models import Annotation
-from projects.models import BatchAssignment
 
 
 class ExampleAssignmentQuerySet(models.QuerySet):
@@ -16,11 +15,6 @@ class ExampleAssignmentQuerySet(models.QuerySet):
 class ExampleAssignment(models.Model):
     objects = ExampleAssignmentQuerySet.as_manager()
     example = models.ForeignKey("Example", related_name="assignments", on_delete=models.CASCADE)
-    batch_assignment = models.ForeignKey(
-        BatchAssignment,
-        related_name="examples_assignments",
-        on_delete=models.CASCADE,
-    )
     order = models.PositiveIntegerField(db_index=True)
     done = models.DateTimeField(null=True, blank=True)
 

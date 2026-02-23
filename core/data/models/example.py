@@ -6,7 +6,6 @@ from django.db import models
 from .example_assignment import ExampleAssignment
 from .models import Annotation
 from projects.models import Batch
-from projects.models import BatchAssignment
 from projects.models import BatchPhase
 
 
@@ -55,12 +54,6 @@ class Example(models.Model):
     objects = ExampleQuerySet.as_manager()
     batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
-
-    assignees = models.ManyToManyField(
-        BatchAssignment,
-        through=ExampleAssignment,
-        related_name="examples",
-    )
 
     class Meta:
         ordering = ["pk"]
