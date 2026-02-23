@@ -18,7 +18,6 @@ from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
-from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 User = get_user_model()

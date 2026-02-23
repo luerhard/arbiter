@@ -13,7 +13,6 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Annotation
 from data.models import Example
 from discuss.models import Message
-from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import ProjectUser
 

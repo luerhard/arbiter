@@ -1,13 +1,10 @@
 from collections import defaultdict
-from collections.abc import Mapping
-from typing import TYPE_CHECKING
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
 
 from .project_user import ProjectRole
-from .project_user import ProjectUser
 
 User = get_user_model()
 
