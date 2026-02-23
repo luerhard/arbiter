@@ -24,7 +24,6 @@ from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
-from projects.models import BatchAssignment
 from projects.models import Project
 from projects.models import ProjectUser
 
@@ -168,6 +167,9 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
 
     def form_valid(self, form):
 
+        project_id = self.kwargs.get("project_id")
+        project = get_object_or_404(Project, id=project_id)
+
         file = form.cleaned_data["file"]
         if file.name.endswith(".csv"):
             df = pd.read_csv(file)
@@ -178,34 +180,18 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
         if "text" not in df.columns:
             form.add_error("file", "Missing required 'text' column.")
 
-        self.df = df
-
-        return super().form_valid(form)
-
-    def save(self):
-        project_id = self.kwargs.get("project_id")
-        project = get_object_or_404(Project, id=project_id)
         batch = Batch(project=project)
         batch.save()
 
-        default_annotators = project.annotators.all()
-        batch_assignments = {
-            annotator.id: BatchAssignment.objects.create(
-                batch=batch,
-                user=annotator,
-                role=ProjectUser.Role.ANNOTATOR,
-                phase=batch.current_phase,
-            )
-            for annotator in default_annotators
-        }
-        for _, row in self.df.iterrows():
-            example = Example(batch=batch, content=row["text"])
-            example.save()
-            for annotator in default_annotators:
-                ExampleAssignment.objects.create(
-                    example=example,
-                    batch_assignment=batch_assignments[annotator.id],
-                )
+        user_role_mapping = {}
+        for user in form.cleaned_data["annotators"]:
+            user_role_mapping[user] = ProjectUser.Role.ANNOTATOR
+        for user in form.cleaned_data["experts"]:
+            user_role_mapping[user] = ProjectUser.Role.EXPERT
+
+        batch.set_phase(Batch.Phase.ANNOTATION, user_role_mapping)
+
+        return super().form_valid(form)
 
 
 class ProjectLabelRowView(View):
