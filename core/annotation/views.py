@@ -194,6 +194,8 @@ class HtmxNavBlock(View):
     def get(self, request):
         assignment_id = request.GET.get("assignment_id")
         context = {}
+        messages.success(request, f"Loaded nav for: {assignment_id}")
+        messages.error(request, f"RED nav for: {assignment_id}")
         if assignment_id:
             a = ExampleAssignment.objects.get(id=assignment_id)
             if a.user != request.user:
