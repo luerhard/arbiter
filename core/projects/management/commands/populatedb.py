@@ -33,23 +33,16 @@ def create_batch(project):
     )
     test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
 
-    annotators = list(project.annotators)
+    batch.users.add(*project.annotators, through_defaults={"role": ProjectRole.ANNOTATOR})
+    batch.users.add(*project.experts, through_defaults={"role": ProjectRole.EXPERT})
 
-    for user in annotators:
-        batch.users.add(user, through_defaults={"role": ProjectRole.ANNOTATOR})
-
-    for i, row in test_df.iterrows():
-        ex = Example.objects.create(batch=batch, content=row["text"])
-        for user in annotators:
-            ExampleAssignment.objects.create(
-                example=ex,
-                user=user,
-                batch=batch,
-                phase=BatchPhase.ANNOTATION,
-                order=i,
-            )
+    examples = []
+    for _i, row in test_df.iterrows():
+        examples.append(Example(batch=batch, content=row["text"]))
+    Example.objects.bulk_create(examples, ignore_conflicts=False)
 
     batch.set_phase(BatchPhase.ANNOTATION)
+
     return batch
 
 
@@ -60,11 +53,8 @@ def create_project(name, description, labels, annotators, experts):
         owner=experts[0],
     )
 
-    for u in annotators:
-        ProjectUser.objects.create(project=project, user=u, default_role=ProjectRole.ANNOTATOR)
-
-    for u in experts:
-        ProjectUser.objects.create(project=project, user=u, default_role=ProjectRole.EXPERT)
+    project.users.add(*annotators, through_defaults={"default_role": ProjectRole.ANNOTATOR})
+    project.users.add(*experts, through_defaults={"default_role": ProjectRole.EXPERT})
 
     for i, label in enumerate(labels, 1):
         Label.objects.create(project=project, name=label, hotkey=str(i))
