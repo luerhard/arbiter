@@ -14,6 +14,7 @@ from .room_state import get_state
 from .room_state import update_state
 from data.models import Annotation
 from data.models import Example
+from data.models import ExampleAssignment
 from projects.models import Batch
 from projects.models import BatchPhase
 
@@ -127,7 +128,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 user = User.objects.get(username=username)
             except User.DoesNotExist:
                 continue
-            example.set_user_annotations(user=user, label_ids=label_ids, phase="DISCUSSION")
+            assignment = ExampleAssignment.objects.filter(
+                user=user,
+                example=example,
+                batch=self.batch,
+                phase=BatchPhase.DISCUSSION,
+            ).get()
+            assignment.set_user_annotations(label_ids=label_ids)
 
     async def _store_discussion_labels(self, username, labels):
         async def mut(state):

@@ -99,3 +99,29 @@ def test_example_set_user_annotations_uses_user_assignment():
     assert annotations.first().label_id == label1.id
     assignment.refresh_from_db()
     assert assignment.done is not None
+
+
+@pytest.mark.django_db
+def test_example_set_user_annotations_with_phase_updates_discussion_assignment():
+    data = _setup_example_assignment()
+    example = data["example"]
+    user = data["user"]
+    label1, _label2 = data["labels"]
+    batch = data["batch"]
+
+    # Create a discussion assignment, then update annotations through Example API.
+    discussion_assignment = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=example,
+        phase=BatchPhase.DISCUSSION,
+        order=2,
+    )
+
+    example.set_user_annotations(user=user, label_ids=[label1.id], phase="DISCUSSION")
+
+    discussion_assignment.refresh_from_db()
+    annotations = Annotation.objects.filter(assignment=discussion_assignment)
+    assert annotations.count() == 1
+    assert annotations.first().label_id == label1.id
+    assert discussion_assignment.done is not None

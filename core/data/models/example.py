@@ -86,15 +86,3 @@ class Example(models.Model):
         if user is not None:
             qs = qs.filter(assignment__user=user)
         return qs
-
-    def set_user_annotations(
-        self,
-        user,
-        label_ids: list[int],
-        phase: Literal["ANNOTATION", "DISCUSSION", "EXPERT"] | None = None,
-    ):
-        assignments = ExampleAssignment.objects.filter(example=self, assignment__user=user)
-        if phase is not None:
-            assignments = assignments.filter(batch_assignment__phase=getattr(BatchPhase, phase))
-        assignment = assignments.get()
-        assignment.set_user_annotations(label_ids=label_ids)
