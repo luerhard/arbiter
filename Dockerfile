@@ -33,7 +33,7 @@ ENV DJANGO_SETTINGS_MODULE=core.settings.prod
 RUN ["mkdir", "-p", "/app/staticfiles/"]
 RUN ["/.venv/bin/python", "core/manage.py", "collectstatic", "--noinput"]
 WORKDIR /app/core
-CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000", "--log-level", "debug", "--capture-output", "--access-logfile", "-", "--error-logfile", "-"]
 
 # ---- Dev image (with debugger) ----
 FROM base AS dev
