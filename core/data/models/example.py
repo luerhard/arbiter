@@ -1,5 +1,4 @@
 from collections import defaultdict
-from typing import Literal
 
 from django.db import models
 

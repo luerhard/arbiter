@@ -7,13 +7,11 @@ from django.core.management.base import BaseCommand
 import pandas as pd
 
 from data.models import Example
-from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
 from projects.models import ProjectRole
-from projects.models import ProjectUser
 
 
 def uniform_choices(elementary_events: list):
