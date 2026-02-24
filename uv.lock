@@ -19,6 +19,7 @@ dependencies = [
     { name = "channels", extra = ["daphne"] },
     { name = "channels-redis" },
     { name = "crispy-tailwind" },
+    { name = "daphne" },
     { name = "django" },
     { name = "django-colorfield" },
     { name = "django-cotton" },
@@ -30,7 +31,6 @@ dependencies = [
     { name = "django-vite" },
     { name = "django-widget-tweaks" },
     { name = "gitpython" },
-    { name = "gunicorn" },
     { name = "pandas" },
     { name = "psycopg", extra = ["binary"] },
     { name = "whitenoise" },
@@ -57,6 +57,7 @@ requires-dist = [
     { name = "channels", extras = ["daphne"], specifier = ">=4.1.0,<5" },
     { name = "channels-redis", specifier = ">=4.2.1" },
     { name = "crispy-tailwind", specifier = ">=1.0.3" },
+    { name = "daphne", specifier = ">=4.1.2" },
     { name = "django", specifier = "~=5.1" },
     { name = "django-colorfield", specifier = ">=0.11.0,<0.12" },
     { name = "django-cotton", specifier = ">=2.1.3" },
@@ -68,7 +69,6 @@ requires-dist = [
     { name = "django-vite", specifier = ">=3.1.0" },
     { name = "django-widget-tweaks", specifier = ">=1.5.0,<2" },
     { name = "gitpython", specifier = ">=3.1.44,<4" },
-    { name = "gunicorn", specifier = ">=25.1.0" },
     { name = "pandas", specifier = ">=2.2,<3.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2.10" },
     { name = "whitenoise", specifier = ">=6.11.0" },
@@ -562,18 +562,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c0/89/37df0b71473153574a5cdef8f242de422a0f5d26d7a9e231e6f169b4ad14/gitpython-3.1.44.tar.gz", hash = "sha256:c87e30b26253bf5418b01b0660f818967f3c503193838337fe5e573331249269", size = 214196, upload-time = "2025-01-02T07:32:43.59Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1d/9a/4114a9057db2f1462d5c8f8390ab7383925fe1ac012eaa42402ad65c2963/GitPython-3.1.44-py3-none-any.whl", hash = "sha256:9e0e10cda9bed1ee64bc9a6de50e7e38a9c9943241cd7f585f6df3ed28011110", size = 207599, upload-time = "2025-01-02T07:32:40.731Z" },
-]
-
-[[package]]
-name = "gunicorn"
-version = "25.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "packaging" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/66/13/ef67f59f6a7896fdc2c1d62b5665c5219d6b0a9a1784938eb9a28e55e128/gunicorn-25.1.0.tar.gz", hash = "sha256:1426611d959fa77e7de89f8c0f32eed6aa03ee735f98c01efba3e281b1c47616", size = 594377, upload-time = "2026-02-13T11:09:58.989Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/da/73/4ad5b1f6a2e21cf1e85afdaad2b7b1a933985e2f5d679147a1953aaa192c/gunicorn-25.1.0-py3-none-any.whl", hash = "sha256:d0b1236ccf27f72cfe14bce7caadf467186f19e865094ca84221424e839b8b8b", size = 197067, upload-time = "2026-02-13T11:09:57.146Z" },
 ]
 
 [[package]]
