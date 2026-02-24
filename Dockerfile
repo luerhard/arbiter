@@ -13,21 +13,32 @@ RUN git config --global user.name "anntotationtool" && \
 # ---- Prod deps (no dev) ----
 FROM base AS deps
 COPY pyproject.toml uv.lock README.md ./
-RUN ["uv", "sync", "--frozen", "--no-dev", "--compile-bytecode"]
+# RUN ["uv", "sync", "--frozen", "--no-dev", "--compile-bytecode"]
+RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
+
+# ---- Frontend build ----
+FROM node:22-alpine AS vite-build
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY . .
+RUN ["npm", "run", "build"]
 
 # ---- Runtime (prod) ----
 FROM base AS runtime
-# copy the venv from deps stage
-# COPY --from=deps /app/.venv /app/.venv
-# app code last for better caching
+COPY --from=deps /.venv /.venv
 COPY . .
-# Default prod command (override in compose for dev)
-CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
+COPY --from=vite-build /app/dist /app/dist
+ENV DJANGO_SETTINGS_MODULE=core.settings.prod
+RUN ["mkdir", "-p", "/app/staticfiles/"]
+RUN ["/.venv/bin/python", "core/manage.py", "collectstatic", "--noinput"]
+WORKDIR /app/core
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 # ---- Dev image (with debugger) ----
 FROM base AS dev
-COPY pyproject.toml uv.lock README.md ./
-RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
+# COPY pyproject.toml uv.lock README.md ./
+# RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
 COPY . .
 # wait for VS Code debugger to attach, then run Daphne
 WORKDIR /app/core/

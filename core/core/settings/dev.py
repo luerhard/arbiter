@@ -33,11 +33,6 @@ DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": lambda request: True}  # noqa: 
 
 CSRF_TRUSTED_ORIGINS = ["http://193.196.54.251"]
 
-MEDIA_ROOT = BASE_DIR / "media"
-MEDIA_URL = "/media/"
-
-CODEBOOKS_ROOT = MEDIA_ROOT / "codebooks"
-CODEBOOKS_ROOT.mkdir(parents=True, exist_ok=True)
 
 # Application definition
 INSTALLED_APPS += [
