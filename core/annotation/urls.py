@@ -23,7 +23,6 @@ htmx_patterns = [
     # path("htmx/nav-block", views.HtmxNavBlock.as_view(), name="annotate-nav-block"),
     # path("next/", views.NextSentence.as_view(), name="annotate-next"),
     # path("prev/", views.PrevSentence.as_view(), name="annotate-prev"),
-    path("htmx/edit/", views.EditAssignment.as_view(), name="annotate-edit"),
 ]
 
 urlpatterns += htmx_patterns

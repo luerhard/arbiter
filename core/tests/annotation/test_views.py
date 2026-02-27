@@ -113,7 +113,6 @@ class TestAnnotateViews:
         page = client.get(resp.url)
         assert page.status_code == 200
         assert b'id="annotation-panel"' in page.content
-        assert b'id="assignmentId"' in page.content
 
     def test_non_annotator_forbidden(self, client):
         user = _first_non_annotator_user()
@@ -185,7 +184,7 @@ class TestEditAssignmentView:
         login = client.login(username=self.user.username, password="123")
         assert login is True
 
-        self.url = reverse("annotate-edit")
+        self.url = reverse("annotate-assignment", args=(self.batch_id, self.assignment.id))
 
     def test_post_correct_labels_saves_and_advances(self, client):
         assert self.assignment.annotations.count() == 0
@@ -196,6 +195,7 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id, "labels": label_ids},
+            HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
         assert "HX-Push-Url" in resp.headers
@@ -211,7 +211,13 @@ class TestEditAssignmentView:
             "annotate-assignment",
             args=(next_assignment.example.batch_id, next_assignment.id),
         )
-        assert re.search(rb'value="%d"' % next_assignment.id, resp.content)
+        assert (
+            reverse(
+                "annotate-assignment",
+                args=(next_assignment.example.batch_id, next_assignment.id),
+            ).encode()
+            in resp.content
+        )
 
     def test_post_no_labels_clears(self, client):
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
@@ -219,7 +225,11 @@ class TestEditAssignmentView:
         self.assignment.set_user_annotations(label_ids=label_ids)
         assert self.assignment.annotations.count() == 1
 
-        resp = client.post(self.url, data={"assignment_id": self.assignment.id})
+        resp = client.post(
+            self.url,
+            data={"assignment_id": self.assignment.id},
+            HTTP_HX_REQUEST="true",
+        )
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
         assert self.assignment.annotations.count() == 0
@@ -230,7 +240,11 @@ class TestEditAssignmentView:
         self.assignment.set_user_annotations(label_ids=label_ids)
         assert self.assignment.annotations.count() == 1
 
-        resp = client.post(self.url, data={"assignment_id": self.assignment.id, "labels": []})
+        resp = client.post(
+            self.url,
+            data={"assignment_id": self.assignment.id, "labels": []},
+            HTTP_HX_REQUEST="true",
+        )
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
         assert self.assignment.annotations.count() == 0
@@ -240,6 +254,7 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id, "labels": [9999]},
+            HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
@@ -251,18 +266,23 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id, "labels": [valid_label_id, 9999]},
+            HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
-        assert self.assignment.annotations.count() == 1
-        assert self.assignment.annotations.first().label_id == valid_label_id
+        # Django's MultipleChoiceField treats any unknown value as invalid input,
+        # so the form doesn't save partial results.
+        assert self.assignment.annotations.count() == 0
 
     def test_post_non_integer_label_id_raises(self, client):
-        with pytest.raises(ValueError):  # noqa: PT011
-            client.post(
-                self.url,
-                data={"assignment_id": self.assignment.id, "labels": ["not-a-number"]},
-            )
+        resp = client.post(
+            self.url,
+            data={"assignment_id": self.assignment.id, "labels": ["not-a-number"]},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 200
+        self.assignment.refresh_from_db()
+        assert self.assignment.annotations.count() == 0
 
     def test_post_wrong_parameter_name_clears(self, client):
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
@@ -273,6 +293,7 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id, "wrong_labels": [1, 2]},
+            HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
