@@ -169,5 +169,6 @@ node_modules/**
 # VSCode specific files
 *.code-workspace
 media/**
+staticfiles/**
 assets/**
 !assets/.gitkeep
