@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 import pytest
 
 from data.models import Example
@@ -99,3 +100,70 @@ def test_example_set_user_annotations_uses_user_assignment():
     assert annotations.first().label_id == label1.id
     assignment.refresh_from_db()
     assert assignment.done is not None
+
+
+@pytest.mark.django_db
+def test_example_assignment_previous_next_respects_order_and_bounds():
+    data = _setup_example_assignment()
+    user = data["user"]
+    batch = data["batch"]
+
+    a1 = data["assignment"]
+
+    ex2 = Example.objects.create(batch=batch, content="Example 2")
+    ex3 = Example.objects.create(batch=batch, content="Example 3")
+
+    a2 = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=ex2,
+        phase=BatchPhase.ANNOTATION,
+        order=2,
+    )
+    a3 = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=ex3,
+        phase=BatchPhase.ANNOTATION,
+        order=3,
+    )
+
+    assert a1.previous() is None
+    assert a1.next().id == a2.id
+    assert a2.previous().id == a1.id
+    assert a2.next().id == a3.id
+    assert a3.previous().id == a2.id
+    assert a3.next() is None
+
+
+@pytest.mark.django_db
+def test_example_assignment_previous_next_skip_annotated_skips_done_assignments():
+    data = _setup_example_assignment()
+    user = data["user"]
+    batch = data["batch"]
+
+    a1 = data["assignment"]
+    ex2 = Example.objects.create(batch=batch, content="Example 2")
+    ex3 = Example.objects.create(batch=batch, content="Example 3")
+
+    a2 = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=ex2,
+        phase=BatchPhase.ANNOTATION,
+        order=2,
+    )
+    a3 = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=ex3,
+        phase=BatchPhase.ANNOTATION,
+        order=3,
+    )
+
+    a2.done = timezone.now()
+    a2.save(update_fields=["done"])
+
+    assert a3.previous().id == a2.id
+    assert a3.previous(skip_annotated=True).id == a1.id
+    assert a1.next(skip_annotated=True).id == a3.id
