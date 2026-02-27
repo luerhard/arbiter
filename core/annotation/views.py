@@ -84,6 +84,9 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         context = _annotation_panel_context(batch, assignment)
         context["progress"] = get_progress(request.user, batch)
 
+        if context["has_next"] and context["progress"]["done"] >= context["progress"]["total"]:
+            redirect("annotate-done", batch_id=batch.id)
+
         if request.htmx:
             return render(request, "annotation/panel.html", context)
 
@@ -101,10 +104,6 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
             batch = self._get_batch(request, batch_id)
         except PermissionError:
             return HttpResponseForbidden()
-
-        progress = get_progress(request.user, batch)
-        if progress["done"] >= progress["total"]:
-            return redirect("annotate-done", batch_id=batch.id)
 
         if assignment_id:
             try:
