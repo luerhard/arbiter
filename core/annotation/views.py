@@ -1,9 +1,9 @@
-import json
 import logging
 
 from django.contrib import messages
 from django.http import HttpResponse
 from django.http import HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
@@ -32,14 +32,13 @@ def get_progress(user, batch):
     return {"done": done, "total": total, "current": current}
 
 
-def _annotation_panel_context(request, batch, assignment):
+def _annotation_panel_context(batch, assignment):
     prev_assignment = assignment.previous()
     next_assignment = assignment.next()
 
     context = {
         "batch": batch,
         "assignment_id": assignment.id,
-        "progress": get_progress(request.user, batch),
         "example": assignment.example,
         "label_form": MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment),
         "has_prev": bool(prev_assignment),
@@ -69,21 +68,48 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
     template_name = "annotation/index.html"
     model = Batch
 
+    def _get_batch(self, request, batch_id: int) -> Batch:
+        batch = Batch.objects.prefetch_related("users").get(id=batch_id)
+        if request.user not in batch.users.all():
+            raise PermissionError
+        return batch
+
+    def _get_assignment(self, request, batch: Batch, assignment_id: int) -> ExampleAssignment:
+        assignment = get_object_or_404(ExampleAssignment, id=assignment_id)
+        if assignment.user != request.user or assignment.example.batch_id != batch.id:
+            raise PermissionError
+        return assignment
+
+    def _render_assignment(self, request, batch: Batch, assignment: ExampleAssignment):
+        context = _annotation_panel_context(batch, assignment)
+        context["progress"] = get_progress(request.user, batch)
+
+        if request.htmx:
+            return render(request, "annotation/panel.html", context)
+
+        codebook = batch.project.codebook.get()
+        context.update(codebook.get_as_context(batch.batch_number))
+        return render(request, "annotation/index.html", context)
+
     def get(
         self,
         request,
         batch_id,
         assignment_id: int | None = None,
     ):
-        batch = Batch.objects.get(id=batch_id)
+        try:
+            batch = self._get_batch(request, batch_id)
+        except PermissionError:
+            return HttpResponseForbidden()
 
         progress = get_progress(request.user, batch)
         if progress["done"] >= progress["total"]:
             return redirect("annotate-done", batch_id=batch.id)
 
         if assignment_id:
-            assignment = ExampleAssignment.objects.get(id=assignment_id)
-            if assignment.user != request.user or assignment.example.batch_id != batch.id:
+            try:
+                assignment = self._get_assignment(request, batch, assignment_id)
+            except PermissionError:
                 return HttpResponseForbidden()
         else:
             assignment = (
@@ -102,63 +128,41 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 assignment_id=assignment.id,
             )
 
-        context = _annotation_panel_context(request, batch, assignment)
+        return self._render_assignment(request, batch, assignment)
 
-        if request.headers.get("HX-Request") == "true":
-            return render(request, "annotation/panel.html", context)
-        codebook = batch.project.codebook.get()
-        context.update(codebook.get_as_context(batch.batch_number))
-        return render(request, "annotation/index.html", context)
+    def post(self, request, batch_id, assignment_id: int | None = None):
+        if assignment_id is None:
+            return HttpResponse(status=400)
 
-
-class EditAssignment(View):
-    def get(self, request):  # noqa: ARG002
-        assignment_id = request.GET.get("assignment_id")
-        if assignment_id:
-            assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-            if assignment.user != request.user:
-                return HttpResponseForbidden()
-            submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-            assignment.set_user_annotations(label_ids=submitted_labels)
-
-            payload = {"assignment_id": assignment.pk}
-        else:
-            msg = "No assignment id found in request"
-            raise Exception(msg)
-
-        resp = HttpResponse(status=200)
-        resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
-        return resp
-
-    def post(self, request, *args, **kwargs):  # noqa: ARG002
-        assignment_id = request.POST.get("assignment_id")
-        assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-        if assignment.user != request.user:
+        try:
+            batch = self._get_batch(request, batch_id)
+            assignment = self._get_assignment(request, batch, assignment_id)
+        except PermissionError:
             return HttpResponseForbidden()
+
         form = MultiLabelForm(request.POST, assignment=assignment, phase=BatchPhase.ANNOTATION)
         if form.is_valid():
             form.save()
-            messages.success(self.request, "Saved.")
+            messages.success(request, "Saved.")
         else:
-            messages.error(self.request, f"Something was invalid: {form}")
-            submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-            assignment.set_user_annotations(label_ids=submitted_labels)
+            messages.error(request, f"Something was invalid: {form}")
 
-        batch = assignment.example.batch
+        progress = get_progress(request.user, batch)
         next_assignment = assignment.next()
-        if not next_assignment:
-            resp = HttpResponse(status=204)
-            resp["HX-Redirect"] = reverse("annotate-done", kwargs={"batch_id": batch.id})
-            return resp
+        if not next_assignment and progress["done"] >= progress["total"]:
+            return redirect("annotate-done", batch_id=batch.id)
 
-        batch = next_assignment.example.batch
-        context = _annotation_panel_context(request, batch, next_assignment)
-        resp = render(request, "annotation/panel.html", context, status=200)
-        resp["HX-Push-Url"] = reverse(
-            "annotate-assignment",
-            kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
-        )
-        return resp
+        context = _annotation_panel_context(batch, next_assignment)
+        context["progress"] = progress
+
+        if request.htmx:
+            resp = render(request, "annotation/panel.html", context, status=200)
+            resp["HX-Push-Url"] = reverse(
+                "annotate-assignment",
+                kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
+            )
+            return resp
+        return redirect("annotate-assignment", batch_id=batch.id, assignment_id=next_assignment.id)
 
 
 class AnnotationDoneView(AnnotatorRequiredMixin, View):
@@ -170,33 +174,3 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
             "progress": get_progress(request.user, batch),
         }
         return render(request, "annotation/done.html", context)
-
-
-# class HtmxLabels(View):
-#     def get(self, request):
-#         assignment_id = request.GET.get("assignment_id")
-#         context = {}
-#         if assignment_id:
-#             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-#             if assignment.user != request.user:
-#                 return HttpResponseForbidden()
-#             previous_annotations = assignment.annotations.select_related("label").all()
-
-#             example = assignment.example
-#             labels = []
-#             for label in example.labels.all():
-#                 new = {
-#                     "name": label.name,
-#                     "id": label.id,
-#                 }
-#                 if label in previous_annotations:
-#                     new["is_set"] = True
-#                 else:
-#                     new["is_set"] = False
-#                 labels.append(new)
-#             context["labels"] = labels
-
-#             form = MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment)
-#             context["label_form"] = form
-
-#         return render(request, "annotation/partials/labels.html", context)
