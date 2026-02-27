@@ -7,5 +7,6 @@
     "python.analysis.typeCheckingMode": "off",
     "python.analysis.extraPaths": [
         "${workspaceFolder}/core"
-    ]
+    ],
+    "python-envs.pythonProjects": []
 }
