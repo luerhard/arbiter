@@ -123,16 +123,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-# For Redis, if it ever becomes slow...
-# CHANNEL_LAYERS = {
-#     "default": {
-#         "BACKEND": "asgi_redis.RedisChannelLayer",
-#         "CONFIG": {
-#             "hosts": [("redis-host-url", 6379)],
-#         },
-#     },
-# }
-
 # Database
 DATABASES = {
     "default": {
@@ -161,28 +151,18 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
-#
-# This is the directory where collectstatic will put the files in production
-STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "media"
-
-STATIC_ROOT.mkdir(parents=True, exist_ok=True)
 
 CODEBOOKS_ROOT = MEDIA_ROOT / "codebooks"
 CODEBOOKS_ROOT.mkdir(parents=True, exist_ok=True)
 
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    BASE_DIR / "dist",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 
 
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

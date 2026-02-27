@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 
+from django.core.exceptions import ImproperlyConfigured
+
 from .base import *
 
 # Password validation
@@ -52,3 +54,18 @@ DJANGO_VITE = {
         "manifest_path": BASE_DIR / "dist" / "manifest.json",
     },
 }
+
+# Static files are collected in production.
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+DIST_DIR = BASE_DIR / "dist"
+if not DIST_DIR.exists():
+    msg = (
+        "Missing Vite build output directory."
+        "Run `npm run build` (or `vite build`) to create `dist/`."
+    )
+    raise ImproperlyConfigured(
+        msg,
+    )
+STATICFILES_DIRS.append(DIST_DIR)

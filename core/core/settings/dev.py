@@ -85,3 +85,8 @@ for app in LOG_APPS:
     LOGGING["loggers"][app] = {"level": "DEBUG", "handlers": [f"file_{app}"]}
 
 DJANGO_VITE = {"default": {"dev_mode": True}}
+
+# django-vite expects STATIC_ROOT to be set (even in dev mode).
+# In development we don't rely on collectstatic, but STATIC_ROOT must be a valid path.
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
