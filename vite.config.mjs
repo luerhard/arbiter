@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import tailwindcss from '@tailwindcss/vite'
 import inject from '@rollup/plugin-inject'
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
     base: "/static/",
     server: {
         host: '0.0.0.0',
@@ -15,6 +15,7 @@ export default defineConfig({
             host: 'localhost',
             overlay: false
         },
+        ...(command === "serve" ? { origin: "http://localhost:5173" } : {}),
     },
     build: {
         manifest: "manifest.json",
@@ -31,5 +32,4 @@ export default defineConfig({
             htmx: 'htmx.org'
         }),
     ],
-
-})
+}));
