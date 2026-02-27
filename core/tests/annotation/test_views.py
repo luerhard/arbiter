@@ -1,5 +1,3 @@
-import re
-
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
