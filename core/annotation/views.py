@@ -19,6 +19,52 @@ from projects.models import BatchPhase
 log = logging.getLogger(__name__)
 
 
+def get_progress(user, batch):
+    """helper function to calculate current progress"""
+    all_assignments = batch.assignments.filter(user=user, phase=BatchPhase.ANNOTATION)
+    done = all_assignments.filter(done__isnull=False).count()
+    total = all_assignments.count()
+    try:
+        current = int(done / total * 100)
+    except ZeroDivisionError:
+        current = 100
+
+    return {"done": done, "total": total, "current": current}
+
+
+def _annotation_panel_context(request, batch, assignment):
+    prev_assignment = assignment.previous()
+    next_assignment = assignment.next()
+
+    context = {
+        "batch": batch,
+        "assignment_id": assignment.id,
+        "progress": get_progress(request.user, batch),
+        "example": assignment.example,
+        "label_form": MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment),
+        "has_prev": bool(prev_assignment),
+        "has_next": bool(next_assignment),
+        "prev_url": (
+            reverse(
+                "annotate-assignment",
+                kwargs={"batch_id": batch.id, "assignment_id": prev_assignment.id},
+            )
+            if prev_assignment
+            else ""
+        ),
+        "next_url": (
+            reverse(
+                "annotate-assignment",
+                kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
+            )
+            if next_assignment
+            else ""
+        ),
+    }
+
+    return context
+
+
 class AnnotateView(AnnotatorRequiredMixin, DetailView):
     template_name = "annotation/index.html"
     model = Batch
@@ -31,9 +77,13 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
     ):
         batch = Batch.objects.get(id=batch_id)
 
+        progress = get_progress(request.user, batch)
+        if progress["done"] >= progress["total"]:
+            return redirect("annotate-done", batch_id=batch.id)
+
         if assignment_id:
             assignment = ExampleAssignment.objects.get(id=assignment_id)
-            if assignment.user != request.user:
+            if assignment.user != request.user or assignment.example.batch_id != batch.id:
                 return HttpResponseForbidden()
         else:
             assignment = (
@@ -44,21 +94,21 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 .order_by("order")
                 .first()
             )
-        progress = get_progress(request.user, batch)
-        if not assignment or progress["done"] >= progress["total"]:
-            return redirect("annotate-done", batch_id=batch.id)
+            if not assignment:
+                return redirect("annotate-done", batch_id=batch.id)
+            return redirect(
+                "annotate-assignment",
+                batch_id=batch.id,
+                assignment_id=assignment.id,
+            )
 
-        context = {}
-        context["assignment_id"] = assignment.id
+        context = _annotation_panel_context(request, batch, assignment)
+
+        if request.headers.get("HX-Request") == "true":
+            return render(request, "annotation/panel.html", context)
         codebook = batch.project.codebook.get()
         context.update(codebook.get_as_context(batch.batch_number))
-
-        response = render(request, "annotation/index.html", context)
-        response["HX-Trigger"] = json.dumps(
-            {"annotation-updated": {"assignment_id": assignment.id}},
-        )
-
-        return response
+        return render(request, "annotation/index.html", context)
 
 
 class EditAssignment(View):
@@ -85,26 +135,29 @@ class EditAssignment(View):
         assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
         if assignment.user != request.user:
             return HttpResponseForbidden()
-        form = MultiLabelForm(request.POST, assignment=assignment, phase="ANNOTATION")
+        form = MultiLabelForm(request.POST, assignment=assignment, phase=BatchPhase.ANNOTATION)
         if form.is_valid():
             form.save()
             messages.success(self.request, "Saved.")
         else:
             messages.error(self.request, f"Something was invalid: {form}")
+            submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
+            assignment.set_user_annotations(label_ids=submitted_labels)
 
         batch = assignment.example.batch
-        submitted_labels = [int(i) for i in self.request.POST.getlist("labels") if i.strip()]
-        assignment.set_user_annotations(label_ids=submitted_labels)
-
         next_assignment = assignment.next()
         if not next_assignment:
             resp = HttpResponse(status=204)
             resp["HX-Redirect"] = reverse("annotate-done", kwargs={"batch_id": batch.id})
             return resp
 
-        payload = {"assignment_id": next_assignment.pk, "batch_id": batch.id}
-        resp = HttpResponse(status=204)
-        resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
+        batch = next_assignment.example.batch
+        context = _annotation_panel_context(request, batch, next_assignment)
+        resp = render(request, "annotation/panel.html", context, status=200)
+        resp["HX-Push-Url"] = reverse(
+            "annotate-assignment",
+            kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
+        )
         return resp
 
 
@@ -119,129 +172,31 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
         return render(request, "annotation/done.html", context)
 
 
-def get_progress(user, batch):
-    """helper function to calculate current progress"""
-    all_assignments = batch.assignments.filter(user=user, phase=BatchPhase.ANNOTATION)
-    done = all_assignments.filter(done__isnull=False).count()
-    total = all_assignments.count()
-    try:
-        current = int(done / total * 100)
-    except ZeroDivisionError:
-        current = 100
+# class HtmxLabels(View):
+#     def get(self, request):
+#         assignment_id = request.GET.get("assignment_id")
+#         context = {}
+#         if assignment_id:
+#             assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
+#             if assignment.user != request.user:
+#                 return HttpResponseForbidden()
+#             previous_annotations = assignment.annotations.select_related("label").all()
 
-    return {"done": done, "total": total, "current": current}
+#             example = assignment.example
+#             labels = []
+#             for label in example.labels.all():
+#                 new = {
+#                     "name": label.name,
+#                     "id": label.id,
+#                 }
+#                 if label in previous_annotations:
+#                     new["is_set"] = True
+#                 else:
+#                     new["is_set"] = False
+#                 labels.append(new)
+#             context["labels"] = labels
 
+#             form = MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment)
+#             context["label_form"] = form
 
-class HtmxPbar(View):
-    def get(self, request):
-        assignment_id = request.GET.get("assignment_id")
-        if assignment_id:
-            assignment = ExampleAssignment.objects.get(id=assignment_id)
-            if assignment.user != request.user:
-                return HttpResponseForbidden()
-            ctx = {
-                "progress": get_progress(request.user, assignment.example.batch),
-            }
-        else:
-            ctx = {"progress": 0}
-        return render(request, "annotation/partials/pbar.html", ctx)
-
-
-class HtmxSentence(View):
-    def get(self, request):
-        assignment_id = request.GET.get("assignment_id")
-        context = {}
-        if assignment_id:
-            assignment = ExampleAssignment.objects.get(id=assignment_id)
-            if assignment.user != request.user:
-                return HttpResponseForbidden()
-            context["example"] = assignment.example
-
-        return render(request, "annotation/partials/sentence.html", context)
-
-
-class HtmxLabels(View):
-    def get(self, request):
-        assignment_id = request.GET.get("assignment_id")
-        context = {}
-        if assignment_id:
-            assignment = ExampleAssignment.objects.filter(id=assignment_id).get()
-            if assignment.user != request.user:
-                return HttpResponseForbidden()
-            previous_annotations = assignment.annotations.select_related("label").all()
-
-            example = assignment.example
-            labels = []
-            for label in example.labels.all():
-                new = {
-                    "name": label.name,
-                    "id": label.id,
-                }
-                if label in previous_annotations:
-                    new["is_set"] = True
-                else:
-                    new["is_set"] = False
-                labels.append(new)
-            context["labels"] = labels
-
-            form = MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment)
-            context["label_form"] = form
-
-        return render(request, "annotation/partials/labels.html", context)
-
-
-class HtmxNavBlock(View):
-    def get(self, request):
-        assignment_id = request.GET.get("assignment_id")
-        context = {}
-        if assignment_id:
-            a = ExampleAssignment.objects.get(id=assignment_id)
-            if a.user != request.user:
-                return HttpResponseForbidden()
-            ctx = {
-                "assignment_id": a.id,
-                "has_prev": bool(a.previous()),
-                "has_next": bool(a.next()),
-            }
-            context.update(ctx)
-        return render(request, "annotation/partials/nav.html", context)
-
-
-class PrevSentence(AnnotatorRequiredMixin, View):
-    def get(self, request):
-        skip_annotated = request.GET.get("filter") == "unfinished"
-        assignment_id = request.GET.get("assignment_id")
-
-        current = ExampleAssignment.objects.get(id=assignment_id)
-        nxt = current.previous(skip_annotated=skip_annotated) or current
-
-        resp = HttpResponse(
-            f'<input id="assignmentId" name="assignment_id" value="{nxt.id}" '
-            'hx-swap-oob="true" hidden>',
-            status=200,
-        )
-        resp["HX-Trigger"] = json.dumps({"annotation-updated": {"assignment_id": nxt.id}})
-        return resp
-
-
-class NextSentence(AnnotatorRequiredMixin, View):
-    def get(self, request):
-        skip_annotated = request.GET.get("filter") == "unfinished"
-        assignment_id = request.GET.get("assignment_id")
-
-        current = ExampleAssignment.objects.get(id=assignment_id)
-        nxt = current.next(skip_annotated=skip_annotated) or current
-
-        payload = {
-            "assignment_id": nxt.id,
-            "has_next": bool(nxt.next(skip_annotated=skip_annotated)),
-            "has_prev": bool(nxt.previous(skip_annotated=skip_annotated)),
-        }
-
-        resp = HttpResponse(
-            f'<input id="assignmentId" name="assignment_id" value="{nxt.id}" '
-            'hx-swap-oob="true" hidden>',
-            status=200,
-        )
-        resp["HX-Trigger"] = json.dumps({"annotation-updated": payload})
-        return resp
+#         return render(request, "annotation/partials/labels.html", context)

@@ -1,58 +1,15 @@
 {% extends "base.html" %}
 {% load markdownify %}
 {% block content %}
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('app', {
-                assignment_id: '{{ assignment_id|default:"" }}'
-            });
-        });
-
-        // attach params to all HTMX requests
-        document.addEventListener('htmx:configRequest', (e) => {
-            e.detail.parameters.assignment_id = Alpine.store('app').assignment_id;
-        });
-    </script>
-    <div x-data
-         x-init=" $store.app = $store.app || {}; $store.app.assignment_id = +$el.dataset.assignmentId;  // '+' coerces to number // Optional: kick your sections on first load to mimic your later HX-Trigger htmx.trigger(document.body, 'annotation-updated', { assignment_id: $store.app.assignment_id }) "
-         data-assignment-id="{{ assignment_id }}"
-         @annotation-updated.window=" $store.app.assignment_id = $event.detail.assignment_id ?? $store.app.assignment_id ">
-        <div class="divide-y divide-gray-200 overflow-hidden rounded-lg bg-white shadow-sm dark:divide-white/10 dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10">
-            <div class="px-4 py-5 sm:px-6">
-                <button command="show-modal"
-                        commandfor="drawer"
-                        class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20">
-                    Open Codebook
-                </button>
-                <c-drawer id="drawer" title="Codebook">
-                {{ codebook.content|markdownify }}
-                </c-drawer>
-            </div>
-            <div class="px-4 py-5 sm:px-6">
-                <div id="pbar"
-                     hx-get="{% url 'annotate-pbar' %}"
-                     hx-trigger="load once, annotation-updated from:body"
-                     hx-swap="innerHTML"></div>
-            </div>
-            <div class="px-4 py-5 sm:p-6">
-                <div id="sentence"
-                     hx-get="{% url 'annotate-sentence' %}"
-                     hx-trigger="load once, annotation-updated from:body"
-                     hx-swap="innerHTML"></div>
-            </div>
-            <div class="px-4 py-4 sm:px-6">
-                <div id="labels"
-                     hx-get="{% url 'annotate-labels' %}"
-                     hx-trigger="load once, annotation-updated from:body"
-                     hx-swap="innerHTML"></div>
-            </div>
-            <div class="px-4 py-4 sm:px-6">
-                <!-- Content goes here -->
-                <div id="nav-block"
-                     hx-get="{% url 'annotate-nav-block' %}"
-                     hx-trigger="load once, annotation-updated from:body"
-                     hx-swap="innerHTML"></div>
-            </div>
-        </div>
+    <div class="px-4 py-5 sm:px-6">
+        <button command="show-modal"
+                commandfor="drawer"
+                class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20">
+            Open Codebook
+        </button>
+        <c-drawer id="drawer" title="Codebook">
+        {{ codebook.content|markdownify }}
+        </c-drawer>
     </div>
+    {% include "annotation/panel.html" %}
 {% endblock content %}

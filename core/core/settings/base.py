@@ -166,6 +166,8 @@ MEDIA_URL = "/media/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_ROOT = BASE_DIR / "media"
 
+STATIC_ROOT.mkdir(parents=True, exist_ok=True)
+
 CODEBOOKS_ROOT = MEDIA_ROOT / "codebooks"
 CODEBOOKS_ROOT.mkdir(parents=True, exist_ok=True)
 
