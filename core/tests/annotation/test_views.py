@@ -139,6 +139,13 @@ class TestAnnotateViews:
         labels = Label.objects.filter(project=assignment.example.batch.project)
         assert labels.exists()
 
+        content = resp.content
+        assert b'checked="False"' not in content
+        assert b'disabled="False"' not in content
+        assert b'checked="True"' not in content
+        assert b'disabled="True"' not in content
+        assert b':checked="detail.selected"' not in content
+
     def test_hx_request_returns_panel_only(self, client):
         user = _first_annotator_user()
         batch_id = _first_annotation_batch_for_user(user)

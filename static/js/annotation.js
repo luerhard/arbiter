@@ -42,10 +42,17 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
     };
 }
 export function labelButton({ id, hotkey, disabled }) {
+    const isDisabled = (value) => {
+        if (typeof value === 'boolean') return value;
+        if (value == null) return false;
+        const normalized = String(value).trim().toLowerCase();
+        return normalized === 'true' || normalized === 'disabled' || normalized === '1';
+    };
+
     return {
         id,
         hotkey,
-        disabled: !!disabled,
+        disabled: isDisabled(disabled),
         _onKey: null,
 
         init() {
