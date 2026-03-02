@@ -40,7 +40,7 @@ def _annotation_panel_context(batch, assignment):
         "batch": batch,
         "assignment_id": assignment.id,
         "example": assignment.example,
-        "label_form": MultiLabelForm(phase=BatchPhase.ANNOTATION, assignment=assignment),
+        "label_form": MultiLabelForm(assignment=assignment),
         "has_prev": bool(prev_assignment),
         "has_next": bool(next_assignment),
         "prev_url": (
@@ -139,7 +139,7 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         except PermissionError:
             return HttpResponseForbidden()
 
-        form = MultiLabelForm(request.POST, assignment=assignment, phase=BatchPhase.ANNOTATION)
+        form = MultiLabelForm(request.POST, assignment=assignment)
         if form.is_valid():
             form.save()
             messages.success(request, "Saved.")
