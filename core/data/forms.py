@@ -8,34 +8,26 @@ log = logging.getLogger(__name__)
 class MultiLabelForm(forms.Form):
     labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
-    def __init__(self, *args, assignment, phase, **kwargs):
+    def __init__(self, *args, assignment, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.assignment = assignment
-        self.example = assignment.example
         self.user = assignment.user
-        annotation_labels = {
-            annotation.label
-            for annotation in self.example.get_user_annotations(
-                user=assignment.user,
-                phase=phase,
-            ).select_related("label")
-        }
+        annotation_labels = assignment.get_user_annotations()
 
         label_details = []
         initial = []
-        for label in self.example.labels.all():
+        for label in self.assignment.batch.project.labels.all():
             label_data = {
                 "id": label.id,
                 "name": label.name,
                 "color": label.color,
                 "hotkey": label.hotkey,
+                "selected": label in annotation_labels,
             }
             label_details.append(label_data)
-            if label in annotation_labels:
-                initial.append(label.id)
 
-        self.fields["labels"].initial = initial
+        self.fields["labels"].initial = label_details
         self.fields["labels"].choices = [(label["id"], label["name"]) for label in label_details]
         self.label_details = label_details
 

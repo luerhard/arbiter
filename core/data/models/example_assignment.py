@@ -88,6 +88,9 @@ class ExampleAssignment(models.Model):
         self.done = timezone.now()
         self.save()
 
+    def get_user_annotations(self):
+        return {annotation.label for annotation in self.annotations.all()}
+
     def check_for_disagreement(self):
         return self.example.has_disagreement
 

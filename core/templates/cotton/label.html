@@ -1,17 +1,6 @@
 <c-vars id value text color hotkey checked disabled />
-<div class="inline-block" x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', initiallyChecked:
-    {% if checked %}
-        true
-    {% else %}
-        false
-    {% endif %}
-    , disabled:
-    {% if disabled %}
-        true
-    {% else %}
-        false
-    {% endif %}
-    })">
+<div class="inline-block"
+     x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', initiallyChecked: {{ checked|yesno:'true,false' }} , disabled: {{ disabled|yesno:'true,false' }} })">
     <!-- Real checkbox for Django; visually hidden but stays in the form -->
     <input type="checkbox"
            name="labels"
