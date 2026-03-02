@@ -41,7 +41,7 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
         }
     };
 }
-export function labelButton({ id, hotkey, disabled}) {
+export function labelButton({ id, hotkey, disabled }) {
     return {
         id,
         hotkey,
