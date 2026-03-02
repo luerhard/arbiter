@@ -88,8 +88,8 @@
 }
 
 .label-input:disabled:checked+.label {
-  background: color-mix(in srgb, var(--label-color) 38%, #ffffff);
-  border-color: color-mix(in srgb, var(--label-color) 72%, #ffffff);
+  background: color-mix(in srgb, var(--label-color) 72%, #ffffff);
+  border-color: color-mix(in srgb, var(--label-color) 92%, #ffffff);
   color: #ffffff;
   box-shadow: none;
 }
