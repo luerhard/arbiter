@@ -4,6 +4,7 @@ import uuid
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils.text import slugify
 import pytest
 
 from data.models import ExampleAssignment
@@ -19,7 +20,8 @@ from users.models import User
 URLS_ANYROLE = [("project-list", None)]
 URLS_EXPERT = [
     ("project-detail-expert", (1,)),
-    ("export-batch", (1,)),
+    ("project-export-batch", (1,)),
+    ("project-export-project", (1,)),
 ]
 URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 
@@ -303,7 +305,7 @@ class TestExportBatchView:
 
         login = client.login(username=expert.username, password="123")
         assert login == True
-        response = client.get(reverse("export-batch", args=(batch.id,)))
+        response = client.get(reverse("project-export-batch", args=(batch.id,)))
 
         assert response.status_code == 200
         assert response["Content-Disposition"] == (
@@ -344,7 +346,44 @@ class TestExportBatchView:
 
         login = client.login(username=expert.username, password="123")
         assert login == True
-        response = client.get(reverse("export-batch", args=(batch.id,)))
+        response = client.get(reverse("project-export-batch", args=(batch.id,)))
 
         assert response.status_code == 200
         assert response.content.decode("utf-8").strip() == ""
+
+    def test_export_project_returns_jsonl_with_slugified_filename(self, client, project_annotation):
+        data = project_annotation
+        batch = data["batch"]
+        project = data["project"]
+        expert = data["expert"]
+        annotator = data["annotators"][0]
+        label = data["labels"][0]
+        example = data["example"]
+
+        assignment = ExampleAssignment.objects.get(
+            batch=batch,
+            user=annotator,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        assignment.set_user_annotations(label_ids=[label.id])
+
+        project.name = "My Project 2026 !!!"
+        project.save()
+
+        login = client.login(username=expert.username, password="123")
+        assert login == True
+        response = client.get(reverse("project-export-project", args=(project.id,)))
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/text"
+        assert response["Content-Disposition"] == (
+            f"attachment; filename=project_{slugify(project.name)}.jsonl"
+        )
+
+        lines = response.content.decode("utf-8").splitlines()
+        assert len(lines) == 1
+        row = json.loads(lines[0])
+        assert row["batch_number"] == batch.batch_number
+        assert row["text_id"] == example.id
+        assert row["labels_annotation"][0]["user"] == annotator.username
