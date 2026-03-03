@@ -43,8 +43,7 @@ class ProjectListView(ListView):
 
     def get_queryset(self):
         return (
-            ProjectUser.objects
-            .filter(user=self.request.user)
+            ProjectUser.objects.filter(user=self.request.user)
             .prefetch_related("project")
             .order_by("-project__pk")
         )
@@ -275,8 +274,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             disagr_ids = [e.id for e in disagr_ex]
             for annotator in context["annotators"]:
                 annotated = (
-                    ExampleAssignment.objects
-                    .filter(
+                    ExampleAssignment.objects.filter(
                         user=annotator,
                         batch=batch,
                         phase=BatchPhase.ANNOTATION,
@@ -286,8 +284,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                     .count()
                 )
                 discussed = (
-                    ExampleAssignment.objects
-                    .filter(
+                    ExampleAssignment.objects.filter(
                         user=annotator,
                         phase=BatchPhase.DISCUSSION,
                         done__isnull=False,
@@ -331,8 +328,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         for batch in batches:
             batch_data = {
                 "batch": batch,
-                "done": batch.examples
-                .filter(
+                "done": batch.examples.filter(
                     assignments__user=self.request.user,
                     assignments__phase=BatchPhase.ANNOTATION,
                     assignments__done__isnull=False,
@@ -372,8 +368,7 @@ def _generate_batch_data(batch):
     }
 
     assignments = (
-        batch.assignments
-        .filter(done__isnull=False)
+        batch.assignments.filter(done__isnull=False)
         .select_related("user")
         .prefetch_related("annotations__label")
         .order_by("example_id", "user__username")
