@@ -21,7 +21,12 @@ urlpatterns = [
         views.ProjectAnnotatorDetailView.as_view(),
         name="project-detail-annotator",
     ),
-    path("export/batch/<int:batch_id>", views.ExportBatch.as_view(), name="export-batch"),
+    path("export/batch/<int:batch_id>", views.ExportBatch.as_view(), name="project-export-batch"),
+    path(
+        "export/project/<int:project_id>",
+        views.ExportProject.as_view(),
+        name="project-export-project",
+    ),
 ]
 
 htmx_patterns = [
