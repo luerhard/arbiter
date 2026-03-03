@@ -19,7 +19,12 @@
   color: #1f2937;
   background: color-mix(in srgb, var(--label-color) 32%, #ffffff);
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
 }
 
 .label:hover {
@@ -48,7 +53,9 @@
   line-height: 1;
   opacity: 0;
   transform: translateY(-50%) scale(0.9);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .label-hotkey {
@@ -58,28 +65,28 @@
   opacity: 0.7;
 }
 
-.label-input:checked+.label {
+.label-input:checked + .label {
   background: color-mix(in srgb, var(--label-color) 92%, #4f46e5);
   border-color: color-mix(in srgb, var(--label-color) 92%, #4f46e5);
   color: #ffffff;
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.18);
 }
 
-.label-input:checked+.label:hover {
+.label-input:checked + .label:hover {
   background: color-mix(in srgb, var(--label-color) 84%, #6366f1);
   border-color: color-mix(in srgb, var(--label-color) 84%, #6366f1);
 }
 
-.label-input:checked+.label .check-icon {
+.label-input:checked + .label .check-icon {
   opacity: 1;
   transform: translateY(-50%) scale(1);
 }
 
-.label-input:checked+.label .label-content {
+.label-input:checked + .label .label-content {
   transform: translateX(0.95rem);
 }
 
-.label-input:disabled+.label {
+.label-input:disabled + .label {
   cursor: not-allowed;
   background: #f3f4f6;
   border-color: #d1d5db;
@@ -87,7 +94,7 @@
   box-shadow: none;
 }
 
-.label-input:disabled:checked+.label {
+.label-input:disabled:checked + .label {
   background: color-mix(in srgb, var(--label-color) 72%, #ffffff);
   border-color: color-mix(in srgb, var(--label-color) 92%, #ffffff);
   color: #ffffff;
@@ -106,7 +113,7 @@
   border-color: color-mix(in srgb, var(--label-color) 66%, #475569);
 }
 
-.dark .label-input:disabled+.label {
+.dark .label-input:disabled + .label {
   background: #4b5563;
   border-color: #4b5563;
   color: #d1d5db;
