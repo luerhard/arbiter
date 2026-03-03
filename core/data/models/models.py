@@ -7,7 +7,7 @@ from projects.models import Project
 class Label(models.Model):
     project = models.ForeignKey(Project, related_name="labels", on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    color = ColorField(max_length=7, default="#2c3e50")
+    color = ColorField(max_length=7, default="#155596")
     hotkey = models.CharField(max_length=1, null=True, blank=True)
 
     def __str__(self):

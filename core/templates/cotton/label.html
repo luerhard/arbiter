@@ -1,44 +1,51 @@
-<c-vars id value text color hotkey checked disabled />
+<c-vars id value text color hotkey model :checked="false" :disabled="false" name="labels" variant="django" />
 <div
   class="inline-block"
-  x-data="labelButton({ id: '{{ id }}', value: '{{ value }}', hotkey: '{{ hotkey|default:'' }}', initiallyChecked:
-    {% if checked %}
-        true
-    {% else %}
-        false
-    {% endif %}
-    , disabled:
-    {% if disabled %}
-        true
-    {% else %}
-        false
-    {% endif %}
-    })"
+  x-data='labelButton({ id: "{{ id|default:""|escapejs }}", hotkey: "{{ hotkey|default:""|escapejs }}", disabled: {% if variant == "alpine" %}{{ disabled|default:"false" }}{% else %}{{ disabled|yesno:"true,false" }}{% endif %} })'
 >
   <!-- Real checkbox for Django; visually hidden but stays in the form -->
+  {% if variant == "django" %}
   <input
     type="checkbox"
-    name="labels"
-    class="sr-only peer"
-    :id="'{{ id }}'"
-    :value="'{{ value }}'"
-    {% if disabled is True %}disabled{% endif %}
-    x-model="isChecked"
+    name="{{ name|default:'labels' }}"
+    class="sr-only label-input"
+    id="{{ id }}"
+    value="{{ value }}"
+    {% if checked|yesno:"true,false" == "true" %}checked{% endif %}
+    {% if disabled|yesno:"true,false" == "true" %}disabled{% endif %}
+    x-ref="input"
   />
-  <!-- Tailwind-styled pill -->
-  <label
-    ::for="'{{ id }}'"
-    class="cursor-pointer peer-disabled:cursor-default rounded-2xl border px-3 py-2 text-sm transition shadow-sm peer-checked:shadow-blue-400/60 select-none bg-gray-100 peer-disabled:bg-gray-100/80 dark:bg-gray-200 dark:peer-disabled:bg-gray-200/80 text-gray-800 peer-not-disabled:hover:bg-white peer-not-disabled:peer-not-checked:hover:border-gray-400 peer-not-disabled:peer-checked:hover:bg-blue-500 peer-checked:border-blue-400 peer-disabled:peer-checked:border-blue-400/80 peer-checked:bg-blue-400 peer-disabled:peer-checked:bg-blue-400/80"
-    {% comment %}
-    :style="`--label-color: {{ color }}; --label-text: ${textColor()};`"
-    {% endcomment %}
-    :data-active="String(isChecked)"
-    @click.prevent="toggle()"
-    @keydown.enter.prevent="toggle()"
-  >
-    {{ text }}
-    <template x-if="hotkey">
-      <span class="ml-1 text-xs opacity-70" x-text="`(${hotkey})`"></span>
-    </template>
+  <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}; --label-text: #ffffff">
+    <i class="bi bi-check check-icon"></i>
+    <span class="label-content">
+      <span>{{ text }}</span>
+      {% if hotkey %}<span class="label-hotkey">({{ hotkey }})</span
+      >{% endif %}
+    </span>
   </label>
+  {% elif variant == "alpine" %}
+  <input
+    type="checkbox"
+    name="{{ name|default:'labels' }}"
+    class="sr-only label-input"
+    :id="{{ id }}"
+    :value="{{ value }}"
+    :disabled="{{ disabled }}"
+    {% if model %}
+    x-model="{{ model }}"
+    {% else %}
+    :checked="{{ checked }}"
+    {% endif %}
+    x-ref="input"
+  />
+  <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }}, '--label-text': '#ffffff' }">
+    <i class="bi bi-check check-icon"></i>
+    <span class="label-content">
+      <span x-text="{{ text }}"></span>
+      <template x-if="typeof hotkey !== 'undefined' && hotkey">
+        <span class="label-hotkey" x-text="`(${hotkey})`"></span>
+      </template>
+    </span>
+  </label>
+  {% endif %}
 </div>

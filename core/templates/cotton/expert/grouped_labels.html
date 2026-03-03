@@ -1,0 +1,17 @@
+<c-vars annotations_by_user empty_text="No labels assigned." />
+<div class="space-y-3">
+    {% for user, annotations in annotations_by_user.items %}
+        <div class="rounded-xl border border-gray-300 bg-white px-3 py-3 dark:border-gray-600 dark:bg-gray-900">
+            <div class="mb-2 text-sm font-semibold text-blue-800 dark:text-blue-300">{{ user }}</div>
+            <div class="flex flex-wrap gap-2">
+                {% for annotation in annotations %}
+                    <c-label text="{{ annotation.label.name }}" color="{{ annotation.label.color }}" checked disabled />
+                {% empty %}
+                    <span class="text-sm text-gray-500 dark:text-gray-400">No labels assigned.</span>
+                {% endfor %}
+            </div>
+        </div>
+    {% empty %}
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ empty_text }}</p>
+    {% endfor %}
+</div>

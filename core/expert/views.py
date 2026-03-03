@@ -9,7 +9,6 @@ from django.views.generic.edit import UpdateView
 
 from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
-from data.models import Annotation
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
@@ -39,23 +38,48 @@ def build_dialog_context(batch, user):
         context["assignment"] = None
         context["sentence"] = None
         context["next_example"] = None
-        context["prev_annotations"] = []
-        context["post_annotations"] = []
+        context["prev_annotations"] = {}
+        context["post_annotations"] = {}
         context["chat_messages"] = []
         context["prev_label_ids"] = []
         return context
 
     current_example = current_assignment.example
+    before_assignments = (
+        ExampleAssignment.objects.filter(
+            batch=batch,
+            example=current_example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        .select_related("user")
+        .prefetch_related("annotations__label")
+        .order_by("user__username")
+    )
+    before_by_user = {a.user.username: list(a.annotations.all()) for a in before_assignments}
+
+    after_assignments = (
+        ExampleAssignment.objects.filter(
+            batch=batch,
+            example=current_example,
+            phase=BatchPhase.DISCUSSION,
+        )
+        .select_related("user")
+        .prefetch_related("annotations__label")
+        .order_by("user__username")
+    )
+    after_by_user = {a.user.username: list(a.annotations.all()) for a in after_assignments}
+
+    context["prev_annotations"] = before_by_user
+    context["post_annotations"] = after_by_user
+    context["prev_label_ids"] = sorted(
+        {
+            annotation.label_id
+            for annotations in after_by_user.values()
+            for annotation in annotations
+        },
+    )
     next_assignment = current_assignment.next(skip_annotated=True)
 
-    annotations_before_discussion = Annotation.objects.filter(
-        assignment__example=current_example,
-        assignment__phase=BatchPhase.ANNOTATION,
-    )
-    annotations_after_discussion = Annotation.objects.filter(
-        assignment__example=current_example,
-        assignment__phase=BatchPhase.DISCUSSION,
-    )
     chat_messages = (
         Message.objects.filter(example=current_example)
         .exclude(user="system")
@@ -67,10 +91,7 @@ def build_dialog_context(batch, user):
     context["sentence"] = current_example
     context["assignment"] = current_assignment
     context["next_example"] = next_assignment.example if next_assignment else None
-    context["prev_annotations"] = annotations_before_discussion
-    context["post_annotations"] = annotations_after_discussion
     context["chat_messages"] = chat_messages
-    context["prev_label_ids"] = [annotation.label.id for annotation in annotations_after_discussion]
     return context
 
 

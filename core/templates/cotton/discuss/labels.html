@@ -1,30 +1,32 @@
-<c-vars user id />
-<div x-data class="flex flex-wrap gap-2" id="{{ id }}">
-  <template x-for="label in $store.labels_{{ user }}">
-    <!-- The c-component that does not have the "enabled" attribute is
-            deemed saved by default. -->
-    <div x-data="{saved: !'{{ enabled }}'.toLowerCase()}">
-      <input
-        type="checkbox"
-        name="labels"
-        class="sr-only peer"
-        :id="'{{ id }}-label-' + label.id"
-        :disabled="saved"
-        {% if enabled is True %}
-        :checked="label.checked"
-        {% else %}
-        :checked="label.is_set"
-        {% endif %}
-        @lock-labels.window="if ('True' == '{{ enabled }}') saved = true"
-        @unlock-labels.window="if ('True' == '{{ enabled }}') saved = false"
-      />
-      <label
-        :for="'{{ id }}-label-' + label.id"
-        @click.prevent="if (!saved) label.checked = !label.checked"
-        x-text="label.label"
-        class="cursor-pointer peer-disabled:cursor-default rounded-2xl border px-3 py-2 text-sm transition shadow-sm peer-checked:shadow-blue-400/60 select-none bg-gray-100 peer-disabled:bg-gray-100/80 dark:bg-gray-200 dark:peer-disabled:bg-gray-200/80 text-gray-800 peer-not-disabled:hover:bg-white peer-not-disabled:peer-not-checked:hover:border-gray-400 peer-not-disabled:peer-checked:hover:bg-blue-500 peer-checked:border-blue-400 peer-disabled:peer-checked:border-blue-400/80 peer-checked:bg-blue-400 peer-disabled:peer-checked:bg-blue-400/80"
-      >
-      </label>
-    </div>
+<c-vars user id enabled />
+<div
+  x-data="{ saved: !'{{ enabled }}'.toLowerCase() }"
+  class="flex flex-wrap gap-2"
+  id="{{ id }}"
+  @lock-labels.window="if ('True' == '{{ enabled }}') saved = true"
+  @unlock-labels.window="if ('True' == '{{ enabled }}') saved = false"
+>
+  <template x-for="label in $store.labels_{{ user }}" :key="label.id">
+    {% if enabled is True %}
+    <c-label
+      variant="alpine"
+      id="'{{ id }}-label-' + label.id"
+      value="label.id"
+      text="label.label"
+      color="label.color"
+      model="label.checked"
+      disabled="saved"
+    />
+    {% else %}
+    <c-label
+      variant="alpine"
+      id="'{{ id }}-label-' + label.id"
+      value="label.id"
+      text="label.label"
+      color="label.color"
+      checked="label.is_set"
+      disabled="true"
+    />
+    {% endif %}
   </template>
 </div>

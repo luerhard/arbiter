@@ -25,7 +25,7 @@
       hx-swap="outerHTML"
     >
       {% csrf_token %}
-      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2" role="group">
+      <div class="flex flex-wrap items-start gap-3" role="group">
         {% for checkbox, detail in label_form.labels|zip_lists:label_form.label_details %}
         <c-label
           id="{{ checkbox.id_for_label }}"
@@ -33,6 +33,7 @@
           text="{{ checkbox.choice_label }}"
           color="{{ detail.color }}"
           hotkey="{{ detail.hotkey }}"
+          :checked="detail.selected"
         />
         {% endfor %}
       </div>
