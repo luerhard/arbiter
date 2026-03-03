@@ -1,3 +1,5 @@
+import json
+import re
 import uuid
 
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -5,6 +7,8 @@ from django.urls import reverse
 import pytest
 
 from data.models import ExampleAssignment
+from discuss.models import Message
+from discuss.models import Room
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
@@ -227,3 +231,120 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
         assert req.url == reverse("project-detail-annotator", args=(1,))
+
+
+@pytest.mark.django_db
+class TestExportBatchView:
+    ISO_WITH_MS_TZ_RE = re.compile(
+        r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{2}:\d{2}$",
+    )
+
+    def test_export_batch_returns_expected_jsonl(self, client, project_annotation):
+        data = project_annotation
+        batch = data["batch"]
+        example = data["example"]
+        expert = data["expert"]
+        annotator_1, annotator_2 = data["annotators"]
+        label_1, label_2 = data["labels"]
+
+        a1 = ExampleAssignment.objects.get(
+            batch=batch,
+            user=annotator_1,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        a2 = ExampleAssignment.objects.get(
+            batch=batch,
+            user=annotator_2,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        a1.set_user_annotations(label_ids=[label_1.id])
+        a2.set_user_annotations(label_ids=[label_2.id])
+
+        batch.set_phase(BatchPhase.DISCUSSION)
+        d1 = ExampleAssignment.objects.get(
+            batch=batch,
+            user=annotator_1,
+            example=example,
+            phase=BatchPhase.DISCUSSION,
+        )
+        d2 = ExampleAssignment.objects.get(
+            batch=batch,
+            user=annotator_2,
+            example=example,
+            phase=BatchPhase.DISCUSSION,
+        )
+        d1.set_user_annotations(label_ids=[label_1.id])
+        d2.set_user_annotations(label_ids=[label_2.id])
+
+        batch.set_phase(BatchPhase.EXPERT)
+        ex = ExampleAssignment.objects.get(
+            batch=batch,
+            user=expert,
+            example=example,
+            phase=BatchPhase.EXPERT,
+        )
+        ex.set_user_annotations(label_ids=[label_1.id])
+
+        room = Room.objects.create()
+        Message.objects.create(
+            room=room,
+            user=annotator_1.username,
+            example=example,
+            message="first message",
+        )
+        Message.objects.create(
+            room=room,
+            user=annotator_2.username,
+            example=example,
+            message="second message",
+        )
+
+        login = client.login(username=expert.username, password="123")
+        assert login == True
+        response = client.get(reverse("export-batch", args=(batch.id,)))
+
+        assert response.status_code == 200
+        assert response["Content-Disposition"] == (
+            f"attachment; filename=batch_{batch.batch_number}.jsonl"
+        )
+        assert response["Content-Type"] == "application/text"
+
+        lines = response.content.decode("utf-8").splitlines()
+        assert len(lines) == 1
+
+        row = json.loads(lines[0])
+        assert row["text_id"] == example.id
+        assert row["text"] == example.content
+        assert row["batch_number"] == batch.batch_number
+        assert row["batch_annotators"] == sorted([annotator_1.username, annotator_2.username])
+        assert row["batch_experts"] == [expert.username]
+
+        assert len(row["labels_annotation"]) == 2
+        assert len(row["labels_discussion"]) == 2
+        assert len(row["labels_expert"]) == 1
+
+        for key in ["labels_annotation", "labels_discussion", "labels_expert"]:
+            for entry in row[key]:
+                assert set(entry.keys()) == {"user", "labels", "at"}
+                assert self.ISO_WITH_MS_TZ_RE.match(entry["at"])
+
+        assert len(row["messages_discussion"]) == 2
+        assert row["messages_discussion"][0]["content"] == "first message"
+        assert row["messages_discussion"][1]["content"] == "second message"
+        for msg in row["messages_discussion"]:
+            assert set(msg.keys()) == {"user", "at", "content"}
+            assert self.ISO_WITH_MS_TZ_RE.match(msg["at"])
+
+    def test_export_batch_empty_when_no_assignment_completed(self, client, project_annotation):
+        data = project_annotation
+        batch = data["batch"]
+        expert = data["expert"]
+
+        login = client.login(username=expert.username, password="123")
+        assert login == True
+        response = client.get(reverse("export-batch", args=(batch.id,)))
+
+        assert response.status_code == 200
+        assert response.content.decode("utf-8").strip() == ""
