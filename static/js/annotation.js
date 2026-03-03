@@ -24,6 +24,17 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
           form?.requestSubmit ? form.requestSubmit() : form?.submit();
         }
       };
+
+      window.addEventListener("keydown", this._onKey);
+
+      // Clean up when this Alpine component is removed (e.g. htmx swaps panel).
+      this.$el.addEventListener(
+        "alpine:destroy",
+        () => {
+          if (this._onKey) window.removeEventListener("keydown", this._onKey);
+        },
+        { once: true },
+      );
     },
   };
 }
