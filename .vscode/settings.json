@@ -8,5 +8,11 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}/core"
     ],
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "files.associations": {
+        "**/templates/**/*.html": "django-html"
+    },
+    "[django-html]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
 }
