@@ -1,3 +1,4 @@
 {
-  "plugins": ["prettier-plugin-django-alpine"]
+  "printWidth": 120,
+  "plugins": ["prettier-plugin-django", "prettier-plugin-django-alpine"]
 }

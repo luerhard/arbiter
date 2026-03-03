@@ -1,39 +1,40 @@
-<!DOCTYPE html>
-{% load static %}
-{% load django_vite %}
-<html class="h-full scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent text-gray-900 dark:text-gray-100"
-      lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>AnnotationTool</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="keywords"
-              content="annotation label labeling text collaborative" />
-        <meta name="description" content="Text Annotation Tool">
-        <meta name="author" content="Lukas Erhard">
-        {% vite_hmr_client %}
-        {% vite_asset 'static/js/main.js' %}
-    </head>
-    <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-          class="h-full bg-white dark:bg-gray-900">
-        <div class="min-h-full">
-            {% include "navbar.html" %}
-            <div class="py-10">
-                <header>
-                    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                        {% comment %} <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1> {% endcomment %}
-                    </div>
-                </header>
-                <main>
-                    <div class="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-                        {% block content %}
-                        {% endblock content %}
-                    </div>
-                </main>
-            </div>
-        </div>
-        <c-toasts>
-        {% for message in messages %}<c-toasts.toast :tags="message.tags", :message="message.message" />{% endfor %}
-        </c-toasts>
-    </body>
+<!doctype html>
+{% load django_vite static %}
+<html
+  class="h-full scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent text-gray-900 dark:text-gray-100"
+  lang="en"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <title>AnnotationTool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="keywords" content="annotation label labeling text collaborative" />
+    <meta name="description" content="Text Annotation Tool" />
+    <meta name="author" content="Lukas Erhard" />
+    {% vite_hmr_client %}
+    {% vite_asset 'static/js/main.js' %}
+  </head>
+  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full bg-white dark:bg-gray-900">
+    <div class="min-h-full">
+      {% include "navbar.html" %}
+      <div class="py-10">
+        <header>
+          <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            {% comment %}
+            <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
+            {% endcomment %}
+          </div>
+        </header>
+        <main>
+          <div class="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
+            {% block content %}
+            {% endblock content %}
+          </div>
+        </main>
+      </div>
+    </div>
+    <c-toasts>
+      {% for message in messages %}<c-toasts.toast :tags="message.tags" , :message="message.message" />{% endfor %}
+    </c-toasts>
+  </body>
 </html>
