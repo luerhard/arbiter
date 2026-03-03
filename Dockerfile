@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 # ---- Base with uv + Python ----
 FROM ghcr.io/astral-sh/uv:python3.13-bookworm AS base
 WORKDIR /app
@@ -10,35 +12,44 @@ ENV UV_PROJECT_ENVIRONMENT=/.venv \
 RUN git config --global user.name "anntotationtool" && \
     git config --global user.email "annotation@tool.com"
 
-# ---- Prod deps (no dev) ----
-FROM base AS deps
+# ---- Runtime deps only ----
+FROM base AS deps-runtime
 COPY pyproject.toml uv.lock README.md ./
-# RUN ["uv", "sync", "--frozen", "--no-dev", "--compile-bytecode"]
-RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-dev --no-install-project
+
+# ---- Dev deps only ----
+FROM base AS deps-dev
+COPY pyproject.toml uv.lock README.md ./
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --group dev --group docs --no-install-project
 
 # ---- Frontend build ----
 FROM node:22-alpine AS vite-build
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm ci
-COPY . .
-RUN ["npm", "run", "build"]
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --no-audit --no-fund
+COPY vite.config.mjs ./
+COPY static ./static
+COPY core ./core
+RUN npm run build
 
 # ---- Runtime (prod) ----
 FROM base AS runtime
-COPY --from=deps /.venv /.venv
-COPY . .
+COPY --from=deps-runtime /.venv /.venv
+COPY core ./core
+COPY static ./static
 COPY --from=vite-build /app/dist /app/dist
 ENV DJANGO_SETTINGS_MODULE=core.settings.prod
-RUN ["mkdir", "-p", "/app/staticfiles/"]
-RUN ["/.venv/bin/python", "core/manage.py", "collectstatic", "--noinput"]
+RUN mkdir -p /app/staticfiles/ && \
+    /.venv/bin/python core/manage.py collectstatic --noinput
 WORKDIR /app/core
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "-v", "2", "core.asgi:application"]
 
 # ---- Dev image (with debugger) ----
 FROM base AS dev
-# COPY pyproject.toml uv.lock README.md ./
-# RUN ["uv", "sync", "--frozen", "--group", "dev", "--group", "docs"]
+COPY --from=deps-dev /.venv /.venv
 COPY . .
 # wait for VS Code debugger to attach, then run Daphne
 WORKDIR /app/core/

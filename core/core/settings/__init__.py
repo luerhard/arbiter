@@ -1,9 +1,9 @@
-# TODO: implement some kind of dev / prod environment detection to dynamically set this.
-# This has time and might be of interest once we decide to ship the application in a
-# docker container or so
-DEBUG = True
+"""Select default settings when DJANGO_SETTINGS_MODULE points to ``core.settings``."""
 
-if DEBUG:
-    from .dev import *
+import os
+
+_selected_settings = os.getenv("DJANGO_SETTINGS_MODULE", "core.settings")
+if _selected_settings.endswith(".prod"):
+    from .prod import *  # noqa: F403
 else:
-    from .prod import *
+    from .dev import *  # noqa: F403
