@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 import logging
 
@@ -7,6 +8,7 @@ from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import reverse
+from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import FormView
 from django.views.generic import ListView
@@ -358,63 +360,68 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
 class ExportBatch(ExpertRequiredMixin, View):
     def get(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
         batch = Batch.objects.get(id=batch_id)
-        labels = batch.project.labels
-        annotators = batch.project.annotators
-        examples = batch.examples
+        annotators = batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
+        experts = batch.assignees(role=ProjectRole.EXPERT).order_by("username")
 
-        rows = []
-        for example in examples.all():
-            row = {
-                "batch_number": batch.batch_number,
-                "text_id": example.id,
-                "text": example.content,
+        shared_data = {
+            "batch_number": batch.batch_number,
+            "batch_annotators": [a.username for a in annotators.all()],
+            "batch_experts": [a.username for a in experts.all()],
+        }
+
+        assignments = (
+            batch.assignments.filter(done__isnull=False)
+            .select_related("user")
+            .prefetch_related("annotations__label")
+            .order_by("example_id", "user__username")
+        )
+
+        rows = {}
+        for assignment in assignments.all():
+            ex = assignment.example
+            if ex.id not in rows:
+                row = {
+                    "text_id": ex.id,
+                    "text": ex.content,
+                    "labels_annotation": [],
+                    "labels_discussion": [],
+                    "messages_discussion": [],
+                    "labels_expert": [],
+                    **shared_data,
+                }
+                rows[ex.id] = row
+
+            label_data = {
+                "user": assignment.user.username,
+                "labels": sorted([a.label.name for a in assignment.annotations.all()]),
+                "at": timezone.localtime(assignment.done).isoformat(timespec="milliseconds"),
             }
-            # Annotation Data
-            row["labels"] = []
-            for annotator in annotators:
-                user_annotations = example.get_user_annotations(
-                    phase="ANNOTATION",
-                    user=annotator,
-                ).select_related("label")
-                labels = [annotation.label.name for annotation in user_annotations]
-                user_data = {"user": annotator.username, "labels": labels}
-                row["labels"].append(user_data)
 
-            # Discussed Annotation Data
-            row["discussed_labels"] = []
-            for annotator in annotators:
-                user_annotations = example.get_user_annotations(
-                    phase="DISCUSSION",
-                    user=annotator,
-                ).select_related("label")
-                labels = [annotation.label.name for annotation in user_annotations]
-                user_data = {"user": annotator.username, "labels": labels}
-                row["discussed_labels"].append(user_data)
+            phase = assignment.phase
+            if phase == BatchPhase.ANNOTATION:
+                rows[ex.id]["labels_annotation"].append(label_data)
+            elif phase == BatchPhase.DISCUSSION:
+                rows[ex.id]["labels_discussion"].append(label_data)
+            elif phase == BatchPhase.EXPERT:
+                rows[ex.id]["labels_expert"].append(label_data)
 
-            # Discussed Annotation Data
-            user_annotations = example.get_user_annotations(
-                phase="EXPERT",
-            ).select_related("label")
-            labels = [annotation.label.name for annotation in user_annotations]
-            row["expert_labels"] = labels
-
-            # Chat Messages
-            row["messages"] = []
-            messages_qs = Message.objects.filter(example=example).order_by("created_at").all()
+        # Chat Messages
+        for example_id in rows.keys():
+            messages_qs = Message.objects.filter(example=example_id).order_by("created_at").all()
+            messages = []
             for message in messages_qs.all():
-                group = {
+                msg = {
                     "user": message.user,
-                    "date": message.created_at,
+                    "at": timezone.localtime(message.created_at).isoformat(timespec="milliseconds"),
                     "content": message.message,
                 }
-                row["messages"].append(group)
-            rows.append(row)
+                messages.append(msg)
+            rows[example_id]["messages_discussion"] = messages
 
-        df = pd.DataFrame(rows)
+        df = pd.DataFrame(rows.values())
 
         json_data = df.to_json(orient="records", lines=True)
 
-        batch = Batch.objects.get(id=batch_id)
         response = HttpResponse(json_data, content_type="application/text")
         response["Content-Disposition"] = f"attachment; filename=batch_{batch.batch_number}.jsonl"
 
