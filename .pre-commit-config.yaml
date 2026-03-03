@@ -17,6 +17,6 @@ repos:
     hooks:
       - id: prettier
         name: prettier
-        entry: npx prettier --ignore-unknown
+        entry: npx prettier --config .prettierrc --write --ignore-unknown
         language: system
         files: \.(html|css|scss|js|json|ya?ml|md)$
