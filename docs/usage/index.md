@@ -5,7 +5,6 @@ We want some kind of user documentation for this projects.
 Maybe, here could be a good place for it.
 :::
 
-
 ## Keyboard Shortcuts
 
 For the Annotation phase, some keyboard shortcuts are implemented.

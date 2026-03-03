@@ -8,28 +8,32 @@ jobs:
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
-    - name: setup python
-      uses: actions/setup-python@v4
-      with:
-        python-version: 3.11
-        cache: "pip"
-    # run ruff
-    - name: Run Ruff Linter
-      uses: chartboost/ruff-action@v1
-      with:
-        args: 'check --extend-select F401 --no-unsafe-fixes --exit-zero'
-    - name: Run Ruff Formatter
-      uses: chartboost/ruff-action@v1
-      with:
-        args: 'format'
-    - name: install djlint
-      run: pip install djlint
-    - name: run djlint
-      run: djlint . --reformat --format-css --format-js
-      continue-on-error: true
-    - name: Auto commit
-      uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: 'auto-commit: fixes by ruff & djlint'
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Run Ruff Fixes
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: check --fix --extend-select F401 --no-unsafe-fixes --exit-zero
+
+      - name: Run Ruff Formatter
+        uses: astral-sh/ruff-action@v3
+        with:
+          args: format
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run Prettier
+        run: npx prettier . --config .prettierrc --write --ignore-unknown
+
+      - name: Auto commit
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "auto-commit: fixes by ruff & prettier"

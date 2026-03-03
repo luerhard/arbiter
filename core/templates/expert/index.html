@@ -2,113 +2,97 @@
 {% load markdownify %}
 {% load crispy_forms_tags %}
 {% block title %}
-    Resolve Disagreement
+Resolve Disagreement
 {% endblock title %}
 {% block content %}
-    <div id="expert-dialog-content"
-         hx-get="{% url 'expert-dialogue-content' batch_id %}"
-         hx-trigger="load"
-         hx-swap="outerHTML"></div>
-    <script>
-        function getDialogElements() {
-            return {
-                codebookForm: document.getElementById('codebook-form'),
-                labelsForm: document.getElementById('labels-form'),
-                textarea: document.getElementById('codebook-content'),
-                rationaleTextarea: document.getElementById('rationale'),
-                rendered: document.getElementById('codebook-rendered'),
-                editButton: document.getElementById('edit-save-button'),
-                buttonsDiv: document.getElementById('div-save-undo'),
-                cancelButton: document.getElementById('cancel-button'),
-                rationaleDiv: document.getElementById('rationale-div'),
-            };
-        }
+<div
+  id="expert-dialog-content"
+  hx-get="{% url 'expert-dialogue-content' batch_id %}"
+  hx-trigger="load"
+  hx-swap="outerHTML"
+></div>
+<script>
+  function getDialogElements() {
+    return {
+      codebookForm: document.getElementById('codebook-form'),
+      labelsForm: document.getElementById('labels-form'),
+      textarea: document.getElementById('codebook-content'),
+      rationaleTextarea: document.getElementById('rationale'),
+      rendered: document.getElementById('codebook-rendered'),
+      editButton: document.getElementById('edit-save-button'),
+      buttonsDiv: document.getElementById('div-save-undo'),
+      cancelButton: document.getElementById('cancel-button'),
+      rationaleDiv: document.getElementById('rationale-div'),
+    };
+  }
 
-        function colorContrast(labelElement) {
-            const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
-            const textColor = lib.funcs.inferTextColorByContrast(color);
-            labelElement.style.setProperty("--text-color", textColor);
-        };
+  function colorContrast(labelElement) {
+    const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
+    const textColor = lib.funcs.inferTextColorByContrast(color);
+    labelElement.style.setProperty('--text-color', textColor);
+  }
 
-        async function submitBothForms() {
-            const {
-                codebookForm,
-                labelsForm,
-                textarea,
-                rationaleTextarea,
-            } = getDialogElements();
-            if (!labelsForm || !textarea || !rationaleTextarea) return;
+  async function submitBothForms() {
+    const { codebookForm, labelsForm, textarea, rationaleTextarea } = getDialogElements();
+    if (!labelsForm || !textarea || !rationaleTextarea) return;
 
-            const isEdit = !textarea.classList.contains('hidden');
-            const rationaleEmpty = !rationaleTextarea.value.trim();
+    const isEdit = !textarea.classList.contains('hidden');
+    const rationaleEmpty = !rationaleTextarea.value.trim();
 
-            if (isEdit) {
-                if (!codebookForm) return;
-                if (rationaleEmpty) {
-                    return;
-                };
-                const res = await fetch(codebookForm.action, {
-                    method: codebookForm.method,
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest"
-                    },
-                    body: new FormData(codebookForm),
-                });
+    if (isEdit) {
+      if (!codebookForm) return;
+      if (rationaleEmpty) {
+        return;
+      }
+      const res = await fetch(codebookForm.action, {
+        method: codebookForm.method,
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        body: new FormData(codebookForm),
+      });
 
-                if (!res.ok) {
-                    return;
-                };
+      if (!res.ok) {
+        return;
+      }
 
-                labelsForm.requestSubmit();
-            } else {
-                labelsForm.requestSubmit();
-            };
-        };
+      labelsForm.requestSubmit();
+    } else {
+      labelsForm.requestSubmit();
+    }
+  }
 
-        function toggleEdit() {
-            const {
-                textarea,
-                rendered,
-                editButton,
-                cancelButton,
-                rationaleDiv
-            } = getDialogElements();
-            if (!textarea || !rendered || !editButton || !cancelButton || !rationaleDiv) return;
-            if (textarea.classList.contains('hidden')) {
-                rendered.classList.add('hidden')
-                textarea.classList.remove('hidden');
-                textarea.removeAttribute('readonly');
+  function toggleEdit() {
+    const { textarea, rendered, editButton, cancelButton, rationaleDiv } = getDialogElements();
+    if (!textarea || !rendered || !editButton || !cancelButton || !rationaleDiv) return;
+    if (textarea.classList.contains('hidden')) {
+      rendered.classList.add('hidden');
+      textarea.classList.remove('hidden');
+      textarea.removeAttribute('readonly');
 
-                editButton.classList.add('hidden');
-                cancelButton.classList.remove('hidden');
-                rationaleDiv.classList.remove('hidden');
-            };
-        };
+      editButton.classList.add('hidden');
+      cancelButton.classList.remove('hidden');
+      rationaleDiv.classList.remove('hidden');
+    }
+  }
 
-        function toggleUndo() {
-            const {
-                textarea,
-                rendered,
-                editButton,
-                cancelButton,
-                buttonsDiv,
-                rationaleDiv
-            } = getDialogElements();
-            if (!textarea || !rendered || !editButton || !cancelButton || !buttonsDiv || !rationaleDiv) return;
-            if (!textarea.readOnly) {
-                textarea.value = rendered.getAttribute("data-codebook-content") || "";
-                textarea.readOnly = true;
-                textarea.classList.add('hidden');
-                if (rendered) {
-                    rendered.classList.remove('hidden');
-                };
+  function toggleUndo() {
+    const { textarea, rendered, editButton, cancelButton, buttonsDiv, rationaleDiv } = getDialogElements();
+    if (!textarea || !rendered || !editButton || !cancelButton || !buttonsDiv || !rationaleDiv) return;
+    if (!textarea.readOnly) {
+      textarea.value = rendered.getAttribute('data-codebook-content') || '';
+      textarea.readOnly = true;
+      textarea.classList.add('hidden');
+      if (rendered) {
+        rendered.classList.remove('hidden');
+      }
 
-                editButton.classList.remove('hidden');
-                cancelButton.classList.add('hidden');
-                buttonsDiv.classList.remove('flex-row');
-                buttonsDiv.classList.add('flex-col');
-                rationaleDiv.classList.add('hidden');
-            };
-        };
-    </script>
+      editButton.classList.remove('hidden');
+      cancelButton.classList.add('hidden');
+      buttonsDiv.classList.remove('flex-row');
+      buttonsDiv.classList.add('flex-col');
+      rationaleDiv.classList.add('hidden');
+    }
+  }
+</script>
 {% endblock content %}

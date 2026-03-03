@@ -227,7 +227,7 @@ class ProjectDetailView(RedirectView):
 class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "project_id"
     model = Project
-    template_name = "projects/project-detail-expert.html"
+    template_name = "projects/project_detail_expert.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -304,7 +304,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
     pk_url_kwarg = "project_id"
     model = Project
-    template_name = "projects/project-detail-annotator.html"
+    template_name = "projects/project_detail_annotator.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

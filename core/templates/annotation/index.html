@@ -1,15 +1,17 @@
 {% extends "base.html" %}
 {% load markdownify %}
 {% block content %}
-    <div class="px-4 py-5 sm:px-6">
-        <button command="show-modal"
-                commandfor="drawer"
-                class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20">
-            Open Codebook
-        </button>
-        <c-drawer id="drawer" title="Codebook">
-        {{ codebook.content|markdownify }}
-        </c-drawer>
-    </div>
-    {% include "annotation/panel.html" %}
+<div class="px-4 py-5 sm:px-6">
+  <button
+    command="show-modal"
+    commandfor="drawer"
+    class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20"
+  >
+    Open Codebook
+  </button>
+  <c-drawer id="drawer" title="Codebook">
+    {{ codebook.content|markdownify }}
+  </c-drawer>
+</div>
+{% include "annotation/panel.html" %}
 {% endblock content %}

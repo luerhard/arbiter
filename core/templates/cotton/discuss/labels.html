@@ -1,14 +1,32 @@
 <c-vars user id enabled />
-<div x-data="{ saved: !'{{ enabled }}'.toLowerCase() }"
-     class="flex flex-wrap gap-2"
-     id="{{ id }}"
-     @lock-labels.window="if ('True' == '{{ enabled }}') saved = true"
-     @unlock-labels.window="if ('True' == '{{ enabled }}') saved = false">
-    <template x-for="label in $store.labels_{{ user }}" :key="label.id">
-        {% if enabled is True %}
-            <c-label variant="alpine" id="'{{ id }}-label-' + label.id" value="label.id" text="label.label" color="label.color" model="label.checked" disabled="saved" />
-        {% else %}
-            <c-label variant="alpine" id="'{{ id }}-label-' + label.id" value="label.id" text="label.label" color="label.color" checked="label.is_set" disabled="true" />
-        {% endif %}
-    </template>
+<div
+  x-data="{ saved: !'{{ enabled }}'.toLowerCase() }"
+  class="flex flex-wrap gap-2"
+  id="{{ id }}"
+  @lock-labels.window="if ('True' == '{{ enabled }}') saved = true"
+  @unlock-labels.window="if ('True' == '{{ enabled }}') saved = false"
+>
+  <template x-for="label in $store.labels_{{ user }}" :key="label.id">
+    {% if enabled is True %}
+    <c-label
+      variant="alpine"
+      id="'{{ id }}-label-' + label.id"
+      value="label.id"
+      text="label.label"
+      color="label.color"
+      model="label.checked"
+      disabled="saved"
+    />
+    {% else %}
+    <c-label
+      variant="alpine"
+      id="'{{ id }}-label-' + label.id"
+      value="label.id"
+      text="label.label"
+      color="label.color"
+      checked="label.is_set"
+      disabled="true"
+    />
+    {% endif %}
+  </template>
 </div>

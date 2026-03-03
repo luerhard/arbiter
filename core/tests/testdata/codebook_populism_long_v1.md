@@ -27,18 +27,20 @@ The people are endowed with morality, charisma, credibility, intelligence, compe
 A populist statement is not, for example "The government has made a mistake." „Die Regierung hat einen Fehler begangen.“
 
 A populist statement is, for example:
+
 - "The Merkel dictatorship has made a mistake." „Die Merkel-Diktatur hat einen Fehler begangen.“
 - These two differ primarily in the moralizing undertone that resonates in the word "Merkel dictatorship".
 
 Only code statements that are meant to be populist.
 If it is clear that the speaker is accusing someone of populism or quoting someone, this is not coded.
 This is not coded because it is not the opinion of the speaker, but that of a third person:
+
 - "Bernd Höcke claims that the Merkel dictatorship makes many mistakes." _Bernd Höcke behauptet, die Merkel-Diktatur mache viele Fehler."_
 
 However, the following example is still coded because no conclusion about the speaker’s opinion
 is possible:
-- "The movie documents the greed of speculators and the failure of politics." _"Der Film dokumentiert die Gier der Spekulanten und das Versagen der Politik."_
 
+- "The movie documents the greed of speculators and the failure of politics." _"Der Film dokumentiert die Gier der Spekulanten und das Versagen der Politik."_
 
 ## Anti-Elitism
 
@@ -68,7 +70,7 @@ do not perform everyday tasks.
 
 - The German government is partly to blame for this atrocity.
 - Never before has a committee chairman tried so self-importantly and arbitrarily to silence the opposition in a committee of inquiry
--"Dear SPD and Greens, you are particularly hypocritical representatives here, because you should actually meekly admit that you prevented a democratic prime minister in Thuringia in the run-up to the election.
+  -"Dear SPD and Greens, you are particularly hypocritical representatives here, because you should actually meekly admit that you prevented a democratic prime minister in Thuringia in the run-up to the election.
 - You say you want everyone in this country to abide by law and order - we all want that - but you yourself employ a whole series of convicted criminals in your ranks, in your parliamentary group, in your offices, using taxpayers’ money.
 - So you admit that you have led German citizens and taxpayers on an odyssey costing over 500 billion euros, the future of which is - I repeat myself here - an open construction site.
 - If you look at the pictures from the Greek-Turkish border, where human rights are being trampled underfoot, where tear gas and stun grenades are being used and refugees are being shot at, then you feel ashamed that the European Union is treating people in need so shamefully.

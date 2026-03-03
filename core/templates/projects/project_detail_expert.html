@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+{% url "project-batch-create" project.id as project_batch_create_url %}
+{% url "project-export-project" project.id as project_export_project_url %}
+<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 grid gap-6 lg:grid-cols-3">
+  <!-- Sidebar -->
+  <aside class="lg:col-span-1">
+    {% include "projects/partials/detail-sidebar.html" %}
+  </aside>
+  <!-- Main content -->
+  <section class="lg:col-span-2">
+    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800">
+        <h2 class="text-xl font-bold">Batches</h2>
+      </div>
+      <div class="py-2 isolate z-10">
+        {% if batches %}
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+            {% for batch in batches reversed %}
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
+              <td class="p-4 align-top">
+                <h3 class="text-lg font-semibold">
+                  Batch
+                  {{ batch.batch.batch_number }}
+                </h3>
+                <dl class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                  <div class="flex justify-between">
+                    <dt class="font-medium">Batch Phase</dt>
+                    <dd>
+                      <!-- Batch Phase Form -->
+                      <div class="relative inline-block text-left" x-data="{ open: false }">
+                        <button
+                          @click="open = !open"
+                          type="button"
+                          class="inline-flex w-full justify-between gap-x-1.5 rounded-md bg-transparent px-4 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-800 hover:bg-gray-200 dark:hover:bg-white/5"
+                        >
+                          {{ batch.batch.get_current_phase_display }}
+                          <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path
+                              fill-rule="evenodd"
+                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                              clip-rule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                        <div
+                          x-show="open"
+                          @click.away="open = false"
+                          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-50 dark:bg-gray-900 shadow-lg ring-1 ring-gray-200 dark:ring-gray-800 focus:outline-none"
+                        >
+                          <form
+                            hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
+                            hx-swap="none"
+                            class="py-1"
+                          >
+                            {% csrf_token %}
+                            {% for value, text in batch.batch_phase_form.fields.current_phase.choices %}
+                            <button
+                              type="submit"
+                              name="current_phase"
+                              value="{{ value }}"
+                              @click="open = false"
+                              class="block w-full px-4 py-2 text-left text-sm {% if batch.batch.current_phase == value %} bg-gray-200 dark:bg-gray-800 text-black dark:text-white {% else %} text-gray-700 dark:text-gray-300 {% endif %} hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white"
+                            >
+                              {{ text }}
+                            </button>
+                            {% endfor %}
+                          </form>
+                        </div>
+                      </div>
+                      <!-- End of Form -->
+                    </dd>
+                  </div>
+                </dl>
+              </td>
+              <!-- Batch Status -->
+              <td>
+                <table class="border-x border-gray-200 dark:border-gray-800 border-separate border-spacing-2">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>Annotation</th>
+                      <th>Discussion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for user in batch.users %}
+                    <tr>
+                      <td>{{ user.user.username }}</td>
+                      <td class="text-end">
+                        {{ user.annotated }}
+                        /
+                        {{ batch.length }}
+                      </td>
+                      <td class="text-end">
+                        {{ user.discussed }}
+                        /
+                        {{ batch.disagreement }}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </td>
+              <!-- Actions -->
+              <td class="flex flex-col items-end p-4 align-top text-right space-y-2 whitespace-nowrap">
+                {% url "project-export-batch" batch_id=batch.batch.id as project_export_batch_url %}
+                <c-button.secondary
+                  href="{{ project_export_batch_url }}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}"
+                  >Export</c-button.secondary
+                >
+                {% if batch.batch.current_phase == "E" %}
+                {% url "expert-dialogue" batch.batch.id as expert_dialogue_url %}
+                <c-button.primary href="{{ expert_dialogue_url }}"> Resolve </c-button.primary>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="rounded-xl border border-dashed border-gray-400 p-12 text-center dark:border-gray-600">
+          <h3 class="text-sm font-medium">No batches available</h3>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Batches will appear here when created.</p>
+        </div>
+        {% endif %}
+        <div class="flex justify-end gap-3 px-6 py-4">
+          <c-button.primary href="{{ project_batch_create_url }}">Create Batch</c-button.primary>
+          <c-button.secondary href="{{ project_export_project_url }}">Export Project</c-button.secondary>
+        </div>
+      </div>
+    </div>
+  </section>
+  <c-expert.notification />
+</div>
+{% endblock content %}

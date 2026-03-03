@@ -1,9 +1,18 @@
 {% for user in users %}
-    <button type="button"
-            class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
-            onclick="const root = this.closest('[x-data]'); if (!root || !window.Alpine) return; const data = window.Alpine.$data(root); if (data && typeof data.add === 'function') { data.add({ id: {{ user.id }}, username: '{{ user.username|escapejs }}' }); }">
-        {{ user.username }}
-    </button>
+<button
+  type="button"
+  class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
+  onclick="
+    const root = this.closest('[x-data]');
+    if (!root || !window.Alpine) return;
+    const data = window.Alpine.$data(root);
+    if (data && typeof data.add === 'function') {
+      data.add({ id: {{ user.id }}, username: '{{ user.username|escapejs }}' });
+    }
+  "
+>
+  {{ user.username }}
+</button>
 {% empty %}
-    <div class="px-3 py-2 text-sm text-gray-500">No matches</div>
+<div class="px-3 py-2 text-sm text-gray-500">No matches</div>
 {% endfor %}
