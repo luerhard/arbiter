@@ -22,7 +22,7 @@ jobs:
           args: format
 
       - name: Run Prettier
-        uses: creD/prettier_action@4.6
+        uses: creyD/prettier_action@4.6
         with:
           prettier_options: --config .prettierrc --write **/*.{js,md,html}
           only_changed: True
