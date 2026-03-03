@@ -3,6 +3,7 @@
 We currently use a couple of techonologies that are required to contribute.
 
 ## Requirements
+
 We use docker to manage requirements.
 
 The docker-compose.yaml file contains the necessary services.
@@ -43,6 +44,7 @@ docker volume rm annotationtool_pgdata
 ```
 
 To start fresh:
+
 ```bash
 # stop all containers
 docker compose down
@@ -54,10 +56,10 @@ docker compose down --volumes
 docker compose up --build
 ```
 
-To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume. 
+To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume.
 
 ```bash
-# reset 
+# reset
 docker exec annotationtool-web-1 uv run manage.py resetdb --noinput
 ```
 
@@ -100,11 +102,12 @@ So to do this
 2. make sure the virtual environment is installed (run `uv sync` to make sure)
 3. now, either run `uv run pytest` from the command-line or use the built-in test runner in VSCode.
 
-## Debugging with VS Code 
-You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables. 
-To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says "Attach to Django in Docker". 
-You can then place breakpoints in the code. 
-When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting. 
+## Debugging with VS Code
+
+You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables.
+To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says "Attach to Django in Docker".
+You can then place breakpoints in the code.
+When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting.
 
 ## Build documentation locally
 
@@ -114,21 +117,23 @@ docker compose run --rm web bash -c "cd ../docs; make html"
 
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
 
-
 ## Overview and starting point
+
 ### Django web app
+
 The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/
 
 The Django web framework is based on modular apps.
 Our tool (currently) consists of the following apps
-* annotation
-* codebook
-* discuss
-* expert
-* projects
-* users
-and
-* data
+
+- annotation
+- codebook
+- discuss
+- expert
+- projects
+- users
+  and
+- data
 
 The apps represent modular parts of the tool.
 They each consist of apps.py, models.py, urls.py and views.py files.
@@ -140,8 +145,6 @@ Data is a bit different from the others, because it contains the connecting bits
 
 For each app, there also is a template in the templates directory, which contains the html.
 This follows Django's principle to seperate the design from the view functionality.
-
-
 
 # Development Server
 
@@ -156,12 +159,15 @@ To access it, you need to be in the University of Stuttgart VPN (or physically o
 ### Current Users
 
 #### admin
+
 - can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on [http://193.196.54.251/admin](http://193.196.54.251/admin). If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.
 
 #### annotator1
+
 - default annotator without special permissions
 
 #### annotator2
+
 - same as annotator1. Exists because we want 2 annotators for each project
 
 #### expert1

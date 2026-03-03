@@ -3,12 +3,12 @@
 This app is concerned with the discussion phase of the annotation.
 
 ## Views
+
 ```{eval-rst}
 .. automodule:: discuss.views
     :members:
     :undoc-members:
 ```
-
 
 ## Models
 
@@ -18,9 +18,7 @@ This app is concerned with the discussion phase of the annotation.
     :undoc-members:
 ```
 
-
 ## Websocket Consumer
-
 
 ```{eval-rst}
 .. automodule:: discuss.consumers

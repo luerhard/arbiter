@@ -9,7 +9,7 @@
   <title>A guide for devs &mdash; AnnotationTool 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0432c510" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
@@ -145,7 +145,7 @@ docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> 
 </pre></div>
 </div>
 <p>To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># reset </span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># reset</span>
 docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>resetdb<span class="w"> </span>--noinput
 </pre></div>
 </div>

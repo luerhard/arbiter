@@ -4,12 +4,12 @@ This app handles everything user-related.
 User model, profile views etc.
 
 ## Views
+
 ```{eval-rst}
 .. automodule:: users.views
     :members:
     :undoc-members:
 ```
-
 
 ## Models
 
