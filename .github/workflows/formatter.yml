@@ -21,11 +21,17 @@ jobs:
         with:
           args: format
 
-      - name: Run Prettier
-        uses: creyD/prettier_action@v4.6
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          prettier_options: --config .prettierrc --write **/*.{js,md,html}
-          only_changed: True
+          node-version: 20
+          cache: npm
+
+      - name: Install npm dependencies
+        run: npm ci
+
+      - name: Run Prettier
+        run: npx prettier . --config .prettierrc --write --ignore-unknown
 
       - name: Auto commit
         uses: stefanzweifel/git-auto-commit-action@v5
