@@ -1,17 +1,20 @@
 {% extends "base.html" %}
 {% block title %}
-    Dashboard
+Dashboard
 {% endblock title %}
 {% block content %}
-    <h1>Dashboard</h1>
-    {% for project_name, project_id, batch_numbers in assignments %}
-        <h2>{{ project_name }}</h2>
-        <ul>
-            {% for batch_number in batch_numbers %}
-                <li>
-                    <a href="{% url 'annotate-batch' project_id batch_number %}">Annotate Batch {{ batch_number }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% endfor %}
+<h1>Dashboard</h1>
+{% for project_name, project_id, batch_numbers in assignments %}
+<h2>{{ project_name }}</h2>
+<ul>
+  {% for batch_number in batch_numbers %}
+  <li>
+    <a href="{% url 'annotate-batch' project_id batch_number %}"
+      >Annotate Batch
+      {{ batch_number }}</a
+    >
+  </li>
+  {% endfor %}
+</ul>
+{% endfor %}
 {% endblock content %}

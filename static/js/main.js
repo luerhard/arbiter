@@ -1,6 +1,5 @@
 import "../css/main.css";
-import '@tailwindplus/elements';
-
+import "@tailwindplus/elements";
 
 import htmx from "htmx.org";
 window.htmx = htmx;
@@ -8,7 +7,7 @@ import "htmx-ext-ws";
 
 import Mousetrap from "mousetrap";
 
-import Alpine from 'alpinejs';
+import Alpine from "alpinejs";
 import focus from "@alpinejs/focus";
 window.Alpine = Alpine;
 Alpine.plugin(focus);
