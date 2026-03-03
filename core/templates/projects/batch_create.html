@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+    {% url "project-user-search" as project_user_search_url %}
     <div class="mx-auto max-w-3xl">
         <div>
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Create batch</h1>
@@ -26,13 +27,13 @@
                     <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Annotators</h2>
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select users who will annotate.</p>
                     {% comment %} <div class="mt-3 space-y-2">{{ form.annotators }}</div> {% endcomment %}
-                    <c-user-search name="annotators" search_url="{% url 'project-user-search' %}" :selected_users="annotators_selected_users" placeholder="Add annotators" />
+                    <c-user-search name="annotators" search_url="{{ project_user_search_url }}" :selected_users="annotators_selected_users" placeholder="Add annotators" />
                     {% if form.annotators.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.annotators.errors }}</p>{% endif %}
                 </div>
                 <div>
                     <h2 class="text-sm font-semibold text-gray-900 dark:text-white">Experts</h2>
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select users who will resolve disagreements.</p>
-                    <c-user-search name="experts" search_url="{% url 'project-user-search' %}" :selected_users="experts_selected_users" placeholder="Add Experts" />
+                    <c-user-search name="experts" search_url="{{ project_user_search_url }}" :selected_users="experts_selected_users" placeholder="Add Experts" />
                     {% if form.experts.errors %}<p class="mt-1 text-sm text-rose-600">{{ form.experts.errors }}</p>{% endif %}
                 </div>
             </div>

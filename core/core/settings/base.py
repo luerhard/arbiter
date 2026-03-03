@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "colorfield",
     "nested_admin",
     "django_vite",
-    "template_partials",
     "core",
     "users",
     "data",
@@ -85,16 +84,11 @@ TEMPLATES = [
         "OPTIONS": {
             "loaders": [
                 (
-                    "template_partials.loader.Loader",
+                    "django.template.loaders.cached.Loader",
                     [
-                        (
-                            "django.template.loaders.cached.Loader",
-                            [
-                                "django_cotton.cotton_loader.Loader",
-                                "django.template.loaders.filesystem.Loader",
-                                "django.template.loaders.app_directories.Loader",
-                            ],
-                        ),
+                        "django_cotton.cotton_loader.Loader",
+                        "django.template.loaders.filesystem.Loader",
+                        "django.template.loaders.app_directories.Loader",
                     ],
                 ),
             ],
@@ -106,7 +100,6 @@ TEMPLATES = [
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",
-                "template_partials.templatetags.partials",
             ],
         },
     },

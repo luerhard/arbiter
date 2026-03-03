@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 {% load widget_tweaks %}
 {% block content %}
+    {% url "project-batch-create" project.id as project_batch_create_url %}
+    {% url "project-export-project" project.id as project_export_project_url %}
     <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 grid gap-6 lg:grid-cols-3">
         <!-- Sidebar -->
         <aside class="lg:col-span-1">
@@ -83,9 +85,11 @@
                                         </td>
                                         <!-- Actions -->
                                         <td class="flex flex-col items-end p-4 align-top text-right space-y-2 whitespace-nowrap">
-                                            <c-button.secondary href="{% url 'project-export-batch' batch_id=batch.batch.id %}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}">Export</c-button.secondary>
+                                            {% url "project-export-batch" batch_id=batch.batch.id as project_export_batch_url %}
+                                            <c-button.secondary href="{{ project_export_batch_url }}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}">Export</c-button.secondary>
                                             {% if batch.batch.current_phase == "E" %}
-                                                <c-button.primary href="{% url 'expert-dialogue' batch.batch.id %}"> Resolve </c-button.primary>
+                                                {% url "expert-dialogue" batch.batch.id as expert_dialogue_url %}
+                                                <c-button.primary href="{{ expert_dialogue_url }}"> Resolve </c-button.primary>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -99,8 +103,8 @@
                         </div>
                     {% endif %}
                     <div class="flex justify-end gap-3 px-6 py-4">
-                        <c-button.primary href="{% url 'project-batch-create' project.id %}">Create Batch</c-button.primary>
-                        <c-button.secondary href="{% url 'project-export-project' project.id %}">Export Project</c-button.secondary>
+                        <c-button.primary href="{{ project_batch_create_url }}">Create Batch</c-button.primary>
+                        <c-button.secondary href="{{ project_export_project_url }}">Export Project</c-button.secondary>
                     </div>
                 </div>
             </div>
