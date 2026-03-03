@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1.7
 
 # ---- Base with uv + Python ----
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm AS base
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
+RUN apk add --no-cache git ca-certificates && update-ca-certificates
 WORKDIR /app
 ENV UV_PROJECT_ENVIRONMENT=/.venv \
     PATH="/.venv/bin:${PATH}" \
@@ -54,4 +55,4 @@ COPY . .
 # wait for VS Code debugger to attach, then run Daphne
 WORKDIR /app/core/
 ENV DJANGO_SETTINGS_MODULE=core.settings
-CMD ["uv", "run", "python", "-X", "frozen_modules=off", "-m", "debugpy","--listen", "0.0.0.0:5678", "-m", "django", "runserver", "0.0.0.0:8000"]
+CMD ["/.venv/bin/python", "-X", "frozen_modules=off", "-m", "debugpy","--listen", "0.0.0.0:5678", "-m", "django", "runserver", "0.0.0.0:8000"]
