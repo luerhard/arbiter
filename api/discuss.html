@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Discussion &mdash; AnnotationTool 0.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=0432c510" />
 
   
@@ -105,7 +105,7 @@
 <span id="views"></span><h2>Views<a class="headerlink" href="#module-discuss.views" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="discuss.views.DiscussView">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.views.</span></span><span class="sig-name descname"><span class="pre">DiscussView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.views.DiscussView" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.views.</span></span><span class="sig-name descname"><span class="pre">DiscussView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.views.DiscussView" title="Link to this definition"></a></dt>
 <dd><dl class="py attribute">
 <dt class="sig sig-object py" id="discuss.views.DiscussView.template_name">
 <span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'annotation/index.html'</span></em><a class="headerlink" href="#discuss.views.DiscussView.template_name" title="Link to this definition"></a></dt>
@@ -134,7 +134,7 @@
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-discuss.models" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="discuss.models.Room">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.models.</span></span><span class="sig-name descname"><span class="pre">Room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.models.Room" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.models.</span></span><span class="sig-name descname"><span class="pre">Room</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.models.Room" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">discuss_room</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -159,12 +159,17 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="discuss.models.Room.DoesNotExist">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#discuss.models.Room.DoesNotExist" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#discuss.models.Room.DoesNotExist" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="discuss.models.Room.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#discuss.models.Room.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#discuss.models.Room.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="discuss.models.Room.NotUpdated">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#discuss.models.Room.NotUpdated" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -202,7 +207,7 @@
 
 <dl class="py class">
 <dt class="sig sig-object py" id="discuss.models.Message">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.models.</span></span><span class="sig-name descname"><span class="pre">Message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">room</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.models.Message" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.models.</span></span><span class="sig-name descname"><span class="pre">Message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">room</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.models.Message" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">discuss_message</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -260,12 +265,17 @@
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="discuss.models.Message.DoesNotExist">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#discuss.models.Message.DoesNotExist" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#discuss.models.Message.DoesNotExist" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="discuss.models.Message.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#discuss.models.Message.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#discuss.models.Message.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="discuss.models.Message.NotUpdated">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#discuss.models.Message.NotUpdated" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -311,27 +321,27 @@
 <span id="websocket-consumer"></span><h2>Websocket Consumer<a class="headerlink" href="#module-discuss.consumers" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.consumers.</span></span><span class="sig-name descname"><span class="pre">ChatConsumer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">discuss.consumers.</span></span><span class="sig-name descname"><span class="pre">ChatConsumer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer" title="Link to this definition"></a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.connect">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.connect" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">connect</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.connect" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.disconnect">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close_code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.disconnect" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">disconnect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">close_code</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.disconnect" title="Link to this definition"></a></dt>
 <dd><p>Called when a WebSocket connection is closed.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.receive">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">receive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.receive" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">receive</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.receive" title="Link to this definition"></a></dt>
 <dd><p>Called with a decoded WebSocket frame.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.save_labels_to_db">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_labels_to_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.save_labels_to_db" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_labels_to_db</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.save_labels_to_db" title="Link to this definition"></a></dt>
 <dd><p>Write cached labels to DB for all users for the given example.</p>
 </dd></dl>
 
@@ -342,18 +352,18 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.save_message_to_db">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_message_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#discuss.consumers.ChatConsumer.save_message_to_db" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_message_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#discuss.consumers.ChatConsumer.save_message_to_db" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.send_state">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.send_state" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.send_state" title="Link to this definition"></a></dt>
 <dd><p>Notify the connected clients in group that annotation ended.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.group_send_state">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group_send_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.group_send_state" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">group_send_state</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.group_send_state" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -363,7 +373,7 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="discuss.consumers.ChatConsumer.get_assigned_annotators">
-<em class="property"><span class="pre">async</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_assigned_annotators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.get_assigned_annotators" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_assigned_annotators</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#discuss.consumers.ChatConsumer.get_assigned_annotators" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
