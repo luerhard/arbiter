@@ -39,6 +39,7 @@ def build_dialog_context(batch, user):
         context["sentence"] = None
         context["next_example"] = None
         context["prev_annotations"] = {}
+        context["annotator"] = None
         context["post_annotations"] = {}
         context["chat_messages"] = []
         context["prev_label_ids"] = []
@@ -56,6 +57,7 @@ def build_dialog_context(batch, user):
         .order_by("user__username")
     )
     before_by_user = {a.user.username: list(a.annotations.all()) for a in before_assignments}
+    context["annotator"] = next(iter(before_by_user))
 
     after_assignments = (
         ExampleAssignment.objects.filter(
