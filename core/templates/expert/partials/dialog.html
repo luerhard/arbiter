@@ -34,19 +34,10 @@
       >
         <div class="px-4 py-2 font-semibold">Labels Before Discussion</div>
         <div class="p-4">
-          {% for annotation in prev_annotations %}
-          <div class="flex items-center space-x-2 py-3">
-            <div class="inline-block min-w-1/3">
-              <c-label text="{{ annotation.label }}" checked disabled />
-            </div>
-            <span>assigned by:</span>
-            <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline"
-              >{{ annotation.assignment.user }}</span
-            >
-          </div>
-          {% empty %}
-          <p>No labels assigned before the discussion.</p>
-          {% endfor %}
+          <c-expert.grouped_labels
+            :annotations_by_user="prev_annotations"
+            empty_text="No labels assigned before the discussion."
+          />
         </div>
       </div>
       <div
@@ -75,19 +66,10 @@
       >
         <div class="px-4 py-2 font-semibold">Labels After Discussion</div>
         <div class="p-4">
-          {% for annotation in post_annotations %}
-          <div class="flex items-center space-x-2 py-3">
-            <div class="inline-block min-w-1/3">
-              <c-label text="{{ annotation.label }}" checked disabled />
-            </div>
-            <span>assigned by:</span>
-            <span class="text-blue-800 dark:text-blue-300 no-underline hover:underline"
-              >{{ annotation.assignment.user }}</span
-            >
-          </div>
-          {% empty %}
-          <p>No labels assigned after the discussion.</p>
-          {% endfor %}
+          <c-expert.grouped-labels
+            :annotations_by_user="post_annotations"
+            empty_text="No labels assigned after the discussion."
+          />
         </div>
       </div>
       <div
@@ -104,15 +86,28 @@
         >
           {% csrf_token %}
           <div class="p-4">
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            <div class="flex flex-wrap gap-2">
               {% for label in labels %}
+              {% if label.id in prev_label_ids %}
               <c-label
                 text="{{ label.name }}"
+                color="{{ label.color }}"
+                hotkey="{{ label.hotkey|default:'' }}"
                 value="{{ label.id }}"
                 id="label_checkbox_{{ label.id }}"
                 name="selected_labels"
                 checked
               />
+              {% else %}
+              <c-label
+                text="{{ label.name }}"
+                color="{{ label.color }}"
+                hotkey="{{ label.hotkey|default:'' }}"
+                value="{{ label.id }}"
+                id="label_checkbox_{{ label.id }}"
+                name="selected_labels"
+              />
+              {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -128,6 +123,7 @@
           <form method="post" id="codebook-form" action="{% url 'codebook-edit' codebook.pk %}">
             {% csrf_token %}
             <div class="mb-4">
+              <!-- djlint:off H021-->
               <div
                 id="codebook-rendered"
                 class="overflow-auto scrollbar"
@@ -146,6 +142,7 @@
 {{ codebook.content }}</textarea
               >
             </div>
+            <!-- djlint:on H021-->
             <div id="rationale-div" class="my-3 hidden">
               <label for="rationale" class="block font-medium mb-1">Rationale</label>
               <textarea
@@ -202,210 +199,13 @@
       Save & Next
     </button>
     {% else %}
-    <div class="flex items-center justify-center my-4">
-      <span class="bg-blue-600/20 ring-1 ring-blue-600 text-3xl font-bold mr-3 px-4 py-1 rounded-2xl"
-        >{{ disagreements_remaining }}</span
-      >
-      <h2 class="text-2xl font-bold">Remaining Disagreements</h2>
-    </div>
-    <div class="grid grid-cols-1 gap-4">
-      <div class="mt-4">
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
-        >
-          <div class="px-4 py-2 font-semibold">Text/Sentence</div>
-          <div class="p-4">
-            <div
-              id="current-example"
-              class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300"
-            >
-              {{ sentence }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="mt-4">
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mb-4"
-        >
-          <div class="px-4 py-2 font-semibold">Labels Before Discussion</div>
-          <div class="p-4">
-            <c-expert.grouped_labels
-              :annotations_by_user="prev_annotations"
-              empty_text="No labels assigned before the discussion."
-            />
-          </div>
-        </div>
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-        >
-          <div class="px-4 py-2 font-semibold">Chat History</div>
-          <div class="p-4">
-            {% for message in chat_messages %}
-            <div type="other-message" class="other-message flex items-start gap-2.5 mb-3">
-              <div
-                class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 bg-gray-300 rounded-e-xl rounded-es-xl dark:bg-gray-700"
-              >
-                <div class="flex items-center space-x-2" dir="ltr">
-                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
-                </div>
-                <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1" dir="ltr">
-                  {{ message.message }}
-                </p>
-              </div>
-            </div>
-            {% endfor %}
-          </div>
-        </div>
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-        >
-          <div class="px-4 py-2 font-semibold">Labels After Discussion</div>
-          <div class="p-4">
-            <c-expert.grouped-labels
-              :annotations_by_user="post_annotations"
-              empty_text="No labels assigned after the discussion."
-            />
-          </div>
-        </div>
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-        >
-          <div class="px-4 py-2 font-semibold">Select Labels for Sentence</div>
-          <form
-            id="labels-form"
-            method="post"
-            action="{% url 'expert-label-save' assignment.id %}"
-            hx-post="{% url 'expert-label-save' assignment.id %}"
-            hx-target="#expert-dialog-content"
-            hx-swap="outerHTML"
-          >
-            {% csrf_token %}
-            <div class="p-4">
-              <div class="flex flex-wrap gap-2">
-                {% for label in labels %}
-                {% if label.id in prev_label_ids %}
-                <c-label
-                  text="{{ label.name }}"
-                  color="{{ label.color }}"
-                  hotkey="{{ label.hotkey|default:'' }}"
-                  value="{{ label.id }}"
-                  id="label_checkbox_{{ label.id }}"
-                  name="selected_labels"
-                  checked
-                />
-                {% else %}
-                <c-label
-                  text="{{ label.name }}"
-                  color="{{ label.color }}"
-                  hotkey="{{ label.hotkey|default:'' }}"
-                  value="{{ label.id }}"
-                  id="label_checkbox_{{ label.id }}"
-                  name="selected_labels"
-                />
-                {% endif %}
-                {% endfor %}
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-      <div class="mt-4">
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
-        >
-          <div class="px-4 py-2 font-semibold">Codebook</div>
-          <div class="p-4">
-            <form method="post" id="codebook-form" action="{% url 'codebook-edit' codebook.pk %}">
-              {% csrf_token %}
-              <div class="mb-4">
-                <!-- djlint:off H021-->
-                <div
-                  id="codebook-rendered"
-                  class="overflow-auto scrollbar"
-                  data-codebook-content="{{ codebook.content|escapejs }}"
-                  style="max-height: 645px"
-                >
-                  {% include "codebook/partials/view-codebook.html" %}
-                </div>
-                <textarea
-                  id="codebook-content"
-                  name="content"
-                  class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 hidden scrollbar"
-                  rows="20"
-                  style="white-space: pre-wrap"
-                >
-{{ codebook.content }}</textarea
-                >
-              </div>
-              <!-- djlint:on H021-->
-              <div id="rationale-div" class="my-3 hidden">
-                <label for="rationale" class="block font-medium mb-1">Rationale</label>
-                <textarea
-                  id="rationale"
-                  name="rationale"
-                  class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl p-2 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500"
-                  rows="3"
-                  placeholder="Describe why the codebook needs to be updated..."
-                ></textarea>
-              </div>
-              <div class="flex flex-col" id="div-save-undo">
-                <button
-                  type="button"
-                  id="edit-save-button"
-                  class="cursor-pointer items-center rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  onclick="toggleEdit()"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  id="cancel-button"
-                  class="hidden cursor-pointer items-center rounded-md border border-transparent bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                  onclick="toggleUndo()"
-                >
-                  Cancel
-                </button>
-                <input type="hidden" name="sentence" value="{{ sentence.content }}" />
-                <input type="hidden" name="example_id" value="{{ example_id }}" />
-                <input type="hidden" name="batch_id" value="{{ batch_id }}" />
-                {% for label in labels %}
-                <input
-                  type="checkbox"
-                  class="hidden"
-                  id="label_hidden_{{ label.id }}"
-                  name="selected_labels"
-                  value="{{ label.id }}"
-                  {% if label.id in prev_label_ids %}checked{% endif %}
-                />
-                {% endfor %}
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="flex justify-center items-center my-8">
-      {% if next_example %}
-      <button
-        type="button"
-        class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        onclick="submitBothForms()"
-      >
-        Save & Next
-      </button>
-      {% else %}
-      <button
-        type="button"
-        class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-        onclick="submitBothForms()"
-      >
-        Finish
-      </button>
-      {% endif %}
-    </div>
+    <button
+      type="button"
+      class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      onclick="submitBothForms()"
+    >
+      Finish
+    </button>
     {% endif %}
   </div>
   {% endif %}
