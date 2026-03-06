@@ -266,9 +266,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 
             disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
             batch_data["disc_disagreement"] = disc_disagr_ex.count()
-            batch_data["expert_dec"] = len(
-                [e for e in disc_disagr_ex if e.has_expert_decision]
-            )
+            batch_data["expert_dec"] = len([e for e in disc_disagr_ex if e.has_expert_decision])
 
             ann_disagr_ex_first_id = 0
             if ann_disagr_count > 0:
