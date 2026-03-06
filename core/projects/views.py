@@ -255,23 +255,27 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "length": batch.examples.count(),
                 "users": [],
             }
-            # Query examples with disagreements and no expert decisions
-            disagr_ex = [
-                e
-                for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
-                if e.has_disagreement and not e.has_expert_decision
-            ]
-            disagr_count = len(disagr_ex)
-            batch_data["disagreement"] = disagr_count
-            batch_data["disagr_after_discussion"] = len(
-                [e for e in disagr_ex if e.has_disagreement_after_discussion],
-            )
-            disagr_ex_first_id = 0
-            if disagr_count > 0:
-                disagr_ex_first_id = sorted(disagr_ex, key=lambda e: e.id)[0].id
-            batch_data["disagreement_first_id"] = disagr_ex_first_id
 
-            disagr_ids = [e.id for e in disagr_ex]
+            # Query examples with disagreements and no expert decisions
+            ann_disagr_ex = batch.disagreements(BatchPhase.ANNOTATION)
+            ann_disagr_count = ann_disagr_ex.count()
+            batch_data["disagreement"] = ann_disagr_count
+            batch_data["disagr_after_discussion"] = len(
+                [e for e in ann_disagr_ex if e.has_disagreement_after_discussion],
+            )
+
+            disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
+            batch_data["disc_disagreement"] = disc_disagr_ex.count()
+            batch_data["expert_dec"] = len(
+                [e for e in disc_disagr_ex if e.has_expert_decision]
+            )
+
+            ann_disagr_ex_first_id = 0
+            if ann_disagr_count > 0:
+                ann_disagr_ex_first_id = sorted(ann_disagr_ex, key=lambda e: e.id)[0].id
+            batch_data["disagreement_first_id"] = ann_disagr_ex_first_id
+
+            disagr_ids = [e.id for e in ann_disagr_ex]
             for annotator in context["annotators"]:
                 annotated = (
                     ExampleAssignment.objects.filter(
