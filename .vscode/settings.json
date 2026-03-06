@@ -6,7 +6,7 @@
   "python.testing.cwd": "${workspaceFolder}/core",
   "python.analysis.typeCheckingMode": "off",
   "python.analysis.extraPaths": ["${workspaceFolder}/core"],
-  "python-envs.pythonProjects": []
+  "python-envs.pythonProjects": [],
   "files.associations": {
     "**/templates/**/*.html": "django-html"
   },
