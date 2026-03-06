@@ -43,14 +43,14 @@
       <div
         class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
       >
-        <div class="h-[250px] overflow-auto scrollbar resize-y px-4">
+        <div class="overflow-auto scrollbar {% if chat_messages|length != 0 %}h-[250px] resize-y{% endif %} px-4">
           <div class="px-4 py-2 font-semibold bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm sticky top-0 z-10">
             Chat History
           </div>
           {% for message in chat_messages %}
-          <div type="other-message" class="other-message flex items-start gap-2.5 mb-3">
+          <div type="other-message" class="other-message flex items-start gap-2.5 mb-3" {% if message.user == annotator %}dir="rtl"{% endif %}>
             <div
-              class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 rounded-e-xl rounded-es-xl {% if message.user == annotator %}bg-cyan-300/80 dark:bg-cyan-700/80{% else %}bg-teal-300/80 dark:bg-teal-700/80{% endif %}"
+              class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-300/80 dark:bg-gray-700/80"
             >
               <div class="flex items-center space-x-2" dir="ltr">
                 <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
