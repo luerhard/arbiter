@@ -263,14 +263,8 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 
             disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
             batch_data["disc_disagreement"] = disc_disagr_ex.count()
-            batch_data["expert_dec"] = len([e for e in disc_disagr_ex if e.has_expert_decision])
+            batch_data["expert_dec"] = disc_disagr_ex.filter(assignments__phase=BatchPhase.EXPERT, assignments__done__isnull=False).count()
 
-            ann_disagr_ex_first_id = 0
-            if ann_disagr_count > 0:
-                ann_disagr_ex_first_id = sorted(ann_disagr_ex, key=lambda e: e.id)[0].id
-            batch_data["disagreement_first_id"] = ann_disagr_ex_first_id
-
-            disagr_ids = [e.id for e in ann_disagr_ex]
             for annotator in context["annotators"]:
                 annotated = (
                     ExampleAssignment.objects.filter(
@@ -279,7 +273,6 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                         phase=BatchPhase.ANNOTATION,
                         done__isnull=False,
                     )
-                    .distinct()
                     .count()
                 )
                 discussed = (
@@ -287,9 +280,8 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                         user=annotator,
                         phase=BatchPhase.DISCUSSION,
                         done__isnull=False,
-                        example_id__in=disagr_ids,
+                        example_id__in=ann_disagr_ex.values_list("id"),
                     )
-                    .distinct()
                     .count()
                 )
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
