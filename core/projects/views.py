@@ -260,9 +260,6 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             ann_disagr_ex = batch.disagreements(BatchPhase.ANNOTATION)
             ann_disagr_count = ann_disagr_ex.count()
             batch_data["disagreement"] = ann_disagr_count
-            batch_data["disagr_after_discussion"] = len(
-                [e for e in ann_disagr_ex if e.has_disagreement_after_discussion],
-            )
 
             disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
             batch_data["disc_disagreement"] = disc_disagr_ex.count()
