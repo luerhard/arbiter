@@ -320,8 +320,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
                     batch=batch,
                     phase=BatchPhase.ANNOTATION,
                     done__isnull=False,
-                )
-                .count(),
+                ).count(),
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)
