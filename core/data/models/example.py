@@ -61,19 +61,19 @@ class Example(models.Model):
         return self.batch.project.labels
 
     @property
-    def has_disagreement(self):
+    def has_disagreement(self) -> bool:
         return (
             Example.objects.filter(id=self.id).disagreements(phase=BatchPhase.ANNOTATION).exists()
         )
 
     @property
-    def has_disagreement_after_discussion(self):
+    def has_disagreement_after_discussion(self) -> bool:
         return (
             Example.objects.filter(id=self.id).disagreements(phase=BatchPhase.DISCUSSION).exists()
         )
 
     @property
-    def has_expert_decision(self):
+    def has_expert_decision(self) -> bool:
         return ExampleAssignment.objects.filter(
             example=self,
             phase=BatchPhase.EXPERT,

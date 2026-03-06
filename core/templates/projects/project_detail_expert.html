@@ -94,11 +94,13 @@
                         /
                         {{ batch.length }}
                       </td>
-                      <td class="text-end">
+                      {% if user == batch.users.0 %}
+                      <td rowspan="2" class="text-end">
                         {{ user.discussed }}
                         /
                         {{ batch.disagreement }}
                       </td>
+                      {% endif %}
                     </tr>
                     {% endfor %}
                   </tbody>
@@ -113,7 +115,9 @@
                 >
                 {% if batch.batch.current_phase == "E" %}
                 {% url "expert-dialogue" batch.batch.id as expert_dialogue_url %}
-                <c-button.primary href="{{ expert_dialogue_url }}"> Resolve </c-button.primary>
+                <c-button.primary href="{{ expert_dialogue_url }}">
+                  Resolve ({{ batch.expert_dec}}/{{ batch.disc_disagreement }})</c-button.primary
+                >
                 {% endif %}
               </td>
             </tr>

@@ -255,44 +255,31 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "length": batch.examples.count(),
                 "users": [],
             }
-            # Query examples with disagreements and no expert decisions
-            disagr_ex = [
-                e
-                for e in Example.objects.filter(batch=batch, batch__project_id=project.id)
-                if e.has_disagreement and not e.has_expert_decision
-            ]
-            disagr_count = len(disagr_ex)
-            batch_data["disagreement"] = disagr_count
-            batch_data["disagr_after_discussion"] = len(
-                [e for e in disagr_ex if e.has_disagreement_after_discussion],
-            )
-            disagr_ex_first_id = 0
-            if disagr_count > 0:
-                disagr_ex_first_id = sorted(disagr_ex, key=lambda e: e.id)[0].id
-            batch_data["disagreement_first_id"] = disagr_ex_first_id
 
-            disagr_ids = [e.id for e in disagr_ex]
+            # Query examples with disagreements and no expert decisions
+            ann_disagr_ex = batch.disagreements(BatchPhase.ANNOTATION)
+            ann_disagr_count = ann_disagr_ex.count()
+            batch_data["disagreement"] = ann_disagr_count
+
+            disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
+            batch_data["disc_disagreement"] = disc_disagr_ex.count()
+            batch_data["expert_dec"] = disc_disagr_ex.filter(
+                assignments__phase=BatchPhase.EXPERT, assignments__done__isnull=False
+            ).count()
+
             for annotator in context["annotators"]:
-                annotated = (
-                    ExampleAssignment.objects.filter(
-                        user=annotator,
-                        batch=batch,
-                        phase=BatchPhase.ANNOTATION,
-                        done__isnull=False,
-                    )
-                    .distinct()
-                    .count()
-                )
-                discussed = (
-                    ExampleAssignment.objects.filter(
-                        user=annotator,
-                        phase=BatchPhase.DISCUSSION,
-                        done__isnull=False,
-                        example_id__in=disagr_ids,
-                    )
-                    .distinct()
-                    .count()
-                )
+                annotated = ExampleAssignment.objects.filter(
+                    user=annotator,
+                    batch=batch,
+                    phase=BatchPhase.ANNOTATION,
+                    done__isnull=False,
+                ).count()
+                discussed = ExampleAssignment.objects.filter(
+                    user=annotator,
+                    phase=BatchPhase.DISCUSSION,
+                    done__isnull=False,
+                    example_id__in=ann_disagr_ex.values_list("id"),
+                ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
@@ -328,13 +315,12 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         for batch in batches:
             batch_data = {
                 "batch": batch,
-                "done": batch.examples.filter(
-                    assignments__user=self.request.user,
-                    assignments__phase=BatchPhase.ANNOTATION,
-                    assignments__done__isnull=False,
-                )
-                .distinct()
-                .count(),
+                "done": ExampleAssignment.objects.filter(
+                    user=self.request.user,
+                    batch=batch,
+                    phase=BatchPhase.ANNOTATION,
+                    done__isnull=False,
+                ).count(),
                 "length": batch.examples.count(),
             }
             context["batches"].append(batch_data)
