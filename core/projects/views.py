@@ -263,27 +263,23 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
 
             disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
             batch_data["disc_disagreement"] = disc_disagr_ex.count()
-            batch_data["expert_dec"] = disc_disagr_ex.filter(assignments__phase=BatchPhase.EXPERT, assignments__done__isnull=False).count()
+            batch_data["expert_dec"] = disc_disagr_ex.filter(
+                assignments__phase=BatchPhase.EXPERT, assignments__done__isnull=False
+            ).count()
 
             for annotator in context["annotators"]:
-                annotated = (
-                    ExampleAssignment.objects.filter(
-                        user=annotator,
-                        batch=batch,
-                        phase=BatchPhase.ANNOTATION,
-                        done__isnull=False,
-                    )
-                    .count()
-                )
-                discussed = (
-                    ExampleAssignment.objects.filter(
-                        user=annotator,
-                        phase=BatchPhase.DISCUSSION,
-                        done__isnull=False,
-                        example_id__in=ann_disagr_ex.values_list("id"),
-                    )
-                    .count()
-                )
+                annotated = ExampleAssignment.objects.filter(
+                    user=annotator,
+                    batch=batch,
+                    phase=BatchPhase.ANNOTATION,
+                    done__isnull=False,
+                ).count()
+                discussed = ExampleAssignment.objects.filter(
+                    user=annotator,
+                    phase=BatchPhase.DISCUSSION,
+                    done__isnull=False,
+                    example_id__in=ann_disagr_ex.values_list("id"),
+                ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
             context["batches"].append(batch_data)
