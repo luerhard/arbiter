@@ -315,12 +315,12 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         for batch in batches:
             batch_data = {
                 "batch": batch,
-                "done": batch.examples.filter(
-                    assignments__user=self.request.user,
-                    assignments__phase=BatchPhase.ANNOTATION,
-                    assignments__done__isnull=False,
+                "done": ExampleAssignment.objects.filter(
+                    user=self.request.user,
+                    batch=batch,
+                    phase=BatchPhase.ANNOTATION,
+                    done__isnull=False,
                 )
-                .distinct()
                 .count(),
                 "length": batch.examples.count(),
             }
