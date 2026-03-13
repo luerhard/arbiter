@@ -18,7 +18,7 @@ dependencies = [
   "psycopg[binary]>=3.2.10",
   "channels-redis>=4.2.1",
   "django-vite>=3.1.0",
-  "django-cotton==2.1.4", # has to be pinned bc url params cannot be passed anymore in 2.3.0
+  "django-cotton==2.6.1", # has to be pinned bc url params cannot be passed anymore in 2.3.0
   "whitenoise>=6.11.0",
   "crispy-tailwind>=1.0.3",
   "daphne>=4.1.2",
