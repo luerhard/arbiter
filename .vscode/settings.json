@@ -13,5 +13,6 @@
   "[django-html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "debug.allowBreakpointsEverywhere": true,
   "prettier.configPath": ".prettierrc"
 }
