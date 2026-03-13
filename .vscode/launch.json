@@ -13,9 +13,13 @@
         {
           "localRoot": "${workspaceFolder}",
           "remoteRoot": "/app"
+        },
+        {
+          "localRoot": "${workspaceFolder}/.venv",
+          "remoteRoot": "/.venv"
         }
       ],
-      "justMyCode": true
+      "justMyCode": false
     }
   ]
 }

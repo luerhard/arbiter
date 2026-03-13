@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "crispy_forms",
     "crispy_tailwind",
     "django_htmx",
+    "django_cotton",
     "markdownify.apps.MarkdownifyConfig",
     "colorfield",
     "nested_admin",
