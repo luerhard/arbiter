@@ -1,4 +1,4 @@
-<div id="expert-dialog-content" class="container mx-auto mt-4 px-4">
+<div id="expert-dialogue" class="container mx-auto mt-4 px-4">
   {% if not assignment %}
   <div
     class="rounded-2xl border border-emerald-300/60 bg-emerald-50 p-6 text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-200"
@@ -88,7 +88,7 @@
           method="post"
           action="{% url 'expert-label-save' assignment.id %}"
           hx-post="{% url 'expert-label-save' assignment.id %}"
-          hx-target="#expert-dialog-content"
+          hx-target="#expert-dialogue"
           hx-swap="outerHTML"
         >
           {% csrf_token %}
@@ -149,14 +149,22 @@
               >
             </div>
             <!-- djlint:on H021-->
-            <div id="rationale-div" class="my-3 hidden">
+            <div
+              id="rationale-div"
+              class="my-3 hidden"
+              x-data="{ empty: true }"
+              x-init="empty = !$refs.rationale.value"
+            >
               <label for="rationale" class="block font-medium mb-1">Rationale</label>
               <textarea
                 id="rationale"
                 name="rationale"
-                class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl p-2 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500"
+                class="w-full border bg-white dark:bg-gray-900 rounded-2xl p-2 caret-blue-500 focus:outline-none "
                 rows="3"
                 placeholder="Describe why the codebook needs to be updated..."
+                x-ref="rationale"
+                @keyup.self.debounce.500ms="empty = !$el.value"
+                :class="empty ? 'border-amber-500 dark:border-amber-500 focus:ring-1 focus:border-amber-300 focus:ring-amber-300' : 'border-gray-200 dark:border-gray-800 focus:ring-1 focus:border-blue-500 focus:ring-blue-500'"
               ></textarea>
             </div>
             <div class="flex flex-col" id="div-save-undo">

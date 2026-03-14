@@ -100,7 +100,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "batch_id"
     model = Batch
     template_name = "expert/index.html"
-    htmx_template_name = "expert/partials/dialog.html"
+    htmx_template_name = "expert/partials/dialogue.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -116,7 +116,6 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             return render(request, self.htmx_template_name, context)
 
         return super().render_to_response(context)
-        # return render(request, self.template_name, context)
 
     def post(self, request, assignment_id, **kwargs):
         assignment = get_object_or_404(
