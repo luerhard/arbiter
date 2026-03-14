@@ -7,7 +7,7 @@ Resolve Disagreement
 {% block content %}
 <div
   id="expert-dialog-content"
-  hx-get="{% url 'expert-dialogue-content' batch_id %}"
+  hx-get="{% url 'expert-dialogue' batch_id %}"
   hx-trigger="load"
   hx-swap="outerHTML"
 ></div>
