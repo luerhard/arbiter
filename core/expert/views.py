@@ -152,7 +152,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         if request.htmx:
             context = build_dialog_context(batch=batch, user=user)
-            return render(request, "expert/partials/dialog.html", context)
+            return render(request, self.htmx_template_name, context)
 
         if has_open_assignments:
             return redirect("expert-dialogue", batch_id=batch.id)

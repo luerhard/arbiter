@@ -20,7 +20,7 @@ class TestExpertViews:
             .first()
         )
         self.shell_url = reverse("expert-dialogue", args=[self.data["batch"].id])
-        self.content_url = reverse("expert-dialogue-content", args=[self.data["batch"].id])
+        self.content_url = reverse("expert-dialogue", args=[self.data["batch"].id])
 
     def test_expert_dialogue_shell_get_as_expert(self):
         response = self.client.get(self.shell_url)
@@ -35,7 +35,7 @@ class TestExpertViews:
         )
 
         assert response.status_code == 200
-        assert "expert/partials/dialog.html" in (t.name for t in response.templates)
+        assert "expert/partials/dialogue.html" in (t.name for t in response.templates)
         assert "codebook" in response.context
         assert "sentence" in response.context
         assert response.context["sentence"] == self.data["example"]
@@ -66,7 +66,7 @@ class TestSaveLabelsExpertView:
             .first()
         )
         self.url = reverse("expert-label-save", args=[self.assignment.id])
-        self.content_url = reverse("expert-dialogue-content", args=[self.data["batch"].id])
+        self.content_url = reverse("expert-dialogue", args=[self.data["batch"].id])
 
     def test_post_correct_labels_non_htmx_redirects(self):
         example = self.data["example"]
@@ -93,7 +93,7 @@ class TestSaveLabelsExpertView:
             HTTP_HX_REQUEST="true",
         )
         assert response.status_code == 200
-        assert "expert/partials/dialog.html" in (t.name for t in response.templates)
+        assert "expert/partials/dialogue.html" in (t.name for t in response.templates)
         trigger = json.loads(response["HX-Trigger"])
         assert "messages" in trigger
         assert any(message["message"] == "Saved." for message in trigger["messages"])
