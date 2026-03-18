@@ -7,7 +7,7 @@ Resolve Disagreement
 {% block content %}
 <div
   id="expert-dialog-content"
-  hx-get="{% url 'expert-dialogue-content' batch_id %}"
+  hx-get="{% url 'expert-dialogue' batch_id %}"
   hx-trigger="load"
   hx-swap="outerHTML"
 ></div>
@@ -26,24 +26,13 @@ Resolve Disagreement
     };
   }
 
-  function colorContrast(labelElement) {
-    const color = getComputedStyle(labelElement).getPropertyValue('--label-color').trim();
-    const textColor = lib.funcs.inferTextColorByContrast(color);
-    labelElement.style.setProperty('--text-color', textColor);
-  }
-
   async function submitBothForms() {
     const { codebookForm, labelsForm, textarea, rationaleTextarea } = getDialogElements();
     if (!labelsForm || !textarea || !rationaleTextarea) return;
 
     const isEdit = !textarea.classList.contains('hidden');
-    const rationaleEmpty = !rationaleTextarea.value.trim();
 
     if (isEdit) {
-      if (!codebookForm) return;
-      if (rationaleEmpty) {
-        return;
-      }
       const res = await fetch(codebookForm.action, {
         method: codebookForm.method,
         headers: {

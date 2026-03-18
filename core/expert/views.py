@@ -5,7 +5,6 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import UpdateView
 
 from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
@@ -97,31 +96,28 @@ def build_dialog_context(batch, user):
     return context
 
 
-class ExpertDialog(ExpertRequiredMixin, DetailView):
+class ExpertDialogue(ExpertRequiredMixin, DetailView):
     pk_url_kwarg = "batch_id"
     model = Batch
     template_name = "expert/index.html"
+    htmx_template_name = "expert/partials/dialogue.html"
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(build_dialog_context(batch=self.object, user=self.request.user))
         context["batch_id"] = self.kwargs.get("batch_id")
         return context
 
-
-class ExpertDialogueContent(ExpertRequiredMixin, DetailView):
-    pk_url_kwarg = "batch_id"
-    model = Batch
-    template_name = "expert/partials/dialog.html"
-
     def get(self, request, *args, **kwargs):  # noqa: ARG002
-        batch = self.get_object()
-        context = build_dialog_context(batch=batch, user=request.user)
-        return render(request, self.template_name, context)
+        self.object = self.get_object()
+        context = self.get_context_data(object=self.object)
 
+        if request.htmx:
+            return render(request, self.htmx_template_name, context)
 
-class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
-    def post(self, request, **kwargs):
-        assignment_id = kwargs.get("assignment_id")
+        return super().render_to_response(context)
+
+    def post(self, request, assignment_id, **kwargs):
         assignment = get_object_or_404(
             ExampleAssignment.objects.select_related("example"),
             pk=assignment_id,
@@ -156,7 +152,7 @@ class SaveLabelsExpert(ExpertRequiredMixin, UpdateView):
 
         if request.htmx:
             context = build_dialog_context(batch=batch, user=user)
-            return render(request, "expert/partials/dialog.html", context)
+            return render(request, self.htmx_template_name, context)
 
         if has_open_assignments:
             return redirect("expert-dialogue", batch_id=batch.id)
