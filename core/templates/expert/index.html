@@ -14,40 +14,12 @@ Resolve Disagreement
 <script>
   function getDialogElements() {
     return {
-      expertForm: document.getElementById('expert-form'),
       textarea: document.getElementById('codebook-content'),
-      rationaleTextarea: document.getElementById('rationale'),
-      rendered: document.getElementById('codebook-rendered'),
       editButton: document.getElementById('edit-save-button'),
       buttonsDiv: document.getElementById('div-save-undo'),
       cancelButton: document.getElementById('cancel-button'),
       rationaleDiv: document.getElementById('rationale-div'),
     };
-  }
-
-  async function submitForms() {
-    const { expertForm, textarea, rationaleTextarea } = getDialogElements();
-    if (!expertForm || !textarea || !rationaleTextarea) return;
-
-    const isEdit = !textarea.classList.contains('hidden');
-
-    if (isEdit) {
-      const res = await fetch(codebookForm.action, {
-        method: codebookForm.method,
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        body: new FormData(codebookForm),
-      });
-
-      if (!res.ok) {
-        return;
-      }
-
-      labelsForm.requestSubmit();
-    } else {
-      labelsForm.requestSubmit();
-    }
   }
 
   function toggleEdit() {
