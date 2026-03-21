@@ -4,6 +4,7 @@ from django.shortcuts import reverse
 import pytest
 
 from data.models import ExampleAssignment
+from codebook.models import Codebook
 from projects.models import BatchPhase
 
 
@@ -51,21 +52,23 @@ class TestExpertViews:
 
 
 @pytest.mark.django_db
-class TestSaveLabelsExpertView:
+class TestSaveExpertView:
     @pytest.fixture(autouse=True)
     def setup(self, client, project_expert):
         self.client = client
         self.data = project_expert
         self.client.login(username=self.data["expert"].username, password="123")
+        project = self.data["project"]
         self.assignment = (
-            ExampleAssignment.objects.from_project(project=self.data["project"])
+            ExampleAssignment.objects.from_project(project=project)
             .filter(
                 user=self.data["expert"],
                 phase=BatchPhase.EXPERT,
             )
             .first()
         )
-        self.url = reverse("expert-save", args=[self.assignment.id])
+        self.codebook = Codebook.objects.filter(project=project).first()
+        self.url = reverse("expert-save", args=[self.assignment.id, self.codebook.id])
         self.content_url = reverse("expert-dialogue", args=[self.data["batch"].id])
 
     def test_post_correct_labels_non_htmx_redirects(self):
@@ -73,7 +76,9 @@ class TestSaveLabelsExpertView:
         assert not example.has_expert_decision
         label_ids = [label.id for label in self.data["labels"]]
 
-        response = self.client.post(self.url, data={"labels": label_ids})
+        response = self.client.post(
+            self.url, data={"labels-labels": label_ids, "codebook-content": "test"}
+        )
 
         assert response.status_code == 302
         assert response.url == reverse("project-detail", args=[self.data["project"].id])
@@ -89,7 +94,7 @@ class TestSaveLabelsExpertView:
         label_ids = [label.id for label in self.data["labels"]]
         response = self.client.post(
             self.url,
-            data={"labels": label_ids},
+            data={"labels-labels": label_ids, "codebook-content": "test"},
             HTTP_HX_REQUEST="true",
         )
         assert response.status_code == 200
@@ -102,7 +107,7 @@ class TestSaveLabelsExpertView:
         invalid_label_id = 9999
         response = self.client.post(
             self.url,
-            data={"labels": [invalid_label_id]},
+            data={"labels-labels": [invalid_label_id], "codebook-content": "test"},
             HTTP_HX_REQUEST="true",
         )
         assert response.status_code == 200
@@ -116,7 +121,7 @@ class TestSaveLabelsExpertView:
 
     def test_post_empty_labels_list(self):
         example = self.data["example"]
-        response = self.client.post(self.url, data={"labels": []})
+        response = self.client.post(self.url, data={"labels-labels": [], "codebook-content": "test"})
         assert response.status_code == 302
         example.refresh_from_db()
         assert example.has_expert_decision
@@ -127,7 +132,7 @@ class TestSaveLabelsExpertView:
         invalid_label_id = 9999
         response = self.client.post(
             self.url,
-            data={"labels": [invalid_label_id]},
+            data={"labels-labels": [invalid_label_id], "codebook-content": "test"},
         )
         assert response.status_code == 302
         example.refresh_from_db()
@@ -144,7 +149,8 @@ class TestSaveLabelsExpertView:
         response = self.client.post(
             self.url,
             data={
-                "labels": [valid_label_id, invalid_label_id],
+                "labels-labels": [valid_label_id, invalid_label_id],
+                "codebook-content": "test",
             },
         )
         assert response.status_code == 302
@@ -159,7 +165,8 @@ class TestSaveLabelsExpertView:
         response = self.client.post(
             self.url,
             data={
-                "labels": ["not-a-number"],
+                "labels-labels": ["not-a-number"],
+                "codebook-content": "test",
             },
         )
         assert response.status_code == 302
@@ -176,3 +183,40 @@ class TestSaveLabelsExpertView:
         )
         assert response.status_code == 200
         assert "All disagreements are resolved." in response.content.decode()
+
+    def test_post_empty_rationale_does_not_update_codebook(self):
+        initial_content = self.codebook.content
+        label_ids = [label.id for label in self.data["labels"]]
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": label_ids,
+                "codebook-content": "test codebook",
+                "codebook-rationale": "",
+            },
+        )
+        assert response.status_code == 302
+        self.codebook.refresh_from_db()
+        assert self.codebook.content == initial_content
+
+    def test_post_with_rationale_updates_codebook(self):
+        initial_content = self.codebook.content
+        rationale = "This is a test rationale."
+        label_ids = [label.id for label in self.data["labels"]]
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": label_ids,
+                "codebook-content": initial_content + "\\n# Some new content",
+                "codebook-rationale": rationale,
+            },
+        )
+        assert response.status_code == 302
+        self.codebook.refresh_from_db()
+        new_content = self.codebook.content
+        assert new_content != initial_content
+        assert "Some new content" in new_content
+
+        last_commit = self.codebook.repo.head.commit
+        commit_message_data = json.loads(last_commit.message)
+        assert commit_message_data["rationale"] == rationale
