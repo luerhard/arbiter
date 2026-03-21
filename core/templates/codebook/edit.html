@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 {% load crispy_forms_tags %}
 {% block content %}
-  <div class="mt-4">
-    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-      <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-          Project:
-          {{ object.project }}
-        </h2>
-      </div>
-      <div class="p-4">{% crispy form %}</div>
+<div class="mt-4">
+  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
+    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        Project:
+        {{ object.project }}
+      </h2>
     </div>
+    <div class="p-4">{% crispy form %}</div>
   </div>
+</div>
 {% endblock content %}
