@@ -65,7 +65,7 @@ class TestSaveLabelsExpertView:
             )
             .first()
         )
-        self.url = reverse("expert-label-save", args=[self.assignment.id])
+        self.url = reverse("expert-save", args=[self.assignment.id])
         self.content_url = reverse("expert-dialogue", args=[self.data["batch"].id])
 
     def test_post_correct_labels_non_htmx_redirects(self):

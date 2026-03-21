@@ -12,6 +12,7 @@ from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
+from codebook.forms import CodebookForm
 
 log = logging.getLogger(__name__)
 
@@ -106,6 +107,14 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context.update(build_dialog_context(batch=self.object, user=self.request.user))
         context["batch_id"] = self.kwargs.get("batch_id")
+        context["codebook_form"] = CodebookForm(prefix="codebook")
+        if context.get("sentence"):
+            context["labels_form"] = MultiLabelFormExpert(
+                prefix="labels",
+                codebook=context["codebook"],
+                example=context["sentence"],
+                user=self.request.user,
+            )
         return context
 
     def get(self, request, *args, **kwargs):  # noqa: ARG002
@@ -117,7 +126,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         return super().render_to_response(context)
 
-    def post(self, request, assignment_id, **kwargs):
+    def post(self, request, assignment_id, codebook_id, **kwargs):
         assignment = get_object_or_404(
             ExampleAssignment.objects.select_related("example"),
             pk=assignment_id,
@@ -129,17 +138,25 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         project = batch.project
         codebook = project.codebook.get()
 
-        form = MultiLabelFormExpert(
+        labels_form = MultiLabelFormExpert(
             request.POST,
             codebook=codebook,
             example=example,
             user=user,
+            prefix="labels"
         )
-        if form.is_valid():
-            form.save()
+        codebook_form = CodebookForm(request.POST, prefix="codebook")
+
+        if labels_form.is_valid() and codebook_form.is_valid():
+            labels_form.save()
+            codebook_form.save(codebook)
             messages.success(request, "Saved.")
         else:
-            messages.error(request, f"Something was invalid: {form}")
+            if labels_form.errors:
+                log.debug(f"Following errors: {labels_form.errors}")
+            if codebook_form.errors:
+                log.debug(f"Following errors: {codebook_form.errors}")
+            messages.error(request, f"Something was invalid: {labels_form.errors} or {codebook_form.errors}")
 
         has_open_assignments = ExampleAssignment.objects.filter(
             batch=batch,

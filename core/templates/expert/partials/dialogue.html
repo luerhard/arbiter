@@ -27,73 +27,73 @@
       </div>
     </div>
   </div>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <div class="mt-4">
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mb-4"
-      >
-        <div class="px-4 py-2 font-semibold">Labels Before Discussion</div>
-        <div class="p-4">
-          <c-expert.grouped_labels
-            :annotations_by_user="prev_annotations"
-            empty_text="No labels assigned before the discussion."
-          />
-        </div>
-      </div>
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="overflow-auto scrollbar {% if chat_messages|length != 0 %}h-[250px] resize-y{% endif %} px-4">
-          <div class="px-4 py-2 font-semibold bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm sticky top-0 z-10">
-            Chat History
-          </div>
-          {% for message in chat_messages %}
-          <div
-            type="other-message"
-            class="other-message flex items-start gap-2.5 mb-3"
-            {% if message.user == annotator %}dir="rtl"
-            {% endif %}
-          >
-            <div
-              class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-300/80 dark:bg-gray-700/80"
-            >
-              <div class="flex items-center space-x-2" dir="ltr">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
-              </div>
-              <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1" dir="ltr">
-                {{ message.message }}
-              </p>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="px-4 py-2 font-semibold">Labels After Discussion</div>
-        <div class="p-4">
-          <c-expert.grouped-labels
-            :annotations_by_user="post_annotations"
-            empty_text="No labels assigned after the discussion."
-          />
-        </div>
-      </div>
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="px-4 py-2 font-semibold">Select Labels for Sentence</div>
-        <form
-          id="labels-form"
-          method="post"
-          action="{% url 'expert-label-save' assignment.id %}"
-          hx-post="{% url 'expert-label-save' assignment.id %}"
-          hx-target="#expert-dialogue"
-          hx-swap="outerHTML"
+  <form
+    id="expert-form"
+    method="post"
+    action="{% url 'expert-save' assignment.id codebook.pk %}"
+    hx-post="{% url 'expert-save' assignment.id codebook.pk %}"
+    hx-target="#expert-dialogue"
+    hx-swap="outerHTML"
+  >
+    {% csrf_token %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="mt-4">
+        <div
+          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mb-4"
         >
-          {% csrf_token %}
+          <div class="px-4 py-2 font-semibold">Labels Before Discussion</div>
           <div class="p-4">
-            <div class="flex flex-wrap gap-2">
+            <c-expert.grouped_labels
+              :annotations_by_user="prev_annotations"
+              empty_text="No labels assigned before the discussion."
+            />
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
+        >
+          <div class="overflow-auto scrollbar {% if chat_messages|length != 0 %}h-[250px] resize-y{% endif %} px-4">
+            <div class="px-4 py-2 font-semibold bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm sticky top-0 z-10">
+              Chat History
+            </div>
+            {% for message in chat_messages %}
+            <div
+              type="other-message"
+              class="other-message flex items-start gap-2.5 mb-3"
+              {% if message.user == annotator %}dir="rtl"
+              {% endif %}
+            >
+              <div
+                class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-300/80 dark:bg-gray-700/80"
+              >
+                <div class="flex items-center space-x-2" dir="ltr">
+                  <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
+                </div>
+                <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1" dir="ltr">
+                  {{ message.message }}
+                </p>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
+        >
+          <div class="px-4 py-2 font-semibold">Labels After Discussion</div>
+          <div class="p-4">
+            <c-expert.grouped-labels
+              :annotations_by_user="post_annotations"
+              empty_text="No labels assigned after the discussion."
+            />
+          </div>
+        </div>
+        <div
+          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
+        >
+          <div class="px-4 py-2 font-semibold">Select Labels for Sentence</div>
+          <div class="p-4">
+            <div class="flex flex-wrap gap-2" name="{{ labels_form.labels.html_name }}">
               {% for label in labels %}
               {% if label.id in prev_label_ids %}
               <c-label
@@ -118,17 +118,14 @@
               {% endfor %}
             </div>
           </div>
-        </form>
+        </div>
       </div>
-    </div>
-    <div class="mt-4">
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
-      >
-        <div class="px-4 py-2 font-semibold">Codebook</div>
-        <div class="p-4">
-          <form method="post" id="codebook-form" action="{% url 'codebook-edit' codebook.pk %}">
-            {% csrf_token %}
+      <div class="mt-4">
+        <div
+          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
+        >
+          <div class="px-4 py-2 font-semibold">Codebook</div>
+          <div class="p-4">
             <div class="mb-4">
               <!-- djlint:off H021-->
               <div
@@ -140,7 +137,7 @@
               </div>
               <textarea
                 id="codebook-content"
-                name="content"
+                name="{{ codebook_form.content.html_name }}"
                 class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 hidden scrollbar"
                 rows="20"
                 style="white-space: pre-wrap"
@@ -154,11 +151,12 @@
               class="my-3 hidden"
               x-data="{ empty: true }"
               x-init="empty = !$refs.rationale.value"
+              @htmx:after-settle.window="console.log('hi')"
             >
               <label for="rationale" class="block font-medium mb-1">Rationale</label>
               <textarea
                 id="rationale"
-                name="rationale"
+                name="{{ codebook_form.rationale.html_name }}"
                 class="w-full border bg-white dark:bg-gray-900 rounded-2xl p-2 caret-blue-500 focus:outline-none"
                 rows="3"
                 placeholder="Describe why the codebook needs to be updated..."
@@ -198,29 +196,25 @@
               />
               {% endfor %}
             </div>
-          </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="flex justify-center items-center my-8">
-    {% if next_example %}
-    <button
-      type="button"
-      class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      onclick="submitBothForms()"
-    >
-      Save & Next
-    </button>
-    {% else %}
-    <button
-      type="button"
-      class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-      onclick="submitBothForms()"
-    >
-      Finish
-    </button>
-    {% endif %}
-  </div>
+    <div class="flex justify-center items-center my-8">
+      {% if next_example %}
+      <input
+        type="submit"
+        value="Save & Next"
+        class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+      {% else %}
+      <input
+        type="submit"
+        value="Finish"
+        class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      >
+      {% endif %}
+    </div>
+  </form>
   {% endif %}
 </div>

@@ -57,15 +57,11 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
         initial["content"] = self.object.content
         return initial
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs.pop("instance", None)
+        return kwargs
+
     def form_valid(self, form):
-        content = form.cleaned_data["content"]
-        rationale = form.cleaned_data["rationale"]
-
-        commit_info = {
-            "rationale": rationale,
-        }
-        commit_message = json.dumps(commit_info, ensure_ascii=False)
-        if content:
-            self.object.save(content=content, commit_message=commit_message)
-
+        form.save(codebook=self.object)
         return redirect(self.object.get_absolute_url())

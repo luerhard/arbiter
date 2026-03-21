@@ -4,9 +4,9 @@ from . import views
 
 urlpatterns = [
     path(
-        "save-labels/<int:assignment_id>/",
+        "save/<int:assignment_id>/<int:codebook_id>",
         views.ExpertDialogue.as_view(),
-        name="expert-label-save",
+        name="expert-save",
     ),
     path(
         "dialogue/<int:batch_id>",

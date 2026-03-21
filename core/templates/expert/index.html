@@ -14,8 +14,7 @@ Resolve Disagreement
 <script>
   function getDialogElements() {
     return {
-      codebookForm: document.getElementById('codebook-form'),
-      labelsForm: document.getElementById('labels-form'),
+      expertForm: document.getElementById('expert-form'),
       textarea: document.getElementById('codebook-content'),
       rationaleTextarea: document.getElementById('rationale'),
       rendered: document.getElementById('codebook-rendered'),
@@ -26,9 +25,9 @@ Resolve Disagreement
     };
   }
 
-  async function submitBothForms() {
-    const { codebookForm, labelsForm, textarea, rationaleTextarea } = getDialogElements();
-    if (!labelsForm || !textarea || !rationaleTextarea) return;
+  async function submitForms() {
+    const { expertForm, textarea, rationaleTextarea } = getDialogElements();
+    if (!expertForm || !textarea || !rationaleTextarea) return;
 
     const isEdit = !textarea.classList.contains('hidden');
 
