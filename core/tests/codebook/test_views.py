@@ -2,8 +2,6 @@ from codebook.models import Codebook
 from django.urls import reverse
 import pytest
 
-from data.models import Example
-from data.models import Label
 from projects.models import Batch
 from projects.models import Project
 

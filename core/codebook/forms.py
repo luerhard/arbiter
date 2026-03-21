@@ -14,13 +14,12 @@ class CodebookForm(forms.Form):
         "caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 "
         "focus:ring-blue-500 rounded-2xl p-2 scrollbar rounded-2xl"
     )
-    content = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": 32, "class": textarea_class})
-    )
+    content = forms.CharField(widget=forms.Textarea(attrs={"rows": 32, "class": textarea_class}))
     rationale = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 8, "class": textarea_class}),
         required=False,
     )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)

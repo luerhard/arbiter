@@ -1,10 +1,10 @@
 import json
 
+from codebook.models import Codebook
 from django.shortcuts import reverse
 import pytest
 
 from data.models import ExampleAssignment
-from codebook.models import Codebook
 from projects.models import BatchPhase
 
 
@@ -121,7 +121,9 @@ class TestSaveExpertView:
 
     def test_post_empty_labels_list(self):
         example = self.data["example"]
-        response = self.client.post(self.url, data={"labels-labels": [], "codebook-content": "test"})
+        response = self.client.post(
+            self.url, data={"labels-labels": [], "codebook-content": "test"}
+        )
         assert response.status_code == 302
         example.refresh_from_db()
         assert example.has_expert_decision
