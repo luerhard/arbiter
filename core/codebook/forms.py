@@ -30,4 +30,3 @@ class CodebookForm(forms.Form):
         commit_message = json.dumps(commit_info, ensure_ascii=False)
         if content:
             codebook.save(content=content, commit_message=commit_message)
-

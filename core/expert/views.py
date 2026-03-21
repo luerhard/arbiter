@@ -1,5 +1,6 @@
 import logging
 
+from codebook.forms import CodebookForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -12,7 +13,6 @@ from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
-from codebook.forms import CodebookForm
 
 log = logging.getLogger(__name__)
 
@@ -139,11 +139,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         codebook = project.codebook.get()
 
         labels_form = MultiLabelFormExpert(
-            request.POST,
-            codebook=codebook,
-            example=example,
-            user=user,
-            prefix="labels"
+            request.POST, codebook=codebook, example=example, user=user, prefix="labels"
         )
         codebook_form = CodebookForm(request.POST, prefix="codebook")
 
@@ -156,7 +152,9 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 log.debug(f"Following errors: {labels_form.errors}")
             if codebook_form.errors:
                 log.debug(f"Following errors: {codebook_form.errors}")
-            messages.error(request, f"Something was invalid: {labels_form.errors} or {codebook_form.errors}")
+            messages.error(
+                request, f"Something was invalid: {labels_form.errors} or {codebook_form.errors}"
+            )
 
         has_open_assignments = ExampleAssignment.objects.filter(
             batch=batch,
