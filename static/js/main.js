@@ -5,6 +5,7 @@ import "@tailwindplus/elements";
 import htmx from "htmx.org";
 window.htmx = htmx;
 import "htmx-ext-ws";
+import "htmx-ext-alpine-morph";
 
 import Mousetrap from "mousetrap";
 import "./vendor/coloris.min.js";
@@ -50,8 +51,10 @@ window.Coloris({
 
 import Alpine from "alpinejs";
 import focus from "@alpinejs/focus";
+import morph from "@alpinejs/morph";
 window.Alpine = Alpine;
 Alpine.plugin(focus);
+Alpine.plugin(morph);
 
 import { navBlock, labelButton } from "./annotation.js";
 import * as ui from "./ui.js";

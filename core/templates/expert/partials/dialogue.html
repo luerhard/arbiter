@@ -32,9 +32,8 @@
     method="post"
     action="{% url 'expert-save' assignment.id codebook.pk %}"
     hx-post="{% url 'expert-save' assignment.id codebook.pk %}"
-    hx-target="#expert-dialogue"
-    hx-swap="outerHTML"
   >
+    <!-- hx-vals="{codebook_changed: ...}" -->
     {% csrf_token %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="mt-4">
@@ -151,7 +150,7 @@
               class="my-3 hidden"
               x-data="{ empty: true }"
               x-init="empty = !$refs.rationale.value"
-              @htmx:after-settle.window="console.log('hi')"
+              @htmx:after-settle.window="empty = !empty; empty = !empty"
             >
               <label for="rationale" class="block font-medium mb-1">Rationale</label>
               <textarea

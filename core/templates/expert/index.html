@@ -7,14 +7,17 @@ Resolve Disagreement
 {% block content %}
 <div
   id="expert-dialog-content"
+  hx-ext="alpine-morph"
   hx-get="{% url 'expert-dialogue' batch_id %}"
   hx-trigger="load"
-  hx-swap="outerHTML"
+  hx-target="this"
+  hx-swap="morph"
 ></div>
 <script>
   function getDialogElements() {
     return {
       textarea: document.getElementById('codebook-content'),
+      rendered: document.getElementById('codebook-rendered'),
       editButton: document.getElementById('edit-save-button'),
       buttonsDiv: document.getElementById('div-save-undo'),
       cancelButton: document.getElementById('cancel-button'),
