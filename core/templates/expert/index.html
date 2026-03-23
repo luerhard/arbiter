@@ -15,7 +15,7 @@ Resolve Disagreement
 ></div>
 <script>
   document.addEventListener('alpine:init', () => {
-      Alpine.store('codebook_modified', false);
+    Alpine.store('codebook_modified', false);
   });
 
   function getDialogElements() {
@@ -57,11 +57,11 @@ Resolve Disagreement
     editButton.classList.remove('hidden');
     cancelSaveButtons.classList.add('hidden');
     rationaleDiv.classList.add('hidden');
-    if (Alpine.store("codebook_modified")) {
+    if (Alpine.store('codebook_modified')) {
       textarea.value = rendered.getAttribute('data-codebook-content') || '';
       codebookHtml.setHTML(lib.expert.sd.makeHtml(textarea.value));
-      Alpine.store("codebook_modified", false);
-    };
+      Alpine.store('codebook_modified', false);
+    }
   }
 
   function toggleSave() {
