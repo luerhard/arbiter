@@ -154,9 +154,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 log.debug(f"Following errors: {labels_form.errors}")
             if codebook_form.errors:
                 log.debug(f"Following errors: {codebook_form.errors}")
-            messages.error(
-                request, f"Something was invalid"
-            )
+            messages.error(request, "Something was invalid")
 
         has_open_assignments = ExampleAssignment.objects.filter(
             batch=batch,
