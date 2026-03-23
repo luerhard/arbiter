@@ -34,7 +34,7 @@ class CodebookForm(forms.Form):
         cleaned_data = super().clean(*args, **kwargs)
         # If 'modified' is False, we discard all other validation errors
         # This is admissible because it won't save the form anyways.
-        if not cleaned_data.get('modified'):
+        if not cleaned_data.get("modified"):
             self._errors.clear()
         return cleaned_data
 
