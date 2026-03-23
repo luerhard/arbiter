@@ -121,7 +121,8 @@
       </div>
       <div class="mt-4">
         <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
+          class="border bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl overflow-hidden"
+          :class="$store.codebook_modified ? 'border-orange-300/70 shadow-orange-300/70 dark:border-orange-300/50 dark:shadow-orange-300/50 shadow-lg' : 'border-gray-200 shadow-sm'"
         >
           <div class="px-4 py-2 font-semibold">Codebook</div>
           <div class="p-4">
@@ -140,6 +141,7 @@
                 class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 hidden scrollbar"
                 rows="20"
                 style="white-space: pre-wrap"
+                @keydown.throttle.750ms="if (!$store.codebook_modified) $store.codebook_modified = true"
               >
 {{ codebook.content }}</textarea
               >
@@ -160,27 +162,39 @@
                 rows="3"
                 placeholder="Describe why the codebook needs to be updated..."
                 x-ref="rationale"
-                @keyup.self.debounce.500ms="empty = !$el.value"
+                @keyup.self.throttle.500ms="empty = !$el.value"
                 :class="empty ? 'border-amber-500 dark:border-amber-500 focus:ring-1 focus:border-amber-300 focus:ring-amber-300' : 'border-gray-200 dark:border-gray-800 focus:ring-1 focus:border-blue-500 focus:ring-blue-500'"
               ></textarea>
             </div>
-            <div class="flex flex-col" id="div-save-undo">
+            <div class="flex flex-col" id="codebook-buttons">
               <button
                 type="button"
-                id="edit-save-button"
+                id="edit-button"
                 class="cursor-pointer items-center rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 onclick="toggleEdit()"
               >
                 Edit
               </button>
-              <button
-                type="button"
-                id="cancel-button"
-                class="hidden cursor-pointer items-center rounded-md border border-transparent bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-                onclick="toggleUndo()"
-              >
-                Cancel
-              </button>
+              <div id="cancel-save-buttons" class="hidden">
+                <div class="flex flex-row">
+                  <button
+                    type="button"
+                    id="undo-button"
+                    class="basis-1/2 mx-1 cursor-pointer items-center rounded-md border border-transparent bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+                    onclick="toggleUndo()"
+                  >
+                    Undo All Changes
+                  </button>
+                  <button
+                    type="button"
+                    id="save-button"
+                    class="basis-1/2 mx-1 cursor-pointer items-center rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    onclick="toggleSave()"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
               <input type="hidden" name="sentence" value="{{ sentence.content }}" />
               <input type="hidden" name="example_id" value="{{ example_id }}" />
               <input type="hidden" name="batch_id" value="{{ batch_id }}" />
@@ -199,7 +213,7 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center items-center my-8">
+    <div class="flex justify-center items-center my-8" @click="$store.codebook_modified = false">
       {% if next_example %}
       <input
         type="submit"

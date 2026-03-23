@@ -14,48 +14,71 @@ Resolve Disagreement
   hx-swap="morph"
 ></div>
 <script>
+  document.addEventListener('alpine:init', () => {
+      Alpine.store('codebook_modified', false);
+  });
+
   function getDialogElements() {
     return {
       textarea: document.getElementById('codebook-content'),
       rendered: document.getElementById('codebook-rendered'),
-      editButton: document.getElementById('edit-save-button'),
-      buttonsDiv: document.getElementById('div-save-undo'),
-      cancelButton: document.getElementById('cancel-button'),
+      codebookHtml: document.getElementById('codebook-html'),
+      editButton: document.getElementById('edit-button'),
+      cancelSaveButtons: document.getElementById('cancel-save-buttons'),
       rationaleDiv: document.getElementById('rationale-div'),
     };
   }
 
   function toggleEdit() {
-    const { textarea, rendered, editButton, cancelButton, rationaleDiv } = getDialogElements();
-    if (!textarea || !rendered || !editButton || !cancelButton || !rationaleDiv) return;
-    if (textarea.classList.contains('hidden')) {
-      rendered.classList.add('hidden');
-      textarea.classList.remove('hidden');
-      textarea.removeAttribute('readonly');
+    const { textarea, rendered, editButton, cancelSaveButtons, rationaleDiv } = getDialogElements();
+    if (!textarea || !rendered || !editButton || !cancelSaveButtons || !rationaleDiv) return;
+    if (!textarea.classList.contains('hidden')) return;
 
-      editButton.classList.add('hidden');
-      cancelButton.classList.remove('hidden');
-      rationaleDiv.classList.remove('hidden');
-    }
+    rendered.classList.add('hidden');
+    textarea.classList.remove('hidden');
+    textarea.removeAttribute('readonly');
+
+    editButton.classList.add('hidden');
+    cancelSaveButtons.classList.remove('hidden');
+    rationaleDiv.classList.remove('hidden');
   }
 
   function toggleUndo() {
-    const { textarea, rendered, editButton, cancelButton, buttonsDiv, rationaleDiv } = getDialogElements();
-    if (!textarea || !rendered || !editButton || !cancelButton || !buttonsDiv || !rationaleDiv) return;
-    if (!textarea.readOnly) {
-      textarea.value = rendered.getAttribute('data-codebook-content') || '';
-      textarea.readOnly = true;
-      textarea.classList.add('hidden');
-      if (rendered) {
-        rendered.classList.remove('hidden');
-      }
+    const { textarea, rendered, editButton, cancelSaveButtons, rationaleDiv, codebookHtml } = getDialogElements();
+    if (!textarea || !rendered || !editButton || !cancelSaveButtons || !rationaleDiv) return;
+    if (textarea.readOnly) return;
 
-      editButton.classList.remove('hidden');
-      cancelButton.classList.add('hidden');
-      buttonsDiv.classList.remove('flex-row');
-      buttonsDiv.classList.add('flex-col');
-      rationaleDiv.classList.add('hidden');
+    textarea.readOnly = true;
+    textarea.classList.add('hidden');
+    if (rendered) {
+      rendered.classList.remove('hidden');
     }
+
+    editButton.classList.remove('hidden');
+    cancelSaveButtons.classList.add('hidden');
+    rationaleDiv.classList.add('hidden');
+    if (Alpine.store("codebook_modified")) {
+      textarea.value = rendered.getAttribute('data-codebook-content') || '';
+      codebookHtml.setHTML(lib.expert.sd.makeHtml(textarea.value));
+      Alpine.store("codebook_modified", false);
+    };
+  }
+
+  function toggleSave() {
+    // toggleCancel();
+    const { textarea, rendered, editButton, cancelSaveButtons, rationaleDiv, codebookHtml } = getDialogElements();
+    if (!textarea || !rendered || !editButton || !cancelSaveButtons || !rationaleDiv) return;
+    if (textarea.readOnly) return;
+    codebookHtml.setHTML(lib.expert.sd.makeHtml(textarea.value));
+    textarea.readOnly = true;
+    textarea.classList.add('hidden');
+    if (rendered) {
+      rendered.classList.remove('hidden');
+    }
+
+    editButton.classList.remove('hidden');
+    cancelSaveButtons.classList.add('hidden');
+    rationaleDiv.classList.add('hidden');
   }
 </script>
 {% endblock content %}
