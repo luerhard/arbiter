@@ -141,6 +141,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         labels_form = MultiLabelFormExpert(
             request.POST, codebook=codebook, example=example, user=user, prefix="labels"
         )
+
         codebook_form = CodebookForm(request.POST, prefix="codebook")
 
         if labels_form.is_valid() and codebook_form.is_valid():

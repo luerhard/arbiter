@@ -32,8 +32,11 @@
     method="post"
     action="{% url 'expert-save' assignment.id codebook.pk %}"
     hx-post="{% url 'expert-save' assignment.id codebook.pk %}"
+    hx-target="#expert-dialogue"
+    hx-swap="outerHTML"
+    hx-include="#codebook-content"
+    hx-vals="js:{'codebook-modified': Alpine.store('codebook_modified')}"
   >
-    <!-- hx-vals="{codebook_changed: ...}" -->
     {% csrf_token %}
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="mt-4">
@@ -213,7 +216,7 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center items-center my-8" @click="$store.codebook_modified = false">
+    <div class="flex justify-center items-center my-8">
       {% if next_example %}
       <input
         type="submit"

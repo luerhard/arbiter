@@ -15,20 +15,33 @@ class CodebookForm(forms.Form):
         "focus:ring-blue-500 rounded-2xl p-2 scrollbar rounded-2xl"
     )
     content = forms.CharField(widget=forms.Textarea(attrs={"rows": 32, "class": textarea_class}))
-    rationale = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": 8, "class": textarea_class}),
-        required=False,
-    )
+    rationale = forms.CharField(widget=forms.Textarea(attrs={"rows": 8, "class": textarea_class}))
+    modified = forms.BooleanField(initial=True, required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper(self)
         self.helper.add_input(Submit("submit", "Save", css_class="btn-primary"))
 
+    def clean_modified(self):
+        field_name = self.add_prefix("modified")
+        if field_name not in self.data:
+            # Enforce the initial value when modified wasn't supplied.
+            return self.fields["modified"].initial
+        return self.cleaned_data["modified"]
+
+    def clean(self, *args, **kwargs):
+        cleaned_data = super().clean(*args, **kwargs)
+        # If 'modified' is False, we discard all other validation errors
+        # This is admissible because it won't save the form anyways.
+        if not cleaned_data.get('modified'):
+            self._errors.clear()
+        return cleaned_data
+
     def save(self, codebook):
-        if "rationale" not in self.changed_data:
-            # For now we'll not save anything if the rationale is empty
+        if not self.cleaned_data["modified"]:
             return
+
         content = self.cleaned_data["content"]
         rationale = self.cleaned_data["rationale"]
 
