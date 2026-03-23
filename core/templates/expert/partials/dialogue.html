@@ -146,7 +146,7 @@
                 style="white-space: pre-wrap"
                 @keydown.throttle.750ms="if (!$store.codebook_modified) $store.codebook_modified = true"
               >
-{{ codebook.content }}</textarea
+{{ submitted_codebook_content|default:codebook.content }}</textarea
               >
             </div>
             <!-- djlint:on H021-->
@@ -206,7 +206,7 @@
                 type="checkbox"
                 class="hidden"
                 id="label_hidden_{{ label.id }}"
-                name="selected_labels"
+
                 value="{{ label.id }}"
                 {% if label.id in prev_label_ids %}checked{% endif %}
               />

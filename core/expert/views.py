@@ -144,7 +144,8 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         codebook_form = CodebookForm(request.POST, prefix="codebook")
 
-        if labels_form.is_valid() and codebook_form.is_valid():
+        forms_are_valid = labels_form.is_valid() and codebook_form.is_valid()
+        if forms_are_valid:
             labels_form.save()
             codebook_form.save(codebook)
             messages.success(request, "Saved.")
@@ -154,7 +155,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             if codebook_form.errors:
                 log.debug(f"Following errors: {codebook_form.errors}")
             messages.error(
-                request, f"Something was invalid: {labels_form.errors} or {codebook_form.errors}"
+                request, f"Something was invalid"
             )
 
         has_open_assignments = ExampleAssignment.objects.filter(
@@ -168,6 +169,16 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         if request.htmx:
             context = build_dialog_context(batch=batch, user=user)
+            if not forms_are_valid:
+                context["labels_form"] = labels_form
+                context["codebook_form"] = codebook_form
+                submitted_labels = request.POST.getlist("selected_labels")
+                context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
+                new_content = codebook_form.data.get(
+                    codebook_form.add_prefix("content"), context["codebook"].content
+                )
+                context["codebook"].content = new_content
+                context["submitted_codebook_content"] = new_content
             return render(request, self.htmx_template_name, context)
 
         if has_open_assignments:

@@ -12,13 +12,10 @@ Resolve Disagreement
   hx-trigger="load"
   hx-target="this"
   hx-swap="morph"
+  @htmx:after-settle.window="Alpine.store('codebook_modified', false)"
 ></div>
 <script>
   document.addEventListener('alpine:init', () => {
-    Alpine.store('codebook_modified', false);
-  });
-
-  document.addEventListener('htmx.afterSettle', () => {
     Alpine.store('codebook_modified', false);
   });
 

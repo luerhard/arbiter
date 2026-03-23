@@ -81,7 +81,7 @@ LOGIN_EXEMPT_URLS = [
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": ["templates"],
+        "DIRS": [BASE_DIR / "core" / "templates"],
         "OPTIONS": {
             "loaders": [
                 (

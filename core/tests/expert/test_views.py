@@ -77,7 +77,7 @@ class TestSaveExpertView:
         label_ids = [label.id for label in self.data["labels"]]
 
         response = self.client.post(
-            self.url, data={"labels-labels": label_ids, "codebook-content": "test"}
+            self.url, data={"labels-labels": label_ids, "codebook-content": "test", "codebook-modified": "false"}
         )
 
         assert response.status_code == 302
@@ -94,7 +94,7 @@ class TestSaveExpertView:
         label_ids = [label.id for label in self.data["labels"]]
         response = self.client.post(
             self.url,
-            data={"labels-labels": label_ids, "codebook-content": "test"},
+            data={"labels-labels": label_ids, "codebook-content": "test", "codebook-modified": "false"},
             HTTP_HX_REQUEST="true",
         )
         assert response.status_code == 200
@@ -107,7 +107,7 @@ class TestSaveExpertView:
         invalid_label_id = 9999
         response = self.client.post(
             self.url,
-            data={"labels-labels": [invalid_label_id], "codebook-content": "test"},
+            data={"labels-labels": [invalid_label_id], "codebook-content": "test", "codebook-modified": "false"},
             HTTP_HX_REQUEST="true",
         )
         assert response.status_code == 200
@@ -122,7 +122,7 @@ class TestSaveExpertView:
     def test_post_empty_labels_list(self):
         example = self.data["example"]
         response = self.client.post(
-            self.url, data={"labels-labels": [], "codebook-content": "test"}
+            self.url, data={"labels-labels": [], "codebook-content": "test", "codebook-modified": "false"}
         )
         assert response.status_code == 302
         example.refresh_from_db()
@@ -134,7 +134,7 @@ class TestSaveExpertView:
         invalid_label_id = 9999
         response = self.client.post(
             self.url,
-            data={"labels-labels": [invalid_label_id], "codebook-content": "test"},
+            data={"labels-labels": [invalid_label_id], "codebook-content": "test", "codebook-modified": "false"},
         )
         assert response.status_code == 302
         example.refresh_from_db()
@@ -153,6 +153,7 @@ class TestSaveExpertView:
             data={
                 "labels-labels": [valid_label_id, invalid_label_id],
                 "codebook-content": "test",
+                "codebook-modified": "false",
             },
         )
         assert response.status_code == 302
@@ -169,6 +170,7 @@ class TestSaveExpertView:
             data={
                 "labels-labels": ["not-a-number"],
                 "codebook-content": "test",
+                "codebook-modified": "false"
             },
         )
         assert response.status_code == 302
