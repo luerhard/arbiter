@@ -19,7 +19,9 @@ from projects.models import ProjectUser
 log = logging.getLogger(__name__)
 
 
-def build_dialog_context(batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm) -> dict[str, Any]:
+def build_dialog_context(
+    batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm
+) -> dict[str, Any]:
     project = batch.project
     context = {
         "batch_id": batch.id,
@@ -120,7 +122,14 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 example=context["sentence"],
                 user=self.request.user,
             )
-        context.update(build_dialog_context(batch=self.object, user=self.request.user, labels_form=labels_form, codebook_form=codebook_form))
+        context.update(
+            build_dialog_context(
+                batch=self.object,
+                user=self.request.user,
+                labels_form=labels_form,
+                codebook_form=codebook_form,
+            )
+        )
         return context
 
     def get(self, request, *args, **kwargs):  # noqa: ARG002
@@ -160,7 +169,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 log.debug(f"Following errors: {labels_form.errors}")
             if codebook_form.errors:
                 log.debug(f"Following errors: {codebook_form.errors}")
-            messages.error(request, f"Something was invalid")
+            messages.error(request, "Something was invalid")
 
         has_open_assignments = ExampleAssignment.objects.filter(
             batch=batch,
@@ -172,7 +181,9 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             batch.set_phase(BatchPhase.FINAL)
 
         if request.htmx:
-            context = build_dialog_context(batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form)
+            context = build_dialog_context(
+                batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form
+            )
             if not forms_are_valid:
                 submitted_labels = request.POST.getlist("selected_labels")
                 context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]

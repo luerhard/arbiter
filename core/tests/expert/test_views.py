@@ -128,9 +128,7 @@ class TestSaveExpertView:
         assert self.assignment.annotations.count() == 0
         trigger = json.loads(response["HX-Trigger"])
         assert "messages" in trigger
-        assert any(
-            "Something was invalid" in message["message"] for message in trigger["messages"]
-        )
+        assert any("Something was invalid" in message["message"] for message in trigger["messages"])
 
     def test_post_empty_labels_list(self):
         example = self.data["example"]
