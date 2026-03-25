@@ -8,7 +8,9 @@
         {{ object.project }}
       </h2>
     </div>
-    <div class="p-4">{% include "codebook/partials/view-codebook.html" %}</div>
+    <div class="p-4">
+      <c-codebook.view content="{{ codebook.content }}"/>
+    </div>
   </div>
 </div>
 {% if role == "E" %}
