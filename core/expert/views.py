@@ -1,5 +1,7 @@
 import logging
+from typing import Any
 
+from codebook.forms import CodebookForm
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -12,16 +14,22 @@ from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
+from projects.models import ProjectUser
 
 log = logging.getLogger(__name__)
 
 
-def build_dialog_context(batch, user):
+def build_dialog_context(
+    batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm
+) -> dict[str, Any]:
     project = batch.project
     context = {
         "batch_id": batch.id,
         "codebook": project.codebook.get(),
         "labels": project.labels.all(),
+        "success": True,
+        "labels_form": labels_form,
+        "codebook_form": codebook_form,
     }
 
     open_assignments = ExampleAssignment.objects.filter(
@@ -104,8 +112,24 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context.update(build_dialog_context(batch=self.object, user=self.request.user))
         context["batch_id"] = self.kwargs.get("batch_id")
+        codebook_form = CodebookForm(prefix="codebook")
+        labels_form = None
+        if context.get("sentence"):
+            labels_form = MultiLabelFormExpert(
+                prefix="labels",
+                codebook=context["codebook"],
+                example=context["sentence"],
+                user=self.request.user,
+            )
+        context.update(
+            build_dialog_context(
+                batch=self.object,
+                user=self.request.user,
+                labels_form=labels_form,
+                codebook_form=codebook_form,
+            )
+        )
         return context
 
     def get(self, request, *args, **kwargs):  # noqa: ARG002
@@ -117,7 +141,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         return super().render_to_response(context)
 
-    def post(self, request, assignment_id, **kwargs):
+    def post(self, request, assignment_id, codebook_id, **kwargs):
         assignment = get_object_or_404(
             ExampleAssignment.objects.select_related("example"),
             pk=assignment_id,
@@ -129,17 +153,23 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         project = batch.project
         codebook = project.codebook.get()
 
-        form = MultiLabelFormExpert(
-            request.POST,
-            codebook=codebook,
-            example=example,
-            user=user,
+        labels_form = MultiLabelFormExpert(
+            request.POST, codebook=codebook, example=example, user=user, prefix="labels"
         )
-        if form.is_valid():
-            form.save()
+
+        codebook_form = CodebookForm(request.POST, prefix="codebook")
+
+        forms_are_valid = labels_form.is_valid() and codebook_form.is_valid()
+        if forms_are_valid:
+            labels_form.save()
+            codebook_form.save(codebook)
             messages.success(request, "Saved.")
         else:
-            messages.error(request, f"Something was invalid: {form}")
+            if labels_form.errors:
+                log.debug(f"Following errors: {labels_form.errors}")
+            if codebook_form.errors:
+                log.debug(f"Following errors: {codebook_form.errors}")
+            messages.error(request, "Something was invalid")
 
         has_open_assignments = ExampleAssignment.objects.filter(
             batch=batch,
@@ -151,7 +181,16 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             batch.set_phase(BatchPhase.FINAL)
 
         if request.htmx:
-            context = build_dialog_context(batch=batch, user=user)
+            context = build_dialog_context(
+                batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form
+            )
+            if not forms_are_valid:
+                submitted_labels = request.POST.getlist("selected_labels")
+                context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
+                context["draft_codebook"] = codebook_form.data.get(
+                    codebook_form.add_prefix("content"), context["codebook"].content
+                )
+                context["success"] = False
             return render(request, self.htmx_template_name, context)
 
         if has_open_assignments:
