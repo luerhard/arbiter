@@ -188,6 +188,11 @@ def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
         state = response["state"]
         assert state["clicked_done"][user.username] == 1
         assert state["discussion_labels"][user.username] == [label.id]
+        assert any(
+            msg.get("user") == "system"
+            and msg.get("text") == f"{user.username} finalized their decision: ['{label.name}']"
+            for msg in state["messages"]
+        )
 
         await communicator.disconnect()
 
