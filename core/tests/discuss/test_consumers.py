@@ -172,6 +172,7 @@ def test_discuss_message_appends_to_state(redis_test_state, discussion_setup):
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
     user, batch = discussion_setup
+    label = Label.objects.create(project=batch.project, name="L1")
 
     async def run():
         communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
@@ -182,11 +183,16 @@ def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
 
         await communicator.receive_json_from()
 
-        await communicator.send_json_to({"clicked-done": True, "labels": [1]})
+        await communicator.send_json_to({"clicked-done": True, "labels": [label.id]})
         response = await communicator.receive_json_from()
         state = response["state"]
         assert state["clicked_done"][user.username] == 1
-        assert state["discussion_labels"][user.username] == [1]
+        assert state["discussion_labels"][user.username] == [label.id]
+        assert any(
+            msg.get("user") == "system"
+            and msg.get("text") == f"{user.username} finalized their decision: ['{label.name}']"
+            for msg in state["messages"]
+        )
 
         await communicator.disconnect()
 

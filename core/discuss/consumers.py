@@ -15,6 +15,7 @@ from .room_state import update_state
 from data.models import Annotation
 from data.models import Example
 from data.models import ExampleAssignment
+from data.models import Label
 from projects.models import Batch
 from projects.models import BatchPhase
 
@@ -159,7 +160,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
             return state
 
-        return await update_state(self.batch_id, mut)
+        state = await update_state(self.batch_id, mut)
+
+        # get labels
+        labels = state["discussion_labels"][username]
+        label_dict = await database_sync_to_async(Label.objects.in_bulk)(labels)
+        label_names = [label_dict[i].name for i in labels]
+
+        # print finalized message
+        msg = f"{username} finalized their decision: {label_names}"
+        await self._append_chat_message(username="system", message=msg)
+
+        return
 
     async def _all_done(self):
         state = await self._get_state()
