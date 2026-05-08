@@ -3,6 +3,8 @@
 
 @plugin "tailwind-scrollbar";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 .label {
   position: relative;
   display: inline-flex;

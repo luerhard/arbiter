@@ -11,6 +11,15 @@
     <meta name="keywords" content="annotation label labeling text collaborative" />
     <meta name="description" content="Text Annotation Tool" />
     <meta name="author" content="Lukas Erhard" />
+    <script>
+      (function () {
+        var stored = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
     {% vite_hmr_client %}
     {% vite_asset 'static/js/main.js' %}
   </head>
