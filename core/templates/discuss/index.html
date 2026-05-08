@@ -90,6 +90,22 @@
             <c-discuss.chat />
             <div id="chat-bottom"></div>
           </div>
+          <div
+            x-data
+            class="px-3 h-6 flex items-center gap-1 text-xs italic text-gray-500 dark:text-gray-400 border-x border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50"
+          >
+            <template x-if="$store.typing_user">
+              <span class="flex items-center gap-1">
+                <span x-text="$store.typing_user"></span>
+                <span>is typing</span>
+                <span class="inline-flex gap-0.5 ml-0.5">
+                  <span class="w-1 h-1 bg-current rounded-full animate-bounce" style="animation-delay: 0ms"></span>
+                  <span class="w-1 h-1 bg-current rounded-full animate-bounce" style="animation-delay: 150ms"></span>
+                  <span class="w-1 h-1 bg-current rounded-full animate-bounce" style="animation-delay: 300ms"></span>
+                </span>
+              </span>
+            </template>
+          </div>
           {% comment %}
           send button and htmx logic
           {% endcomment %}
@@ -232,6 +248,25 @@
       ratio: 0,
     });
     Alpine.store('codebook', false);
+    Alpine.store('typing_user', null);
+  });
+
+  let chatSocket = null;
+  let typingSent = false;
+  let typingSendTimer = null;
+  let typingClearTimer = null;
+
+  function sendTyping(isTyping) {
+    if (!chatSocket) return;
+    try {
+      chatSocket.send(JSON.stringify({ typing: isTyping }));
+    } catch (e) {
+      console.warn('typing send failed', e);
+    }
+  }
+
+  document.body.addEventListener('htmx:wsOpen', function (event) {
+    chatSocket = event.detail.socketWrapper;
   });
 
   const diff_codebook_trigger = new Event('diffCodebookTrigger');
@@ -275,6 +310,29 @@
       }, 500);
     });
 
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+      messageInput.addEventListener('input', function () {
+        if (messageInput.value.trim() === '') {
+          if (typingSent) {
+            sendTyping(false);
+            typingSent = false;
+          }
+          clearTimeout(typingSendTimer);
+          return;
+        }
+        if (!typingSent) {
+          sendTyping(true);
+          typingSent = true;
+        }
+        clearTimeout(typingSendTimer);
+        typingSendTimer = setTimeout(() => {
+          sendTyping(false);
+          typingSent = false;
+        }, 2500);
+      });
+    }
+
     bottom_el = document.getElementById('chat-bottom');
     scrollToBottom = (element = bottom_el) => {
       window.setTimeout(() => {
@@ -311,6 +369,22 @@
   document.body.addEventListener('htmx:wsAfterMessage', function (event) {
     // parse JSON data to object
     const data = JSON.parse(event.detail.message);
+
+    if ('typing' in data) {
+      const t = data.typing;
+      if (t.typing) {
+        Alpine.store('typing_user', t.user);
+        clearTimeout(typingClearTimer);
+        typingClearTimer = setTimeout(() => {
+          Alpine.store('typing_user', null);
+        }, 5000);
+      } else if (Alpine.store('typing_user') === t.user) {
+        Alpine.store('typing_user', null);
+        clearTimeout(typingClearTimer);
+      }
+      return;
+    }
+
     console.log('WebSocket Message Received: ', data);
 
     if ('done' in data) {
@@ -413,6 +487,12 @@
     const inputField = document.getElementById('message-input');
     if (inputField) {
       inputField.value = ''; // Clear the input field
+    }
+
+    if ('message' in data && typingSent) {
+      sendTyping(false);
+      typingSent = false;
+      clearTimeout(typingSendTimer);
     }
 
     if ('clicked-done' in data) {
