@@ -300,3 +300,42 @@ def test_discuss_two_users_save_discussion_decisions(
     assert assignment2.done is not None
     assert list(assignment1.annotations.values_list("label_id", flat=True)) == [label1.id]
     assert list(assignment2.annotations.values_list("label_id", flat=True)) == [label2.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_typing_event_broadcast(redis_test_state, discussion_with_disagreement):
+    user1, user2, batch, *_ = discussion_with_disagreement
+
+    async def run():
+        comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm1.scope["user"] = user1
+        connected, _ = await comm1.connect()
+        assert connected is True
+        await comm1.receive_json_from()
+
+        comm2 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm2.scope["user"] = user2
+        connected, _ = await comm2.connect()
+        assert connected is True
+
+        # Both users receive a state after the second user joins.
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        # user1 starts typing -> user2 sees it, user1 does not.
+        await comm1.send_json_to({"typing": True})
+        msg = await comm2.receive_json_from()
+        assert msg == {"typing": {"user": user1.username, "typing": True}}
+        assert await comm1.receive_nothing(timeout=0.2)
+
+        # user1 stops typing -> user2 sees the stop event.
+        await comm1.send_json_to({"typing": False})
+        msg = await comm2.receive_json_from()
+        assert msg == {"typing": {"user": user1.username, "typing": False}}
+        assert await comm1.receive_nothing(timeout=0.2)
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
