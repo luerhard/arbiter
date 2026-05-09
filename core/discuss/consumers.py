@@ -99,6 +99,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # send to all users
             await self.group_send_state()
 
+        elif "typing" in data.keys():
+            await self.channel_layer.group_send(  # type: ignore
+                self.room_group_name,
+                {
+                    "type": "chat_typing",
+                    "user": self.username,
+                    "typing": bool(data["typing"]),
+                },
+            )
+
         elif "clicked-done" in data.keys():
             labels = list(data["labels"])
 
@@ -263,6 +273,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(
             text_data=json.dumps(
                 {"state": event["state"], "user": self.username},
+                ensure_ascii=False,
+            ),
+        )
+
+    async def chat_typing(self, event):
+        if event["user"] == self.username:
+            return
+        await self.send(
+            text_data=json.dumps(
+                {"typing": {"user": event["user"], "typing": event["typing"]}},
                 ensure_ascii=False,
             ),
         )
