@@ -56,7 +56,7 @@ window.Coloris({
   ],
 });
 
-import { navBlock, labelButton } from "./annotation.js";
+import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import * as ui from "./ui.js";
 import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
@@ -71,6 +71,7 @@ window.lib.expert = expert;
 
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
+Alpine.data("skipAnnotatedToggle", skipAnnotatedToggle);
 Alpine.start();
 
 // Debugging

@@ -32,22 +32,47 @@ def get_progress(user, batch):
     return {"done": done, "total": total, "current": current}
 
 
-def _annotation_panel_context(batch, assignment):
-    prev_assignment = assignment.previous()
-    next_assignment = assignment.next()
+def _next_unfinished_with_wraparound(assignment):
+    nxt = assignment.next(skip_annotated=True)
+    if nxt is not None:
+        return nxt
+    return (
+        ExampleAssignment.objects.filter(
+            batch=assignment.batch,
+            user=assignment.user,
+            phase=assignment.phase,
+            done__isnull=True,
+        )
+        .exclude(id=assignment.id)
+        .order_by("order")
+        .first()
+    )
+
+
+def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
+    prev_assignment = assignment.previous(skip_annotated=skip_annotated)
+    next_assignment = assignment.next(skip_annotated=skip_annotated)
+    qs = "?skip_annotated=1" if skip_annotated else ""
 
     context = {
         "batch": batch,
         "assignment_id": assignment.id,
         "example": assignment.example,
         "label_form": MultiLabelForm(assignment=assignment),
+        "skip_annotated": skip_annotated,
         "has_prev": bool(prev_assignment),
         "has_next": bool(next_assignment),
+        "post_url": reverse(
+            "annotate-assignment",
+            kwargs={"batch_id": batch.id, "assignment_id": assignment.id},
+        )
+        + qs,
         "prev_url": (
             reverse(
                 "annotate-assignment",
                 kwargs={"batch_id": batch.id, "assignment_id": prev_assignment.id},
             )
+            + qs
             if prev_assignment
             else ""
         ),
@@ -56,6 +81,7 @@ def _annotation_panel_context(batch, assignment):
                 "annotate-assignment",
                 kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
             )
+            + qs
             if next_assignment
             else ""
         ),
@@ -81,7 +107,8 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         return assignment
 
     def _render_assignment(self, request, batch: Batch, assignment: ExampleAssignment):
-        context = _annotation_panel_context(batch, assignment)
+        skip_annotated = request.GET.get("skip_annotated") == "1"
+        context = _annotation_panel_context(batch, assignment, skip_annotated=skip_annotated)
         context["progress"] = get_progress(request.user, batch)
 
         if context["has_next"] and context["progress"]["done"] >= context["progress"]["total"]:
@@ -110,6 +137,19 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 assignment = self._get_assignment(request, batch, assignment_id)
             except PermissionError:
                 return HttpResponseForbidden()
+
+            skip_annotated = request.GET.get("skip_annotated") == "1"
+            if skip_annotated and assignment.done is not None:
+                target = _next_unfinished_with_wraparound(assignment)
+                if target is None:
+                    return redirect("annotate-done", batch_id=batch.id)
+                return redirect(
+                    reverse(
+                        "annotate-assignment",
+                        kwargs={"batch_id": batch.id, "assignment_id": target.id},
+                    )
+                    + "?skip_annotated=1",
+                )
         else:
             assignment = (
                 ExampleAssignment.objects.filter(
@@ -146,22 +186,30 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         else:
             messages.error(request, f"Something was invalid: {form}")
 
+        skip_annotated = request.GET.get("skip_annotated") == "1"
         progress = get_progress(request.user, batch)
-        next_assignment = assignment.next()
+        if skip_annotated:
+            next_assignment = _next_unfinished_with_wraparound(assignment)
+        else:
+            next_assignment = assignment.next()
         if not next_assignment and progress["done"] >= progress["total"]:
             return redirect("annotate-done", batch_id=batch.id)
 
-        context = _annotation_panel_context(batch, next_assignment)
+        context = _annotation_panel_context(batch, next_assignment, skip_annotated=skip_annotated)
         context["progress"] = progress
+
+        push_url = reverse(
+            "annotate-assignment",
+            kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
+        )
+        if skip_annotated:
+            push_url += "?skip_annotated=1"
 
         if request.htmx:
             resp = render(request, "annotation/panel.html", context, status=200)
-            resp["HX-Push-Url"] = reverse(
-                "annotate-assignment",
-                kwargs={"batch_id": batch.id, "assignment_id": next_assignment.id},
-            )
+            resp["HX-Push-Url"] = push_url
             return resp
-        return redirect("annotate-assignment", batch_id=batch.id, assignment_id=next_assignment.id)
+        return redirect(push_url)
 
 
 class AnnotationDoneView(AnnotatorRequiredMixin, View):

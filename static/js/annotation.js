@@ -39,6 +39,21 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
   };
 }
 
+export function skipAnnotatedToggle() {
+  return {
+    on: new URLSearchParams(window.location.search).get("skip_annotated") === "1",
+    toggle() {
+      const url = new URL(window.location.href);
+      if (this.on) {
+        url.searchParams.delete("skip_annotated");
+      } else {
+        url.searchParams.set("skip_annotated", "1");
+      }
+      window.location.href = url.toString();
+    },
+  };
+}
+
 export function labelButton({ id, hotkey, disabled }) {
   const isDisabled = (value) => {
     if (typeof value === "boolean") return value;

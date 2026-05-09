@@ -1,13 +1,25 @@
 {% extends "base.html" %}
 {% load markdownify %}
 {% block content %}
-<div class="px-4 py-5 sm:px-6">
+<div class="flex items-center gap-2 px-4 py-5 sm:px-6">
   <button
     command="show-modal"
     commandfor="drawer"
     class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20"
   >
     Open Codebook
+  </button>
+  <button
+    type="button"
+    id="skip-annotated-toggle"
+    x-data="skipAnnotatedToggle()"
+    @click="toggle()"
+    :aria-pressed="on ? 'true' : 'false'"
+    :class="on
+      ? 'rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400'
+      : 'rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20'"
+  >
+    Hide finished
   </button>
   <c-drawer id="drawer" title="Codebook">
     {{ codebook.content|markdownify }}

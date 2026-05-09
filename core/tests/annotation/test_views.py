@@ -308,3 +308,200 @@ class TestEditAssignmentView:
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
         assert self.assignment.annotations.count() == 0
+
+
+@pytest.mark.django_db
+class TestSkipAnnotatedToggle:
+    @pytest.fixture(autouse=True)
+    def _setup(self, client):
+        self.user = _first_annotator_user()
+        self.batch_id = _first_annotation_batch_for_user(self.user)
+        _ensure_batch_unfinished_for_user(self.batch_id, self.user)
+
+        self.assignments = list(
+            ExampleAssignment.objects.filter(
+                user=self.user,
+                example__batch_id=self.batch_id,
+                phase=BatchPhase.ANNOTATION,
+            ).order_by("order"),
+        )
+        while len(self.assignments) < 3:
+            _ensure_next_assignment_exists(self.assignments[-1])
+            self.assignments = list(
+                ExampleAssignment.objects.filter(
+                    user=self.user,
+                    example__batch_id=self.batch_id,
+                    phase=BatchPhase.ANNOTATION,
+                ).order_by("order"),
+            )
+
+        login = client.login(username=self.user.username, password="123")
+        assert login is True
+
+    def _url(self, assignment, qs=""):
+        return reverse("annotate-assignment", args=(self.batch_id, assignment.id)) + qs
+
+    def test_toggle_button_present_when_off(self, client):
+        first = self.assignments[0]
+        resp = client.get(self._url(first))
+        assert resp.status_code == 200
+        assert resp.context["skip_annotated"] is False
+        assert b'id="skip-annotated-toggle"' in resp.content
+        assert b'x-data="skipAnnotatedToggle()"' in resp.content
+        assert b"Hide finished" in resp.content
+
+    def test_toggle_button_present_when_on(self, client):
+        first = self.assignments[0]
+        resp = client.get(self._url(first, "?skip_annotated=1"))
+        assert resp.status_code == 200
+        assert resp.context["skip_annotated"] is True
+        assert b'id="skip-annotated-toggle"' in resp.content
+        assert b"Hide finished" in resp.content
+
+    def test_get_redirects_to_next_unfinished_when_landing_on_done_with_skip(self, client):
+        # Simulates the bug: user finished item 0, navigated back to it, then
+        # toggled "Hide finished". Landing on a done assignment with skip on
+        # should jump them to the next unfinished example.
+        first, second = self.assignments[0], self.assignments[1]
+        first.done = timezone.now()
+        first.save()
+
+        resp = client.get(self._url(first, "?skip_annotated=1"))
+        assert resp.status_code == 302
+        assert resp.url == self._url(second, "?skip_annotated=1")
+
+    def test_get_with_skip_on_done_wraps_around_to_earlier_unfinished(self, client):
+        # User toggled skip on while viewing the LAST assignment, which is done.
+        # No unfinished after it, so wrap around to the first unfinished one.
+        last = self.assignments[-1]
+        first = self.assignments[0]
+        for idx, a in enumerate(self.assignments):
+            a.done = None if idx == 0 else timezone.now()
+            a.save()
+
+        resp = client.get(self._url(last, "?skip_annotated=1"))
+        assert resp.status_code == 302
+        assert resp.url == self._url(first, "?skip_annotated=1")
+
+    def test_get_with_skip_on_done_redirects_done_when_nothing_unfinished(self, client):
+        first = self.assignments[0]
+        for a in self.assignments:
+            a.done = timezone.now()
+            a.save()
+
+        resp = client.get(self._url(first, "?skip_annotated=1"))
+        assert resp.status_code == 302
+        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_get_without_skip_renders_done_assignment(self, client):
+        # Without skip on, viewing a done assignment is a valid review action and
+        # should NOT redirect.
+        first = self.assignments[0]
+        first.done = timezone.now()
+        first.save()
+
+        resp = client.get(self._url(first))
+        assert resp.status_code == 200
+        assert resp.context["assignment_id"] == first.id
+
+    def test_navigation_urls_carry_param_when_toggle_on(self, client):
+        first = self.assignments[0]
+        second = self.assignments[1]
+        resp = client.get(self._url(first, "?skip_annotated=1"))
+        assert resp.status_code == 200
+        assert resp.context["next_url"] == self._url(second, "?skip_annotated=1")
+        assert resp.context["post_url"] == self._url(first, "?skip_annotated=1")
+        assert f'hx-post="{self._url(first, "?skip_annotated=1")}"'.encode() in resp.content
+
+    def test_navigation_urls_have_no_param_when_toggle_off(self, client):
+        first = self.assignments[0]
+        second = self.assignments[1]
+        resp = client.get(self._url(first))
+        assert resp.status_code == 200
+        assert resp.context["next_url"] == self._url(second)
+        assert resp.context["post_url"] == self._url(first)
+
+    def test_next_url_skips_annotated_examples_when_on(self, client):
+        first, second, third = self.assignments[0], self.assignments[1], self.assignments[2]
+        second.done = timezone.now()
+        second.save()
+
+        resp = client.get(self._url(first, "?skip_annotated=1"))
+        assert resp.status_code == 200
+        assert resp.context["next_url"] == self._url(third, "?skip_annotated=1")
+
+    def test_next_url_does_not_skip_when_off(self, client):
+        first, second = self.assignments[0], self.assignments[1]
+        second.done = timezone.now()
+        second.save()
+
+        resp = client.get(self._url(first))
+        assert resp.status_code == 200
+        assert resp.context["next_url"] == self._url(second)
+
+    def test_prev_url_skips_annotated_examples_when_on(self, client):
+        first, second, third = self.assignments[0], self.assignments[1], self.assignments[2]
+        second.done = timezone.now()
+        second.save()
+
+        resp = client.get(self._url(third, "?skip_annotated=1"))
+        assert resp.status_code == 200
+        assert resp.context["prev_url"] == self._url(first, "?skip_annotated=1")
+
+    def test_post_with_skip_advances_and_pushes_url_with_param(self, client):
+        first, second = self.assignments[0], self.assignments[1]
+        labels = Label.objects.filter(project=first.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(
+            self._url(first, "?skip_annotated=1"),
+            data={"labels": label_ids},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 200
+        assert resp.headers["HX-Push-Url"] == self._url(second, "?skip_annotated=1")
+
+    def test_post_with_skip_wraps_around_to_earlier_unfinished(self, client):
+        # Only the first and the second-to-last assignments stay unfinished. After the
+        # user POSTs the second-to-last, there is nothing unfinished AFTER it, so the
+        # view should wrap around to the first unfinished assignment in the batch.
+        wrap_target_idx = 0
+        post_idx = len(self.assignments) - 2
+        for idx, a in enumerate(self.assignments):
+            a.done = None if idx in {wrap_target_idx, post_idx} else timezone.now()
+            a.save()
+
+        wrap_target = self.assignments[wrap_target_idx]
+        current = self.assignments[post_idx]
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(
+            self._url(current, "?skip_annotated=1"),
+            data={"labels": label_ids},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 200
+        assert resp.headers["HX-Push-Url"] == self._url(wrap_target, "?skip_annotated=1")
+
+    def test_post_without_skip_does_not_wrap_and_redirects_done_when_complete(self, client):
+        # All assignments done except the current one. A plain POST (no skip) should
+        # finalize the batch and redirect to the done page rather than wrapping around.
+        current = self.assignments[-1]
+        for a in self.assignments:
+            if a.id == current.id:
+                a.done = None
+            else:
+                a.done = timezone.now()
+            a.save()
+
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(
+            self._url(current),
+            data={"labels": label_ids},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 302
+        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
