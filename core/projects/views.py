@@ -343,7 +343,9 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
             batch.set_phase(new.current_phase)
             phase = batch.get_current_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
-            return HttpResponse(status=204)
+            response = HttpResponse(status=204)
+            response["HX-Refresh"] = "true"
+            return response
         else:
             msg = "invalid form"
             raise Exception(msg)
