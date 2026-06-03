@@ -352,6 +352,17 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
             raise Exception(msg)
 
 
+class DeleteBatch(ExpertRequiredMixin, View):
+    def post(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
+        batch = get_object_or_404(Batch, id=batch_id)
+        batch_number = batch.batch_number
+        batch.delete()
+        messages.success(request, f"Batch {batch_number} deleted.")
+        response = HttpResponse(status=204)
+        response["HX-Refresh"] = "true"
+        return response
+
+
 def _generate_batch_data(batch):
     annotators = batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
     experts = batch.assignees(role=ProjectRole.EXPERT).order_by("username")

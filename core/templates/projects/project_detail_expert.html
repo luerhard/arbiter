@@ -119,6 +119,19 @@
                   Resolve ({{ batch.expert_dec}}/{{ batch.disc_disagreement }})</c-button.primary
                 >
                 {% endif %}
+                <form
+                  hx-post="{% url 'delete-batch' batch_id=batch.batch.id %}"
+                  hx-confirm="Delete Batch {{ batch.batch.batch_number }}? This permanently removes all of its examples, annotations and discussions."
+                  hx-swap="none"
+                >
+                  {% csrf_token %}
+                  <button
+                    type="submit"
+                    class="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-600 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700"
+                  >
+                    Delete
+                  </button>
+                </form>
               </td>
             </tr>
             {% endfor %}
