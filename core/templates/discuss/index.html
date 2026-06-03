@@ -298,7 +298,7 @@
     codebook_open.addEventListener('click', function () {
       codebook_toggle.click();
       new_window = window.open(
-        '/codebook/view/{{ batch_id }}',
+        '/codebook/view/{{ codebook.pk }}',
         'Codebook Pop-up',
         'popup,left=100,top=100,width=700,height=1000',
       );
