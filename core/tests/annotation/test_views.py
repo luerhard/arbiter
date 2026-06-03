@@ -7,6 +7,7 @@ from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import BatchPhase
+from projects.models.batch import BatchUser
 from users.models import User
 
 
@@ -173,6 +174,61 @@ class TestAnnotateViews:
         assert resp.status_code == 200
         assert b'id="annotation-panel"' in resp.content
         assert b"<html" not in resp.content
+
+
+@pytest.mark.django_db
+class TestAnnotationDoneFinalize:
+    def _annotate(self, data, label_for_a1, label_for_a2):
+        a1, a2 = data["annotators"]
+        example = data["example"]
+        ExampleAssignment.objects.get(
+            user=a1, example=example, phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([label_for_a1.id])
+        ExampleAssignment.objects.get(
+            user=a2, example=example, phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([label_for_a2.id])
+
+    def test_finalize_ignored_when_not_done(self, client, project_annotation):
+        a1 = project_annotation["annotators"][0]
+        batch = project_annotation["batch"]
+
+        client.login(username=a1.username, password="123")
+        resp = client.post(reverse("annotate-done", args=(batch.id,)))
+
+        assert resp.status_code == 302
+        assert BatchUser.objects.get(batch=batch, user=a1).finalized_at is None
+        batch.refresh_from_db()
+        assert batch.current_phase == BatchPhase.ANNOTATION
+
+    def test_partial_finalize_records_but_does_not_advance(self, client, project_annotation):
+        data = project_annotation
+        a1, a2 = data["annotators"]
+        batch = data["batch"]
+        label1, label2 = data["labels"]
+        self._annotate(data, label1, label2)  # disagreement
+
+        client.login(username=a1.username, password="123")
+        resp = client.post(reverse("annotate-done", args=(batch.id,)))
+
+        assert resp.status_code == 302
+        assert BatchUser.objects.get(batch=batch, user=a1).finalized_at is not None
+        assert BatchUser.objects.get(batch=batch, user=a2).finalized_at is None
+        batch.refresh_from_db()
+        assert batch.current_phase == BatchPhase.ANNOTATION
+
+    def test_full_finalize_advances_to_discussion(self, client, project_annotation):
+        data = project_annotation
+        a1, a2 = data["annotators"]
+        batch = data["batch"]
+        label1, label2 = data["labels"]
+        self._annotate(data, label1, label2)  # disagreement
+
+        for annotator in (a1, a2):
+            client.login(username=annotator.username, password="123")
+            client.post(reverse("annotate-done", args=(batch.id,)))
+
+        batch.refresh_from_db()
+        assert batch.current_phase == BatchPhase.DISCUSSION
 
 
 @pytest.mark.django_db

@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import View
 
@@ -15,6 +16,8 @@ from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
 from projects.models import BatchPhase
+from projects.models import ProjectRole
+from projects.models.batch import BatchUser
 
 log = logging.getLogger(__name__)
 
@@ -219,11 +222,31 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
 
 
 class AnnotationDoneView(AnnotatorRequiredMixin, View):
-    def get(self, request, batch_id):
-        batch = Batch.objects.get(id=batch_id)
-        context = {
+    def _context(self, request, batch):
+        batch_user = BatchUser.objects.filter(batch=batch, user=request.user).first()
+        return {
             "batch": batch,
             "project": batch.project,
             "progress": get_progress(request.user, batch),
+            "finalized": batch_user is not None and batch_user.finalized_at is not None,
+            "finalized_count": BatchUser.objects.filter(
+                batch=batch, role=ProjectRole.ANNOTATOR, finalized_at__isnull=False,
+            ).count(),
+            "annotator_count": batch.assignees(role=ProjectRole.ANNOTATOR).count(),
+            "phase_advanced": batch.current_phase != BatchPhase.ANNOTATION,
         }
-        return render(request, "annotation/done.html", context)
+
+    def get(self, request, batch_id):
+        batch = Batch.objects.get(id=batch_id)
+        return render(request, "annotation/done.html", self._context(request, batch))
+
+    def post(self, request, batch_id):
+        batch = Batch.objects.get(id=batch_id)
+        progress = get_progress(request.user, batch)
+        done = progress["done"] >= progress["total"]
+        if done and batch.current_phase == BatchPhase.ANNOTATION:
+            BatchUser.objects.filter(
+                batch=batch, user=request.user, finalized_at__isnull=True,
+            ).update(finalized_at=timezone.now())
+            batch.advance_from_annotation_if_finalized()
+        return redirect("annotate-done", batch_id=batch.id)

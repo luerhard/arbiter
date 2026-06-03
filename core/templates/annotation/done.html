@@ -15,9 +15,27 @@
         /
         {{ progress.total }}
       </p>
+      {% if phase_advanced %}
+      <p class="mt-4 text-sm font-medium text-green-700 dark:text-green-400">
+        This batch has moved on to the next phase. Thanks for your work!
+      </p>
+      {% elif finalized %}
+      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
+        You have finalized your annotations. Waiting for the other annotators ({{ finalized_count }}/{{ annotator_count }}
+        finalized).
+      </p>
+      {% endif %}
     </div>
   </div>
   <div class="mt-6 flex flex-wrap gap-3">
+    {% if not phase_advanced and not finalized %}
+    <form method="post" action="{% url 'annotate-done' batch.id %}">
+      {% csrf_token %}
+      <button type="submit" class="rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600">
+        Finalize annotation
+      </button>
+    </form>
+    {% endif %}
     <a
       class="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
       href="{% url 'project-detail-annotator' project.id %}"

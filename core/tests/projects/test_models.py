@@ -2,6 +2,7 @@ from collections import defaultdict
 import uuid
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 import pytest
 
 from data.models import Example
@@ -13,8 +14,13 @@ from projects.models import BatchPhase
 from projects.models import Project
 from projects.models import ProjectRole
 from projects.models import ProjectUser
+from projects.models.batch import BatchUser
 
 User = get_user_model()
+
+
+def _finalize(batch, *users):
+    BatchUser.objects.filter(batch=batch, user__in=users).update(finalized_at=timezone.now())
 
 
 def _create_project_with_batch():
@@ -157,6 +163,79 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
         user=data["expert"],
         batch__batchuser__role=ProjectRole.EXPERT,
     ).exists()
+
+
+@pytest.mark.django_db
+def test_all_annotators_finalized():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    annotator1, annotator2 = data["annotators"]
+
+    assert batch.all_annotators_finalized() is False
+
+    _finalize(batch, annotator1)
+    assert batch.all_annotators_finalized() is False
+
+    _finalize(batch, annotator2)
+    assert batch.all_annotators_finalized() is True
+
+
+@pytest.mark.django_db
+def test_advance_no_op_when_not_all_finalized():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    annotator1, _ = data["annotators"]
+
+    _finalize(batch, annotator1)
+    assert batch.advance_from_annotation_if_finalized() is None
+    assert batch.current_phase == BatchPhase.ANNOTATION
+
+
+@pytest.mark.django_db
+def test_advance_to_discussion_when_disagreements_exist():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    annotator1, annotator2 = data["annotators"]
+
+    _finalize(batch, annotator1, annotator2)
+    result = batch.advance_from_annotation_if_finalized()
+
+    assert result == BatchPhase.DISCUSSION
+    assert batch.current_phase == BatchPhase.DISCUSSION
+
+
+@pytest.mark.django_db
+def test_advance_to_final_when_no_disagreements():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1 = data["examples"][0]
+    label1 = data["labels"][0]
+    annotator1, annotator2 = data["annotators"]
+
+    # remove the only disagreement so both annotators agree on every example
+    a12 = ExampleAssignment.objects.get(example=ex1, user=annotator2)
+    a12.annotations.all().delete()
+    Annotation.objects.create(assignment=a12, label=label1)
+    assert batch.disagreements(BatchPhase.ANNOTATION).count() == 0
+
+    _finalize(batch, annotator1, annotator2)
+    result = batch.advance_from_annotation_if_finalized()
+
+    assert result == BatchPhase.FINAL
+    assert batch.current_phase == BatchPhase.FINAL
+
+
+@pytest.mark.django_db
+def test_advance_no_op_when_not_in_annotation_phase():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    annotator1, annotator2 = data["annotators"]
+    batch.current_phase = BatchPhase.DISCUSSION
+    batch.save()
+
+    _finalize(batch, annotator1, annotator2)
+    assert batch.advance_from_annotation_if_finalized() is None
+    assert batch.current_phase == BatchPhase.DISCUSSION
 
 
 @pytest.mark.django_db
