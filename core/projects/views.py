@@ -264,7 +264,8 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
             disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
             batch_data["disc_disagreement"] = disc_disagr_ex.count()
             batch_data["expert_dec"] = disc_disagr_ex.filter(
-                assignments__phase=BatchPhase.EXPERT, assignments__done__isnull=False,
+                assignments__phase=BatchPhase.EXPERT,
+                assignments__done__isnull=False,
             ).count()
 
             for annotator in context["annotators"]:
