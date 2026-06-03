@@ -34,6 +34,7 @@ class BatchUser(models.Model):
         choices=ProjectRole,
         db_index=True,
     )
+    finalized_at = models.DateTimeField(null=True, blank=True)
 
 
 class Batch(models.Model):
@@ -105,6 +106,32 @@ class Batch(models.Model):
                 disagreements.append(example_id)
 
         return Example.objects.filter(id__in=disagreements)
+
+    def all_annotators_finalized(self) -> bool:
+        """True if every annotator has confirmed they are done annotating."""
+        annotators = BatchUser.objects.filter(batch=self, role=ProjectRole.ANNOTATOR)
+        if not annotators.exists():
+            return False
+        return not annotators.filter(finalized_at__isnull=True).exists()
+
+    def advance_from_annotation_if_finalized(self) -> "BatchPhase | None":
+        """Advance the batch once all annotators have finalized.
+
+        -> DISCUSSION when disagreements exist, otherwise straight to FINAL.
+        Returns the new phase, or None if nothing changed.
+        """
+        if self.current_phase != BatchPhase.ANNOTATION:
+            return None
+        if not self.all_annotators_finalized():
+            return None
+
+        next_phase = (
+            BatchPhase.DISCUSSION
+            if self.disagreements(BatchPhase.ANNOTATION).exists()
+            else BatchPhase.FINAL
+        )
+        self.set_phase(next_phase)
+        return next_phase
 
     def set_phase(self, phase: BatchPhase):
         self.current_phase = phase
