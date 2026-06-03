@@ -32,6 +32,7 @@ urlpatterns = [
 htmx_patterns = [
     path("htmx/label-row", views.ProjectLabelRowView.as_view(), name="project-label-row"),
     path("edit/<int:batch_id>", views.ChangeBatchPhase.as_view(), name="change-batch-phase"),
+    path("delete/<int:batch_id>", views.DeleteBatch.as_view(), name="delete-batch"),
     path("htmx/user-search", views.HtmxUserSearch.as_view(), name="project-user-search"),
 ]
 

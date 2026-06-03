@@ -220,6 +220,23 @@ class TestViews:
         req = client.post(url, data)
         assert req.status_code == 204
 
+    def test_delete_batch_as_annotator(self, client):
+        url = reverse("delete-batch", args=(1,))
+        login = client.login(username="annotator1", password="123")
+        assert login == True
+        req = client.post(url)
+        assert req.status_code == 403
+        assert Batch.objects.filter(id=1).exists()
+
+    def test_delete_batch_as_expert(self, client):
+        url = reverse("delete-batch", args=(1,))
+        login = client.login(username="expert1", password="123")
+        assert login == True
+        req = client.post(url)
+        assert req.status_code == 204
+        assert req.headers["HX-Refresh"] == "true"
+        assert not Batch.objects.filter(id=1).exists()
+
     def test_redirect_project_detail_expert(self, client):
         url = reverse("project-detail", args=(1,))
         login = client.login(username="expert1", password="123")
@@ -233,6 +250,23 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 302
         assert req.url == reverse("project-detail-annotator", args=(1,))
+
+
+@pytest.mark.django_db
+def test_delete_batch_cascades_related_objects(client, project_annotation):
+    data = project_annotation
+    batch = data["batch"]
+    expert = data["expert"]
+    assert ExampleAssignment.objects.filter(batch=batch).exists()
+
+    login = client.login(username=expert.username, password="123")
+    assert login is True
+
+    resp = client.post(reverse("delete-batch", args=(batch.id,)))
+
+    assert resp.status_code == 204
+    assert not Batch.objects.filter(id=batch.id).exists()
+    assert not ExampleAssignment.objects.filter(batch_id=batch.id).exists()
 
 
 @pytest.mark.django_db
