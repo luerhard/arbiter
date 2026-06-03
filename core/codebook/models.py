@@ -50,6 +50,11 @@ class Codebook(models.Model):
             self.repo.delete_tag(tag)
         self.repo.create_tag(tag)
 
+    def untag_version(self, batch_number: int):
+        tag = f"batch_{batch_number}"
+        if tag in self.repo.tags:
+            self.repo.delete_tag(tag)
+
     def diff(self, old: int, new: int):
         tag_old = f"batch_{old}"
         tag_new = f"batch_{new}"

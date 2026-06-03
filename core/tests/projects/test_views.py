@@ -257,7 +257,10 @@ def test_delete_batch_cascades_related_objects(client, project_annotation):
     data = project_annotation
     batch = data["batch"]
     expert = data["expert"]
+    codebook = data["project"].codebook.get()
+    tag = f"batch_{batch.batch_number}"
     assert ExampleAssignment.objects.filter(batch=batch).exists()
+    assert tag in codebook.repo.tags
 
     login = client.login(username=expert.username, password="123")
     assert login is True
@@ -267,6 +270,7 @@ def test_delete_batch_cascades_related_objects(client, project_annotation):
     assert resp.status_code == 204
     assert not Batch.objects.filter(id=batch.id).exists()
     assert not ExampleAssignment.objects.filter(batch_id=batch.id).exists()
+    assert tag not in codebook.repo.tags
 
 
 @pytest.mark.django_db

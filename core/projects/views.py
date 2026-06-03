@@ -356,6 +356,9 @@ class DeleteBatch(ExpertRequiredMixin, View):
     def post(self, request, batch_id, *args, **kwargs):  # noqa: ARG002
         batch = get_object_or_404(Batch, id=batch_id)
         batch_number = batch.batch_number
+        codebook = batch.project.codebook.first()
+        if codebook is not None:
+            codebook.untag_version(batch_number)
         batch.delete()
         messages.success(request, f"Batch {batch_number} deleted.")
         response = HttpResponse(status=204)
