@@ -22,7 +22,7 @@
     Hide finished
   </button>
   <c-drawer id="drawer" title="Codebook">
-    {{ codebook.content|markdownify }}
+    <c-codebook.view content="{{ codebook.content }}" />
   </c-drawer>
 </div>
 {% include "annotation/panel.html" %}
