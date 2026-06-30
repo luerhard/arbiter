@@ -68,7 +68,10 @@ def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dic
 
 
 def build_dialog_context(
-    batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm,
+    batch: Batch,
+    user: ProjectUser,
+    labels_form: MultiLabelFormExpert,
+    codebook_form: CodebookForm,
 ) -> dict[str, Any]:
     project = batch.project
     context = {
@@ -202,7 +205,11 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         codebook = project.codebook.get()
 
         labels_form = MultiLabelFormExpert(
-            request.POST, codebook=codebook, example=example, user=user, prefix="labels",
+            request.POST,
+            codebook=codebook,
+            example=example,
+            user=user,
+            prefix="labels",
         )
 
         codebook_form = CodebookForm(request.POST, prefix="codebook")
@@ -231,13 +238,17 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         if request.htmx:
             context = build_dialog_context(
-                batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form,
+                batch=batch,
+                user=user,
+                labels_form=labels_form,
+                codebook_form=codebook_form,
             )
             if not forms_are_valid:
                 submitted_labels = request.POST.getlist("selected_labels")
                 context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
                 context["draft_codebook"] = codebook_form.data.get(
-                    codebook_form.add_prefix("content"), context["codebook"].content,
+                    codebook_form.add_prefix("content"),
+                    context["codebook"].content,
                 )
                 context["success"] = False
             return render(request, self.htmx_template_name, context)
