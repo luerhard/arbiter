@@ -10,7 +10,9 @@ from django.views.generic.detail import DetailView
 
 from .forms import MultiLabelFormExpert
 from core.mixins import ExpertRequiredMixin
+from data.models import Example
 from data.models import ExampleAssignment
+from data.models import Label
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
@@ -19,8 +21,54 @@ from projects.models import ProjectUser
 log = logging.getLogger(__name__)
 
 
+def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dict[str, Any]:
+    """Collect the context of an expert decision to embed in the codebook commit."""
+    batch = example.batch
+
+    def labels_by_user(phase: BatchPhase) -> dict[str, list[str]]:
+        assignments = (
+            ExampleAssignment.objects.filter(batch=batch, example=example, phase=phase)
+            .select_related("user")
+            .prefetch_related("annotations__label")
+            .order_by("user__username")
+        )
+        return {
+            assignment.user.username: [
+                annotation.label.name
+                for annotation in assignment.annotations.all()
+                if annotation.label
+            ]
+            for assignment in assignments
+        }
+
+    chat_history = [
+        {
+            "user": message.user,
+            "message": message.message,
+            "created_at": message.created_at.isoformat(),
+        }
+        for message in Message.objects.filter(example=example)
+        .exclude(user="system")
+        .order_by("created_at")
+    ]
+
+    final_decision = list(
+        Label.objects.filter(
+            id__in=[int(i) for i in final_label_ids if str(i).strip()],
+        ).values_list("name", flat=True),
+    )
+
+    return {
+        "text": example.content,
+        "labels_before_discussion": labels_by_user(BatchPhase.ANNOTATION),
+        "labels_after_discussion": labels_by_user(BatchPhase.DISCUSSION),
+        "chat_history": chat_history,
+        "final_decision": final_decision,
+    }
+
+
 def build_dialog_context(
-    batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm
+    batch: Batch, user: ProjectUser, labels_form: MultiLabelFormExpert, codebook_form: CodebookForm,
 ) -> dict[str, Any]:
     project = batch.project
     context = {
@@ -128,7 +176,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 user=self.request.user,
                 labels_form=labels_form,
                 codebook_form=codebook_form,
-            )
+            ),
         )
         return context
 
@@ -154,7 +202,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         codebook = project.codebook.get()
 
         labels_form = MultiLabelFormExpert(
-            request.POST, codebook=codebook, example=example, user=user, prefix="labels"
+            request.POST, codebook=codebook, example=example, user=user, prefix="labels",
         )
 
         codebook_form = CodebookForm(request.POST, prefix="codebook")
@@ -162,7 +210,8 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         forms_are_valid = labels_form.is_valid() and codebook_form.is_valid()
         if forms_are_valid:
             labels_form.save()
-            codebook_form.save(codebook)
+            metadata = build_decision_metadata(example, labels_form.cleaned_data["labels"])
+            codebook_form.save(codebook, metadata=metadata)
             messages.success(request, "Saved.")
         else:
             if labels_form.errors:
@@ -182,13 +231,13 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
 
         if request.htmx:
             context = build_dialog_context(
-                batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form
+                batch=batch, user=user, labels_form=labels_form, codebook_form=codebook_form,
             )
             if not forms_are_valid:
                 submitted_labels = request.POST.getlist("selected_labels")
                 context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
                 context["draft_codebook"] = codebook_form.data.get(
-                    codebook_form.add_prefix("content"), context["codebook"].content
+                    codebook_form.add_prefix("content"), context["codebook"].content,
                 )
                 context["success"] = False
             return render(request, self.htmx_template_name, context)

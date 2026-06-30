@@ -240,3 +240,12 @@ class TestSaveExpertView:
         last_commit = self.codebook.repo.head.commit
         commit_message_data = json.loads(last_commit.message)
         assert commit_message_data["rationale"] == rationale
+
+        # Expert decision context is embedded alongside the rationale.
+        example = self.data["example"]
+        label_names = sorted(label.name for label in self.data["labels"])
+        assert commit_message_data["text"] == example.content
+        assert sorted(commit_message_data["final_decision"]) == label_names
+        assert "labels_before_discussion" in commit_message_data
+        assert "labels_after_discussion" in commit_message_data
+        assert "chat_history" in commit_message_data

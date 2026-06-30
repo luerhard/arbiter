@@ -38,7 +38,7 @@ class CodebookForm(forms.Form):
             self._errors.clear()
         return cleaned_data
 
-    def save(self, codebook):
+    def save(self, codebook, metadata=None):
         if not self.cleaned_data["modified"]:
             return
 
@@ -48,6 +48,8 @@ class CodebookForm(forms.Form):
         commit_info = {
             "rationale": rationale,
         }
+        if metadata:
+            commit_info.update(metadata)
         commit_message = json.dumps(commit_info, ensure_ascii=False)
         if content:
             codebook.save(content=content, commit_message=commit_message)
