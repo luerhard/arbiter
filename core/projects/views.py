@@ -246,7 +246,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         context["codebook"] = project.codebook.get()
 
         # get associated batches
-        batches = project.batches.all()
+        batches = project.batches.order_by("-batch_number")
         context["batches"] = []
         for batch in batches:
             batch_data = {
@@ -318,7 +318,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
                 BatchPhase.DISCUSSION,
                 BatchPhase.EXPERT,
             ],
-        )
+        ).order_by("-batch_number")
         for batch in batches:
             batch_data = {
                 "batch": batch,
