@@ -1,12 +1,18 @@
+import io
 import logging
+import zipfile
 
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
+from django.utils.text import slugify
+from django.views.generic import View
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import UpdateView
 
 from .forms import CodebookForm
 from .models import Codebook
+from core import settings
 from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from projects.models import ProjectUser
@@ -64,3 +70,22 @@ class CodebookUpdateView(ExpertRequiredMixin, UpdateView):
     def form_valid(self, form):
         form.save(codebook=self.object)
         return redirect(self.object.get_absolute_url())
+
+
+class CodebookExportView(ExpertRequiredMixin, View):
+    pk_url_kwarg = "codebook_id"
+
+    def get(self, request, codebook_id, *args, **kwargs):
+        codebook = get_object_or_404(Codebook, pk=codebook_id)
+        repo_dir = settings.CODEBOOKS_ROOT / codebook.git_dir
+
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as zf:
+            for path in repo_dir.rglob("*"):
+                if path.is_file():
+                    zf.write(path, path.relative_to(repo_dir))
+
+        response = HttpResponse(buffer.getvalue(), content_type="application/zip")
+        safe_name = slugify(codebook.project.name)
+        response["Content-Disposition"] = f"attachment; filename=codebook_{safe_name}.zip"
+        return response

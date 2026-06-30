@@ -10,4 +10,5 @@ urlpatterns = [
         name="codebook-diff",
     ),
     path("edit/<int:codebook_id>", views.CodebookUpdateView.as_view(), name="codebook-edit"),
+    path("export/<int:codebook_id>", views.CodebookExportView.as_view(), name="codebook-export"),
 ]
