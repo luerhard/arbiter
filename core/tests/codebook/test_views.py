@@ -1,3 +1,6 @@
+import io
+import zipfile
+
 from codebook.models import Codebook
 from django.urls import reverse
 import pytest
@@ -74,6 +77,35 @@ class TestViews:
 
         codebook.refresh_from_db()
         assert codebook.content == new_content + "\n"
+
+    def test_codebook_export_not_logged_in(self, client):
+        url = reverse("codebook-export", args=(1,))
+        req = client.get(url)
+        assert req.status_code == 302
+
+    def test_codebook_export_annotator_access_denied(self, client):
+        url = reverse("codebook-export", args=(1,))
+        login = client.login(username="annotator1", password="123")
+        assert login is True
+        req = client.get(url)
+        assert req.status_code == 403
+
+    def test_codebook_export_as_expert(self, client):
+        url = reverse("codebook-export", args=(1,))
+        login = client.login(username="expert1", password="123")
+        assert login is True
+        req = client.get(url)
+
+        assert req.status_code == 200
+        assert req["Content-Type"] == "application/zip"
+        assert "attachment" in req["Content-Disposition"]
+        assert req["Content-Disposition"].endswith(".zip")
+
+        with zipfile.ZipFile(io.BytesIO(req.content)) as zf:
+            assert zf.testzip() is None
+            names = zf.namelist()
+            assert "main.md" in names
+            assert any(name.startswith(".git/") for name in names)
 
     def test_get_as_context(self, client, project_setup):
         login = client.login(username="expert1", password="123")
