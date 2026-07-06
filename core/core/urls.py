@@ -32,6 +32,7 @@ urlpatterns = [
     path("codebook/", include("codebook.urls")),
     path("expert/", include("expert.urls")),
     path("data/", include("data.urls")),
+    path("notifications/", include("notifications.urls")),
 ]
 
 # Additional settings for development

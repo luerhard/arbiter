@@ -44,6 +44,15 @@
     </div>
     <c-toasts>
       {% for message in messages %}<c-toasts.toast :tags="message.tags" , :message="message.message" />{% endfor %}
+      {% if user.is_authenticated %}
+      <div
+        id="notification-stack"
+        class="contents"
+        hx-get="{% url 'notifications-unread' %}"
+        hx-trigger="load, every 15s"
+        hx-swap="innerHTML"
+      ></div>
+      {% endif %}
     </c-toasts>
   </body>
 </html>

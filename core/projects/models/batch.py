@@ -174,6 +174,7 @@ class Batch(models.Model):
         return next_batch
 
     def set_phase(self, phase: BatchPhase):
+        old_phase = self.current_phase
         self.current_phase = phase
 
         if self.current_phase == BatchPhase.ANNOTATION:
@@ -182,6 +183,23 @@ class Batch(models.Model):
 
         self._create_example_assignments(phase=phase)
         self.save()
+
+        if old_phase != phase:
+            self._notify_phase_change(phase)
+
+    def _notify_phase_change(self, phase: BatchPhase):
+        """Create an unread notification for every batch user; the polling UI
+        shows them as persistent toasts until marked as read."""
+        Notification = apps.get_model("notifications", "Notification")  # noqa: N806
+        label = BatchPhase(phase).label
+        message = (
+            f"Batch {self.batch_number} of project "
+            f"'{self.project.name}' moved to phase {label}."
+        )
+        Notification.objects.bulk_create(
+            Notification(user=user, batch=self, message=message)
+            for user in self.users.all().distinct()
+        )
 
     def _create_example_assignments(self, phase: BatchPhase):
         ExampleAssignment = apps.get_model("data", "ExampleAssignment")
