@@ -304,6 +304,66 @@ def test_discuss_two_users_save_discussion_decisions(
 
 @pytest.mark.django_db(transaction=True)
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_saves_multiple_and_zero_labels(redis_test_state, discussion_with_disagreement):
+    # One user finalizes with ALL labels, the other with NO labels. Both are
+    # valid multi-label outcomes (zero labels == "non-offensive") and must be
+    # persisted exactly as sent.
+    user1, user2, batch, example, labels = discussion_with_disagreement
+    label1, label2 = labels
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm1.scope["user"] = user1
+        connected, _ = await comm1.connect()
+        assert connected is True
+        await comm1.receive_json_from()
+
+        comm2 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm2.scope["user"] = user2
+        connected, _ = await comm2.connect()
+        assert connected is True
+
+        # Both users receive a state after second user joins.
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm1.send_json_to({"clicked-done": True, "labels": [label1.id, label2.id]})
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm2.send_json_to({"clicked-done": True, "labels": []})
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    assignment1 = ExampleAssignment.objects.get(
+        batch=batch,
+        example=example,
+        user=user1,
+        phase=BatchPhase.DISCUSSION,
+    )
+    assignment2 = ExampleAssignment.objects.get(
+        batch=batch,
+        example=example,
+        user=user2,
+        phase=BatchPhase.DISCUSSION,
+    )
+
+    assert assignment1.done is not None
+    assert assignment2.done is not None
+    assert sorted(assignment1.annotations.values_list("label_id", flat=True)) == sorted(
+        [label1.id, label2.id],
+    )
+    assert assignment2.annotations.count() == 0
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_typing_event_broadcast(redis_test_state, discussion_with_disagreement):
     user1, user2, batch, *_ = discussion_with_disagreement
 
