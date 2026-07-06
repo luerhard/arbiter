@@ -104,6 +104,11 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         assignment = get_object_or_404(ExampleAssignment, id=assignment_id)
         if assignment.user != request.user or assignment.example.batch_id != batch.id:
             raise PermissionError
+        # The annotation UI must only ever touch annotation-phase assignments;
+        # saving here against e.g. a discussion assignment would overwrite
+        # labels of a later phase.
+        if assignment.phase != BatchPhase.ANNOTATION:
+            raise PermissionError
         return assignment
 
     def _render_assignment(self, request, batch: Batch, assignment: ExampleAssignment):
@@ -155,6 +160,7 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
                 ExampleAssignment.objects.filter(
                     user=request.user,
                     example__batch=batch,
+                    phase=BatchPhase.ANNOTATION,
                 )
                 .order_by("order")
                 .first()

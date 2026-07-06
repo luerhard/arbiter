@@ -127,7 +127,7 @@ def project_expert(project_discussion):
     ea_a1.set_user_annotations(label_ids=[label1.id])
     ea_a2 = (
         ExampleAssignment.objects.from_project(project=project)
-        .filter(user=a1, example=example, phase=BatchPhase.DISCUSSION)
+        .filter(user=a2, example=example, phase=BatchPhase.DISCUSSION)
         .first()
     )
     ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])

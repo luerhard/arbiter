@@ -42,6 +42,19 @@ class TestExpertViews:
         assert response.context["sentence"] == self.data["example"]
         assert response.context["assignment"] == self.assignment
 
+    def test_dialogue_label_checkboxes_use_form_field_name(self):
+        # Regression: the rendered checkboxes must POST under the name the bound
+        # form actually reads (labels_form.labels.html_name). A mismatch here
+        # silently drops every expert label selection.
+        response = self.client.get(self.content_url, HTTP_HX_REQUEST="true")
+        assert response.status_code == 200
+        html_name = response.context["labels_form"]["labels"].html_name
+        content = response.content.decode()
+        for label in self.data["labels"]:
+            assert f'id="label_checkbox_{label.id}"' in content
+        assert f'name="{html_name}"' in content
+        assert 'name="selected_labels"' not in content
+
     def test_expert_dialogue_view_get_as_annotator(self, client):
         login = client.login(username=self.data["annotators"][0].username, password="123")
         assert login is True
@@ -130,7 +143,29 @@ class TestSaveExpertView:
         assert "messages" in trigger
         assert any("Something was invalid" in message["message"] for message in trigger["messages"])
 
+    def test_post_single_label(self):
+        example = self.data["example"]
+        assert not example.has_expert_decision
+        label = self.data["labels"][0]
+
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": [label.id],
+                "codebook-content": "test",
+                "codebook-modified": "false",
+            },
+        )
+
+        assert response.status_code == 302
+        example.refresh_from_db()
+        self.assignment.refresh_from_db()
+        assert example.has_expert_decision
+        assert list(self.assignment.annotations.values_list("label_id", flat=True)) == [label.id]
+
     def test_post_empty_labels_list(self):
+        # Zero labels is a valid expert verdict ("non-offensive" under
+        # multi-label): the decision counts as done but stores no annotations.
         example = self.data["example"]
         response = self.client.post(
             self.url,
@@ -138,7 +173,10 @@ class TestSaveExpertView:
         )
         assert response.status_code == 302
         example.refresh_from_db()
+        self.assignment.refresh_from_db()
         assert example.has_expert_decision
+        assert self.assignment.done is not None
+        assert self.assignment.annotations.count() == 0
 
     def test_post_invalid_label_id(self):
         example = self.data["example"]

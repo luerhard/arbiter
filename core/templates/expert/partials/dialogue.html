@@ -103,7 +103,7 @@
                 hotkey="{{ label.hotkey|default:'' }}"
                 value="{{ label.id }}"
                 id="label_checkbox_{{ label.id }}"
-                name="selected_labels"
+                name="{{ labels_form.labels.html_name }}"
                 checked
               />
               {% else %}
@@ -113,7 +113,7 @@
                 hotkey="{{ label.hotkey|default:'' }}"
                 value="{{ label.id }}"
                 id="label_checkbox_{{ label.id }}"
-                name="selected_labels"
+                name="{{ labels_form.labels.html_name }}"
               />
               {% endif %}
               {% endfor %}

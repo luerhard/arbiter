@@ -165,22 +165,21 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
         context["batch_id"] = self.kwargs.get("batch_id")
         codebook_form = CodebookForm(prefix="codebook")
-        labels_form = None
+        context.update(
+            build_dialog_context(
+                batch=self.object,
+                user=self.request.user,
+                labels_form=None,
+                codebook_form=codebook_form,
+            ),
+        )
         if context.get("sentence"):
-            labels_form = MultiLabelFormExpert(
+            context["labels_form"] = MultiLabelFormExpert(
                 prefix="labels",
                 codebook=context["codebook"],
                 example=context["sentence"],
                 user=self.request.user,
             )
-        context.update(
-            build_dialog_context(
-                batch=self.object,
-                user=self.request.user,
-                labels_form=labels_form,
-                codebook_form=codebook_form,
-            ),
-        )
         return context
 
     def get(self, request, *args, **kwargs):  # noqa: ARG002
@@ -244,7 +243,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 codebook_form=codebook_form,
             )
             if not forms_are_valid:
-                submitted_labels = request.POST.getlist("selected_labels")
+                submitted_labels = request.POST.getlist(labels_form.add_prefix("labels"))
                 context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
                 context["draft_codebook"] = codebook_form.data.get(
                     codebook_form.add_prefix("content"),

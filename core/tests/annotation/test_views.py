@@ -146,6 +146,25 @@ class TestAnnotateViews:
         assert b'disabled="True"' not in content
         assert b':checked="detail.selected"' not in content
 
+    def test_panel_label_checkboxes_use_form_field_name(self, client):
+        # Regression guard (see the expert-phase bug): the rendered checkboxes
+        # must POST under the name the form actually reads, otherwise label
+        # selections are silently dropped.
+        user = _first_annotator_user()
+        batch_id = _first_annotation_batch_for_user(user)
+        _ensure_batch_unfinished_for_user(batch_id, user)
+        assignment = _first_assignment_for_user_in_batch(user, batch_id)
+
+        login = client.login(username=user.username, password="123")
+        assert login is True
+
+        resp = client.get(reverse("annotate-assignment", args=(batch_id, assignment.id)))
+        assert resp.status_code == 200
+        html_name = resp.context["label_form"]["labels"].html_name
+        content = resp.content.decode()
+        labels = Label.objects.filter(project=assignment.example.batch.project)
+        assert content.count(f'name="{html_name}"') >= labels.count()
+
     def test_hx_request_returns_panel_only(self, client):
         user = _first_annotator_user()
         batch_id = _first_annotation_batch_for_user(user)
@@ -229,6 +248,21 @@ class TestEditAssignmentView:
             in resp.content
         )
 
+    def test_post_single_label_saves(self, client):
+        assert self.assignment.annotations.count() == 0
+        label = Label.objects.filter(project=self.assignment.example.batch.project).first()
+
+        resp = client.post(
+            self.url,
+            data={"assignment_id": self.assignment.id, "labels": [label.id]},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 200
+
+        self.assignment.refresh_from_db()
+        assert self.assignment.done is not None
+        assert list(self.assignment.annotations.values_list("label_id", flat=True)) == [label.id]
+
     def test_post_no_labels_clears(self, client):
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
@@ -293,6 +327,53 @@ class TestEditAssignmentView:
         assert resp.status_code == 200
         self.assignment.refresh_from_db()
         assert self.assignment.annotations.count() == 0
+
+    def test_post_to_non_annotation_phase_assignment_forbidden(self, client):
+        # Regression: batch 1 of the populated DB also has DISCUSSION-phase
+        # assignments for this user. The annotation view must never save into
+        # them, otherwise annotation-phase input overwrites discussion labels.
+        discussion_assignment = (
+            ExampleAssignment.objects.filter(
+                user=self.user,
+                example__batch_id=self.batch_id,
+                phase=BatchPhase.DISCUSSION,
+            )
+            .order_by("order")
+            .first()
+        )
+        assert discussion_assignment is not None
+        labels_before = sorted(
+            discussion_assignment.annotations.values_list("label_id", flat=True),
+        )
+
+        label = Label.objects.filter(project=self.assignment.example.batch.project).first()
+        url = reverse(
+            "annotate-assignment",
+            args=(self.batch_id, discussion_assignment.id),
+        )
+        resp = client.post(
+            url,
+            data={"assignment_id": discussion_assignment.id, "labels": [label.id]},
+            HTTP_HX_REQUEST="true",
+        )
+        assert resp.status_code == 403
+
+        discussion_assignment.refresh_from_db()
+        assert (
+            sorted(discussion_assignment.annotations.values_list("label_id", flat=True))
+            == labels_before
+        )
+
+    def test_batch_entry_redirects_to_annotation_phase_assignment(self, client):
+        # Regression: the entry redirect must pick the ANNOTATION-phase
+        # assignment even though a DISCUSSION-phase assignment with the same
+        # order exists in this batch.
+        resp = client.get(reverse("annotate-batch", args=(self.batch_id,)))
+        assert resp.status_code == 302
+        assignment_id = int(resp.url.rstrip("/").split("/")[-1])
+        assignment = ExampleAssignment.objects.get(id=assignment_id)
+        assert assignment.phase == BatchPhase.ANNOTATION
+        assert assignment.user == self.user
 
     def test_post_wrong_parameter_name_clears(self, client):
         labels = Label.objects.filter(project=self.assignment.example.batch.project)

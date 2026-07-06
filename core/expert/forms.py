@@ -29,4 +29,17 @@ class MultiLabelFormExpert(forms.Form):
     def save(self):
         data = self.cleaned_data
         labels = [int(i) for i in data["labels"] if i.strip()]
+        if labels:
+            log.info(
+                "Expert decision saved: example=%s user=%s labels=%s",
+                self.example.id,
+                self.user.username,
+                labels,
+            )
+        else:
+            log.info(
+                "Expert decision saved with no labels (non-offensive): example=%s user=%s",
+                self.example.id,
+                self.user.username,
+            )
         self.assignment.set_user_annotations(label_ids=labels)
