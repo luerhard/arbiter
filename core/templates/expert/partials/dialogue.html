@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div id="expert-dialogue" class="container mx-auto mt-4 px-4">
   {% if not assignment %}
   <div
@@ -94,28 +95,17 @@
         >
           <div class="px-4 py-2 font-semibold">Select Labels for Sentence</div>
           <div class="p-4">
-            <div class="flex flex-wrap gap-2" name="{{ labels_form.labels.html_name }}">
-              {% for label in labels %}
-              {% if label.id in prev_label_ids %}
+            <div class="flex flex-wrap gap-2">
+              {% for checkbox, detail in labels_form.labels|zip_lists:labels_form.label_details %}
               <c-label
-                text="{{ label.name }}"
-                color="{{ label.color }}"
-                hotkey="{{ label.hotkey|default:'' }}"
-                value="{{ label.id }}"
-                id="label_checkbox_{{ label.id }}"
-                name="{{ labels_form.labels.html_name }}"
-                checked
+                id="{{ checkbox.id_for_label }}"
+                value="{{ checkbox.data.value }}"
+                text="{{ checkbox.choice_label }}"
+                color="{{ detail.color }}"
+                hotkey="{{ detail.hotkey|default:'' }}"
+                name="{{ checkbox.data.name }}"
+                :checked="checkbox.data.selected"
               />
-              {% else %}
-              <c-label
-                text="{{ label.name }}"
-                color="{{ label.color }}"
-                hotkey="{{ label.hotkey|default:'' }}"
-                value="{{ label.id }}"
-                id="label_checkbox_{{ label.id }}"
-                name="{{ labels_form.labels.html_name }}"
-              />
-              {% endif %}
               {% endfor %}
             </div>
           </div>
@@ -201,15 +191,6 @@
               <input type="hidden" name="sentence" value="{{ sentence.content }}" />
               <input type="hidden" name="example_id" value="{{ example_id }}" />
               <input type="hidden" name="batch_id" value="{{ batch_id }}" />
-              {% for label in labels %}
-              <input
-                type="checkbox"
-                class="hidden"
-                id="label_hidden_{{ label.id }}"
-                value="{{ label.id }}"
-                {% if label.id in prev_label_ids %}checked{% endif %}
-              />
-              {% endfor %}
             </div>
           </div>
         </div>

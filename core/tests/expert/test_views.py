@@ -50,10 +50,15 @@ class TestExpertViews:
         assert response.status_code == 200
         html_name = response.context["labels_form"]["labels"].html_name
         content = response.content.decode()
-        for label in self.data["labels"]:
-            assert f'id="label_checkbox_{label.id}"' in content
-        assert f'name="{html_name}"' in content
+        assert content.count(f'name="{html_name}"') >= len(self.data["labels"])
         assert 'name="selected_labels"' not in content
+        # The union of discussion-phase labels is pre-selected via the form's
+        # initial data (both labels in the project_expert fixture).
+        initial = response.context["labels_form"].fields["labels"].initial
+        assert initial == sorted(label.id for label in self.data["labels"])
+        # Cotton must have evaluated the dynamic :checked binding.
+        assert ':checked="checkbox.data.selected"' not in content
+        assert "checked" in content
 
     def test_expert_dialogue_view_get_as_annotator(self, client):
         login = client.login(username=self.data["annotators"][0].username, password="123")
@@ -241,6 +246,55 @@ class TestSaveExpertView:
         )
         assert response.status_code == 200
         assert "All disagreements are resolved." in response.content.decode()
+
+    def test_htmx_save_renders_next_example_with_own_preselection(self):
+        # Regression: after a successful htmx save the response shows the NEXT
+        # example. Its checkboxes must be pre-selected from that example's own
+        # discussion labels -- not from the selection just submitted.
+        from data.models import Example
+
+        batch = self.data["batch"]
+        a1, a2 = self.data["annotators"]
+        label1, label2 = self.data["labels"]
+
+        example2 = Example.objects.create(batch=batch, content="Second example")
+        for phase in (BatchPhase.ANNOTATION, BatchPhase.DISCUSSION):
+            for user, label_ids in ((a1, []), (a2, [label2.id])):
+                assignment = ExampleAssignment.objects.create(
+                    batch=batch,
+                    user=user,
+                    example=example2,
+                    phase=phase,
+                    order=2,
+                )
+                assignment.set_user_annotations(label_ids)
+        batch.set_phase(BatchPhase.EXPERT)
+
+        # Save the first example with BOTH labels selected.
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": [label1.id, label2.id],
+                "codebook-content": "test",
+                "codebook-modified": "false",
+            },
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        assert response.context["sentence"] == example2
+
+        # Example 2's discussion union is {label2}: label2 checked, label1 not.
+        content = response.content.decode()
+        import re
+
+        checkboxes = {
+            m.group(1): "checked" in m.group(0)
+            for m in re.finditer(
+                r'<input[^>]*name="labels-labels"[^>]*value="(\d+)"[^>]*>',
+                content,
+            )
+        }
+        assert checkboxes == {str(label1.id): False, str(label2.id): True}
 
     def test_post_empty_rationale_does_not_update_codebook(self):
         initial_content = self.codebook.content

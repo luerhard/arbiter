@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db import transaction
 from django.utils import timezone
 
 from .models import Annotation
@@ -74,19 +75,21 @@ class ExampleAssignment(models.Model):
         return query.order_by("order").first()
 
     def set_user_annotations(self, label_ids: list[int]):
+        # Atomic so a failure between delete and create can never wipe the
+        # previously stored labels.
+        with transaction.atomic():
+            # delete previous annotations if any
+            self.annotations.all().delete()
 
-        # delete previous annotations if any
-        self.annotations.all().delete()
-
-        # set new annotations
-        updates = []
-        for label in self.example.labels.all():
-            if label.pk in label_ids:
-                new = Annotation(assignment=self, label=label)
-                updates.append(new)
-        Annotation.objects.bulk_create(updates)
-        self.done = timezone.now()
-        self.save()
+            # set new annotations
+            updates = []
+            for label in self.example.labels.all():
+                if label.pk in label_ids:
+                    new = Annotation(assignment=self, label=label)
+                    updates.append(new)
+            Annotation.objects.bulk_create(updates)
+            self.done = timezone.now()
+            self.save()
 
     def get_user_annotations(self):
         return {annotation.label for annotation in self.annotations.all()}
