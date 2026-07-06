@@ -182,10 +182,14 @@ class TestAnnotationDoneFinalize:
         a1, a2 = data["annotators"]
         example = data["example"]
         ExampleAssignment.objects.get(
-            user=a1, example=example, phase=BatchPhase.ANNOTATION,
+            user=a1,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
         ).set_user_annotations([label_for_a1.id])
         ExampleAssignment.objects.get(
-            user=a2, example=example, phase=BatchPhase.ANNOTATION,
+            user=a2,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
         ).set_user_annotations([label_for_a2.id])
 
     def test_finalize_ignored_when_not_done(self, client, project_annotation):
