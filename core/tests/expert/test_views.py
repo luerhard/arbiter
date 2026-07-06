@@ -60,6 +60,21 @@ class TestExpertViews:
         assert ':checked="checkbox.data.selected"' not in content
         assert "checked" in content
 
+    def test_dialogue_renders_without_annotation_phase_assignments(self):
+        # Regression: an example with no annotation-phase assignments (e.g.
+        # inconsistent or migrated data) crashed the dialogue with
+        # StopIteration when picking the annotator for chat alignment.
+        ExampleAssignment.objects.filter(
+            example=self.data["example"],
+            phase=BatchPhase.ANNOTATION,
+        ).delete()
+
+        response = self.client.get(self.content_url, HTTP_HX_REQUEST="true")
+
+        assert response.status_code == 200
+        assert response.context["annotator"] is None
+        assert response.context["sentence"] == self.data["example"]
+
     def test_expert_dialogue_view_get_as_annotator(self, client):
         login = client.login(username=self.data["annotators"][0].username, password="123")
         assert login is True
