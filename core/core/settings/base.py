@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "discuss",
     "expert",
     "codebook",
+    "notifications",
 ]
 
 MIDDLEWARE = [
