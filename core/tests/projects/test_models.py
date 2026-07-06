@@ -368,6 +368,29 @@ def test_advance_from_discussion_no_op_outside_discussion_phase():
 
 
 @pytest.mark.django_db
+def test_project_batch_state_indicators():
+    data = _create_project_with_batch()
+    project = data["project"]
+    batch = data["batch"]
+
+    # fixture batch is in ANNOTATION phase
+    assert project.annotator_n_active_batches == 1
+    assert project.annotator_any_annotation_batches is True
+    assert project.annotator_any_discussion_batches is False
+
+    batch.set_phase(BatchPhase.DISCUSSION)
+    assert project.annotator_n_active_batches == 1
+    assert project.annotator_any_annotation_batches is False
+    assert project.annotator_any_discussion_batches is True
+
+    batch.current_phase = BatchPhase.FINAL
+    batch.save()
+    assert project.annotator_n_active_batches == 0
+    assert project.annotator_any_annotation_batches is False
+    assert project.annotator_any_discussion_batches is False
+
+
+@pytest.mark.django_db
 def test_batch_assignment_get_disagreements_for_phase():
     data = _create_project_with_batch()
     batch = data["batch"]

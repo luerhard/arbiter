@@ -27,6 +27,50 @@ URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 
 
 @pytest.mark.django_db
+class TestProjectListIndicators:
+    def _project_row(self, content, project_name):
+        rows = [row for row in content.split("<tr") if project_name in row]
+        assert rows, f"no project list row found for {project_name}"
+        return rows[0]
+
+    def test_open_annotation_badge_shown(self, client, project_annotation):
+        # Regression: the list template referenced Project properties that did
+        # not exist, so every project always rendered "Closed".
+        annotator = project_annotation["annotators"][0]
+        project = project_annotation["project"]
+        client.login(username=annotator.username, password="123")
+
+        response = client.get(reverse("project-list"))
+
+        assert response.status_code == 200
+        row = self._project_row(response.content.decode(), project.name)
+        assert "Open" in row
+        assert row.count("Closed") == 1  # discussion column stays closed
+
+    def test_discussion_badge_shown_after_phase_change(self, client, project_discussion):
+        annotator = project_discussion["annotators"][0]
+        project = project_discussion["project"]
+        client.login(username=annotator.username, password="123")
+
+        response = client.get(reverse("project-list"))
+
+        row = self._project_row(response.content.decode(), project.name)
+        assert "Open" in row
+        assert row.count("Closed") == 1  # annotation column now closed
+
+    def test_active_batch_count_rendered(self, client, project_annotation):
+        annotator = project_annotation["annotators"][0]
+        project = project_annotation["project"]
+        client.login(username=annotator.username, password="123")
+
+        response = client.get(reverse("project-list"))
+
+        row = self._project_row(response.content.decode(), project.name)
+        assert f'<span class="font-semibold">{project.annotator_n_active_batches}</span>' in row
+        assert project.annotator_n_active_batches == 1
+
+
+@pytest.mark.django_db
 class TestProjectAndBatchCreationViews:
     def test_create_project_creates_project_users(self, client):
         suffix = uuid.uuid4().hex[:8]
