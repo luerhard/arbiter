@@ -37,14 +37,6 @@ def _ensure_batch_unfinished_for_user(batch_id, user):
     ).update(done=None)
 
 
-def _ensure_batch_finished_for_user(batch_id, user):
-    ExampleAssignment.objects.filter(
-        example__batch_id=batch_id,
-        user=user,
-        phase=BatchPhase.ANNOTATION,
-    ).update(done=timezone.now())
-
-
 def _first_assignment_for_user_in_batch(user, batch_id):
     assignment = (
         ExampleAssignment.objects.filter(
@@ -181,23 +173,6 @@ class TestAnnotateViews:
         assert resp.status_code == 200
         assert b'id="annotation-panel"' in resp.content
         assert b"<html" not in resp.content
-
-    @pytest.mark.skip
-    def test_finished_batch_redirects_to_done(self, client):
-        # TODO: this test should reflect:
-        # should redirect to done if all examples are annotated AND a user just finished the
-        # last one. Otherwise, users cannot go back to their finished annotation and click through
-        # them.
-        user = _first_annotator_user()
-        batch_id = _first_annotation_batch_for_user(user)
-        _ensure_batch_finished_for_user(batch_id, user)
-
-        login = client.login(username=user.username, password="123")
-        assert login is True
-
-        resp = client.get(reverse("annotate-batch", args=(batch_id,)))
-        assert resp.status_code == 302
-        assert resp.url == reverse("annotate-done", args=(batch_id,))
 
 
 @pytest.mark.django_db
