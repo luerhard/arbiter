@@ -265,8 +265,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await update_state(self.batch_id, mut)
 
+        if end_reason:
+            await database_sync_to_async(self._advance_batch_after_discussion)()
+
         if msg:
             await self._append_chat_message(username="system", message=msg)
+
+    def _advance_batch_after_discussion(self):
+        # Re-fetch: self.batch was loaded at connect time and may be stale.
+        batch = Batch.objects.get(pk=self.batch_id)
+        new_phase = batch.advance_from_discussion()
+        if new_phase is not None:
+            log.info(f"Batch {batch.id} advanced to phase {new_phase} after discussion ended.")
 
     async def send_state(self, event):  # noqa: ARG002
         """Notify the connected clients in group that annotation ended."""

@@ -238,6 +238,135 @@ def test_advance_no_op_when_not_in_annotation_phase():
     assert batch.current_phase == BatchPhase.DISCUSSION
 
 
+def _add_setup_batch(project, with_examples=True):
+    batch = Batch.objects.create(project=project, current_phase=BatchPhase.SETUP)
+    for user in project.users.all():
+        role = (
+            ProjectRole.ANNOTATOR
+            if ProjectUser.objects.get(project=project, user=user).default_role
+            == ProjectRole.ANNOTATOR
+            else ProjectRole.EXPERT
+        )
+        batch.users.add(user, through_defaults={"role": role})
+    if with_examples:
+        Example.objects.create(batch=batch, content="Next batch example")
+    return batch
+
+
+def _resolve_all_disagreements(data):
+    """Make both annotators agree on every example (annotation phase)."""
+    ex1 = data["examples"][0]
+    label1 = data["labels"][0]
+    a12 = ExampleAssignment.objects.get(example=ex1, user=data["annotators"][1])
+    a12.annotations.all().delete()
+    Annotation.objects.create(assignment=a12, label=label1)
+
+
+@pytest.mark.django_db
+def test_finalize_without_disagreements_starts_next_setup_batch():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    next_batch = _add_setup_batch(data["project"])
+
+    _resolve_all_disagreements(data)
+    _finalize(batch, *data["annotators"])
+    result = batch.advance_from_annotation_if_finalized()
+
+    assert result == BatchPhase.FINAL
+    next_batch.refresh_from_db()
+    assert next_batch.current_phase == BatchPhase.ANNOTATION
+    # Starting the next batch must create its annotation assignments.
+    assert ExampleAssignment.objects.filter(
+        batch=next_batch,
+        phase=BatchPhase.ANNOTATION,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_finalize_without_next_setup_batch_is_harmless():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+
+    _resolve_all_disagreements(data)
+    _finalize(batch, *data["annotators"])
+    result = batch.advance_from_annotation_if_finalized()
+
+    assert result == BatchPhase.FINAL
+    assert batch.start_next_setup_batch() is None
+
+
+@pytest.mark.django_db
+def test_setup_batch_without_examples_is_not_started():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    empty_batch = _add_setup_batch(data["project"], with_examples=False)
+
+    _resolve_all_disagreements(data)
+    _finalize(batch, *data["annotators"])
+    batch.advance_from_annotation_if_finalized()
+
+    empty_batch.refresh_from_db()
+    assert empty_batch.current_phase == BatchPhase.SETUP
+
+
+@pytest.mark.django_db
+def test_advance_from_discussion_to_expert_when_disagreements_remain():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1 = data["examples"][0]
+    label1, label2 = data["labels"]
+
+    batch.set_phase(BatchPhase.DISCUSSION)
+    disc = ExampleAssignment.objects.filter(example=ex1, phase=BatchPhase.DISCUSSION).order_by(
+        "id",
+    )
+    # still disagreeing after discussion
+    Annotation.objects.create(assignment=disc[0], label=label1)
+    Annotation.objects.create(assignment=disc[1], label=label2)
+
+    result = batch.advance_from_discussion()
+
+    assert result == BatchPhase.EXPERT
+    assert batch.current_phase == BatchPhase.EXPERT
+    assert ExampleAssignment.objects.filter(
+        batch=batch,
+        phase=BatchPhase.EXPERT,
+        example=ex1,
+    ).exists()
+
+
+@pytest.mark.django_db
+def test_advance_from_discussion_to_final_when_resolved_starts_next_batch():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1 = data["examples"][0]
+    label1 = data["labels"][0]
+    next_batch = _add_setup_batch(data["project"])
+
+    batch.set_phase(BatchPhase.DISCUSSION)
+    disc = ExampleAssignment.objects.filter(example=ex1, phase=BatchPhase.DISCUSSION)
+    # both annotators agree after discussion -> no expert decisions needed
+    for assignment in disc:
+        Annotation.objects.create(assignment=assignment, label=label1)
+
+    result = batch.advance_from_discussion()
+
+    assert result == BatchPhase.FINAL
+    assert batch.current_phase == BatchPhase.FINAL
+    assert not ExampleAssignment.objects.filter(batch=batch, phase=BatchPhase.EXPERT).exists()
+    next_batch.refresh_from_db()
+    assert next_batch.current_phase == BatchPhase.ANNOTATION
+
+
+@pytest.mark.django_db
+def test_advance_from_discussion_no_op_outside_discussion_phase():
+    data = _create_project_with_batch()
+    batch = data["batch"]
+
+    assert batch.advance_from_discussion() is None
+    assert batch.current_phase == BatchPhase.ANNOTATION
+
+
 @pytest.mark.django_db
 def test_batch_assignment_get_disagreements_for_phase():
     data = _create_project_with_batch()

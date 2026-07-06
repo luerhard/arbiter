@@ -301,6 +301,61 @@ def test_discuss_two_users_save_discussion_decisions(
     assert list(assignment1.annotations.values_list("label_id", flat=True)) == [label1.id]
     assert list(assignment2.annotations.values_list("label_id", flat=True)) == [label2.id]
 
+    # Disagreement remains after discussion -> expert decisions are needed.
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.EXPERT
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_agreement_finalizes_batch(redis_test_state, discussion_with_disagreement):
+    # Both users converge on the same label during discussion: no expert
+    # decisions are needed, so ending the discussion finalizes the batch.
+    user1, user2, batch, example, labels = discussion_with_disagreement
+    label1, _ = labels
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm1.scope["user"] = user1
+        connected, _ = await comm1.connect()
+        assert connected is True
+        await comm1.receive_json_from()
+
+        comm2 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm2.scope["user"] = user2
+        connected, _ = await comm2.connect()
+        assert connected is True
+
+        # Both users receive a state after second user joins.
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm1.send_json_to({"clicked-done": True, "labels": [label1.id]})
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm2.send_json_to({"clicked-done": True, "labels": [label1.id]})
+        await comm1.receive_json_from()
+        await comm2.receive_json_from()
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.FINAL
+    assert not ExampleAssignment.objects.filter(batch=batch, phase=BatchPhase.EXPERT).exists()
+    for user in (user1, user2):
+        assignment = ExampleAssignment.objects.get(
+            batch=batch,
+            example=example,
+            user=user,
+            phase=BatchPhase.DISCUSSION,
+        )
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label1.id]
+
 
 @pytest.mark.django_db(transaction=True)
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
