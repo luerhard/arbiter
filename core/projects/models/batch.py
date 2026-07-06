@@ -193,8 +193,7 @@ class Batch(models.Model):
         Notification = apps.get_model("notifications", "Notification")  # noqa: N806
         label = BatchPhase(phase).label
         message = (
-            f"Batch {self.batch_number} of project "
-            f"'{self.project.name}' moved to phase {label}."
+            f"Batch {self.batch_number} of project '{self.project.name}' moved to phase {label}."
         )
         Notification.objects.bulk_create(
             Notification(user=user, batch=self, message=message)
