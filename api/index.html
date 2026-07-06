@@ -99,6 +99,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="annotation.html#annotation.views.AnnotationDoneView"><code class="docutils literal notranslate"><span class="pre">AnnotationDoneView</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotationDoneView.get"><code class="docutils literal notranslate"><span class="pre">AnnotationDoneView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="annotation.html#annotation.views.AnnotationDoneView.post"><code class="docutils literal notranslate"><span class="pre">AnnotationDoneView.post()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -327,6 +328,9 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Batch.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Batch.MultipleObjectsReturned</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Batch.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.advance_from_annotation_if_finalized"><code class="docutils literal notranslate"><span class="pre">Batch.advance_from_annotation_if_finalized()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.advance_from_discussion"><code class="docutils literal notranslate"><span class="pre">Batch.advance_from_discussion()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.all_annotators_finalized"><code class="docutils literal notranslate"><span class="pre">Batch.all_annotators_finalized()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.assignees"><code class="docutils literal notranslate"><span class="pre">Batch.assignees()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.assignments"><code class="docutils literal notranslate"><span class="pre">Batch.assignments</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.batch_number"><code class="docutils literal notranslate"><span class="pre">Batch.batch_number</span></code></a></li>
@@ -338,11 +342,13 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.id"><code class="docutils literal notranslate"><span class="pre">Batch.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.labels"><code class="docutils literal notranslate"><span class="pre">Batch.labels</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.max_batch_number"><code class="docutils literal notranslate"><span class="pre">Batch.max_batch_number</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.notifications"><code class="docutils literal notranslate"><span class="pre">Batch.notifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.objects"><code class="docutils literal notranslate"><span class="pre">Batch.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.project"><code class="docutils literal notranslate"><span class="pre">Batch.project</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.project_id"><code class="docutils literal notranslate"><span class="pre">Batch.project_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.save"><code class="docutils literal notranslate"><span class="pre">Batch.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.set_phase"><code class="docutils literal notranslate"><span class="pre">Batch.set_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.start_next_setup_batch"><code class="docutils literal notranslate"><span class="pre">Batch.start_next_setup_batch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Batch.users"><code class="docutils literal notranslate"><span class="pre">Batch.users</span></code></a></li>
 </ul>
 </li>
@@ -358,6 +364,9 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Project.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Project.MultipleObjectsReturned</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Project.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.annotator_any_annotation_batches"><code class="docutils literal notranslate"><span class="pre">Project.annotator_any_annotation_batches</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.annotator_any_discussion_batches"><code class="docutils literal notranslate"><span class="pre">Project.annotator_any_discussion_batches</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.annotator_n_active_batches"><code class="docutils literal notranslate"><span class="pre">Project.annotator_n_active_batches</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.annotators"><code class="docutils literal notranslate"><span class="pre">Project.annotators</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.batches"><code class="docutils literal notranslate"><span class="pre">Project.batches</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.codebook"><code class="docutils literal notranslate"><span class="pre">Project.codebook</span></code></a></li>
@@ -434,6 +443,7 @@
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.last_login"><code class="docutils literal notranslate"><span class="pre">User.last_login</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.last_name"><code class="docutils literal notranslate"><span class="pre">User.last_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.logentry_set"><code class="docutils literal notranslate"><span class="pre">User.logentry_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.notifications"><code class="docutils literal notranslate"><span class="pre">User.notifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.owned_projects"><code class="docutils literal notranslate"><span class="pre">User.owned_projects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.password"><code class="docutils literal notranslate"><span class="pre">User.password</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.projects"><code class="docutils literal notranslate"><span class="pre">User.projects</span></code></a></li>

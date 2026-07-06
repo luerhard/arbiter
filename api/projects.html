@@ -381,6 +381,7 @@ method.</p>
 <li><p><strong>assignments</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.ExampleAssignment" title="data.models.example_assignment.ExampleAssignment"><code class="xref py py-class docutils literal notranslate"><span class="pre">ExampleAssignment</span></code></a>) – All assignments of this batch (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p></li>
 <li><p><strong>examples</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="data.html#data.models.Example" title="data.models.example.Example"><code class="xref py py-class docutils literal notranslate"><span class="pre">Example</span></code></a>) – All examples of this batch (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p></li>
 <li><p><strong>batchuser</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchUser</span></code>) – All batch users of this batch (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p></li>
+<li><p><strong>notifications</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">Notification</span></code>) – All notifications of this batch (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -398,6 +399,30 @@ method.</p>
 <dt class="sig sig-object py" id="projects.models.Batch.NotUpdated">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#projects.models.Batch.NotUpdated" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Batch.advance_from_annotation_if_finalized">
+<span class="sig-name descname"><span class="pre">advance_from_annotation_if_finalized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#projects.models.BatchPhase" title="projects.models.batch.BatchPhase"><span class="pre">BatchPhase</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#projects.models.Batch.advance_from_annotation_if_finalized" title="Link to this definition"></a></dt>
+<dd><p>Advance the batch once all annotators have finalized.</p>
+<p>-&gt; DISCUSSION when disagreements exist, otherwise straight to FINAL
+(no discussion or expert decisions needed) and the next batch starts.
+Returns the new phase, or None if nothing changed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Batch.advance_from_discussion">
+<span class="sig-name descname"><span class="pre">advance_from_discussion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#projects.models.BatchPhase" title="projects.models.batch.BatchPhase"><span class="pre">BatchPhase</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#projects.models.Batch.advance_from_discussion" title="Link to this definition"></a></dt>
+<dd><p>Advance the batch once the discussion has ended.</p>
+<p>-&gt; EXPERT when disagreements remain after discussion, otherwise FINAL
+(no expert decisions needed) and the next batch starts.
+Returns the new phase, or None if nothing changed.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Batch.all_annotators_finalized">
+<span class="sig-name descname"><span class="pre">all_annotators_finalized</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#projects.models.Batch.all_annotators_finalized" title="Link to this definition"></a></dt>
+<dd><p>True if every annotator has confirmed they are done annotating.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="projects.models.Batch.assignees">
@@ -476,6 +501,13 @@ method.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.Batch.notifications">
+<span class="sig-name descname"><span class="pre">notifications</span></span><a class="headerlink" href="#projects.models.Batch.notifications" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">Notification</span></code></p>
+<p>All notifications of this batch (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">batch</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Batch.objects">
 <span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromBatchQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#projects.models.Batch.objects" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -505,8 +537,15 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="projects.models.Batch.set_phase">
-<span class="sig-name descname"><span class="pre">set_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#projects.models.BatchPhase" title="projects.models.batch.BatchPhase"><span class="pre">BatchPhase</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Batch.set_phase" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">set_phase</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#projects.models.BatchPhase" title="projects.models.batch.BatchPhase"><span class="pre">BatchPhase</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">actor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Batch.set_phase" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Batch.start_next_setup_batch">
+<span class="sig-name descname"><span class="pre">start_next_setup_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#projects.models.Batch" title="projects.models.batch.Batch"><span class="pre">Batch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#projects.models.Batch.start_next_setup_batch" title="Link to this definition"></a></dt>
+<dd><p>Move the project’s next SETUP batch (lowest batch number) into
+ANNOTATION. Batches without examples are not started.</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Batch.users">
@@ -593,6 +632,21 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="projects.models.Project.NotUpdated">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#projects.models.Project.NotUpdated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.models.Project.annotator_any_annotation_batches">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annotator_any_annotation_batches</span></span><a class="headerlink" href="#projects.models.Project.annotator_any_annotation_batches" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.models.Project.annotator_any_discussion_batches">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annotator_any_discussion_batches</span></span><a class="headerlink" href="#projects.models.Project.annotator_any_discussion_batches" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.models.Project.annotator_n_active_batches">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annotator_n_active_batches</span></span><a class="headerlink" href="#projects.models.Project.annotator_n_active_batches" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
