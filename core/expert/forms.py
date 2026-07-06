@@ -59,8 +59,7 @@ class MultiLabelFormExpert(forms.Form):
             )
         else:
             log.info(
-                "Expert decision saved with no labels (non-offensive): "
-                "example=%s user=%s",
+                "Expert decision saved with no labels (non-offensive): example=%s user=%s",
                 self.example.id,
                 self.user.username,
             )
