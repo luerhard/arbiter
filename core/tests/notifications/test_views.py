@@ -30,6 +30,31 @@ class TestPhaseChangeCreatesNotifications:
 
         assert Notification.objects.filter(batch=batch).count() == 0
 
+    def test_manual_phase_change_via_view_notifies(self, client, project_annotation):
+        # Regression: ChangeBatchPhase binds a ModelForm to the batch instance,
+        # which overwrites current_phase during validation. set_phase must
+        # detect the change against the DB state, not the mutated instance,
+        # or manual phase changes never notify anyone.
+        batch = project_annotation["batch"]
+        expert = project_annotation["expert"]
+        Notification.objects.filter(batch=batch).delete()
+        client.login(username=expert.username, password="123")
+
+        response = client.post(
+            reverse("change-batch-phase", args=[batch.id]),
+            data={"current_phase": BatchPhase.DISCUSSION},
+        )
+
+        assert response.status_code == 204
+        batch.refresh_from_db()
+        assert batch.current_phase == BatchPhase.DISCUSSION
+        notifications = Notification.objects.filter(batch=batch)
+        # The acting expert gets a django message instead of a notification;
+        # everyone else on the batch is notified.
+        assert notifications.count() == 2
+        assert {n.user for n in notifications} == set(project_annotation["annotators"])
+        assert all("Discussion" in n.message for n in notifications)
+
     def test_auto_advance_notifies_for_both_batches(self, project_annotation):
         # When a batch finalizes and the next SETUP batch starts, users get a
         # notification for each transition.
