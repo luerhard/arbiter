@@ -230,7 +230,9 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
             "progress": get_progress(request.user, batch),
             "finalized": batch_user is not None and batch_user.finalized_at is not None,
             "finalized_count": BatchUser.objects.filter(
-                batch=batch, role=ProjectRole.ANNOTATOR, finalized_at__isnull=False,
+                batch=batch,
+                role=ProjectRole.ANNOTATOR,
+                finalized_at__isnull=False,
             ).count(),
             "annotator_count": batch.assignees(role=ProjectRole.ANNOTATOR).count(),
             "phase_advanced": batch.current_phase != BatchPhase.ANNOTATION,
@@ -246,7 +248,9 @@ class AnnotationDoneView(AnnotatorRequiredMixin, View):
         done = progress["done"] >= progress["total"]
         if done and batch.current_phase == BatchPhase.ANNOTATION:
             BatchUser.objects.filter(
-                batch=batch, user=request.user, finalized_at__isnull=True,
+                batch=batch,
+                user=request.user,
+                finalized_at__isnull=True,
             ).update(finalized_at=timezone.now())
             batch.advance_from_annotation_if_finalized()
         return redirect("annotate-done", batch_id=batch.id)
