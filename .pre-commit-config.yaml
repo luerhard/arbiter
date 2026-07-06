@@ -8,10 +8,13 @@ repos:
         args: [--maxkb=2048]
       - id: check-merge-conflict
 
-  - repo: https://github.com/asottile/add-trailing-comma
-    rev: v4.0.0
+  # Keep args and version in sync with .github/workflows/formatter.yml
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
     hooks:
-      - id: add-trailing-comma
+      - id: ruff-check
+        args: [--fix, --extend-select, F401, --no-unsafe-fixes, --exit-zero]
+      - id: ruff-format
 
   - repo: local
     hooks:
