@@ -100,7 +100,6 @@ def build_dialog_context(
         context["annotator"] = None
         context["post_annotations"] = {}
         context["chat_messages"] = []
-        context["prev_label_ids"] = []
         return context
 
     current_example = current_assignment.example
@@ -131,13 +130,6 @@ def build_dialog_context(
 
     context["prev_annotations"] = before_by_user
     context["post_annotations"] = after_by_user
-    context["prev_label_ids"] = sorted(
-        {
-            annotation.label_id
-            for annotations in after_by_user.values()
-            for annotation in annotations
-        },
-    )
     next_assignment = current_assignment.next(skip_annotated=True)
 
     chat_messages = (
@@ -242,9 +234,18 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
                 labels_form=labels_form,
                 codebook_form=codebook_form,
             )
-            if not forms_are_valid:
-                submitted_labels = request.POST.getlist(labels_form.add_prefix("labels"))
-                context["prev_label_ids"] = [int(i) for i in submitted_labels if i.isnumeric()]
+            if forms_are_valid:
+                # The response renders the NEXT open example; the saved form is
+                # bound to the previous one and would leak its checkbox state.
+                context["codebook_form"] = CodebookForm(prefix="codebook")
+                if context.get("sentence"):
+                    context["labels_form"] = MultiLabelFormExpert(
+                        prefix="labels",
+                        codebook=codebook,
+                        example=context["sentence"],
+                        user=user,
+                    )
+            else:
                 context["draft_codebook"] = codebook_form.data.get(
                     codebook_form.add_prefix("content"),
                     context["codebook"].content,

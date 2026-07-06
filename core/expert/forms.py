@@ -2,6 +2,7 @@ import logging
 
 from django import forms
 
+from data.models import Annotation
 from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import BatchPhase
@@ -21,14 +22,34 @@ class MultiLabelFormExpert(forms.Form):
             user=self.user,
             phase=BatchPhase.EXPERT,
         ).get()
-        labels_queryset = Label.objects.filter(project_id=codebook.project.id)
-        labels_choices = [(label.id, label.name) for label in labels_queryset]
-        log.debug(f"{labels_choices =}")
-        self.fields["labels"].choices = labels_choices
+
+        # Pre-select the union of all discussion-phase labels for this example.
+        discussion_label_ids = Annotation.objects.filter(
+            assignment__example=self.example,
+            assignment__phase=BatchPhase.DISCUSSION,
+        ).values_list("label_id", flat=True)
+
+        label_details = []
+        for label in Label.objects.filter(project_id=codebook.project.id):
+            label_details.append(
+                {
+                    "id": label.id,
+                    "name": label.name,
+                    "color": label.color,
+                    "hotkey": label.hotkey,
+                },
+            )
+        self.fields["labels"].choices = [(label["id"], label["name"]) for label in label_details]
+        self.fields["labels"].initial = sorted(set(discussion_label_ids))
+        self.label_details = label_details
 
     def save(self):
         data = self.cleaned_data
         labels = [int(i) for i in data["labels"] if i.strip()]
+        # Audit trail for expert decisions. Zero labels is a valid verdict
+        # ("non-offensive" under multi-label), so it is logged rather than
+        # rejected -- but logged distinctly so a silently-dropped selection
+        # (as opposed to a genuine no-label decision) is visible.
         if labels:
             log.info(
                 "Expert decision saved: example=%s user=%s labels=%s",
@@ -38,7 +59,8 @@ class MultiLabelFormExpert(forms.Form):
             )
         else:
             log.info(
-                "Expert decision saved with no labels (non-offensive): example=%s user=%s",
+                "Expert decision saved with no labels (non-offensive): "
+                "example=%s user=%s",
                 self.example.id,
                 self.user.username,
             )
