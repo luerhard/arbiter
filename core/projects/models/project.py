@@ -45,6 +45,30 @@ class Project(models.Model):
             return max_batch_number
         return 0
 
+    @property
+    def annotator_n_active_batches(self):
+        from .batch import BatchPhase
+
+        return self.batches.filter(
+            current_phase__in=[
+                BatchPhase.ANNOTATION,
+                BatchPhase.DISCUSSION,
+                BatchPhase.EXPERT,
+            ],
+        ).count()
+
+    @property
+    def annotator_any_annotation_batches(self):
+        from .batch import BatchPhase
+
+        return self.batches.filter(current_phase=BatchPhase.ANNOTATION).exists()
+
+    @property
+    def annotator_any_discussion_batches(self):
+        from .batch import BatchPhase
+
+        return self.batches.filter(current_phase=BatchPhase.DISCUSSION).exists()
+
     def __str__(self):
         return self.name
 
