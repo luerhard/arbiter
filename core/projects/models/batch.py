@@ -173,8 +173,11 @@ class Batch(models.Model):
         next_batch.set_phase(BatchPhase.ANNOTATION)
         return next_batch
 
-    def set_phase(self, phase: BatchPhase):
-        old_phase = self.current_phase
+    def set_phase(self, phase: BatchPhase, actor=None):
+        # Read the old phase from the DB: bound ModelForms (ChangeBatchPhase)
+        # mutate the in-memory instance during validation, which would make
+        # the phase-change detection below always see "no change".
+        old_phase = Batch.objects.filter(pk=self.pk).values_list("current_phase", flat=True).first()
         self.current_phase = phase
 
         if self.current_phase == BatchPhase.ANNOTATION:
@@ -185,19 +188,27 @@ class Batch(models.Model):
         self.save()
 
         if old_phase != phase:
-            self._notify_phase_change(phase)
+            self._notify_phase_change(phase, actor=actor)
 
-    def _notify_phase_change(self, phase: BatchPhase):
+    def _notify_phase_change(self, phase: BatchPhase, actor=None):
         """Create an unread notification for every batch user; the polling UI
-        shows them as persistent toasts until marked as read."""
+        shows them as persistent toasts until marked as read.
+
+        `actor` is the user who deliberately triggered the change (manual
+        phase form). They get immediate feedback via a django message
+        instead, so they are excluded here. Automatic transitions pass no
+        actor: even the annotator whose action triggered the advance may not
+        realize they were the last one to finish."""
         Notification = apps.get_model("notifications", "Notification")  # noqa: N806
         label = BatchPhase(phase).label
         message = (
             f"Batch {self.batch_number} of project '{self.project.name}' moved to phase {label}."
         )
+        users = self.users.all().distinct()
+        if actor is not None:
+            users = users.exclude(pk=actor.pk)
         Notification.objects.bulk_create(
-            Notification(user=user, batch=self, message=message)
-            for user in self.users.all().distinct()
+            Notification(user=user, batch=self, message=message) for user in users
         )
 
     def _create_example_assignments(self, phase: BatchPhase):
