@@ -117,7 +117,8 @@ class Batch(models.Model):
     def advance_from_annotation_if_finalized(self) -> "BatchPhase | None":
         """Advance the batch once all annotators have finalized.
 
-        -> DISCUSSION when disagreements exist, otherwise straight to FINAL.
+        -> DISCUSSION when disagreements exist, otherwise straight to FINAL
+        (no discussion or expert decisions needed) and the next batch starts.
         Returns the new phase, or None if nothing changed.
         """
         if self.current_phase != BatchPhase.ANNOTATION:
@@ -131,7 +132,46 @@ class Batch(models.Model):
             else BatchPhase.FINAL
         )
         self.set_phase(next_phase)
+        if next_phase == BatchPhase.FINAL:
+            self.start_next_setup_batch()
         return next_phase
+
+    def advance_from_discussion(self) -> "BatchPhase | None":
+        """Advance the batch once the discussion has ended.
+
+        -> EXPERT when disagreements remain after discussion, otherwise FINAL
+        (no expert decisions needed) and the next batch starts.
+        Returns the new phase, or None if nothing changed.
+        """
+        if self.current_phase != BatchPhase.DISCUSSION:
+            return None
+
+        next_phase = (
+            BatchPhase.EXPERT
+            if self.disagreements(BatchPhase.DISCUSSION).exists()
+            else BatchPhase.FINAL
+        )
+        self.set_phase(next_phase)
+        if next_phase == BatchPhase.FINAL:
+            self.start_next_setup_batch()
+        return next_phase
+
+    def start_next_setup_batch(self) -> "Batch | None":
+        """Move the project's next SETUP batch (lowest batch number) into
+        ANNOTATION. Batches without examples are not started."""
+        next_batch = (
+            Batch.objects.filter(
+                project=self.project,
+                current_phase=BatchPhase.SETUP,
+                examples__isnull=False,
+            )
+            .order_by("batch_number")
+            .first()
+        )
+        if next_batch is None:
+            return None
+        next_batch.set_phase(BatchPhase.ANNOTATION)
+        return next_batch
 
     def set_phase(self, phase: BatchPhase):
         self.current_phase = phase

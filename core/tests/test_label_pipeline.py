@@ -9,6 +9,10 @@ database contains exactly the labels each user submitted.
 Covered label combinations per phase: no labels (a valid verdict under
 multi-label annotation, e.g. "non-offensive"), a single label, and multiple
 labels.
+
+Phase transitions are not set manually: the test relies on the auto-increment
+feature (annotators finalizing moves ANNOTATION -> DISCUSSION, the discussion
+ending moves DISCUSSION -> EXPERT, the last expert decision -> FINAL).
 """
 
 import os
@@ -172,8 +176,15 @@ def test_labels_survive_full_pipeline(
         assert assignment.done is not None
         assert _stored_label_ids(assignment) == sorted(combos[choice])
 
-    # --- Phase 2: Discussion (websocket) ---------------------------------
-    batch.set_phase(BatchPhase.DISCUSSION)
+    # --- Phase transition: both annotators finalize (HTTP) ---------------
+    # Auto-advance: disagreements exist, so the batch moves to DISCUSSION.
+    for user in (a1, a2):
+        client = Client()
+        assert client.login(username=user.username, password="123") is True
+        response = client.post(reverse("annotate-done", args=(batch.id,)))
+        assert response.status_code == 302
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.DISCUSSION
     assert example in batch.disagreements(BatchPhase.ANNOTATION)
 
     _discuss_via_websocket(a1, a2, batch, combos[discussion["a1"]], combos[discussion["a2"]])
@@ -189,7 +200,10 @@ def test_labels_survive_full_pipeline(
         assert _stored_label_ids(assignment) == sorted(combos[choice])
 
     # --- Phase 3: Expert decision (HTTP) ----------------------------------
-    batch.set_phase(BatchPhase.EXPERT)
+    # Auto-advance: the discussion ended with disagreement in every scenario,
+    # so the consumer moved the batch to EXPERT without manual intervention.
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.EXPERT
     assert example in batch.disagreements(BatchPhase.DISCUSSION)
 
     assignment = _expert_decision_via_http(expert, batch, example, combos[expert_choice])
