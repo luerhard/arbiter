@@ -114,7 +114,9 @@ def build_dialog_context(
         .order_by("user__username")
     )
     before_by_user = {a.user.username: list(a.annotations.all()) for a in before_assignments}
-    context["annotator"] = next(iter(before_by_user))
+    # Presentational only (right-aligns this user's chat messages); an example
+    # without annotation-phase assignments must not crash the dialogue.
+    context["annotator"] = next(iter(before_by_user), None)
 
     after_assignments = (
         ExampleAssignment.objects.filter(
