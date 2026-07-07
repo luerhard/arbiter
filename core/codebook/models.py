@@ -119,5 +119,14 @@ class Codebook(models.Model):
 
         super().save(**kwargs)
 
+    def commit_decision_revision(self, commit_message: str):
+        """Record a decision correction that does not change the codebook.
+
+        The decision log in the git history is append-only: the original
+        commit keeps its metadata, and the correction is appended as an
+        empty commit whose message carries the revised metadata.
+        """
+        self.repo.git.commit("--allow-empty", m=commit_message)
+
     def get_as_context(self, batch_number: int):
         return {"codebook": self, "content_diff": self.diff(batch_number - 1, batch_number)}

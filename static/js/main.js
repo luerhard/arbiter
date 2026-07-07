@@ -60,14 +60,12 @@ import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import * as ui from "./ui.js";
 import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
-import * as expert from "./expert.js";
 import { initToasts } from "./toasts.js";
 
 window.lib = window.lib || {};
 window.lib.ui = ui;
 window.lib.funcs = funcs;
 window.lib.discuss = discuss;
-window.lib.expert = expert;
 
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);

@@ -2,8 +2,6 @@ import logging
 
 from django import forms
 
-from data.models import Annotation
-from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import BatchPhase
 
@@ -13,24 +11,14 @@ log = logging.getLogger(__name__)
 class MultiLabelFormExpert(forms.Form):
     labels = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
-    def __init__(self, *args, example, codebook, user, **kwargs):
+    def __init__(self, *args, assignment, **kwargs):
         super().__init__(*args, **kwargs)
-        self.example = example
-        self.user = user
-        self.assignment = ExampleAssignment.objects.filter(
-            example=self.example,
-            user=self.user,
-            phase=BatchPhase.EXPERT,
-        ).get()
-
-        # Pre-select the union of all discussion-phase labels for this example.
-        discussion_label_ids = Annotation.objects.filter(
-            assignment__example=self.example,
-            assignment__phase=BatchPhase.DISCUSSION,
-        ).values_list("label_id", flat=True)
+        self.assignment = assignment
+        self.example = assignment.example
+        self.user = assignment.user
 
         label_details = []
-        for label in Label.objects.filter(project_id=codebook.project.id):
+        for label in Label.objects.filter(project=assignment.batch.project):
             label_details.append(
                 {
                     "id": label.id,
@@ -40,8 +28,21 @@ class MultiLabelFormExpert(forms.Form):
                 },
             )
         self.fields["labels"].choices = [(label["id"], label["name"]) for label in label_details]
-        self.fields["labels"].initial = sorted(set(discussion_label_ids))
+        self.fields["labels"].initial = self._initial_label_ids()
         self.label_details = label_details
+
+    def _initial_label_ids(self):
+        # Editing a saved decision pre-selects that decision; an open
+        # assignment pre-selects the union of all discussion-phase labels.
+        if self.assignment.done is not None:
+            return sorted(self.assignment.annotations.values_list("label_id", flat=True))
+        from data.models import Annotation
+
+        discussion_label_ids = Annotation.objects.filter(
+            assignment__example=self.example,
+            assignment__phase=BatchPhase.DISCUSSION,
+        ).values_list("label_id", flat=True)
+        return sorted(set(discussion_label_ids))
 
     def save(self):
         data = self.cleaned_data

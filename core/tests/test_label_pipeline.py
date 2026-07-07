@@ -103,20 +103,16 @@ def _discuss_via_websocket(user1, user2, batch, labels_user1, labels_user2):
 
 
 def _expert_decision_via_http(expert, batch, example, label_ids):
-    """Save the final decision through the expert view."""
+    """Save the final decision through the expert view.
+
+    A label-only decision carries no codebook fields at all: codebook edits
+    are separate server-side drafts.
+    """
     client = Client()
     assert client.login(username=expert.username, password="123") is True
     assignment = _assignment(batch, expert, example, BatchPhase.EXPERT)
-    codebook = batch.project.codebook.get()
-    url = reverse("expert-save", args=(assignment.id, codebook.id))
-    response = client.post(
-        url,
-        data={
-            "labels-labels": label_ids,
-            "codebook-content": codebook.content,
-            "codebook-modified": "false",
-        },
-    )
+    url = reverse("expert-assignment", args=(batch.id, assignment.id))
+    response = client.post(url, data={"labels": label_ids})
     assert response.status_code == 302
     return assignment
 
