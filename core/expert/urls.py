@@ -4,13 +4,28 @@ from . import views
 
 urlpatterns = [
     path(
-        "save/<int:assignment_id>/<int:codebook_id>",
-        views.ExpertDialogue.as_view(),
-        name="expert-save",
+        "batch/<int:batch_id>",
+        views.ExpertBatchView.as_view(),
+        name="expert-batch",
     ),
     path(
-        "dialogue/<int:batch_id>",
-        views.ExpertDialogue.as_view(),
-        name="expert-dialogue",
+        "batch/<int:batch_id>/assignment/<int:assignment_id>",
+        views.ExpertAssignmentView.as_view(),
+        name="expert-assignment",
+    ),
+    path(
+        "batch/<int:batch_id>/assignment/<int:assignment_id>/codebook",
+        views.CodebookPanelView.as_view(),
+        name="expert-codebook-panel",
+    ),
+    path(
+        "batch/<int:batch_id>/assignment/<int:assignment_id>/draft",
+        views.CodebookDraftSaveView.as_view(),
+        name="expert-draft-save",
+    ),
+    path(
+        "batch/<int:batch_id>/assignment/<int:assignment_id>/draft/delete",
+        views.CodebookDraftDeleteView.as_view(),
+        name="expert-draft-delete",
     ),
 ]

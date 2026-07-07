@@ -33,8 +33,9 @@ class CodebookForm(forms.Form):
 
     @staticmethod
     def _normalize(content):
-        # Browsers submit textarea content with \r\n line endings.
-        return "\n".join((content or "").splitlines()).strip()
+        from .utils import normalize_content
+
+        return normalize_content(content)
 
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
