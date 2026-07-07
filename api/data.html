@@ -318,7 +318,10 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <p>Reverse relationships:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>annotations</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All annotations of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotations</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All annotations of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p></li>
+<li><p><strong>codebook_draft</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code>) – The codebook draft of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py exception">
@@ -365,6 +368,13 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.check_for_disagreement_after_discussion">
 <span class="sig-name descname"><span class="pre">check_for_disagreement_after_discussion</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#data.models.ExampleAssignment.check_for_disagreement_after_discussion" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.ExampleAssignment.codebook_draft">
+<span class="sig-name descname"><span class="pre">codebook_draft</span></span><a class="headerlink" href="#data.models.ExampleAssignment.codebook_draft" title="Link to this definition"></a></dt>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code></p>
+<p>The codebook draft of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p>
+</dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.done">

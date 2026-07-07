@@ -543,8 +543,9 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="projects.models.Batch.start_next_setup_batch">
 <span class="sig-name descname"><span class="pre">start_next_setup_batch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#projects.models.Batch" title="projects.models.batch.Batch"><span class="pre">Batch</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#projects.models.Batch.start_next_setup_batch" title="Link to this definition"></a></dt>
-<dd><p>Move the project’s next SETUP batch (lowest batch number) into
-ANNOTATION. Batches without examples are not started.</p>
+<dd><p>Move the project’s next SETUP batch into ANNOTATION.</p>
+<p>Only batches AFTER this one are considered (skipped earlier batches
+stay untouched), only in SETUP phase, and only with examples.</p>
 </dd></dl>
 
 <dl class="py attribute">
