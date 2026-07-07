@@ -205,7 +205,7 @@ class ExpertDialogue(ExpertRequiredMixin, DetailView):
             prefix="labels",
         )
 
-        codebook_form = CodebookForm(request.POST, prefix="codebook")
+        codebook_form = CodebookForm(request.POST, prefix="codebook", codebook=codebook)
 
         forms_are_valid = labels_form.is_valid() and codebook_form.is_valid()
         if forms_are_valid:
