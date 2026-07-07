@@ -18,8 +18,9 @@ class CodebookForm(forms.Form):
     rationale = forms.CharField(widget=forms.Textarea(attrs={"rows": 8, "class": textarea_class}))
     modified = forms.BooleanField(initial=True, required=False)
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, codebook=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.codebook = codebook
         self.helper = FormHelper(self)
         self.helper.add_input(Submit("submit", "Save", css_class="btn-primary"))
 
@@ -30,8 +31,27 @@ class CodebookForm(forms.Form):
             return self.fields["modified"].initial
         return self.cleaned_data["modified"]
 
+    @staticmethod
+    def _normalize(content):
+        # Browsers submit textarea content with \r\n line endings.
+        return "\n".join((content or "").splitlines()).strip()
+
     def clean(self, *args, **kwargs):
         cleaned_data = super().clean(*args, **kwargs)
+
+        # The client-side 'modified' flag is a hint, not an authority: if the
+        # submitted content actually differs from the stored codebook, treat
+        # the form as modified so the change is validated (rationale
+        # required) and saved instead of silently dropped.
+        if (
+            not cleaned_data.get("modified")
+            and self.codebook is not None
+            and self.data.get(self.add_prefix("content")) is not None
+            and self._normalize(self.data.get(self.add_prefix("content")))
+            != self._normalize(self.codebook.content)
+        ):
+            cleaned_data["modified"] = True
+
         # If 'modified' is False, we discard all other validation errors
         # This is admissible because it won't save the form anyways.
         if not cleaned_data.get("modified"):

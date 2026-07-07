@@ -75,6 +75,17 @@ class TestExpertViews:
         assert response.context["annotator"] is None
         assert response.context["sentence"] == self.data["example"]
 
+    def test_dialogue_templates_have_alpine_scope(self):
+        # Regression: the codebook-modified tracking (@keydown, :class,
+        # @htmx:after-settle) consists of Alpine directives, which are only
+        # initialized inside an x-data tree. Without x-data on the roots the
+        # flag was stuck at false and codebook edits were silently dropped.
+        partial = self.client.get(self.content_url, HTTP_HX_REQUEST="true").content.decode()
+        assert 'id="expert-dialogue" x-data' in partial
+        full_page = self.client.get(self.shell_url).content.decode()
+        assert 'id="expert-dialogue-content"' in full_page
+        assert "x-data" in full_page
+
     def test_expert_dialogue_view_get_as_annotator(self, client):
         login = client.login(username=self.data["annotators"][0].username, password="123")
         assert login is True
@@ -113,7 +124,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": label_ids,
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
         )
@@ -134,7 +145,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": label_ids,
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
             HTTP_HX_REQUEST="true",
@@ -151,7 +162,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": [invalid_label_id],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
             HTTP_HX_REQUEST="true",
@@ -172,7 +183,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": [label.id],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
         )
@@ -189,7 +200,11 @@ class TestSaveExpertView:
         example = self.data["example"]
         response = self.client.post(
             self.url,
-            data={"labels-labels": [], "codebook-content": "test", "codebook-modified": "false"},
+            data={
+                "labels-labels": [],
+                "codebook-content": self.codebook.content,
+                "codebook-modified": "false",
+            },
         )
         assert response.status_code == 302
         example.refresh_from_db()
@@ -206,7 +221,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": [invalid_label_id],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
         )
@@ -226,7 +241,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": [valid_label_id, invalid_label_id],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
         )
@@ -243,7 +258,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": ["not-a-number"],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
         )
@@ -290,7 +305,7 @@ class TestSaveExpertView:
             self.url,
             data={
                 "labels-labels": [label1.id, label2.id],
-                "codebook-content": "test",
+                "codebook-content": self.codebook.content,
                 "codebook-modified": "false",
             },
             HTTP_HX_REQUEST="true",
@@ -310,6 +325,65 @@ class TestSaveExpertView:
             )
         }
         assert checkboxes == {str(label1.id): False, str(label2.id): True}
+
+    def test_codebook_change_saved_despite_false_modified_flag(self):
+        # THE regression users reported: the client-side modified flag was
+        # stuck at false, so codebook edits during expert decisions were
+        # silently discarded. The server now detects the content change.
+        new_content = self.codebook.content + "\n\n# Edge case added during expert decision"
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": [self.data["labels"][0].id],
+                "codebook-content": new_content,
+                "codebook-rationale": "documented an edge case",
+                "codebook-modified": "false",
+            },
+        )
+        assert response.status_code == 302
+        self.codebook.refresh_from_db()
+        assert "Edge case added during expert decision" in self.codebook.content
+
+    def test_codebook_change_without_rationale_is_rejected_not_dropped(self):
+        # A content change without rationale must produce a visible error
+        # (and save nothing) instead of silently discarding the edit.
+        original = self.codebook.content
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": [self.data["labels"][0].id],
+                "codebook-content": original + "\nchanged without rationale",
+                "codebook-rationale": "",
+                "codebook-modified": "false",
+            },
+            HTTP_HX_REQUEST="true",
+        )
+        assert response.status_code == 200
+        trigger = json.loads(response["HX-Trigger"])
+        assert any("Something was invalid" in m["message"] for m in trigger["messages"])
+        self.codebook.refresh_from_db()
+        assert self.codebook.content == original
+        self.assignment.refresh_from_db()
+        assert self.assignment.annotations.count() == 0
+
+    def test_unchanged_content_with_crlf_line_endings_is_not_a_change(self):
+        # Browsers submit textarea content with \r\n line endings; an
+        # untouched codebook must not be treated as an edit (which would
+        # demand a rationale and block the label-only flow).
+        crlf_content = "\r\n".join(self.codebook.content.splitlines())
+        label = self.data["labels"][0]
+        response = self.client.post(
+            self.url,
+            data={
+                "labels-labels": [label.id],
+                "codebook-content": crlf_content,
+                "codebook-rationale": "",
+                "codebook-modified": "false",
+            },
+        )
+        assert response.status_code == 302
+        self.assignment.refresh_from_db()
+        assert list(self.assignment.annotations.values_list("label_id", flat=True)) == [label.id]
 
     def test_post_empty_rationale_does_not_update_codebook(self):
         initial_content = self.codebook.content
