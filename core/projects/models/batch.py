@@ -157,12 +157,15 @@ class Batch(models.Model):
         return next_phase
 
     def start_next_setup_batch(self) -> "Batch | None":
-        """Move the project's next SETUP batch (lowest batch number) into
-        ANNOTATION. Batches without examples are not started."""
+        """Move the project's next SETUP batch into ANNOTATION.
+
+        Only batches AFTER this one are considered (skipped earlier batches
+        stay untouched), only in SETUP phase, and only with examples."""
         next_batch = (
             Batch.objects.filter(
                 project=self.project,
                 current_phase=BatchPhase.SETUP,
+                batch_number__gt=self.batch_number,
                 examples__isnull=False,
             )
             .order_by("batch_number")
