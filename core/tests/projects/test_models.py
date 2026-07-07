@@ -296,6 +296,25 @@ def test_finalize_without_next_setup_batch_is_harmless():
 
 
 @pytest.mark.django_db
+def test_setup_batch_with_smaller_number_is_never_started():
+    # A skipped batch (still in SETUP but numbered before the finalizing
+    # batch) must not be resurrected; only later batches are auto-started.
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    skipped = _add_setup_batch(data["project"])
+    Batch.objects.filter(pk=skipped.pk).update(batch_number=batch.batch_number - 1)
+
+    _resolve_all_disagreements(data)
+    _finalize(batch, *data["annotators"])
+    result = batch.advance_from_annotation_if_finalized()
+
+    assert result == BatchPhase.FINAL
+    skipped.refresh_from_db()
+    assert skipped.current_phase == BatchPhase.SETUP
+    assert batch.start_next_setup_batch() is None
+
+
+@pytest.mark.django_db
 def test_setup_batch_without_examples_is_not_started():
     data = _create_project_with_batch()
     batch = data["batch"]
