@@ -9,6 +9,7 @@ services:
       - REDIS_HOST=redis
     volumes:
       - media:/app/media
+      - ./backups:/app/backups
     ports:
       - "8000:8000" # app
     depends_on:

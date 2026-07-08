@@ -2,7 +2,7 @@
 
 # ---- Base with uv + Python ----
 FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
-RUN apk add --no-cache git ca-certificates && update-ca-certificates
+RUN apk add --no-cache git ca-certificates postgresql16-client && update-ca-certificates
 WORKDIR /app
 ENV UV_PROJECT_ENVIRONMENT=/.venv \
     PATH="/.venv/bin:${PATH}" \
