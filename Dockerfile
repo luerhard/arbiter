@@ -2,7 +2,7 @@
 
 # ---- Base with uv + Python ----
 FROM ghcr.io/astral-sh/uv:python3.13-alpine AS base
-RUN apk add --no-cache git ca-certificates postgresql16-client && update-ca-certificates
+RUN apk add --no-cache git ca-certificates postgresql18-client && update-ca-certificates
 WORKDIR /app
 ENV UV_PROJECT_ENVIRONMENT=/.venv \
     PATH="/.venv/bin:${PATH}" \
@@ -10,8 +10,8 @@ ENV UV_PROJECT_ENVIRONMENT=/.venv \
     PYTHONDONTWRITEBYTECODE=1 \
     UV_LINK_MODE=copy
 
-RUN git config --global user.name "anntotationtool" && \
-    git config --global user.email "annotation@tool.com"
+RUN git config --global user.name "arbiter" && \
+    git config --global user.email "arbiter@tool.com"
 
 # ---- Runtime deps only ----
 FROM base AS deps-runtime
