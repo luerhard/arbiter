@@ -198,10 +198,15 @@ When the app is running, and you navigate with the GUI to a breakpoint, the code
 </section>
 <section id="build-documentation-locally">
 <h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>bash<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs; make html&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs; make html&quot;</span>
 </pre></div>
 </div>
 <p>This will create <code class="docutils literal notranslate"><span class="pre">docs/_build/html/index.html</span></code> which is the starting page of the documentation.</p>
+<p>To open it, run this in the command line</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--service-ports<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs/_build/html &amp;&amp; python -m http.server 8080&quot;</span>
+</pre></div>
+</div>
+<p>Then open http://localhost:8080 in private mode in your browser.</p>
 </section>
 <section id="overview-and-starting-point">
 <h2>Overview and starting point<a class="headerlink" href="#overview-and-starting-point" title="Link to this heading"></a></h2>
