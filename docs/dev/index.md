@@ -118,11 +118,12 @@ docker compose run --rm web sh -c "cd ../docs; make html"
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
 
 To open it, run this in the command line
+
 ```bash
 docker compose run --rm --service-ports web sh -c "cd ../docs/_build/html && python -m http.server 8080"
 ```
 
-Then open http://localhost:8080 in private mode in your browser. 
+Then open http://localhost:8080 in private mode in your browser.
 
 ## Overview and starting point
 
