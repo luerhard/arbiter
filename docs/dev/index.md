@@ -112,10 +112,15 @@ When the app is running, and you navigate with the GUI to a breakpoint, the code
 ## Build documentation locally
 
 ```bash
-docker compose run --rm web bash -c "cd ../docs; make html"
+docker compose run --rm web sh -c "cd ../docs; make html"
 ```
 
 This will create `docs/_build/html/index.html` which is the starting page of the documentation.
+
+To open it: 
+```bash
+docker compose run --rm --service-ports web sh -c "cd ../docs/_build/html && python -m http.server 8080"
+```
 
 ## Overview and starting point
 
