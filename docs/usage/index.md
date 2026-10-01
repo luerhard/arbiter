@@ -23,10 +23,13 @@ Unlike traditional post-hoc statistical methods that attempt to model disagreeme
 
 To log into Arbiter, enter the credentials provided by your system administrator. The login interface is identical for annotators and experts
 
-<p align="center">
-  <img src="screenshots/login.png" width="500" alt="Arbiter Login Interface"><br>
-  <sub><b>Figure 1: Arbiter Login Screen</b>Authentication page for Annotators and Experts</sub>
-</p>
+:::{figure} screenshots/login.png
+:width: 500px
+:align: center
+:alt: Arbiter Login Interface
+
+**Figure 1: Arbiter Login Screen**. Authentication page for Annotators and Experts
+:::
 
 ## User Roles and Workflow Description
 
@@ -40,10 +43,13 @@ Arbiter structures data labeling around three distinct user roles and a multi-st
 
 ### Workflow
 
-<p align="center">
-  <img src="screenshots/workflow_diagram.png" width="500" alt="Arbiter Login Interface"><br>
-  <sub><b>Figure 2: Arbiter Workflow</b></sub>
-</p>
+:::{figure} screenshots/workflow_diagram.png
+:width: 500px
+:align: center
+:alt: Arbiter Login Interface
+
+**Figure 2: Arbiter Workflow**
+:::
 
 1. **First batch and codebook upload**: Expert user uploads batches and the first version of the annotation guidelines.
 2. **Annotation**: Annotators independently assign labels according to current codebook guidelines.
@@ -68,10 +74,13 @@ To set up a new annotation project:
 
 3. Click **Create Project** at the bottom of the page to finalize setup.
 
-<p align="center">
-  <img src="screenshots/expert_create_project_filled.png" width="650" alt="Create Project Form"><br>
-  <sub><b>Figure 3: Project Creation Form</b>. Filling in project title, description, user assignments, labels, display colors, and hotkeys.</sub>
-</p>
+:::{figure} screenshots/expert_create_project_filled.png
+:width: 650px
+:align: center
+:alt: Create Project Form
+
+**Figure 3: Project Creation Form**. Filling in project title, description, user assignments, labels, display colors, and hotkeys.
+:::
 
 ---
 
@@ -83,20 +92,29 @@ Once a project is created, data samples must be grouped and uploaded in batches:
 2. In the modal dialog, select a dataset file (`CSV` or `XLSX` containing a `text` column) and select the designated annotators and experts for that batch.
 3. Upon upload, the new batch appears in the project's **Batches** list in `Annotation` mode.
 
-<p align="center">
-  <img src="screenshots/expert_upload_first_batch.png" width="550" alt="Empty Project Dashboard"><br>
-  <sub><b>Figure 4: Initial Project Dashboard</b>. Dashboard view prior to uploading dataset batches.</sub>
-</p>
+:::{figure} screenshots/expert_upload_first_batch.png
+:width: 550px
+:align: center
+:alt: Empty Project Dashboard
 
-<p align="center">
-  <img src="screenshots/expert_create_first_batch.png" width="550" alt="Create Batch Modal"><br>
-  <sub><b>Figure 5: Batch Creation Modal</b>. Uploading a dataset file and assigning specific annotators and experts to the batch.</sub>
-</p>
+**Figure 4: Initial Project Dashboard**. Dashboard view prior to uploading dataset batches.
+:::
 
-<p align="center">
-  <img src="screenshots/expert_batch_uploaded.png" width="650" alt="Active Batch Overview"><br>
-  <sub><b>Figure 6: Active Batch Dashboard</b>. Overview card displaying Batch 1 in the Annotation phase, showing real-time annotation progress per user.</sub>
-</p>
+:::{figure} screenshots/expert_create_first_batch.png
+:width: 550px
+:align: center
+:alt: Create Batch Modal
+
+**Figure 5: Batch Creation Modal**. Uploading a dataset file and assigning specific annotators and experts to the batch.
+:::
+
+:::{figure} screenshots/expert_batch_uploaded.png
+:width: 650px
+:align: center
+:alt: Active Batch Overview
+
+**Figure 6: Active Batch Dashboard**. Overview card displaying Batch 1 in the Annotation phase, showing real-time annotation progress per user.
+:::
 
 ---
 
@@ -107,10 +125,13 @@ After creating a batch, the Expert writes the initial annotation guidelines (Cod
 1. Click **View Codebook** on the project dashboard.
 2. Click **Edit**, enter the initial guideline instructions, write a rationale for the initial setup, and save.
 
-<p align="center">
-  <img src="screenshots/expert_first_codebook.png" width="650" alt="Initial Codebook Editor"><br>
-  <sub><b>Figure 7: Initial Codebook Setup</b>. Editor interface where Experts input first instructions and save the initial Codebook commit.</sub>
-</p>
+:::{figure} screenshots/expert_first_codebook.png
+:width: 650px
+:align: center
+:alt: Initial Codebook Editor
+
+**Figure 7: Initial Codebook Setup**. Editor interface where Experts input first instructions and save the initial Codebook commit.
+:::
 
 ---
 
@@ -126,15 +147,21 @@ When annotators complete peer discussion without reaching consensus on a sample,
 
 > **Important Note**: In order for annotators to see highlighted Codebook changes when starting a new batch, the subsequent batch must already be created and in `Setup` mode when the Codebook edit takes place.
 
-<p align="center">
-  <img src="screenshots/expert_resolve.png" width="650" alt="Unresolved Disagreements Alert"><br>
-  <sub><b>Figure 8: Unresolved Disagreement Alert</b>. Batch dashboard card indicating cases needing expert adjudication via the "Resolve" button.</sub>
-</p>
+:::{figure} screenshots/expert_resolve.png
+:width: 650px
+:align: center
+:alt: Unresolved Disagreements Alert
 
-<p align="center">
-  <img src="screenshots/expert_codebook_editing.png" width="650" alt="Expert Adjudication Interface"><br>
-  <sub><b>Figure 9: Expert Adjudication & Codebook Revision Interface</b>. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook rule editing, and rationale logging.</sub>
-</p>
+**Figure 8: Unresolved Disagreement Alert**. Batch dashboard card indicating cases needing expert adjudication via the "Resolve" button.
+:::
+
+:::{figure} screenshots/expert_codebook_editing.png
+:width: 650px
+:align: center
+:alt: Expert Adjudication Interface
+
+**Figure 9: Expert Adjudication & Codebook Revision Interface**. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook rule editing, and rationale logging.
+:::
 
 ---
 
@@ -145,10 +172,13 @@ When all annotations, discussions, and expert adjudications for a batch are comp
 - Click **Export** on an individual batch card to download its final labels, discussion transcripts, and revision history.
 - Click **Export Project** to download the complete dataset and full Git-backed audit trail for the entire project.
 
-<p align="center">
-  <img src="screenshots/expert_export_project.png" width="650" alt="Export Project Dashboard"><br>
-  <sub><b>Figure 10: Data Export Dashboard</b>. Finalized batch view offering individual batch or full project data export options.</sub>
-</p>
+:::{figure} screenshots/expert_export_project.png
+:width: 650px
+:align: center
+:alt: Export Project Dashboard
+
+**Figure 10: Data Export Dashboard**. Finalized batch view offering individual batch or full project data export options.
+:::
 
 ---
 
@@ -160,10 +190,13 @@ The Annotator role focuses on independent labeling, peer discussion of conflicti
 
 When logging in, Annotators see a summary of all assigned projects, active batches, and current phase statuses.
 
-<p align="center">
-  <img src="screenshots/annotator_start.png" width="650" alt="Annotator Home Dashboard"><br>
-  <sub><b>Figure 11: Annotator Home Dashboard</b>. Overview of assigned projects, count of active batches, and current phase indicator.</sub>
-</p>
+:::{figure} screenshots/annotator_start.png
+:width: 650px
+:align: center
+:alt: Annotator Home Dashboard
+
+**Figure 11: Annotator Home Dashboard**. Overview of assigned projects, count of active batches, and current phase indicator.
+:::
 
 ---
 
@@ -175,15 +208,21 @@ Clicking on a project opens the batch management view:
 - **View Codebook**: Opens the current annotation guidelines.
 - **Open Codebook Changes**: Displays the codebook view showing newly added rules since the previous batch.
 
-<p align="center">
-  <img src="screenshots/annotator_first_batch_overview.png" width="650" alt="Annotator Batch Overview"><br>
-  <sub><b>Figure 12: Annotator Batch Overview Card</b>. Displaying assigned samples (0/11 annotated) and action buttons.</sub>
-</p>
+:::{figure} screenshots/annotator_first_batch_overview.png
+:width: 650px
+:align: center
+:alt: Annotator Batch Overview
 
-<p align="center">
-  <img src="screenshots/annotator_first_codebook_view.png" width="650" alt="Initial Codebook View Modal"><br>
-  <sub><b>Figure 13: Codebook</b>. Displaying instructions before any batch edits occur.</sub>
-</p>
+**Figure 12: Annotator Batch Overview Card**. Displaying assigned samples (0/11 annotated) and action buttons.
+:::
+
+:::{figure} screenshots/annotator_first_codebook_view.png
+:width: 650px
+:align: center
+:alt: Initial Codebook View Modal
+
+**Figure 13: Codebook**. Displaying instructions before any batch edits occur.
+:::
 
 ---
 
@@ -196,15 +235,21 @@ In the Annotation phase, annotators label each sample independently:
 3. Navigate through samples using arrow buttons or keyboard shortcuts.
 4. When finished, click **Finalize annotation**.
 
-<p align="center">
-  <img src="screenshots/annotator_annotation_interface.png" width="550" alt="Independent Annotation Screen"><br>
-  <sub><b>Figure 14: Annotation Interface</b>. Single-sample labeling screen with progress bar, label selection buttons, and navigation controls.</sub>
-</p>
+:::{figure} screenshots/annotator_annotation_interface.png
+:width: 550px
+:align: center
+:alt: Independent Annotation Screen
 
-<p align="center">
-  <img src="screenshots/finalize_annotation.png" width="550" alt="Finalize Batch Screen"><br>
-  <sub><b>Figure 15: Finalize Batch</b>. Completion prompt displayed when all samples in a batch have been labeled.</sub>
-</p>
+**Figure 14: Annotation Interface**. Single-sample labeling screen with progress bar, label selection buttons, and navigation controls.
+:::
+
+:::{figure} screenshots/finalize_annotation.png
+:width: 550px
+:align: center
+:alt: Finalize Batch Screen
+
+**Figure 15: Finalize Batch**. Completion prompt displayed when all samples in a batch have been labeled.
+:::
 
 #### Keyboard Shortcuts
 
@@ -228,15 +273,21 @@ When independent annotation is complete and label mismatches exist between annot
 3. Discuss the sample with your peer.
 4. If you reach consensus, update your label selections. If you remain in disagreement, leave the conflicting labels as-is to escalate the sample to the Expert. Click **Save & Done**.
 
-<p align="center">
-  <img src="screenshots/annotator_start_discussion.png" width="550" alt="Start Discussion Alert"><br>
-  <sub><b>Figure 16: Peer Discussion Alert</b>. Batch card notifying annotators that independent labeling is complete and peer discussion is open.</sub>
-</p>
+:::{figure} screenshots/annotator_start_discussion.png
+:width: 550px
+:align: center
+:alt: Start Discussion Alert
 
-<p align="center">
-  <img src="screenshots/annotator_discussion_interface.png" width="650" alt="Real-Time Chat Discussion Interface"><br>
-  <sub><b>Figure 17: Real-Time Peer Discussion Interface</b>. Split-screen workspace showing conflicting label choices, connection status, and live chat messaging.</sub>
-</p>
+**Figure 16: Peer Discussion Alert**. Batch card notifying annotators that independent labeling is complete and peer discussion is open.
+:::
+
+:::{figure} screenshots/annotator_discussion_interface.png
+:width: 650px
+:align: center
+:alt: Real-Time Chat Discussion Interface
+
+**Figure 17: Real-Time Peer Discussion Interface**. Split-screen workspace showing conflicting label choices, connection status, and live chat messaging.
+:::
 
 ---
 
@@ -247,15 +298,21 @@ When the Expert adjudicates an escalated sample and updates the guidelines:
 1. Upon entering the next batch, click **Open Codebook Changes**.
 2. The Codebook view highlights all newly added or modified rules in highlighted format.
 
-<p align="center">
-  <img src="screenshots/annotator_open_codebook_changes.png" width="550" alt="Codebook Update Notification"><br>
-  <sub><b>Figure 18: Codebook Update</b>. Button on new batch card indicating updated guidelines are available.</sub>
-</p>
+:::{figure} screenshots/annotator_open_codebook_changes.png
+:width: 550px
+:align: center
+:alt: Codebook Update Notification
 
-<p align="center">
-  <img src="screenshots/annotator_codebook_view_edited.png" width="650" alt="Diff-Highlighted Codebook View"><br>
-  <sub><b>Figure 19: Highlighted Codebook Edits View</b>. Updated guideline screen with newly added rules highlighted in green.</sub>
-</p>
+**Figure 18: Codebook Update**. Button on new batch card indicating updated guidelines are available.
+:::
+
+:::{figure} screenshots/annotator_codebook_view_edited.png
+:width: 650px
+:align: center
+:alt: Diff-Highlighted Codebook View
+
+**Figure 19: Highlighted Codebook Edits View**. Updated guideline screen with newly added rules highlighted in green.
+:::
 
 ---
 
@@ -267,10 +324,13 @@ Administrators manage system deployment, user account creation, user group assig
 
 Log in at `http://<your-server-ip>/admin`. The dashboard provides quick access to User and Group management, along with a log of recent administrative actions.
 
-<p align="center">
-  <img src="screenshots/admin.png" width="650" alt="Django Admin Homepage"><br>
-  <sub><b>Figure 20: Django Administration Homepage</b> — Central management portal for site administration, user accounts, and system logs.</sub>
-</p>
+:::{figure} screenshots/admin.png
+:width: 650px
+:align: center
+:alt: Django Admin Homepage
+
+**Figure 20: Django Administration Homepage** — Central management portal for site administration, user accounts, and system logs.
+:::
 
 ---
 
@@ -282,10 +342,13 @@ To register new Annotators or Experts:
 2. Enter a unique username and password.
 3. Click **Save** to create the user account.
 
-<p align="center">
-  <img src="screenshots/admin_add_user.png" width="650" alt="Add User Form"><br>
-  <sub><b>Figure 21: User Registration Form</b> — Admin form for creating new user credentials.</sub>
-</p>
+:::{figure} screenshots/admin_add_user.png
+:width: 650px
+:align: center
+:alt: Add User Form
+
+**Figure 21: User Registration Form** — Admin form for creating new user credentials.
+:::
 
 ---
 
@@ -296,10 +359,13 @@ Organize users into functional groups to streamline role assignments:
 1. Navigate to **Groups** under Authentication and Authorization.
 2. Use the dual-list selector to assign users to specific system groups (e.g., Annotators, Experts).
 
-<p align="center">
-  <img src="screenshots/admin_user_groups.png" width="650" alt="User Group Assignment"><br>
-  <sub><b>Figure 22: User Group Management</b> — Interface for assigning users to designated functional groups.</sub>
-</p>
+:::{figure} screenshots/admin_user_groups.png
+:width: 650px
+:align: center
+:alt: User Group Assignment
+
+**Figure 22: User Group Management** — Interface for assigning users to designated functional groups.
+:::
 
 ---
 
@@ -311,7 +377,10 @@ Fine-tune model-level access rights for specific accounts or groups:
 2. In the **User permissions** section, select specific Django model permissions (e.g., `Expert | codebook draft | Can add codebook draft`, `Projects | batch | Can add batch`).
 3. Click **Save** to enforce permission settings.
 
-<p align="center">
-  <img src="screenshots/admin_user_permissions.png" width="650" alt="User Permissions Selector"><br>
-  <sub><b>Figure 23: Fine-Grained User Permissions</b> — Selector panel for assigning specific system and model permissions to user profiles.</sub>
-</p>
+:::{figure} screenshots/admin_user_permissions.png
+:width: 650px
+:align: center
+:alt: User Permissions Selector
+
+**Figure 23: Fine-Grained User Permissions** — Selector panel for assigning specific system and model permissions to user profiles.
+:::
