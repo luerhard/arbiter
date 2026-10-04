@@ -167,3 +167,28 @@ def test_example_assignment_previous_next_skip_annotated_skips_done_assignments(
     assert a3.previous().id == a2.id
     assert a3.previous(skip_annotated=True).id == a1.id
     assert a1.next(skip_annotated=True).id == a3.id
+
+
+@pytest.mark.django_db
+def test_example_assignment_save_without_order_appends_to_user_queue():
+    data = _setup_example_assignment()
+    batch, user = data["batch"], data["user"]
+    example2 = Example.objects.create(batch=batch, content="Example 2")
+    example3 = Example.objects.create(batch=batch, content="Example 3")
+
+    appended = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=example2,
+        phase=BatchPhase.ANNOTATION,
+    )
+    other_phase = ExampleAssignment.objects.create(
+        batch=batch,
+        user=user,
+        example=example3,
+        phase=BatchPhase.DISCUSSION,
+    )
+
+    assert appended.order == data["assignment"].order + 1
+    assert other_phase.order == 1
+    assert "id: " in str(appended)

@@ -43,7 +43,7 @@ class ExampleAssignment(models.Model):
         ]
 
     def __str__(self):
-        return f"id: {self.id}, user: {self.user.usernam}, ex: {self.example.id} done: {self.done}"
+        return f"id: {self.id}, user: {self.user.username}, ex: {self.example.id} done: {self.done}"
 
     def __repr__(self):
         return f"id: {self.id}, user: {self.user.username}, ex: {self.example.id} done: {self.done}"
@@ -101,11 +101,12 @@ class ExampleAssignment(models.Model):
         return self.example.has_disagreement_after_discussion
 
     def save(self, *args, **kwargs):
-        # auto set order for the first time
+        # auto set order for the first time: append to this user's queue
         if self.order is None:
             max_order = ExampleAssignment.objects.filter(
-                batch_assignment=self.batch_assignment,
-                example__batch=self.example.batch,
+                batch=self.batch,
+                user=self.user,
+                phase=self.phase,
             ).aggregate(max_order=models.Max("order"))["max_order"]
 
             # if there are no other entries
