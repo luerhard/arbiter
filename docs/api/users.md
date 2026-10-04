@@ -18,3 +18,27 @@ User model, profile views etc.
     :members:
     :undoc-members:
 ```
+
+## Forms
+
+```{eval-rst}
+.. automodule:: users.forms
+    :members:
+    :undoc-members:
+```
+
+## Group permissions
+
+```{eval-rst}
+.. automodule:: users.group_permissions
+    :members:
+    :undoc-members:
+```
+
+## Management commands
+
+```{eval-rst}
+.. automodule:: users.management.commands.update_permissions
+    :members:
+    :undoc-members:
+```
