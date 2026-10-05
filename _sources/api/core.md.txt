@@ -10,3 +10,27 @@ The idea is to keep this rather empty and to dispatch most of the logic to its s
     :members:
     :undoc-members:
 ```
+
+## Forms
+
+```{eval-rst}
+.. automodule:: core.forms
+    :members:
+    :undoc-members:
+```
+
+## Mixins
+
+```{eval-rst}
+.. automodule:: core.mixins
+    :members:
+    :undoc-members:
+```
+
+## Middleware
+
+```{eval-rst}
+.. automodule:: core.middleware
+    :members:
+    :undoc-members:
+```

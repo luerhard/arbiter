@@ -1,0 +1,625 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codebook &mdash; AnnotationTool 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Core" href="core.html" />
+    <link rel="prev" title="Annotation" href="annotation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            AnnotationTool
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/index.html#general-info-overview">General Info &amp; Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Codebook</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#module-codebook.views">Views</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookView"><code class="docutils literal notranslate"><span class="pre">CodebookView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookDiffView"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookUpdateView"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookExportView"><code class="docutils literal notranslate"><span class="pre">CodebookExportView</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-codebook.models">Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.models.Codebook"><code class="docutils literal notranslate"><span class="pre">Codebook</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-codebook.forms">Forms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.forms.CodebookForm"><code class="docutils literal notranslate"><span class="pre">CodebookForm</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-codebook.utils">Utils</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.utils.normalize_content"><code class="docutils literal notranslate"><span class="pre">normalize_content()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-codebook.markdown_extensions.git_diff_preprocess">Markdown extensions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension"><code class="docutils literal notranslate"><span class="pre">PreProcessDiffsExtension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_preprocess.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor"><code class="docutils literal notranslate"><span class="pre">InsertionInlineProcessor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_insertion.InsertionExtension"><code class="docutils literal notranslate"><span class="pre">InsertionExtension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_insertion.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_del.DelInlineProcessor"><code class="docutils literal notranslate"><span class="pre">DelInlineProcessor</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_del.DelExtension"><code class="docutils literal notranslate"><span class="pre">DelExtension</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.markdown_extensions.git_diff_del.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">AnnotationTool</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Documentation</a></li>
+      <li class="breadcrumb-item active">Codebook</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/codebook.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="codebook">
+<h1>Codebook<a class="headerlink" href="#codebook" title="Link to this heading"></a></h1>
+<p>This app manages the codebook of each project.
+Every codebook is stored as a markdown file in its own git repository, so each change is a commit and the codebook version of every batch is marked with a git tag.
+Differences between versions are rendered with custom markdown extensions.</p>
+<section id="module-codebook.views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-codebook.views" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.views.CodebookView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookView" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookView.pk_url_kwarg">
+<span class="sig-name descname"><span class="pre">pk_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook_id'</span></em><a class="headerlink" href="#codebook.views.CodebookView.pk_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#codebook.views.CodebookView.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#codebook.models.Codebook" title="codebook.models.Codebook"><code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookView.context_object_name">
+<span class="sig-name descname"><span class="pre">context_object_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook'</span></em><a class="headerlink" href="#codebook.views.CodebookView.context_object_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook/view.html'</span></em><a class="headerlink" href="#codebook.views.CodebookView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookDiffView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookDiffView" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView.pk_url_kwarg">
+<span class="sig-name descname"><span class="pre">pk_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook_id'</span></em><a class="headerlink" href="#codebook.views.CodebookDiffView.pk_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#codebook.views.CodebookDiffView.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#codebook.models.Codebook" title="codebook.models.Codebook"><code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView.context_object_name">
+<span class="sig-name descname"><span class="pre">context_object_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook'</span></em><a class="headerlink" href="#codebook.views.CodebookDiffView.context_object_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook/view-diff.html'</span></em><a class="headerlink" href="#codebook.views.CodebookDiffView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookDiffView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookDiffView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookUpdateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookUpdateView" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.pk_url_kwarg">
+<span class="sig-name descname"><span class="pre">pk_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook_id'</span></em><a class="headerlink" href="#codebook.views.CodebookUpdateView.pk_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#codebook.views.CodebookUpdateView.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#codebook.models.Codebook" title="codebook.models.Codebook"><code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.form_class">
+<span class="sig-name descname"><span class="pre">form_class</span></span><a class="headerlink" href="#codebook.views.CodebookUpdateView.form_class" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#codebook.forms.CodebookForm" title="codebook.forms.CodebookForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookForm</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook/edit.html'</span></em><a class="headerlink" href="#codebook.views.CodebookUpdateView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.get_initial">
+<span class="sig-name descname"><span class="pre">get_initial</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookUpdateView.get_initial" title="Link to this definition"></a></dt>
+<dd><p>Return the initial data to use for forms on this view.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.get_form_kwargs">
+<span class="sig-name descname"><span class="pre">get_form_kwargs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookUpdateView.get_form_kwargs" title="Link to this definition"></a></dt>
+<dd><p>Return the keyword arguments for instantiating the form.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookUpdateView.form_valid">
+<span class="sig-name descname"><span class="pre">form_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">form</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookUpdateView.form_valid" title="Link to this definition"></a></dt>
+<dd><p>If the form is valid, save the associated model.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.views.CodebookExportView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookExportView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookExportView" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookExportView.pk_url_kwarg">
+<span class="sig-name descname"><span class="pre">pk_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook_id'</span></em><a class="headerlink" href="#codebook.views.CodebookExportView.pk_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookExportView.get">
+<span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codebook_id</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookExportView.get" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-codebook.models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-codebook.models" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.models.Codebook">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.models.</span></span><span class="sig-name descname"><span class="pre">Codebook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">git_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook" title="Link to this definition"></a></dt>
+<dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">codebook_codebook</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.1)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
+<li><p><strong>git_dir</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.FilePathField" title="(in Django v6.1)"><em>FilePathField</em></a>) – Git dir</p></li>
+</ul>
+</dd>
+</dl>
+<p>Relationship fields:</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>project</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a>) – Project (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">codebook</span></code>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.Codebook.project">
+<span class="sig-name descname"><span class="pre">project</span></span><a class="headerlink" href="#codebook.models.Codebook.project" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> to <a class="reference internal" href="projects.html#projects.models.Project" title="projects.models.project.Project"><code class="xref py py-class docutils literal notranslate"><span class="pre">Project</span></code></a></p>
+<p>Project (related name: <code class="xref py py-attr docutils literal notranslate"><span class="pre">codebook</span></code>)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.Codebook.git_dir">
+<span class="sig-name descname"><span class="pre">git_dir</span></span><a class="headerlink" href="#codebook.models.Codebook.git_dir" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.FilePathField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilePathField</span></code></a></p>
+<p>Git dir</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="codebook.models.Codebook.file">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file</span></span><a class="headerlink" href="#codebook.models.Codebook.file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="codebook.models.Codebook.content">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">content</span></span><a class="headerlink" href="#codebook.models.Codebook.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="codebook.models.Codebook.repo">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">repo</span></span><a class="headerlink" href="#codebook.models.Codebook.repo" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.get_absolute_url">
+<span class="sig-name descname"><span class="pre">get_absolute_url</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.get_absolute_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.tag_version">
+<span class="sig-name descname"><span class="pre">tag_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.tag_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.untag_version">
+<span class="sig-name descname"><span class="pre">untag_version</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.untag_version" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.diff">
+<span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.diff" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.save" title="Link to this definition"></a></dt>
+<dd><p>Save the current instance. Override this in a subclass if you want to
+control the saving process.</p>
+<p>The ‘force_insert’ and ‘force_update’ parameters can be used to insist
+that the “save” must be an SQL insert or update (or equivalent for
+non-SQL backends), respectively. Normally, they should not be set.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.commit_decision_revision">
+<span class="sig-name descname"><span class="pre">commit_decision_revision</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.commit_decision_revision" title="Link to this definition"></a></dt>
+<dd><p>Record a decision correction that does not change the codebook.</p>
+<p>The decision log in the git history is append-only: the original
+commit keeps its metadata, and the correction is appended as an
+empty commit whose message carries the revised metadata.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.get_as_context">
+<span class="sig-name descname"><span class="pre">get_as_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.get_as_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="codebook.models.Codebook.DoesNotExist">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#codebook.models.Codebook.DoesNotExist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="codebook.models.Codebook.MultipleObjectsReturned">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#codebook.models.Codebook.MultipleObjectsReturned" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="codebook.models.Codebook.NotUpdated">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotUpdated</span></span><a class="headerlink" href="#codebook.models.Codebook.NotUpdated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.Codebook.id">
+<span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#codebook.models.Codebook.id" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BigAutoField</span></code></a></p>
+<p>Primary key: ID</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.Codebook.objects">
+<span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.Manager</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#codebook.models.Codebook.objects" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.Codebook.project_id">
+<span class="sig-name descname"><span class="pre">project_id</span></span><a class="headerlink" href="#codebook.models.Codebook.project_id" title="Link to this definition"></a></dt>
+<dd><p>Internal field, use <a class="reference internal" href="#codebook.models.Codebook.project" title="codebook.models.Codebook.project"><code class="xref py py-class docutils literal notranslate"><span class="pre">project</span></code></a> instead.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-codebook.forms">
+<span id="forms"></span><h2>Forms<a class="headerlink" href="#module-codebook.forms" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.forms.</span></span><span class="sig-name descname"><span class="pre">CodebookForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codebook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.forms.CodebookForm" title="Link to this definition"></a></dt>
+<dd><p><strong>Form fields:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">content</span></code>: Content (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rationale</span></code>: Rationale (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">modified</span></code>: Modified (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.BooleanField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a>)</p></li>
+</ul>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.textarea_class">
+<span class="sig-name descname"><span class="pre">textarea_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'w-full</span> <span class="pre">border</span> <span class="pre">bg-white</span> <span class="pre">dark:bg-gray-900</span> <span class="pre">p-2</span> <span class="pre">text-gray-900</span> <span class="pre">dark:text-gray-100</span> <span class="pre">caret-blue-500</span> <span class="pre">focus:outline-none</span> <span class="pre">focus:ring-1</span> <span class="pre">focus:border-blue-500</span> <span class="pre">focus:ring-blue-500</span> <span class="pre">rounded-2xl</span> <span class="pre">p-2</span> <span class="pre">scrollbar</span> <span class="pre">rounded-2xl'</span></em><a class="headerlink" href="#codebook.forms.CodebookForm.textarea_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">codebook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.forms.CodebookForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.clean_modified">
+<span class="sig-name descname"><span class="pre">clean_modified</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#codebook.forms.CodebookForm.clean_modified" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.clean">
+<span class="sig-name descname"><span class="pre">clean</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.forms.CodebookForm.clean" title="Link to this definition"></a></dt>
+<dd><p>Hook for doing any extra form-wide cleaning after Field.clean() has
+been called on every field. Any ValidationError raised by this method
+will not be associated with a particular field; it will have a
+special-case association with the field named ‘__all__’.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codebook</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.forms.CodebookForm.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="codebook.forms.CodebookForm.media">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#codebook.forms.CodebookForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-codebook.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-codebook.utils" title="Link to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="codebook.utils.normalize_content">
+<span class="sig-prename descclassname"><span class="pre">codebook.utils.</span></span><span class="sig-name descname"><span class="pre">normalize_content</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#codebook.utils.normalize_content" title="Link to this definition"></a></dt>
+<dd><p>Normalize line endings and surrounding whitespace for comparisons.</p>
+<p>Browsers submit textarea content with rn line endings while the
+git-backed codebook stores n; comparing raw strings would flag every
+untouched submission as a change.</p>
+</dd></dl>
+
+</section>
+<section id="module-codebook.markdown_extensions.git_diff_preprocess">
+<span id="markdown-extensions"></span><h2>Markdown extensions<a class="headerlink" href="#module-codebook.markdown_extensions.git_diff_preprocess" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_preprocess.</span></span><span class="sig-name descname"><span class="pre">PreprocessDiffs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Markdown</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs" title="Link to this definition"></a></dt>
+<dd><p>Make sure that Git Diff syntax does not collide with normal MD syntax.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_POS">
+<span class="sig-name descname"><span class="pre">FIX_PATTERN_START_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\{\\+((?:\\-|\\d*\\.|\\&gt;|\\#*)</span> <span class="pre">?)(.*?)\\+\\}'</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_POS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_NEG">
+<span class="sig-name descname"><span class="pre">FIX_PATTERN_START_NEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\[\\-((?:\\-|\\d*\\.|\\&gt;|\\#*)</span> <span class="pre">?)(.*?)\\-\\]'</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_NEG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_POS">
+<span class="sig-name descname"><span class="pre">FIX_PATTERN_WRAP_POS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\{\\+(\\*\\*\\*\\*|\\*\\*|\\*|\\_\\_\\_\\_|\\_\\_|\\_|\\`\\`\\`|\\`|\\~\\~|\\~)(.*?)\\1\\+\\}'</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_POS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_NEG">
+<span class="sig-name descname"><span class="pre">FIX_PATTERN_WRAP_NEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\[\\-(\\*\\*\\*\\*|\\*\\*|\\*|\\_\\_\\_\\_|\\_\\_|\\_|\\`\\`\\`|\\`|\\~\\~|\\~)(.*?)\\1\\-\\]'</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_NEG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.run" title="Link to this definition"></a></dt>
+<dd><p>Each subclass of <cite>Preprocessor</cite> should override the <cite>run</cite> method, which
+takes the document as a list of strings split by newlines and returns
+the (possibly modified) list of lines.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_preprocess.</span></span><span class="sig-name descname"><span class="pre">PreProcessDiffsExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension.extendMarkdown">
+<span class="sig-name descname"><span class="pre">extendMarkdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">md</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension.extendMarkdown" title="Link to this definition"></a></dt>
+<dd><p>Add the various processors and patterns to the Markdown Instance.</p>
+<p>This method must be overridden by every extension.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>md: The Markdown instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.makeExtension">
+<span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_preprocess.</span></span><span class="sig-name descname"><span class="pre">makeExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.makeExtension" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class" id="module-codebook.markdown_extensions.git_diff_insertion">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_insertion.</span></span><span class="sig-name descname"><span class="pre">InsertionInlineProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Markdown</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor.handleMatch">
+<span class="sig-name descname"><span class="pre">handleMatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor.handleMatch" title="Link to this definition"></a></dt>
+<dd><p>Return a ElementTree element from the given match and the
+start and end index of the matched text.</p>
+<p>If <cite>start</cite> and/or <cite>end</cite> are returned as <cite>None</cite>, it will be
+assumed that the processor did not find a valid region of text.</p>
+<p>Subclasses should override this method.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>m: A re match object containing a match of the pattern.
+data: The buffer currently under analysis.</p>
+</dd>
+<dt>Returns:</dt><dd><p>el: The ElementTree element, text or None.
+start: The start of the region that has been matched or None.
+end: The end of the region that has been matched or None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_insertion.InsertionExtension">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_insertion.</span></span><span class="sig-name descname"><span class="pre">InsertionExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_insertion.InsertionExtension" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_insertion.InsertionExtension.extendMarkdown">
+<span class="sig-name descname"><span class="pre">extendMarkdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">md</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_insertion.InsertionExtension.extendMarkdown" title="Link to this definition"></a></dt>
+<dd><p>Add the various processors and patterns to the Markdown Instance.</p>
+<p>This method must be overridden by every extension.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>md: The Markdown instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_insertion.makeExtension">
+<span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_insertion.</span></span><span class="sig-name descname"><span class="pre">makeExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_insertion.makeExtension" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class" id="module-codebook.markdown_extensions.git_diff_del">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_del.DelInlineProcessor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_del.</span></span><span class="sig-name descname"><span class="pre">DelInlineProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">md</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Markdown</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_del.DelInlineProcessor" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_del.DelInlineProcessor.handleMatch">
+<span class="sig-name descname"><span class="pre">handleMatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_del.DelInlineProcessor.handleMatch" title="Link to this definition"></a></dt>
+<dd><p>Return a ElementTree element from the given match and the
+start and end index of the matched text.</p>
+<p>If <cite>start</cite> and/or <cite>end</cite> are returned as <cite>None</cite>, it will be
+assumed that the processor did not find a valid region of text.</p>
+<p>Subclasses should override this method.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>m: A re match object containing a match of the pattern.
+data: The buffer currently under analysis.</p>
+</dd>
+<dt>Returns:</dt><dd><p>el: The ElementTree element, text or None.
+start: The start of the region that has been matched or None.
+end: The end of the region that has been matched or None.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_del.DelExtension">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_del.</span></span><span class="sig-name descname"><span class="pre">DelExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_del.DelExtension" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_del.DelExtension.extendMarkdown">
+<span class="sig-name descname"><span class="pre">extendMarkdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">md</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_del.DelExtension.extendMarkdown" title="Link to this definition"></a></dt>
+<dd><p>Add the various processors and patterns to the Markdown Instance.</p>
+<p>This method must be overridden by every extension.</p>
+<dl class="simple">
+<dt>Arguments:</dt><dd><p>md: The Markdown instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_del.makeExtension">
+<span class="sig-prename descclassname"><span class="pre">codebook.markdown_extensions.git_diff_del.</span></span><span class="sig-name descname"><span class="pre">makeExtension</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.markdown_extensions.git_diff_del.makeExtension" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="annotation.html" class="btn btn-neutral float-left" title="Annotation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="core.html" class="btn btn-neutral float-right" title="Core" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

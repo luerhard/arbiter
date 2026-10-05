@@ -57,17 +57,17 @@
 <li class="toctree-l3"><a class="reference internal" href="#django-web-app">Django web app</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#development-server">Development Server</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#access">Access</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#current-users">Current Users</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#admin">admin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotator1">annotator1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotator2">annotator2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expert1">expert1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#expert2">expert2</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#passwords">Passwords</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="#development-server">Development Server</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#access">Access</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#current-users">Current Users</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#admin">admin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#annotator1">annotator1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#annotator2">annotator2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#expert1">expert1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#expert2">expert2</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#passwords">Passwords</a></li>
 </ul>
 </li>
 </ul>
@@ -199,12 +199,12 @@ When the app is running, and you navigate with the GUI to a breakpoint, the code
 </section>
 <section id="build-documentation-locally">
 <h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs; make html&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"cd ../docs; make html"</span>
 </pre></div>
 </div>
 <p>This will create <code class="docutils literal notranslate"><span class="pre">docs/_build/html/index.html</span></code> which is the starting page of the documentation.</p>
 <p>To open it, run this in the command line</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--service-ports<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;cd ../docs/_build/html &amp;&amp; python -m http.server 8080&quot;</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--service-ports<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"cd ../docs/_build/html &amp;&amp; python -m http.server 8080"</span>
 </pre></div>
 </div>
 <p>Then open http://localhost:8080 in private mode in your browser.</p>
@@ -236,51 +236,51 @@ The urls.py contain the URL declarations for the app.</p>
 This follows Django’s principle to seperate the design from the view functionality.</p>
 </section>
 </section>
-</section>
 <section id="development-server">
-<h1>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h1>
+<h2>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h2>
 <section id="access">
-<h2>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h2>
+<h3>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h3>
 <p>We now have a development Server which serves as a showcase of the current state of the project.</p>
 <p>The adress is: <a class="reference external" href="http://193.196.54.251">http://193.196.54.251</a></p>
 <p>To access it, you need to be in the University of Stuttgart VPN (or physically on campus).</p>
 </section>
 <section id="current-users">
-<h2>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h2>
+<h3>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h3>
 <section id="admin">
-<h3>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h3>
+<h4>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on <a class="reference external" href="http://193.196.54.251/admin">http://193.196.54.251/admin</a>. If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.</p></li>
 </ul>
 </section>
 <section id="annotator1">
-<h3>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h3>
+<h4>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>default annotator without special permissions</p></li>
 </ul>
 </section>
 <section id="annotator2">
-<h3>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h3>
+<h4>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>same as annotator1. Exists because we want 2 annotators for each project</p></li>
 </ul>
 </section>
 <section id="expert1">
-<h3>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h3>
+<h4>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>A role to show the expert interface.</p></li>
 </ul>
 </section>
 <section id="expert2">
-<h3>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h3>
+<h4>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h4>
 <ul class="simple">
 <li><p>A second expert.</p></li>
 <li><p>expert2 should behave the same as expert1.</p></li>
 </ul>
 </section>
 <section id="passwords">
-<h3>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h3>
+<h4>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h4>
 <p>every user has a password of “123”.</p>
+</section>
 </section>
 </section>
 </section>

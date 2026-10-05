@@ -47,12 +47,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html#general-info-overview">General Info &amp; Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html#development-server">Development Server</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projects.html">Projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="users.html">Users</a></li>
 </ul>
@@ -107,9 +109,159 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="codebook.html">Codebook</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html#module-codebook.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.views.CodebookView"><code class="docutils literal notranslate"><span class="pre">CodebookView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CodebookView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookView.model"><code class="docutils literal notranslate"><span class="pre">CodebookView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookView.context_object_name"><code class="docutils literal notranslate"><span class="pre">CodebookView.context_object_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookView.template_name"><code class="docutils literal notranslate"><span class="pre">CodebookView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookView.get_context_data"><code class="docutils literal notranslate"><span class="pre">CodebookView.get_context_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView.model"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView.context_object_name"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView.context_object_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView.template_name"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookDiffView.get_context_data"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView.get_context_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.model"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.model</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.form_class"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.form_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.template_name"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.get_initial"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.get_initial()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.get_form_kwargs"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.get_form_kwargs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookUpdateView.form_valid"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView.form_valid()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.views.CodebookExportView"><code class="docutils literal notranslate"><span class="pre">CodebookExportView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookExportView.pk_url_kwarg"><code class="docutils literal notranslate"><span class="pre">CodebookExportView.pk_url_kwarg</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.views.CodebookExportView.get"><code class="docutils literal notranslate"><span class="pre">CodebookExportView.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html#module-codebook.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.models.Codebook"><code class="docutils literal notranslate"><span class="pre">Codebook</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.project"><code class="docutils literal notranslate"><span class="pre">Codebook.project</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.git_dir"><code class="docutils literal notranslate"><span class="pre">Codebook.git_dir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.file"><code class="docutils literal notranslate"><span class="pre">Codebook.file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.content"><code class="docutils literal notranslate"><span class="pre">Codebook.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.repo"><code class="docutils literal notranslate"><span class="pre">Codebook.repo</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.get_absolute_url"><code class="docutils literal notranslate"><span class="pre">Codebook.get_absolute_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.tag_version"><code class="docutils literal notranslate"><span class="pre">Codebook.tag_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.untag_version"><code class="docutils literal notranslate"><span class="pre">Codebook.untag_version()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.diff"><code class="docutils literal notranslate"><span class="pre">Codebook.diff()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.save"><code class="docutils literal notranslate"><span class="pre">Codebook.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.commit_decision_revision"><code class="docutils literal notranslate"><span class="pre">Codebook.commit_decision_revision()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.get_as_context"><code class="docutils literal notranslate"><span class="pre">Codebook.get_as_context()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Codebook.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Codebook.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Codebook.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.id"><code class="docutils literal notranslate"><span class="pre">Codebook.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.objects"><code class="docutils literal notranslate"><span class="pre">Codebook.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.models.Codebook.project_id"><code class="docutils literal notranslate"><span class="pre">Codebook.project_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html#module-codebook.forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm"><code class="docutils literal notranslate"><span class="pre">CodebookForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.textarea_class"><code class="docutils literal notranslate"><span class="pre">CodebookForm.textarea_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.__init__"><code class="docutils literal notranslate"><span class="pre">CodebookForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.clean_modified"><code class="docutils literal notranslate"><span class="pre">CodebookForm.clean_modified()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.clean"><code class="docutils literal notranslate"><span class="pre">CodebookForm.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.save"><code class="docutils literal notranslate"><span class="pre">CodebookForm.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.forms.CodebookForm.media"><code class="docutils literal notranslate"><span class="pre">CodebookForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html#module-codebook.utils">Utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.utils.normalize_content"><code class="docutils literal notranslate"><span class="pre">normalize_content()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html#module-codebook.markdown_extensions.git_diff_preprocess">Markdown extensions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_POS"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs.FIX_PATTERN_START_POS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_START_NEG"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs.FIX_PATTERN_START_NEG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_POS"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs.FIX_PATTERN_WRAP_POS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_NEG"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs.FIX_PATTERN_WRAP_NEG</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.run"><code class="docutils literal notranslate"><span class="pre">PreprocessDiffs.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension"><code class="docutils literal notranslate"><span class="pre">PreProcessDiffsExtension</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreProcessDiffsExtension.extendMarkdown"><code class="docutils literal notranslate"><span class="pre">PreProcessDiffsExtension.extendMarkdown()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_preprocess.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor"><code class="docutils literal notranslate"><span class="pre">InsertionInlineProcessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor.handleMatch"><code class="docutils literal notranslate"><span class="pre">InsertionInlineProcessor.handleMatch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_insertion.InsertionExtension"><code class="docutils literal notranslate"><span class="pre">InsertionExtension</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_insertion.InsertionExtension.extendMarkdown"><code class="docutils literal notranslate"><span class="pre">InsertionExtension.extendMarkdown()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_insertion.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_del.DelInlineProcessor"><code class="docutils literal notranslate"><span class="pre">DelInlineProcessor</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_del.DelInlineProcessor.handleMatch"><code class="docutils literal notranslate"><span class="pre">DelInlineProcessor.handleMatch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_del.DelExtension"><code class="docutils literal notranslate"><span class="pre">DelExtension</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_del.DelExtension.extendMarkdown"><code class="docutils literal notranslate"><span class="pre">DelExtension.extendMarkdown()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="codebook.html#codebook.markdown_extensions.git_diff_del.makeExtension"><code class="docutils literal notranslate"><span class="pre">makeExtension()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="core.html">Core</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="core.html#module-core.views">Views</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="core.html#core.views.core"><code class="docutils literal notranslate"><span class="pre">core()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#module-core.forms">Forms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#module-core.mixins">Mixins</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.RoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">RoleRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.RoleRequiredMixin.dispatch"><code class="docutils literal notranslate"><span class="pre">RoleRequiredMixin.dispatch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.BatchRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchRoleRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.BatchRoleRequiredMixin.dispatch"><code class="docutils literal notranslate"><span class="pre">BatchRoleRequiredMixin.dispatch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.AnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnnotatorRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.AnnotatorRequiredMixin.roles"><code class="docutils literal notranslate"><span class="pre">AnnotatorRequiredMixin.roles</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.ExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">ExpertRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.ExpertRequiredMixin.roles"><code class="docutils literal notranslate"><span class="pre">ExpertRequiredMixin.roles</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.AnyRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnyRoleRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.AnyRoleRequiredMixin.roles"><code class="docutils literal notranslate"><span class="pre">AnyRoleRequiredMixin.roles</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.BatchAnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchAnnotatorRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.BatchAnnotatorRequiredMixin.roles"><code class="docutils literal notranslate"><span class="pre">BatchAnnotatorRequiredMixin.roles</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.mixins.BatchExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchExpertRequiredMixin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.mixins.BatchExpertRequiredMixin.roles"><code class="docutils literal notranslate"><span class="pre">BatchExpertRequiredMixin.roles</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="core.html#module-core.middleware">Middleware</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="core.html#core.middleware.HtmxMessageMiddleware"><code class="docutils literal notranslate"><span class="pre">HtmxMessageMiddleware</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="core.html#core.middleware.HtmxMessageMiddleware.process_response"><code class="docutils literal notranslate"><span class="pre">HtmxMessageMiddleware.process_response()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -190,6 +342,16 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data.views">Views</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data.html#module-data.forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.forms.MultiLabelForm"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.__init__"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.save"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.media"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="discuss.html">Discussion</a><ul>
@@ -247,7 +409,107 @@
 <li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.chat_typing"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.chat_typing()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.group_send_state"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.group_send_state()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.get_example"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.get_example()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.is_batch_annotator"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.is_batch_annotator()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="discuss.html#discuss.consumers.ChatConsumer.get_assigned_annotators"><code class="docutils literal notranslate"><span class="pre">ChatConsumer.get_assigned_annotators()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="discuss.html#module-discuss.room_state">Room state</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.room_state.get_state"><code class="docutils literal notranslate"><span class="pre">get_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.room_state.set_state"><code class="docutils literal notranslate"><span class="pre">set_state()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="discuss.html#discuss.room_state.update_state"><code class="docutils literal notranslate"><span class="pre">update_state()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="expert.html">Expert</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="expert.html#module-expert.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.build_decision_metadata"><code class="docutils literal notranslate"><span class="pre">build_decision_metadata()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.ExpertBatchView"><code class="docutils literal notranslate"><span class="pre">ExpertBatchView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.ExpertBatchView.get"><code class="docutils literal notranslate"><span class="pre">ExpertBatchView.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.ExpertAssignmentView"><code class="docutils literal notranslate"><span class="pre">ExpertAssignmentView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.ExpertAssignmentView.template_name"><code class="docutils literal notranslate"><span class="pre">ExpertAssignmentView.template_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.ExpertAssignmentView.partial_name"><code class="docutils literal notranslate"><span class="pre">ExpertAssignmentView.partial_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.ExpertAssignmentView.get"><code class="docutils literal notranslate"><span class="pre">ExpertAssignmentView.get()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.ExpertAssignmentView.post"><code class="docutils literal notranslate"><span class="pre">ExpertAssignmentView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.CodebookPanelView"><code class="docutils literal notranslate"><span class="pre">CodebookPanelView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.CodebookPanelView.get"><code class="docutils literal notranslate"><span class="pre">CodebookPanelView.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.CodebookDraftSaveView"><code class="docutils literal notranslate"><span class="pre">CodebookDraftSaveView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.CodebookDraftSaveView.post"><code class="docutils literal notranslate"><span class="pre">CodebookDraftSaveView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.views.CodebookDraftDeleteView"><code class="docutils literal notranslate"><span class="pre">CodebookDraftDeleteView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.views.CodebookDraftDeleteView.post"><code class="docutils literal notranslate"><span class="pre">CodebookDraftDeleteView.post()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html#module-expert.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.models.CodebookDraft"><code class="docutils literal notranslate"><span class="pre">CodebookDraft</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.assignment"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.assignment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.content"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.content</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.rationale"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.rationale</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.base_revision"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.base_revision</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.updated_at"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.updated_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.NotUpdated"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.assignment_id"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.assignment_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.get_next_by_updated_at"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.get_next_by_updated_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.get_previous_by_updated_at"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.get_previous_by_updated_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.id"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.models.CodebookDraft.objects"><code class="docutils literal notranslate"><span class="pre">CodebookDraft.objects</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html#module-expert.forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.__init__"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.save"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.media"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="notifications.html">Notifications</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html#module-notifications.views">Views</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notifications.html#notifications.views.UnreadNotificationsView"><code class="docutils literal notranslate"><span class="pre">UnreadNotificationsView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.views.UnreadNotificationsView.get"><code class="docutils literal notranslate"><span class="pre">UnreadNotificationsView.get()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="notifications.html#notifications.views.MarkNotificationReadView"><code class="docutils literal notranslate"><span class="pre">MarkNotificationReadView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.views.MarkNotificationReadView.post"><code class="docutils literal notranslate"><span class="pre">MarkNotificationReadView.post()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html#module-notifications.models">Models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="notifications.html#notifications.models.Notification"><code class="docutils literal notranslate"><span class="pre">Notification</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.user"><code class="docutils literal notranslate"><span class="pre">Notification.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.batch"><code class="docutils literal notranslate"><span class="pre">Notification.batch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.message"><code class="docutils literal notranslate"><span class="pre">Notification.message</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.created_at"><code class="docutils literal notranslate"><span class="pre">Notification.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.read_at"><code class="docutils literal notranslate"><span class="pre">Notification.read_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.mark_read"><code class="docutils literal notranslate"><span class="pre">Notification.mark_read()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Notification.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Notification.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Notification.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.batch_id"><code class="docutils literal notranslate"><span class="pre">Notification.batch_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.get_next_by_created_at"><code class="docutils literal notranslate"><span class="pre">Notification.get_next_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.get_previous_by_created_at"><code class="docutils literal notranslate"><span class="pre">Notification.get_previous_by_created_at()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.id"><code class="docutils literal notranslate"><span class="pre">Notification.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.objects"><code class="docutils literal notranslate"><span class="pre">Notification.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="notifications.html#notifications.models.Notification.user_id"><code class="docutils literal notranslate"><span class="pre">Notification.user_id</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -276,6 +538,7 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.template_name"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.template_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.form_class"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.form_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.get_success_url"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.get_success_url()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.get_form_kwargs"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.get_form_kwargs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.get_context_data"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.get_context_data()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectBatchCreateView.form_valid"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView.form_valid()</span></code></a></li>
 </ul>
@@ -362,6 +625,21 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchPhase.FINAL"><code class="docutils literal notranslate"><span class="pre">BatchPhase.FINAL</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.models.BatchUser"><code class="docutils literal notranslate"><span class="pre">BatchUser</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">BatchUser.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">BatchUser.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.NotUpdated"><code class="docutils literal notranslate"><span class="pre">BatchUser.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.batch"><code class="docutils literal notranslate"><span class="pre">BatchUser.batch</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.batch_id"><code class="docutils literal notranslate"><span class="pre">BatchUser.batch_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.finalized_at"><code class="docutils literal notranslate"><span class="pre">BatchUser.finalized_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.get_role_display"><code class="docutils literal notranslate"><span class="pre">BatchUser.get_role_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.id"><code class="docutils literal notranslate"><span class="pre">BatchUser.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.objects"><code class="docutils literal notranslate"><span class="pre">BatchUser.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.role"><code class="docutils literal notranslate"><span class="pre">BatchUser.role</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.user"><code class="docutils literal notranslate"><span class="pre">BatchUser.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.BatchUser.user_id"><code class="docutils literal notranslate"><span class="pre">BatchUser.user_id</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.models.Project"><code class="docutils literal notranslate"><span class="pre">Project</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Project.DoesNotExist</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Project.MultipleObjectsReturned</span></code></a></li>
@@ -403,6 +681,49 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.ProjectUser.project_id"><code class="docutils literal notranslate"><span class="pre">ProjectUser.project_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.ProjectUser.user"><code class="docutils literal notranslate"><span class="pre">ProjectUser.user</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.ProjectUser.user_id"><code class="docutils literal notranslate"><span class="pre">ProjectUser.user_id</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="projects.html#module-projects.forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.__init__"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.clean"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.media"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.forms.BatchCreateForm"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.BatchCreateForm.__init__"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.BatchCreateForm.clean"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm.clean()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.BatchCreateForm.clean_file"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm.clean_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.BatchCreateForm.media"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.forms.BatchPhaseForm"><code class="docutils literal notranslate"><span class="pre">BatchPhaseForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.BatchPhaseForm.media"><code class="docutils literal notranslate"><span class="pre">BatchPhaseForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="projects.html#module-projects.management.commands.backup">Management commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.backup.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.backup.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.backup.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.backup.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.uniform_choices"><code class="docutils literal notranslate"><span class="pre">uniform_choices()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.create_batch"><code class="docutils literal notranslate"><span class="pre">create_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.create_project"><code class="docutils literal notranslate"><span class="pre">create_project()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.resetdb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.resetdb.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.resetdb.Command.add_arguments"><code class="docutils literal notranslate"><span class="pre">Command.add_arguments()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.resetdb.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -452,6 +773,33 @@
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.projectuser_set"><code class="docutils literal notranslate"><span class="pre">User.projectuser_set</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.user_permissions"><code class="docutils literal notranslate"><span class="pre">User.user_permissions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.models.User.username"><code class="docutils literal notranslate"><span class="pre">User.username</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="users.html#module-users.forms">Forms</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.UserCreationForm"><code class="docutils literal notranslate"><span class="pre">UserCreationForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.UserCreationForm.media"><code class="docutils literal notranslate"><span class="pre">UserCreationForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.UserChangeForm"><code class="docutils literal notranslate"><span class="pre">UserChangeForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.UserChangeForm.media"><code class="docutils literal notranslate"><span class="pre">UserChangeForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.UserRegistrationForm"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.UserRegistrationForm.media"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="users.html#module-users.group_permissions">Group permissions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.group_permissions.create_groups"><code class="docutils literal notranslate"><span class="pre">create_groups()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="users.html#module-users.management.commands.update_permissions">Management commands</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.management.commands.update_permissions.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.management.commands.update_permissions.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.management.commands.update_permissions.Command.handle"><code class="docutils literal notranslate"><span class="pre">Command.handle()</span></code></a></li>
 </ul>
 </li>
 </ul>

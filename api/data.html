@@ -47,9 +47,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html#general-info-overview">General Info &amp; Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html#development-server">Development Server</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
 <li class="toctree-l2"><a class="reference internal" href="core.html">Core</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Data</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-data.models">Models</a><ul>
@@ -59,9 +59,16 @@
 <li class="toctree-l4"><a class="reference internal" href="#data.models.Label"><code class="docutils literal notranslate"><span class="pre">Label</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data.views">Views</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-data.forms">Forms</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data.forms.MultiLabelForm"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projects.html">Projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="users.html">Users</a></li>
 </ul>
@@ -321,7 +328,7 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>annotations</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ForeignKey" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> from <a class="reference internal" href="#data.models.Annotation" title="data.models.models.Annotation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Annotation</span></code></a>) – All annotations of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p></li>
-<li><p><strong>codebook_draft</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code>) – The codebook draft of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p></li>
+<li><p><strong>codebook_draft</strong> (Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <a class="reference internal" href="expert.html#expert.models.CodebookDraft" title="expert.models.CodebookDraft"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code></a>) – The codebook draft of this example assignment (related name of <a class="reference internal" href="expert.html#expert.models.CodebookDraft.assignment" title="expert.models.CodebookDraft.assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -373,8 +380,8 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.ExampleAssignment.codebook_draft">
 <span class="sig-name descname"><span class="pre">codebook_draft</span></span><a class="headerlink" href="#data.models.ExampleAssignment.codebook_draft" title="Link to this definition"></a></dt>
-<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code></p>
-<p>The codebook draft of this example assignment (related name of <code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code>)</p>
+<dd><p>Type: Reverse <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.OneToOneField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">OneToOneField</span></code></a> from <a class="reference internal" href="expert.html#expert.models.CodebookDraft" title="expert.models.CodebookDraft"><code class="xref py py-class docutils literal notranslate"><span class="pre">CodebookDraft</span></code></a></p>
+<p>The codebook draft of this example assignment (related name of <a class="reference internal" href="expert.html#expert.models.CodebookDraft.assignment" title="expert.models.CodebookDraft.assignment"><code class="xref py py-attr docutils literal notranslate"><span class="pre">assignment</span></code></a>)</p>
 </dd></dl>
 
 <dl class="py attribute">
@@ -574,6 +581,37 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <dt class="sig sig-object py" id="data.models.Label.project_id">
 <span class="sig-name descname"><span class="pre">project_id</span></span><a class="headerlink" href="#data.models.Label.project_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#data.models.Label.project" title="data.models.Label.project"><code class="xref py py-class docutils literal notranslate"><span class="pre">project</span></code></a> instead.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-data.views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-data.views" title="Link to this heading"></a></h2>
+</section>
+<section id="module-data.forms">
+<span id="forms"></span><h2>Forms<a class="headerlink" href="#module-data.forms" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="data.forms.MultiLabelForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.forms.</span></span><span class="sig-name descname"><span class="pre">MultiLabelForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.forms.MultiLabelForm" title="Link to this definition"></a></dt>
+<dd><p><strong>Form fields:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">labels</span></code>: Labels (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.MultipleChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleChoiceField</span></code></a>)</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="data.forms.MultiLabelForm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">assignment</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.forms.MultiLabelForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="data.forms.MultiLabelForm.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.forms.MultiLabelForm.save" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="data.forms.MultiLabelForm.media">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#data.forms.MultiLabelForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
 </dd></dl>
 
 </dd></dl>

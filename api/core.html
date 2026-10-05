@@ -21,7 +21,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Data" href="data.html" />
-    <link rel="prev" title="Annotation" href="annotation.html" /> 
+    <link rel="prev" title="Codebook" href="codebook.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -47,18 +47,35 @@
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../usage/index.html#general-info-overview">General Info &amp; Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html#development-server">Development Server</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-core.views">Views</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#core.views.core"><code class="docutils literal notranslate"><span class="pre">core()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.forms">Forms</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.mixins">Mixins</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.RoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">RoleRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchRoleRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.AnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnnotatorRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.ExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">ExpertRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.AnyRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnyRoleRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchAnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchAnnotatorRequiredMixin</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchExpertRequiredMixin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#module-core.middleware">Middleware</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#core.middleware.HtmxMessageMiddleware"><code class="docutils literal notranslate"><span class="pre">HtmxMessageMiddleware</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projects.html">Projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="users.html">Users</a></li>
 </ul>
@@ -102,13 +119,109 @@ The idea is to keep this rather empty and to dispatch most of the logic to its s
 <dd></dd></dl>
 
 </section>
+<section id="module-core.forms">
+<span id="forms"></span><h2>Forms<a class="headerlink" href="#module-core.forms" title="Link to this heading"></a></h2>
+</section>
+<section id="module-core.mixins">
+<span id="mixins"></span><h2>Mixins<a class="headerlink" href="#module-core.mixins" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.RoleRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">RoleRequiredMixin</span></span><a class="headerlink" href="#core.mixins.RoleRequiredMixin" title="Link to this definition"></a></dt>
+<dd><p>Project-level check against ProjectUser.default_role.</p>
+<p>Use for project pages and for managing a project or its batches
+(create, export, change phase, delete).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.mixins.RoleRequiredMixin.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.mixins.RoleRequiredMixin.dispatch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.BatchRoleRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">BatchRoleRequiredMixin</span></span><a class="headerlink" href="#core.mixins.BatchRoleRequiredMixin" title="Link to this definition"></a></dt>
+<dd><p>Batch-level check against BatchUser.role.</p>
+<p>Use for views where a user works on a batch (annotate, discuss, decide as
+expert). Roles are assigned per batch, so a project expert may annotate
+one batch, and project members who are not part of a batch get no access.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="core.mixins.BatchRoleRequiredMixin.dispatch">
+<span class="sig-name descname"><span class="pre">dispatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.mixins.BatchRoleRequiredMixin.dispatch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.AnnotatorRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">AnnotatorRequiredMixin</span></span><a class="headerlink" href="#core.mixins.AnnotatorRequiredMixin" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="core.mixins.AnnotatorRequiredMixin.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ProjectRole.ANNOTATOR,)</span></em><a class="headerlink" href="#core.mixins.AnnotatorRequiredMixin.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.ExpertRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">ExpertRequiredMixin</span></span><a class="headerlink" href="#core.mixins.ExpertRequiredMixin" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="core.mixins.ExpertRequiredMixin.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ProjectRole.EXPERT,)</span></em><a class="headerlink" href="#core.mixins.ExpertRequiredMixin.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.AnyRoleRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">AnyRoleRequiredMixin</span></span><a class="headerlink" href="#core.mixins.AnyRoleRequiredMixin" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="core.mixins.AnyRoleRequiredMixin.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ProjectRole.ANNOTATOR,</span> <span class="pre">ProjectRole.EXPERT)</span></em><a class="headerlink" href="#core.mixins.AnyRoleRequiredMixin.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.BatchAnnotatorRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">BatchAnnotatorRequiredMixin</span></span><a class="headerlink" href="#core.mixins.BatchAnnotatorRequiredMixin" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="core.mixins.BatchAnnotatorRequiredMixin.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ProjectRole.ANNOTATOR,)</span></em><a class="headerlink" href="#core.mixins.BatchAnnotatorRequiredMixin.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="core.mixins.BatchExpertRequiredMixin">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.mixins.</span></span><span class="sig-name descname"><span class="pre">BatchExpertRequiredMixin</span></span><a class="headerlink" href="#core.mixins.BatchExpertRequiredMixin" title="Link to this definition"></a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="core.mixins.BatchExpertRequiredMixin.roles">
+<span class="sig-name descname"><span class="pre">roles</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">(ProjectRole.EXPERT,)</span></em><a class="headerlink" href="#core.mixins.BatchExpertRequiredMixin.roles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-core.middleware">
+<span id="middleware"></span><h2>Middleware<a class="headerlink" href="#module-core.middleware" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="core.middleware.HtmxMessageMiddleware">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">core.middleware.</span></span><span class="sig-name descname"><span class="pre">HtmxMessageMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">get_response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.middleware.HtmxMessageMiddleware" title="Link to this definition"></a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="core.middleware.HtmxMessageMiddleware.process_response">
+<span class="sig-name descname"><span class="pre">process_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#core.middleware.HtmxMessageMiddleware.process_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="annotation.html" class="btn btn-neutral float-left" title="Annotation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="codebook.html" class="btn btn-neutral float-left" title="Codebook" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="data.html" class="btn btn-neutral float-right" title="Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

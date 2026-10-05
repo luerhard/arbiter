@@ -154,7 +154,7 @@ Data is a bit different from the others, because it contains the connecting bits
 For each app, there also is a template in the templates directory, which contains the html.
 This follows Django's principle to seperate the design from the view functionality.
 
-# Development Server
+## Development Server
 
 ### Access
 

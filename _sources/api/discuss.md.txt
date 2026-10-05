@@ -25,3 +25,11 @@ This app is concerned with the discussion phase of the annotation.
     :members:
     :undoc-members:
 ```
+
+## Room state
+
+```{eval-rst}
+.. automodule:: discuss.room_state
+    :members:
+    :undoc-members:
+```
