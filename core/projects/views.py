@@ -19,13 +19,14 @@ import pandas as pd
 from .forms import BatchCreateForm
 from .forms import BatchPhaseForm
 from .forms import ProjectCreateForm
-from core.mixins import AnnotatorRequiredMixin
+from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
+from projects.models import BatchUser
 from projects.models import Project
 from projects.models import ProjectRole
 from projects.models import ProjectUser
@@ -151,6 +152,11 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
     def get_success_url(self):
         return reverse("project-detail", kwargs={"project_id": self.kwargs.get("project_id")})
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["project"] = get_object_or_404(Project, id=self.kwargs.get("project_id"))
+        return kwargs
+
     @staticmethod
     def _jsonify_users(users):
         out = []
@@ -245,6 +251,9 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         )
         context["codebook"] = project.codebook.get()
 
+        my_roles = _batch_roles(self.request.user, project)
+        context["has_annotation_work"] = ProjectRole.ANNOTATOR in my_roles.values()
+
         # get associated batches
         batches = project.batches.order_by("-batch_number")
         context["batches"] = []
@@ -254,6 +263,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 "batch_phase_form": BatchPhaseForm(instance=batch),
                 "length": batch.examples.count(),
                 "users": [],
+                "is_batch_expert": my_roles.get(batch.id) == ProjectRole.EXPERT,
             }
 
             # Query examples with disagreements and no expert decisions
@@ -268,7 +278,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 assignments__done__isnull=False,
             ).count()
 
-            for annotator in context["annotators"]:
+            for annotator in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username"):
                 annotated = ExampleAssignment.objects.filter(
                     user=annotator,
                     batch=batch,
@@ -289,7 +299,16 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
         return context
 
 
-class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
+def _batch_roles(user, project) -> dict[int, str]:
+    """Map batch id -> the user's role in that batch, for all batches of the project."""
+    return dict(
+        BatchUser.objects.filter(user=user, batch__project=project).values_list("batch_id", "role"),
+    )
+
+
+class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, DetailView):
+    """The batches the user works on, in whatever role they have per batch."""
+
     pk_url_kwarg = "project_id"
     model = Project
     template_name = "projects/project_detail_annotator.html"
@@ -310,9 +329,10 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         )
         context["codebook"] = project.codebook.get()
 
-        # view for annotators
+        my_roles = _batch_roles(self.request.user, project)
         context["batches"] = []
         batches = project.batches.filter(
+            id__in=my_roles.keys(),
             current_phase__in=[
                 BatchPhase.ANNOTATION,
                 BatchPhase.DISCUSSION,
@@ -322,6 +342,7 @@ class ProjectAnnotatorDetailView(AnnotatorRequiredMixin, DetailView):
         for batch in batches:
             batch_data = {
                 "batch": batch,
+                "role": my_roles[batch.id],
                 "done": ExampleAssignment.objects.filter(
                     user=self.request.user,
                     batch=batch,
@@ -462,11 +483,14 @@ class ExportBatch(ExpertRequiredMixin, View):
 class HtmxUserSearch(View):
     def get(self, request, **kwargs):  # noqa: ARG002
         query = (request.GET.get("q") or "").strip()
+        project_id = request.GET.get("project_id")
 
+        users = User.objects.all()
+        if project_id:
+            users = users.filter(projectuser__project_id=project_id)
         if query:
-            users = User.objects.filter(username__icontains=query).order_by("username")[:5]
-        else:
-            users = User.objects.all()[:5]
+            users = users.filter(username__icontains=query)
+        users = users.order_by("username")[:5]
         return render(
             request,
             "projects/partials/user_search_results.html",

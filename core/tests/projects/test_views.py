@@ -231,13 +231,15 @@ class TestViews:
         assert req.status_code == 200
 
     @pytest.mark.parametrize("params", URLS_ANNOTATOR)
-    def test_http_403_as_expert(self, params, client):
+    def test_annotator_page_open_to_expert(self, params, client):
+        # the annotator page lists the user's own batches; roles are set per
+        # batch, so experts may annotate too and need the page as well
         slug, args = params
         url = reverse(slug, args=args)
         login = client.login(username="expert1", password="123")
         assert login == True
         req = client.get(url)
-        assert req.status_code == 403
+        assert req.status_code == 200
 
     @pytest.mark.parametrize("params", URLS_EXPERT)
     def test_http_403_as_annotator(self, params, client):

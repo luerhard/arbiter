@@ -13,7 +13,7 @@ from django.views.generic import View
 
 from .forms import MultiLabelFormExpert
 from .models import CodebookDraft
-from core.mixins import ExpertRequiredMixin
+from core.mixins import BatchExpertRequiredMixin
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
@@ -129,7 +129,7 @@ def _codebook_panel_context(assignment: ExampleAssignment, mode: str = "view") -
     }
 
 
-class _AssignmentAccessMixin(ExpertRequiredMixin):
+class _AssignmentAccessMixin(BatchExpertRequiredMixin):
     def get_assignment(self, request, batch_id, assignment_id):
         """Return the assignment or None when it isn't this expert's
         expert-phase assignment in this batch."""
@@ -145,7 +145,7 @@ class _AssignmentAccessMixin(ExpertRequiredMixin):
         return assignment if allowed else None
 
 
-class ExpertBatchView(ExpertRequiredMixin, View):
+class ExpertBatchView(BatchExpertRequiredMixin, View):
     """Entry point: redirect to the first open (or first) expert assignment."""
 
     def get(self, request, batch_id):

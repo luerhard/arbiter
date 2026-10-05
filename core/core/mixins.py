@@ -2,9 +2,16 @@ from django.http import HttpResponseForbidden
 
 from projects.models import ProjectRole
 from projects.models import ProjectUser
+from projects.models.batch import BatchUser
 
 
 class RoleRequiredMixin:
+    """Project-level check against ProjectUser.default_role.
+
+    Use for project pages and for managing a project or its batches
+    (create, export, change phase, delete).
+    """
+
     def dispatch(self, request, *args, **kwargs):
         project_id = kwargs.get("project_id")
         assignment_id = (
@@ -43,7 +50,27 @@ class RoleRequiredMixin:
             return HttpResponseForbidden("Project ID not provided.")
 
         if not membership:
-            return HttpResponseForbidden("You do not have annotator permissions on this project.")
+            return HttpResponseForbidden("You do not have the required role in this project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+class BatchRoleRequiredMixin:
+    """Batch-level check against BatchUser.role.
+
+    Use for views where a user works on a batch (annotate, discuss, decide as
+    expert). Roles are assigned per batch, so a project expert may annotate
+    one batch, and project members who are not part of a batch get no access.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+        has_role = BatchUser.objects.filter(
+            batch_id=kwargs["batch_id"],
+            user_id=request.user.id,
+            role__in=self.roles,
+        ).exists()
+        if not has_role:
+            return HttpResponseForbidden("You do not have the required role in this batch.")
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -58,3 +85,11 @@ class ExpertRequiredMixin(RoleRequiredMixin):
 
 class AnyRoleRequiredMixin(RoleRequiredMixin):
     roles = (ProjectRole.ANNOTATOR, ProjectRole.EXPERT)
+
+
+class BatchAnnotatorRequiredMixin(BatchRoleRequiredMixin):
+    roles = (ProjectRole.ANNOTATOR,)
+
+
+class BatchExpertRequiredMixin(BatchRoleRequiredMixin):
+    roles = (ProjectRole.EXPERT,)

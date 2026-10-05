@@ -70,8 +70,13 @@ class BatchCreateForm(forms.ModelForm):
         required=True,
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, project, **kwargs):
         super().__init__(*args, **kwargs)
+        # Any project member can take either role in a batch; users outside
+        # the project would get assignments for pages they cannot open.
+        members = User.objects.filter(projectuser__project=project)
+        self.fields["annotators"].queryset = members
+        self.fields["experts"].queryset = members
         self.fields["file"].widget.attrs.update(
             {
                 "class": "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "  # noqa: E501

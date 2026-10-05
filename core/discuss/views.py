@@ -5,13 +5,13 @@ from django.shortcuts import render
 from django.shortcuts import reverse
 from django.views.generic import View
 
-from core.mixins import AnnotatorRequiredMixin
+from core.mixins import BatchAnnotatorRequiredMixin
 from projects.models import Batch
 
 log = logging.getLogger(__name__)
 
 
-class DiscussView(AnnotatorRequiredMixin, View):
+class DiscussView(BatchAnnotatorRequiredMixin, View):
     template_name = "annotation/index.html"
     model = Batch
 

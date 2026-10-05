@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import View
 
-from core.mixins import AnnotatorRequiredMixin
+from core.mixins import BatchAnnotatorRequiredMixin
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
 from projects.models import Batch
@@ -93,7 +93,7 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
     return context
 
 
-class AnnotateView(AnnotatorRequiredMixin, DetailView):
+class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
     template_name = "annotation/index.html"
     model = Batch
 
@@ -221,7 +221,7 @@ class AnnotateView(AnnotatorRequiredMixin, DetailView):
         return redirect(push_url)
 
 
-class AnnotationDoneView(AnnotatorRequiredMixin, View):
+class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
     def _context(self, request, batch):
         batch_user = BatchUser.objects.filter(batch=batch, user=request.user).first()
         return {

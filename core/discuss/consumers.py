@@ -18,6 +18,8 @@ from data.models import ExampleAssignment
 from data.models import Label
 from projects.models import Batch
 from projects.models import BatchPhase
+from projects.models import BatchUser
+from projects.models import ProjectRole
 
 # logging.basicConfig(level=logging.DEBUG)
 log = logging.getLogger(__name__)
@@ -27,12 +29,18 @@ User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.joined = False
         self.route = self.scope["url_route"]
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
+        self.user = self.scope["user"]
+        if not await self.is_batch_annotator():
+            await self.close()
+            return
+
         self.batch = await database_sync_to_async(Batch.objects.get)(id=self.batch_id)
         self.room_group_name = f"chat_{self.batch_id}"
-        self.user = self.scope["user"]
         self.username = getattr(self.user, "username", str(self.user))
+        self.joined = True
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
         await self.accept()
 
@@ -64,6 +72,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.group_send_state()
 
     async def disconnect(self, close_code):  # noqa: ARG002
+        if not self.joined:
+            return
+
         async def _leave(state):
             if self.username in state["online_users"]:
                 state["online_users"].remove(self.username)
@@ -349,5 +360,16 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return example, by_user, total_pages
 
     @database_sync_to_async
+    def is_batch_annotator(self):
+        return (
+            self.user.is_authenticated
+            and BatchUser.objects.filter(
+                batch_id=self.batch_id,
+                user_id=self.user.id,
+                role=ProjectRole.ANNOTATOR,
+            ).exists()
+        )
+
+    @database_sync_to_async
     def get_assigned_annotators(self):
-        return set(Batch.objects.get(id=self.batch_id).project.annotators)
+        return set(Batch.objects.get(id=self.batch_id).assignees(role=ProjectRole.ANNOTATOR))

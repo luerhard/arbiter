@@ -13,6 +13,13 @@
     <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
       <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800">
         <h2 class="text-xl font-bold">Batches</h2>
+        {% if has_annotation_work %}
+        <a
+          href="{% url 'project-detail-annotator' project.id %}"
+          class="mt-1 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400"
+          >You also annotate in this project: go to my batches</a
+        >
+        {% endif %}
       </div>
       <div class="py-2 isolate z-10">
         {% if batches %}
@@ -95,7 +102,7 @@
                         {{ batch.length }}
                       </td>
                       {% if user == batch.users.0 %}
-                      <td rowspan="2" class="text-end">
+                      <td rowspan="{{ batch.users|length }}" class="text-end">
                         {{ user.discussed }}
                         /
                         {{ batch.disagreement }}
@@ -113,7 +120,7 @@
                   href="{{ project_export_batch_url }}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}"
                   >Export</c-button.secondary
                 >
-                {% if batch.batch.current_phase == "E" %}
+                {% if batch.batch.current_phase == "E" and batch.is_batch_expert %}
                 {% url "expert-batch" batch.batch.id as expert_dialogue_url %}
                 <c-button.primary href="{{ expert_dialogue_url }}">
                   Resolve ({{ batch.expert_dec}}/{{ batch.disc_disagreement }})</c-button.primary
