@@ -35,7 +35,7 @@
         {% endcomment %}
         <c-user-search
           name="annotators"
-          search_url="{{ project_user_search_url }}"
+          search_url="{{ project_user_search_url }}?project_id={{ project.id }}"
           :selected_users="annotators_selected_users"
           placeholder="Add annotators"
         />
@@ -48,7 +48,7 @@
         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Select users who will resolve disagreements.</p>
         <c-user-search
           name="experts"
-          search_url="{{ project_user_search_url }}"
+          search_url="{{ project_user_search_url }}?project_id={{ project.id }}"
           :selected_users="experts_selected_users"
           placeholder="Add Experts"
         />

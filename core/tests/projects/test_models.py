@@ -410,7 +410,7 @@ def test_project_batch_state_indicators():
 
 
 @pytest.mark.django_db
-def test_batch_assignment_get_disagreements_for_phase():
+def test_batch_disagreements_for_phase():
     data = _create_project_with_batch()
     batch = data["batch"]
     ex1, _ = data["examples"]

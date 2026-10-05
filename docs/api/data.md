@@ -10,3 +10,19 @@ The data is so heavily interlinked that we run into circular imports and non-sen
     :members:
     :undoc-members:
 ```
+
+## Views
+
+```{eval-rst}
+.. automodule:: data.views
+    :members:
+    :undoc-members:
+```
+
+## Forms
+
+```{eval-rst}
+.. automodule:: data.forms
+    :members:
+    :undoc-members:
+```

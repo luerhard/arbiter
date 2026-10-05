@@ -4,6 +4,7 @@ import uuid
 from asgiref.sync import async_to_sync
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 from django.test import override_settings
 import pytest
 import redis
@@ -58,6 +59,7 @@ def discussion_setup(db):
         defaults={"default_role": ProjectRole.ANNOTATOR},
     )
     batch = Batch.objects.create(project=project, current_phase=BatchPhase.DISCUSSION)
+    batch.users.add(user, through_defaults={"role": ProjectRole.ANNOTATOR})
     return user, batch
 
 
@@ -454,3 +456,77 @@ def test_discuss_typing_event_broadcast(redis_test_state, discussion_with_disagr
         await comm2.disconnect()
 
     async_to_sync(run)()
+
+
+async def _try_connect(batch, user):
+    communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+    communicator.scope["user"] = user
+    connected, _ = await communicator.connect()
+    if connected:
+        await communicator.disconnect()
+    return connected
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_rejects_anonymous_user(redis_test_state, discussion_setup):
+    _, batch = discussion_setup
+
+    assert async_to_sync(_try_connect)(batch, AnonymousUser()) is False
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_rejects_project_annotator_not_in_batch(redis_test_state, discussion_setup):
+    _, batch = discussion_setup
+    outsider = User.objects.create_user(
+        username=f"not_in_batch_{uuid.uuid4().hex[:8]}",
+        password="123",
+    )
+    ProjectUser.objects.create(
+        project=batch.project,
+        user=outsider,
+        default_role=ProjectRole.ANNOTATOR,
+    )
+
+    assert async_to_sync(_try_connect)(batch, outsider) is False
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_required_users_are_batch_annotators(redis_test_state, discussion_setup):
+    user, batch = discussion_setup
+    # a project annotator who is not part of this batch must not be waited for
+    other = User.objects.create_user(
+        username=f"other_batch_{uuid.uuid4().hex[:8]}",
+        password="123",
+    )
+    ProjectUser.objects.create(
+        project=batch.project,
+        user=other,
+        default_role=ProjectRole.ANNOTATOR,
+    )
+    # a project expert who annotates in this batch must be waited for
+    expert = User.objects.create_user(
+        username=f"expert_annotator_{uuid.uuid4().hex[:8]}",
+        password="123",
+    )
+    ProjectUser.objects.create(
+        project=batch.project,
+        user=expert,
+        default_role=ProjectRole.EXPERT,
+    )
+    batch.users.add(expert, through_defaults={"role": ProjectRole.ANNOTATOR})
+
+    async def run():
+        communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        communicator.scope["user"] = user
+        connected, _ = await communicator.connect()
+        assert connected is True
+        state = (await communicator.receive_json_from())["state"]
+        await communicator.disconnect()
+        return state
+
+    state = async_to_sync(run)()
+
+    assert set(state["required_users"]) == {user.username, expert.username}
