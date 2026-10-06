@@ -202,7 +202,11 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             next_assignment = _next_unfinished_with_wraparound(assignment)
         else:
             next_assignment = assignment.next()
-        if not next_assignment and progress["done"] >= progress["total"]:
+        if next_assignment is None and progress["done"] < progress["total"]:
+            # the last sample was saved while earlier ones are still open:
+            # go back to the first open one
+            next_assignment = _next_unfinished_with_wraparound(assignment)
+        if next_assignment is None:
             return redirect("annotate-done", batch_id=batch.id)
 
         context = _annotation_panel_context(batch, next_assignment, skip_annotated=skip_annotated)

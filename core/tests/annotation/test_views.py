@@ -621,3 +621,37 @@ class TestSkipAnnotatedToggle:
         )
         assert resp.status_code == 302
         assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_post_last_without_skip_jumps_to_first_unfinished(self, client):
+        # Regression: saving the last sample while earlier ones were still open
+        # crashed (there is no "next" sample). It should go back to the first open one.
+        first_open = self.assignments[0]
+        current = self.assignments[-1]
+        for a in self.assignments:
+            a.done = None if a.id in {first_open.id, current.id} else timezone.now()
+            a.save()
+
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(self._url(current), data={"labels": label_ids}, HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 200
+        assert resp.headers["HX-Push-Url"] == self._url(first_open)
+        current.refresh_from_db()
+        assert current.done is not None
+
+    def test_post_last_without_htmx_redirects_to_first_unfinished(self, client):
+        first_open = self.assignments[0]
+        current = self.assignments[-1]
+        for a in self.assignments:
+            a.done = None if a.id in {first_open.id, current.id} else timezone.now()
+            a.save()
+
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(self._url(current), data={"labels": label_ids})
+
+        assert resp.status_code == 302
+        assert resp.url == self._url(first_open)
