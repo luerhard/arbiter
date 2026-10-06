@@ -360,6 +360,39 @@
     @apply rounded bg-danger-soft px-0.5 text-danger;
   }
 
+  /* Toasts and notifications (cotton/toasts, notifications/partials/unread.html).
+     data-variant="success|error|warning|info" picks the color of the stripe and icon. */
+  .toast-stack {
+    @apply pointer-events-none fixed top-5 right-5 z-50 flex w-[380px] flex-col gap-2.5;
+  }
+  /* below the top bar of the work screens */
+  .has-topbar .toast-stack {
+    @apply top-[76px];
+  }
+  .toast {
+    @apply pointer-events-auto flex items-start gap-3 rounded-xl border border-line bg-surface py-3 pr-3 pl-3.5 text-ink;
+    --toast-color: var(--c-accent-ink);
+    box-shadow:
+      inset 3px 0 0 var(--toast-color),
+      0 12px 32px rgb(11 13 16 / 0.14);
+  }
+  .toast[data-variant="success"] {
+    --toast-color: var(--c-success);
+  }
+  .toast[data-variant="error"] {
+    --toast-color: var(--c-danger);
+  }
+  .toast[data-variant="warning"] {
+    --toast-color: var(--c-warning);
+  }
+  .toast-icon {
+    @apply mt-px size-5 shrink-0;
+    color: var(--toast-color);
+  }
+  .toast-close {
+    @apply -mt-0.5 -mr-0.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-3 hover:bg-subtle hover:text-ink;
+  }
+
   /* Dropdown menu (Tailwind Plus <el-dropdown>/<el-menu>) */
   .menu {
     @apply w-60 rounded-[10px] border border-line bg-surface p-1.5 text-sm shadow-[0_12px_32px_rgb(11_13_16/0.14)] transition transition-discrete [--anchor-gap:--spacing(1.5)] data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in;

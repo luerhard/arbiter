@@ -9,7 +9,9 @@ from .models import Notification
 
 class UnreadNotificationsView(LoginRequiredMixin, View):
     def get(self, request):
-        notifications = request.user.notifications.filter(read_at__isnull=True)
+        notifications = request.user.notifications.filter(read_at__isnull=True).select_related(
+            "batch"
+        )
         return render(
             request,
             "notifications/partials/unread.html",

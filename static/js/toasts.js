@@ -18,7 +18,7 @@ function iconSvg(icon, className) {
   svg.setAttribute("viewBox", "0 0 24 24");
   svg.setAttribute("fill", "none");
   svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "1.5");
+  svg.setAttribute("stroke-width", "1.8");
   svg.setAttribute("aria-hidden", "true");
   svg.setAttribute("class", className);
 
@@ -31,7 +31,7 @@ function iconSvg(icon, className) {
   } else if (icon === "x-circle") {
     path.setAttribute("d", "m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
   } else {
-    path.setAttribute("d", "m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
+    path.setAttribute("d", "M12 16v-4.5m0-3h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
   }
 
   svg.appendChild(path);
@@ -41,63 +41,14 @@ function iconSvg(icon, className) {
 function applyToastVariant(element, tags) {
   if (!element) return;
 
+  // colors come from .toast[data-variant=...] in main.css
   const variant = resolveToastVariant(tags);
-  element.classList.remove("bg-white", "dark:bg-gray-800", "outline-black/5", "dark:outline-white/10");
-
-  const body = element.querySelector("[data-toast-body]");
-  if (body) {
-    body.classList.remove("text-gray-900", "dark:text-white");
-  }
+  element.dataset.variant = variant;
 
   const iconHost = element.querySelector("[data-toast-icon]");
   if (iconHost) {
-    iconHost.replaceChildren();
-  }
-
-  if (variant === "success") {
-    element.classList.add(
-      "bg-green-50",
-      "text-green-900",
-      "outline-green-900/10",
-      "dark:bg-green-900/30",
-      "dark:text-green-100",
-      "dark:outline-green-500/20",
-    );
-    if (body) body.classList.add("text-green-900", "dark:text-green-100");
-    iconHost?.appendChild(iconSvg("check-circle", "size-6 text-green-400"));
-  } else if (variant === "error") {
-    element.classList.add(
-      "bg-red-50",
-      "text-red-900",
-      "outline-red-900/10",
-      "dark:bg-red-900/30",
-      "dark:text-red-100",
-      "dark:outline-red-500/20",
-    );
-    if (body) body.classList.add("text-red-900", "dark:text-red-100");
-    iconHost?.appendChild(iconSvg("x-circle", "size-6 text-red-400"));
-  } else if (variant === "warning") {
-    element.classList.add(
-      "bg-amber-50",
-      "text-amber-900",
-      "outline-amber-900/10",
-      "dark:bg-amber-900/25",
-      "dark:text-amber-100",
-      "dark:outline-amber-500/20",
-    );
-    if (body) body.classList.add("text-amber-900", "dark:text-amber-100");
-    iconHost?.appendChild(iconSvg("arrow-up-circle", "size-6 text-amber-400"));
-  } else {
-    element.classList.add(
-      "bg-indigo-50",
-      "text-indigo-900",
-      "outline-indigo-900/10",
-      "dark:bg-indigo-900/30",
-      "dark:text-indigo-100",
-      "dark:outline-indigo-500/20",
-    );
-    if (body) body.classList.add("text-indigo-900", "dark:text-indigo-100");
-    iconHost?.appendChild(iconSvg("arrow-up-circle", "size-6 text-indigo-400"));
+    const icon = { success: "check-circle", error: "x-circle" }[variant] ?? "info-circle";
+    iconHost.replaceChildren(iconSvg(icon, "toast-icon"));
   }
 }
 
