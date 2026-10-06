@@ -292,6 +292,17 @@
   .badge {
     @apply inline-flex items-center gap-1.5 rounded-full bg-subtle px-2.5 py-0.5 text-xs font-medium text-ink-2;
   }
+  .breadcrumb {
+    @apply text-[13px] text-ink-3 [&_a]:hover:text-ink [&_a]:hover:underline;
+  }
+  .avatar[data-role="E"] {
+    background: #f1eafe;
+    color: #5a2fb5;
+  }
+  .dark .avatar[data-role="E"] {
+    background: color-mix(in srgb, #b38cff 16%, var(--c-surface));
+    color: #d9c6ff;
+  }
   .avatar {
     @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent-ink uppercase;
   }

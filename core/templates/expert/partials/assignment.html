@@ -203,5 +203,12 @@
   {% endif %}
 </div>
 {% if request.htmx %}
-{% include "expert/partials/progress.html" with oob=True %}
+<c-progress
+  id="expert-progress"
+  :done="disagreements_decided"
+  :total="disagreements_total"
+  phase="E"
+  suffix="decided"
+  oob="true"
+/>
 {% endif %}

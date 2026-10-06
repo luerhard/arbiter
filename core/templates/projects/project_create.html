@@ -5,13 +5,11 @@ New project · Arbiter
 {% block content %}
 {% url "project-user-search" as project_user_search_url %}
 <div class="mx-auto flex max-w-3xl flex-col gap-7">
-  <header class="flex flex-col gap-1.5">
-    <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
-      <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> / New project
-    </nav>
-    <h1 class="page-title">New project</h1>
-    <p class="page-subtitle">Name the project, choose who annotates and who decides, and define the labels.</p>
-  </header>
+  <c-page-header
+    title="New project"
+    crumb="New project"
+    subtitle="Name the project, choose who annotates and who decides, and define the labels."
+  />
 
   <form method="post" class="flex flex-col gap-5">
     {% csrf_token %}
@@ -23,40 +21,25 @@ New project · Arbiter
 
     <section class="card flex flex-col gap-5 p-6">
       <h2 class="card-title">About</h2>
-      <div>
-        <label for="{{ form.name.id_for_label }}" class="field-label">Project title</label>
-        {{ form.name }}
-        {% if form.name.errors %}
-        <p class="field-error">{{ form.name.errors|join:" " }}</p>
-        {% endif %}
-      </div>
-      <div>
-        <label for="{{ form.description.id_for_label }}" class="field-label"
-          >Description <span class="font-normal text-ink-3">· optional</span></label
-        >
-        {{ form.description }}
-        {% if form.description.errors %}
-        <p class="field-error">{{ form.description.errors|join:" " }}</p>
-        {% endif %}
-      </div>
+      <c-field :field="form.name" />
+      <c-field :field="form.description" />
     </section>
 
     <section class="card flex flex-col gap-5 p-6">
       <h2 class="card-title">Team</h2>
       <div class="grid grid-cols-2 gap-6">
-        <div>
-          <c-element-header sub_text="They label every sample independently and discuss disagreements."
-            >Annotators</c-element-header
-          >
+        <c-field
+          :field="form.annotators"
+          label="Annotators"
+          help="They label every sample independently and discuss disagreements."
+        >
           <c-user-search name="annotators" search_url="{{ project_user_search_url }}" placeholder="Search users" />
-          {% if form.annotators.errors %}
-          <p class="field-error">{{ form.annotators.errors|join:" " }}</p>
-          {% endif %}
-        </div>
-        <div>
-          <c-element-header sub_text="They decide what discussion could not settle and edit the codebook."
-            >Experts</c-element-header
-          >
+        </c-field>
+        <c-field
+          :field="form.experts"
+          label="Experts"
+          help="They decide what discussion could not settle and edit the codebook."
+        >
           <c-user-search
             name="experts"
             search_url="{{ project_user_search_url }}"
@@ -64,10 +47,7 @@ New project · Arbiter
             :selected_users="experts_selected_users|default:'[]'"
             placeholder="Search users"
           />
-          {% if form.experts.errors %}
-          <p class="field-error">{{ form.experts.errors|join:" " }}</p>
-          {% endif %}
-        </div>
+        </c-field>
       </div>
     </section>
 

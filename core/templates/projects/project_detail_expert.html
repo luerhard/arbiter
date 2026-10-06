@@ -7,27 +7,21 @@
 {% url "project-batch-create" project.id as project_batch_create_url %}
 {% url "project-export-project" project.id as project_export_project_url %}
 <div class="flex flex-col gap-7">
-  <header class="flex flex-wrap items-end justify-between gap-4">
-    <div class="flex flex-col gap-1.5">
-      <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
-        <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
-        {{ project.name }}
-      </nav>
-      <h1 class="page-title">{{ project.name }}</h1>
-      <p class="page-subtitle">
-        {% if project.description %}{{ project.description }}
-        ·
-        {% endif %}{{ project.labels.count }}
-        label{{ project.labels.count|pluralize }}
-        ·
-        {{ annotators|length }}
-        annotator{{ annotators|length|pluralize }}
-        ·
-        {{ experts|length }}
-        expert{{ experts|length|pluralize }}
-      </p>
-    </div>
-    <div class="flex gap-2.5">
+  <c-page-header :title="project.name" :project="project">
+    <c-slot name="subtitle">
+      {% if project.description %}{{ project.description }}
+      ·
+      {% endif %}
+      {{ project.labels.count }}
+      label{{ project.labels.count|pluralize }}
+      ·
+      {{ annotators|length }}
+      annotator{{ annotators|length|pluralize }}
+      ·
+      {{ experts|length }}
+      expert{{ experts|length|pluralize }}
+    </c-slot>
+    <c-slot name="actions">
       <a href="{{ project_export_project_url }}" class="btn btn-secondary">
         {% heroicon_micro "arrow-down-tray" class="size-4" %}
         Export project
@@ -36,8 +30,8 @@
         {% heroicon_micro "plus" class="size-4" %}
         New batch
       </a>
-    </div>
-  </header>
+    </c-slot>
+  </c-page-header>
 
   <div class="flex items-start gap-6">
     <section class="flex min-w-0 flex-1 flex-col gap-3.5" aria-label="Batches">
@@ -207,14 +201,10 @@
       </article>
       {% endwith %}
       {% empty %}
-      <div class="card flex flex-col items-center gap-3 px-6 py-14 text-center">
-        <h2 class="text-[15px] font-semibold">No batches yet</h2>
-        <p class="max-w-sm text-ink-2">
-          Upload a CSV or Excel file with a <code class="font-mono text-[13px]">text</code> column to create the first
-          batch.
-        </p>
-        <a href="{{ project_batch_create_url }}" class="btn btn-primary mt-1">New batch</a>
-      </div>
+      <c-empty-state title="No batches yet">
+        Upload a CSV or Excel file with a text column to create the first batch.
+        <c-slot name="actions"><a href="{{ project_batch_create_url }}" class="btn btn-primary">New batch</a></c-slot>
+      </c-empty-state>
       {% endfor %}
     </section>
 

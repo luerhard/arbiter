@@ -84,5 +84,5 @@
   </div>
 </div>
 {% if request.htmx %}
-{% include "annotation/partials/progress.html" with oob=True %}
+<c-progress id="annotation-progress" :done="progress.done" :total="progress.total" phase="A" suffix="done" oob="true" />
 {% endif %}

@@ -1,0 +1,24 @@
+{% comment %}
+Progress bar with "done / total", colored by phase:
+<c-progress :done="progress.done" :total="progress.total" phase="A" suffix="done" id="annotation-progress" />
+oob="true" re-sends it out-of-band with an htmx response (keeps the top bar up to date).
+{% endcomment %}
+<c-vars done="" total="" phase="" suffix="" id="" oob="" />
+<div
+  {% if id %}id="{{ id }}"
+  {% endif %}
+  class="flex flex-1 items-center gap-3"
+  data-phase="{{ phase }}"
+  {% if oob %}hx-swap-oob="true"
+  {% endif %}
+>
+  {% if total %}
+  <div class="progress flex-1"><div class="progress-bar" style="width: {% widthratio done total 100 %}%"></div></div>
+  <span class="font-mono text-[13px] whitespace-nowrap text-ink-2"
+    >{{ done }}
+    /
+    {{ total }}
+    {{ suffix }}</span
+  >
+  {% endif %}
+</div>

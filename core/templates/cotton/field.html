@@ -1,0 +1,20 @@
+{% comment %}
+Form field with label, help text and errors:
+<c-field :field="form.name" help="Shown to everyone in the project." />
+For a custom input put it in the slot (the label then has no "for"):
+<c-field :field="form.annotators" label="Annotators"> <c-user-search … /> </c-field>
+{% endcomment %}
+<c-vars field="" label="" help="" />
+<div>
+  <label {% if not slot %}for="{{ field.id_for_label }}" {% endif %} class="field-label">
+    {{ label|default:field.label }}
+    {% if not field.field.required %}<span class="font-normal text-ink-3">· optional</span>{% endif %}
+  </label>
+  {% if slot %}{{ slot }}{% else %}{{ field }}{% endif %}
+  {% if help %}
+  <p class="field-help">{{ help }}</p>
+  {% endif %}
+  {% for error in field.errors %}
+  <p class="field-error">{{ error }}</p>
+  {% endfor %}
+</div>

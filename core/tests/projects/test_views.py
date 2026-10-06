@@ -473,3 +473,34 @@ class TestExportBatchView:
         assert row["batch_number"] == batch.batch_number
         assert row["text_id"] == example.id
         assert row["labels_annotation"][0]["user"] == annotator.username
+
+
+@pytest.mark.django_db
+class TestPageHeader:
+    def _breadcrumb(self, response):
+        content = response.content.decode()
+        return content.split('aria-label="Breadcrumb"', 1)[1].split("</nav>", 1)[0]
+
+    def test_project_page_breadcrumb_ignores_codebook_in_context(self, client, project_annotation):
+        # Regression: cotton components see the page context, so the view's
+        # `codebook` variable added a "Codebook" crumb that nobody asked for.
+        expert = project_annotation["expert"]
+        project = project_annotation["project"]
+        client.login(username=expert.username, password="123")
+
+        response = client.get(reverse("project-detail-expert", args=(project.id,)))
+
+        crumb = self._breadcrumb(response)
+        assert project.name in crumb
+        assert "Codebook" not in crumb
+
+    def test_codebook_changes_breadcrumb_links_back_to_codebook(self, client, project_annotation):
+        expert = project_annotation["expert"]
+        codebook = project_annotation["project"].codebook.get()
+        client.login(username=expert.username, password="123")
+
+        response = client.get(reverse("codebook-diff", kwargs={"codebook_id": codebook.pk}))
+
+        crumb = self._breadcrumb(response)
+        assert reverse("codebook-view", args=(codebook.pk,)) in crumb
+        assert "Changes" in crumb

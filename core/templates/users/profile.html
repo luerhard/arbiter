@@ -1,12 +1,11 @@
 {% extends "base.html" %}
-{% load custom_tags %}
 {% block title %}
 Profile · Arbiter
 {% endblock title %}
 {% block content %}
 <div class="mx-auto flex max-w-3xl flex-col gap-7">
   <header class="flex items-center gap-4">
-    <span class="avatar size-14 text-lg">{{ username|initials }}</span>
+    <c-avatar :name="username" size="size-14 text-lg" />
     <div class="flex flex-col gap-0.5">
       <h1 class="page-title">{{ username }}</h1>
       <p class="page-subtitle">Your account</p>

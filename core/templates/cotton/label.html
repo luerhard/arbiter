@@ -1,4 +1,15 @@
-<c-vars id value text color hotkey model :checked="false" :disabled="false" name="labels" variant="django" />
+<c-vars
+  id=""
+  value=""
+  text=""
+  color=""
+  hotkey=""
+  model=""
+  :checked="false"
+  :disabled="false"
+  name="labels"
+  variant="django"
+/>
 <div
   class="inline-block"
   x-data='labelButton({ id: "{{ id|default:""|escapejs }}", hotkey: "{{ hotkey|default:""|escapejs }}", disabled: {% if variant == "alpine" %}{{ disabled|default:"false" }}{% else %}{{ disabled|yesno:"true,false" }}{% endif %} })'

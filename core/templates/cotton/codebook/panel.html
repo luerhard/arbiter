@@ -2,7 +2,7 @@
 Codebook side panel for the work screens. Shows the codebook and, when given, what changed for this batch. Usage:
 <c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
 {% endcomment %}
-<c-vars codebook content_diff />
+<c-vars codebook="" content_diff="" />
 <aside
   x-data="{ tab: 'read' }"
   x-show="$store.codebookPanel.open"

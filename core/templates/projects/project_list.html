@@ -4,18 +4,19 @@ Projects · Arbiter
 {% endblock title %}
 {% block content %}
 <div class="flex flex-col gap-7">
-  <header class="flex items-end justify-between gap-4">
-    <div class="flex flex-col gap-1.5">
-      <h1 class="page-title">All projects</h1>
-      <p class="page-subtitle">Every project you are part of, with your role and where its batches stand.</p>
-    </div>
-    {% if create_url %}
-    <a href="{{ create_url }}" class="btn btn-primary">
-      {% heroicon_micro "plus" class="size-4" %}
-      New project
-    </a>
-    {% endif %}
-  </header>
+  <c-page-header
+    title="All projects"
+    subtitle="Every project you are part of, with your role and where its batches stand."
+  >
+    <c-slot name="actions">
+      {% if create_url %}
+      <a href="{{ create_url }}" class="btn btn-primary"
+        >{% heroicon_micro "plus" class="size-4" %}
+        New project</a
+      >
+      {% endif %}
+    </c-slot>
+  </c-page-header>
 
   <div class="card overflow-hidden">
     <table class="w-full">

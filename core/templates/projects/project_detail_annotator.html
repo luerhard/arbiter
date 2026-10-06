@@ -5,18 +5,13 @@
 {% endblock title %}
 {% block content %}
 <div class="flex flex-col gap-7">
-  <header class="flex flex-col gap-1.5">
-    <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
-      <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
-      {{ project.name }}
-    </nav>
-    <h1 class="page-title">{{ project.name }}</h1>
-    <p class="page-subtitle">
+  <c-page-header :title="project.name" :project="project">
+    <c-slot name="subtitle">
       {% if project.description %}{{ project.description }}
       ·
       {% endif %}Your batches that are still in progress.
-    </p>
-  </header>
+    </c-slot>
+  </c-page-header>
 
   <div class="flex items-start gap-6">
     <section class="flex min-w-0 flex-1 flex-col gap-3.5" aria-label="My batches">
@@ -67,10 +62,7 @@
       </article>
       {% endwith %}
       {% empty %}
-      <div class="card flex flex-col items-center gap-2 px-6 py-14 text-center">
-        <h2 class="text-[15px] font-semibold">No batches in progress</h2>
-        <p class="max-w-sm text-ink-2">Batches appear here when you are assigned to one.</p>
-      </div>
+      <c-empty-state title="No batches in progress">Batches appear here when you are assigned to one.</c-empty-state>
       {% endfor %}
     </section>
 

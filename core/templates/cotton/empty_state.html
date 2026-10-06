@@ -1,0 +1,13 @@
+{% comment %}
+Placeholder for an empty list:
+<c-empty-state title="No batches yet"> Explanation … <c-slot name="actions"> …button… </c-slot> </c-empty-state>
+{% endcomment %}
+<c-vars title="" icon="" actions="" />
+<div class="card flex flex-col items-center gap-2 px-6 py-14 text-center">
+  {{ icon }}
+  <h2 class="text-[15px] font-semibold">{{ title }}</h2>
+  <p class="max-w-sm text-ink-2">{{ slot }}</p>
+  {% if actions %}
+  <div class="mt-2">{{ actions }}</div>
+  {% endif %}
+</div>

@@ -6,22 +6,13 @@ Codebook ·
 {% endblock title %}
 {% block content %}
 <div class="flex flex-col gap-7">
-  <header class="flex flex-wrap items-end justify-between gap-4">
-    <div class="flex flex-col gap-1.5">
-      <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
-        <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
-        <a href="{% url 'project-detail' codebook.project.id %}" class="hover:text-ink hover:underline"
-          >{{ codebook.project.name }}</a
-        >
-        / Codebook
-      </nav>
-      <h1 class="page-title">Codebook</h1>
-      <p class="page-subtitle">
-        The shared instructions for
-        {{ codebook.project.name }}. Every change is kept with its rationale.
-      </p>
-    </div>
-    <div class="flex gap-2.5">
+  <c-page-header
+    title="Codebook"
+    :project="codebook.project"
+    crumb="Codebook"
+    subtitle="The shared instructions for {{ codebook.project.name }}. Every change is kept with its rationale."
+  >
+    <c-slot name="actions">
       <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}" class="btn btn-secondary">Latest changes</a>
       {% if role == "E" %}
       <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary">
@@ -33,8 +24,8 @@ Codebook ·
         Edit
       </a>
       {% endif %}
-    </div>
-  </header>
+    </c-slot>
+  </c-page-header>
 
   <article class="card px-12 py-10">
     <div class="max-w-3xl">

@@ -5,20 +5,8 @@ Batch
 done ·
 {{ project.name }}
 {% endblock title %}
-{% block focus_back_url %}{% url 'project-detail' project.id %}{% endblock focus_back_url %}
-{% block focus_context %}
-<span class="text-ink-3">{{ project.name }}</span>
-<span class="text-line-strong">/</span>
-<span class="font-semibold"
-  >Batch
-  {{ batch.batch_number }}</span
->
-{% endblock focus_context %}
-{% block focus_phase %}
-<span class="phase-badge" data-phase="{{ batch.current_phase }}">{{ batch.get_current_phase_display }}</span>
-{% endblock focus_phase %}
 {% block focus_progress %}
-{% include "annotation/partials/progress.html" %}
+<c-progress id="annotation-progress" :done="progress.done" :total="progress.total" phase="A" suffix="done" />
 {% endblock focus_progress %}
 {% block content %}
 <main class="flex flex-1 items-start justify-center px-14 py-16">

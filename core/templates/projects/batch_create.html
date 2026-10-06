@@ -7,15 +7,12 @@ New batch ·
 {% block content %}
 {% url "project-user-search" as project_user_search_url %}
 <div class="mx-auto flex max-w-3xl flex-col gap-7">
-  <header class="flex flex-col gap-1.5">
-    <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
-      <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
-      <a href="{% url 'project-detail' project.id %}" class="hover:text-ink hover:underline">{{ project.name }}</a> /
-      New batch
-    </nav>
-    <h1 class="page-title">New batch</h1>
-    <p class="page-subtitle">Upload the samples and choose who works on this batch.</p>
-  </header>
+  <c-page-header
+    title="New batch"
+    :project="project"
+    crumb="New batch"
+    subtitle="Upload the samples and choose who works on this batch."
+  />
 
   <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5">
     {% csrf_token %}
@@ -27,16 +24,11 @@ New batch ·
 
     <section class="card flex flex-col gap-3 p-6">
       <h2 class="card-title">Samples</h2>
-      <div>
-        <label for="{{ form.file.id_for_label }}" class="field-label">Data file</label>
-        {{ form.file }}
-        <p class="field-help">
-          A CSV or Excel (.xlsx) file with a <code class="font-mono">text</code> column. Each row becomes one sample.
-        </p>
-        {% if form.file.errors %}
-        <p class="field-error">{{ form.file.errors|join:" " }}</p>
-        {% endif %}
-      </div>
+      <c-field
+        :field="form.file"
+        label="Data file"
+        help="A CSV or Excel (.xlsx) file with a text column. Each row becomes one sample."
+      />
     </section>
 
     <section class="card flex flex-col gap-5 p-6">
@@ -45,30 +37,22 @@ New batch ·
         <p class="field-help">Anyone in the project can take either role. Roles can differ from batch to batch.</p>
       </div>
       <div class="grid grid-cols-2 gap-6">
-        <div>
-          <c-element-header sub_text="Label every sample, then discuss disagreements.">Annotators</c-element-header>
+        <c-field :field="form.annotators" label="Annotators" help="Label every sample, then discuss disagreements.">
           <c-user-search
             name="annotators"
             search_url="{{ project_user_search_url }}?project_id={{ project.id }}"
             :selected_users="annotators_selected_users"
             placeholder="Search project members"
           />
-          {% if form.annotators.errors %}
-          <p class="field-error">{{ form.annotators.errors|join:" " }}</p>
-          {% endif %}
-        </div>
-        <div>
-          <c-element-header sub_text="Decide what discussion could not settle.">Experts</c-element-header>
+        </c-field>
+        <c-field :field="form.experts" label="Experts" help="Decide what discussion could not settle.">
           <c-user-search
             name="experts"
             search_url="{{ project_user_search_url }}?project_id={{ project.id }}"
             :selected_users="experts_selected_users"
             placeholder="Search project members"
           />
-          {% if form.experts.errors %}
-          <p class="field-error">{{ form.experts.errors|join:" " }}</p>
-          {% endif %}
-        </div>
+        </c-field>
       </div>
     </section>
 

@@ -5,20 +5,8 @@ Annotate · Batch
 ·
 {{ batch.project.name }}
 {% endblock title %}
-{% block focus_back_url %}{% url 'project-detail' batch.project.id %}{% endblock focus_back_url %}
-{% block focus_context %}
-<span class="text-ink-3">{{ batch.project.name }}</span>
-<span class="text-line-strong">/</span>
-<span class="font-semibold"
-  >Batch
-  {{ batch.batch_number }}</span
->
-{% endblock focus_context %}
-{% block focus_phase %}
-<span class="phase-badge" data-phase="A">Annotation</span>
-{% endblock focus_phase %}
 {% block focus_progress %}
-{% include "annotation/partials/progress.html" %}
+<c-progress id="annotation-progress" :done="progress.done" :total="progress.total" phase="A" suffix="done" />
 {% endblock focus_progress %}
 {% block focus_actions %}
 <button
