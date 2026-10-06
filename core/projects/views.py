@@ -1,11 +1,14 @@
 import json
 import logging
+import shutil
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import HttpResponseBadRequest
+from django.http import HttpResponseForbidden
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
 from django.utils import timezone
@@ -60,6 +63,26 @@ class ProjectListView(ListView):
         context = super().get_context_data(**kwargs)
         context["create_url"] = reverse("project-create") if self.request.user.is_staff else None
         return context
+
+
+class ProjectDeleteView(View):
+    """Delete a project with everything in it. Only its owner may do this."""
+
+    def post(self, request, project_id, *args, **kwargs):  # noqa: ARG002
+        project = get_object_or_404(Project, id=project_id)
+        if project.owner_id != request.user.id:
+            return HttpResponseForbidden("Only the owner can delete this project.")
+
+        # the codebook's git repository is a folder on disk, deleted after the database rows
+        codebook_dirs = [
+            codebook.file.parent for codebook in project.codebook.all() if codebook.git_dir
+        ]
+        project.delete()  # one transaction, including the chat rooms (discuss.signals)
+        for path in codebook_dirs:
+            shutil.rmtree(path, ignore_errors=True)
+
+        messages.success(request, f"Project {project.name} deleted.")
+        return redirect("project-list")
 
 
 class ProjectCreateView(FormView):
@@ -426,9 +449,7 @@ class DeleteBatch(ExpertRequiredMixin, View):
             codebook.untag_version(batch_number)
         batch.delete()
         messages.success(request, f"Batch {batch_number} deleted.")
-        response = HttpResponse(status=204)
-        response["HX-Refresh"] = "true"
-        return response
+        return redirect("project-detail", project_id=batch.project_id)
 
 
 _LABEL_KEYS = {

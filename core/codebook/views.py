@@ -2,6 +2,7 @@ import io
 import logging
 import zipfile
 
+from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -47,6 +48,17 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
         batch_new = int(batch_new)
         batch_old = self.request.GET.get("batch_old", max(0, batch_new - 1))
         batch_old = int(batch_old)
+        # every batch tags its codebook version as batch_N; deleting a batch removes its tag
+        tagged = {
+            int(number)
+            for tag in self.object.repo.tags
+            if (number := tag.name.removeprefix("batch_")).isdigit()
+        }
+        if batch_new not in tagged:
+            msg = f"Batch {batch_new} has no codebook version."
+            raise Http404(msg)
+        # if the previous batch was deleted, compare with the one before it
+        batch_old = max((number for number in tagged if number <= batch_old), default=0)
         context["content_diff"] = self.object.diff(batch_old, batch_new)
         context["batch_old"] = batch_old
         context["batch_new"] = batch_new

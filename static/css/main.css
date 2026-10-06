@@ -207,6 +207,9 @@
   .btn-danger {
     @apply border border-danger-line bg-surface text-danger hover:bg-danger-soft;
   }
+  .btn-danger-solid {
+    @apply bg-danger font-semibold text-white hover:bg-danger/90 dark:text-night;
+  }
   .btn-sm {
     @apply h-8 gap-1.5 rounded-md px-3 text-[13px];
   }

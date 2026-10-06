@@ -6,7 +6,9 @@ import logging
 import os
 from typing import Any
 
+from redis import Redis as SyncRedis
 from redis.asyncio import Redis
+from redis.exceptions import RedisError
 from redis.exceptions import WatchError
 
 log = logging.getLogger(__name__)
@@ -79,3 +81,12 @@ async def update_state(
         except WatchError:
             # state changed between WATCH and EXEC, retry
             continue
+
+
+def delete_state(batch_id: int | str) -> None:
+    """Forget the chat state of a deleted batch. A Redis outage must not block the deletion."""
+    try:
+        with SyncRedis.from_url(REDIS_URL) as r:
+            r.delete(_key(batch_id))
+    except RedisError:
+        log.warning("Could not delete the chat state of batch %s", batch_id, exc_info=True)

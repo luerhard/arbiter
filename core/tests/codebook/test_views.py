@@ -147,3 +147,35 @@ class TestViews:
 
         codebook.refresh_from_db()
         assert codebook.content == new_content + "\n"
+
+
+@pytest.mark.django_db
+class TestDiffAfterBatchDeletion:
+    """Deleting a batch removes its codebook tag; the next batch's diff must still work."""
+
+    def _diff(self, client, codebook, old, new):
+        return client.get(
+            reverse("codebook-diff", args=(codebook.pk,)), {"batch_old": old, "batch_new": new}
+        )
+
+    def test_compares_with_the_batch_before_the_deleted_one(self, client, project_annotation):
+        codebook = project_annotation["project"].codebook.get()
+        for number in (2, 3):
+            codebook.save(content=f"Version {number}\n", commit_message=f"Batch {number}")
+            codebook.tag_version(number)
+        codebook.untag_version(2)
+        client.login(username=project_annotation["expert"].username, password="123")
+
+        response = self._diff(client, codebook, 2, 3)
+
+        assert response.status_code == 200
+        assert response.context["batch_old"] == 1
+        assert "Version 3" in response.context["content_diff"]
+
+    def test_deleted_batch_has_no_diff(self, client, project_annotation):
+        codebook = project_annotation["project"].codebook.get()
+        client.login(username=project_annotation["expert"].username, password="123")
+
+        response = self._diff(client, codebook, 1, 2)
+
+        assert response.status_code == 404

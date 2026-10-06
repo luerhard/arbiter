@@ -11,6 +11,7 @@ urlpatterns = [
         name="project-batch-create",
     ),
     path("<int:project_id>", views.ProjectDetailView.as_view(), name="project-detail"),
+    path("<int:project_id>/delete", views.ProjectDeleteView.as_view(), name="project-delete"),
     path(
         "<int:project_id>/expert",
         views.ProjectExpertDetailView.as_view(),

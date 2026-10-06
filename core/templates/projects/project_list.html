@@ -26,7 +26,8 @@ Projects · Arbiter
           <th class="border-b border-line px-4 py-3.5 font-semibold">Your role</th>
           <th class="border-b border-line px-4 py-3.5 text-right font-semibold">Active batches</th>
           <th class="border-b border-line px-4 py-3.5 font-semibold">Annotation</th>
-          <th class="border-b border-line px-5.5 py-3.5 font-semibold">Discussion</th>
+          <th class="border-b border-line px-4 py-3.5 font-semibold">Discussion</th>
+          <th class="border-b border-line px-5.5 py-3.5"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody class="divide-y divide-line">
@@ -59,18 +60,57 @@ Projects · Arbiter
             <span class="badge">Closed</span>
             {% endif %}
           </td>
-          <td class="px-5.5 py-4">
+          <td class="px-4 py-4">
             {% if project.annotator_any_discussion_batches %}
             <span class="phase-badge" data-phase="D">Open</span>
             {% else %}
             <span class="badge">Closed</span>
             {% endif %}
           </td>
+          <td class="px-5.5 py-4 text-right">
+            {% if project.owner_id == user.id %}
+            <button
+              type="button"
+              command="show-modal"
+              commandfor="delete-project-{{ project.pk }}"
+              class="btn btn-ghost btn-sm btn-icon hover:text-danger"
+              aria-label="Delete {{ project.name }}"
+              title="Delete project"
+            >
+              {% heroicon_mini "trash" class="size-4" %}
+            </button>
+            {% with n_batches=project.batches.count %}
+            {% url "project-delete" project.pk as delete_url %}
+            <c-confirm-dialog
+              id="delete-project-{{ project.pk }}"
+              title="Delete {{ project.name }}?"
+              :action="delete_url"
+              confirm="Delete project"
+            >
+              <p>
+                This permanently deletes the project with its
+                {{ n_batches }}
+                batch{{ n_batches|pluralize:"es" }}: all samples, annotations, discussions, expert decisions and the
+                codebook with its history. This cannot be undone.
+              </p>
+              {% if n_batches and project_user.default_role == "E" %}
+              <p>
+                To keep the data,
+                <a href="{% url 'project-export-project' project.pk %}" class="font-medium text-ink underline"
+                  >export the project</a
+                >
+                first.
+              </p>
+              {% endif %}
+            </c-confirm-dialog>
+            {% endwith %}
+            {% endif %}
+          </td>
         </tr>
         {% endwith %}
         {% empty %}
         <tr>
-          <td colspan="5" class="px-5.5 py-12 text-center text-ink-2">You are not part of any project yet.</td>
+          <td colspan="6" class="px-5.5 py-12 text-center text-ink-2">You are not part of any project yet.</td>
         </tr>
         {% endfor %}
       </tbody>

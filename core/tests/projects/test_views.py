@@ -284,8 +284,8 @@ class TestViews:
         login = client.login(username="expert1", password="123")
         assert login == True
         req = client.post(url)
-        assert req.status_code == 204
-        assert req.headers["HX-Refresh"] == "true"
+        assert req.status_code == 302
+        assert req.url == reverse("project-detail", args=(1,))
         assert not Batch.objects.filter(id=1).exists()
 
     def test_redirect_project_detail_expert(self, client):
@@ -318,10 +318,26 @@ def test_delete_batch_cascades_related_objects(client, project_annotation):
 
     resp = client.post(reverse("delete-batch", args=(batch.id,)))
 
-    assert resp.status_code == 204
+    assert resp.status_code == 302
     assert not Batch.objects.filter(id=batch.id).exists()
     assert not ExampleAssignment.objects.filter(batch_id=batch.id).exists()
     assert tag not in codebook.repo.tags
+
+
+@pytest.mark.django_db
+def test_delete_batch_asks_for_confirmation(client, project_annotation):
+    batch = project_annotation["batch"]
+    client.login(username=project_annotation["expert"].username, password="123")
+
+    content = client.get(
+        reverse("project-detail-expert", args=(batch.project_id,))
+    ).content.decode()
+
+    assert f'commandfor="delete-batch-{batch.id}"' in content
+    assert f'id="delete-batch-{batch.id}"' in content
+    assert f'action="{reverse("delete-batch", args=(batch.id,))}"' in content
+    assert re.search(r"its\s+1\s+sample:", content)
+    assert "hx-confirm" not in content
 
 
 @pytest.mark.django_db
