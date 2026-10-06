@@ -115,7 +115,17 @@ ASGI_APPLICATION = "core.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": ["redis://redis:6379/0"]},
+        "CONFIG": {
+            "hosts": [
+                {
+                    "address": "redis://redis:6379/0",
+                    # channels_redis waits up to 5 s (brpop_timeout) for new
+                    # messages; redis-py >= 8 defaults to a 5 s socket timeout,
+                    # which races with that wait and kills the websocket.
+                    "socket_timeout": 15,
+                },
+            ],
+        },
     },
 }
 
