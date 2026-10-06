@@ -9,6 +9,7 @@ from django.utils.text import slugify
 import pandas as pd
 import pytest
 
+from data.models import Example
 from data.models import ExampleAssignment
 from discuss.models import Message
 from discuss.models import Room
@@ -446,14 +447,63 @@ class TestExportBatchView:
         row = json.loads(response.content.decode("utf-8").splitlines()[0])
         assert row["metadata"] == {"id": 7, "source": "twitter"}
 
-    def test_export_batch_empty_when_no_assignment_completed(self, client, project_annotation):
+    def test_export_batch_lists_every_example_before_annotation(self, client, project_annotation):
+        # A freshly uploaded batch exports its texts and metadata; only the labels are empty.
         data = project_annotation
-        batch = data["batch"]
-        expert = data["expert"]
+        batch, example = data["batch"], data["example"]
+        example.metadata = {"id": 7}
+        example.save()
 
-        login = client.login(username=expert.username, password="123")
-        assert login == True
+        client.login(username=data["expert"].username, password="123")
         response = client.get(reverse("project-export-batch", args=(batch.id,)))
+
+        assert response.status_code == 200
+        [line] = response.content.decode("utf-8").splitlines()
+        row = json.loads(line)
+        assert row["text_id"] == example.id
+        assert row["text"] == example.content
+        assert row["metadata"] == {"id": 7}
+        assert row["batch_number"] == batch.batch_number
+        for key in [
+            "labels_annotation",
+            "labels_discussion",
+            "labels_expert",
+            "messages_discussion",
+        ]:
+            assert row[key] == []
+
+    def test_export_batch_includes_unannotated_examples_next_to_annotated(
+        self,
+        client,
+        project_annotation,
+    ):
+        data = project_annotation
+        batch, first = data["batch"], data["example"]
+        second = Example.objects.create(batch=batch, content="Second", metadata={"id": 8})
+        assignment = ExampleAssignment.objects.get(
+            batch=batch,
+            user=data["annotators"][0],
+            example=first,
+            phase=BatchPhase.ANNOTATION,
+        )
+        assignment.set_user_annotations(label_ids=[data["labels"][0].id])
+
+        client.login(username=data["expert"].username, password="123")
+        response = client.get(reverse("project-export-batch", args=(batch.id,)))
+
+        rows = [json.loads(line) for line in response.content.decode("utf-8").splitlines()]
+        assert [row["text_id"] for row in rows] == [first.id, second.id]
+        assert len(rows[0]["labels_annotation"]) == 1
+        assert rows[1]["labels_annotation"] == []
+        assert rows[1]["metadata"] == {"id": 8}
+
+    def test_export_project_without_batches_is_empty(self, client, project_annotation):
+        # Regression: joining zero batches raised "No objects to concatenate".
+        project = project_annotation["project"]
+        project.batches.all().delete()
+        client.login(username=project_annotation["expert"].username, password="123")
+
+        response = client.get(reverse("project-export-project", args=(project.id,)))
 
         assert response.status_code == 200
         assert response.content.decode("utf-8").strip() == ""

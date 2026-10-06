@@ -327,80 +327,77 @@ class DeleteBatch(ExpertRequiredMixin, View):
         return response
 
 
-def _generate_batch_data(batch):
-    annotators = batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
-    experts = batch.assignees(role=ProjectRole.EXPERT).order_by("username")
+_LABEL_KEYS = {
+    BatchPhase.ANNOTATION: "labels_annotation",
+    BatchPhase.DISCUSSION: "labels_discussion",
+    BatchPhase.EXPERT: "labels_expert",
+}
 
+
+def _timestamp(value) -> str:
+    return timezone.localtime(value).isoformat(timespec="milliseconds")
+
+
+def _generate_batch_data(batch):
+    """One export row per example of the batch: text, metadata, labels per phase and chat.
+    Examples that nobody has labeled yet are included with empty label lists."""
     shared_data = {
         "batch_number": batch.batch_number,
-        "batch_annotators": [a.username for a in annotators.all()],
-        "batch_experts": [a.username for a in experts.all()],
+        "batch_annotators": [
+            u.username for u in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
+        ],
+        "batch_experts": [
+            u.username for u in batch.assignees(role=ProjectRole.EXPERT).order_by("username")
+        ],
+    }
+
+    rows = {
+        example.id: {
+            "text_id": example.id,
+            "text": example.content,
+            "metadata": example.metadata,
+            "labels_annotation": [],
+            "labels_discussion": [],
+            "messages_discussion": [],
+            "labels_expert": [],
+            **shared_data,
+        }
+        for example in batch.examples.order_by("pk")
     }
 
     assignments = (
-        batch.assignments.filter(done__isnull=False)
+        batch.assignments.filter(done__isnull=False, phase__in=_LABEL_KEYS)
         .select_related("user")
         .prefetch_related("annotations__label")
         .order_by("example_id", "user__username")
     )
+    for assignment in assignments:
+        rows[assignment.example_id][_LABEL_KEYS[assignment.phase]].append(
+            {
+                "user": assignment.user.username,
+                "labels": sorted(a.label.name for a in assignment.annotations.all()),
+                "at": _timestamp(assignment.done),
+            },
+        )
 
-    rows = {}
-    for assignment in assignments.all():
-        ex = assignment.example
-        if ex.id not in rows:
-            row = {
-                "text_id": ex.id,
-                "text": ex.content,
-                "metadata": ex.metadata,
-                "labels_annotation": [],
-                "labels_discussion": [],
-                "messages_discussion": [],
-                "labels_expert": [],
-                **shared_data,
-            }
-            rows[ex.id] = row
-
-        label_data = {
-            "user": assignment.user.username,
-            "labels": sorted([a.label.name for a in assignment.annotations.all()]),
-            "at": timezone.localtime(assignment.done).isoformat(timespec="milliseconds"),
-        }
-
-        phase = assignment.phase
-        if phase == BatchPhase.ANNOTATION:
-            rows[ex.id]["labels_annotation"].append(label_data)
-        elif phase == BatchPhase.DISCUSSION:
-            rows[ex.id]["labels_discussion"].append(label_data)
-        elif phase == BatchPhase.EXPERT:
-            rows[ex.id]["labels_expert"].append(label_data)
-
-    # Chat Messages
-    for example_id in rows.keys():
-        messages_qs = Message.objects.filter(example=example_id).order_by("created_at").all()
-        messages = []
-        for message in messages_qs.all():
-            msg = {
+    messages = Message.objects.filter(example__in=rows).order_by("created_at")
+    for message in messages:
+        rows[message.example_id]["messages_discussion"].append(
+            {
                 "user": message.user,
-                "at": timezone.localtime(message.created_at).isoformat(timespec="milliseconds"),
+                "at": _timestamp(message.created_at),
                 "content": message.message,
-            }
-            messages.append(msg)
-        rows[example_id]["messages_discussion"] = messages
+            },
+        )
 
-    df = pd.DataFrame(rows.values())
-
-    return df
+    return pd.DataFrame(rows.values())
 
 
 class ExportProject(ExpertRequiredMixin, View):
     def get(self, request, project_id, *args, **kwargs):  # noqa: ARG002
         project = Project.objects.get(id=project_id)
-        dfs = []
-        for batch in project.batches.order_by("batch_number").all():
-            df = _generate_batch_data(batch)
-            dfs.append(df)
-        df = pd.concat(dfs, axis=0)
-        json_data = df.to_json(orient="records", lines=True)
+        frames = [_generate_batch_data(b) for b in project.batches.order_by("batch_number")]
+        json_data = pd.concat(frames).to_json(orient="records", lines=True) if frames else ""
 
         response = HttpResponse(json_data, content_type="application/text")
         safe_name = slugify(project.name)
