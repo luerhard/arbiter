@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import shutil
 import tempfile
@@ -7,10 +8,12 @@ from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 import pytest
+import redis
 
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
+from discuss import room_state
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
@@ -59,6 +62,25 @@ def django_db_setup(django_db_blocker):  # noqa: PT004
 
     project_settings.CODEBOOKS_ROOT = dev_codebooks_root
     shutil.rmtree(test_codebooks_root, ignore_errors=True)
+
+
+@pytest.fixture
+def redis_client(monkeypatch, settings):
+    """An empty Redis database for the chat state and the channel layer. In docker compose
+    (and CI) Redis runs in its own container, which REDIS_HOST names."""
+    url = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:6379/15"
+    monkeypatch.setattr(room_state, "REDIS_URL", url)
+    settings.CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [url]},
+        },
+    }
+    client = redis.Redis.from_url(url, decode_responses=True)
+    client.flushdb()
+    yield client
+    client.flushdb()
+    client.close()
 
 
 @pytest.fixture

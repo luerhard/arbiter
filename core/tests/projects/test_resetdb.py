@@ -1,11 +1,8 @@
 from django.core.management import call_command
 import pytest
-import redis
 
 from discuss import room_state
 from projects.management.commands import resetdb
-
-REDIS_URL = "redis://localhost:6379/15"
 
 
 @pytest.fixture
@@ -14,22 +11,6 @@ def skip_database_reset(monkeypatch):
     calls = []
     monkeypatch.setattr(resetdb, "call_command", lambda name, **_: calls.append(name))
     return calls
-
-
-@pytest.fixture
-def redis_client(monkeypatch, settings):
-    monkeypatch.setattr(room_state, "REDIS_URL", REDIS_URL)
-    settings.CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {"hosts": [REDIS_URL]},
-        },
-    }
-    client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
-    client.flushdb()
-    yield client
-    client.flushdb()
-    client.close()
 
 
 @pytest.mark.django_db

@@ -1,22 +1,10 @@
 from django.urls import reverse
 import pytest
-import redis
 
 from discuss import room_state
 from discuss.models import Message
 from discuss.models import Room
 from projects.models import Batch
-
-
-@pytest.fixture
-def redis_client(monkeypatch):
-    url = "redis://localhost:6379/15"
-    monkeypatch.setattr(room_state, "REDIS_URL", url)
-    client = redis.Redis.from_url(url, decode_responses=True)
-    client.flushdb()
-    yield client
-    client.flushdb()
-    client.close()
 
 
 def _chat(batch_id, client):
