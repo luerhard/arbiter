@@ -26,7 +26,5 @@ export default defineConfig(({ command }) => ({
       },
     },
   },
-  plugins: [
-    tailwindcss(),
-  ],
+  plugins: [tailwindcss()],
 }));
