@@ -22,7 +22,8 @@ class DiscussView(BatchAnnotatorRequiredMixin, View):
         context = {}
         context["batch_id"] = batch_id
 
-        batch = Batch.objects.get(id=batch_id)
+        batch = Batch.objects.select_related("project").get(id=batch_id)
+        context["batch"] = batch
 
         codebook = batch.project.codebook.get()
         context.update(codebook.get_as_context(batch.batch_number))

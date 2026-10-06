@@ -293,10 +293,38 @@ class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
                 ).count()
                 user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
                 batch_data["users"].append(user_data)
+
+            # totals for the batch card
+            batch_data["steps"] = _phase_steps(batch)
+            batch_data["annotated_total"] = sum(u["annotated"] for u in batch_data["users"])
+            batch_data["annotated_max"] = batch_data["length"] * len(batch_data["users"])
+            batch_data["discussed"] = (
+                batch_data["users"][0]["discussed"] if batch_data["users"] else 0
+            )
+            batch_data["expert_open"] = batch_data["disc_disagreement"] - batch_data["expert_dec"]
             context["batches"].append(batch_data)
 
         log.debug(f"Providing the following context to the Expert: {context}")
         return context
+
+
+_PHASE_FLOW = [BatchPhase.ANNOTATION, BatchPhase.DISCUSSION, BatchPhase.EXPERT, BatchPhase.FINAL]
+
+
+def _phase_steps(batch) -> list[dict]:
+    """The phases of a batch as steps (done/current/todo) for the phase stepper."""
+    current = batch.current_phase
+    position = _PHASE_FLOW.index(current) if current in _PHASE_FLOW else -1
+    steps = []
+    for index, phase in enumerate(_PHASE_FLOW):
+        if index < position or (index == position and phase == BatchPhase.FINAL):
+            state = "done"
+        elif index == position:
+            state = "current"
+        else:
+            state = "todo"
+        steps.append({"phase": phase, "label": phase.label, "state": state})
+    return steps
 
 
 def _batch_roles(user, project) -> dict[int, str]:

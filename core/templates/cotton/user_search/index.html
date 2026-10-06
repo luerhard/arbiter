@@ -1,7 +1,7 @@
 <c-vars name search_url selected_users placeholder />
 <div
   x-data="window.lib.ui.userPicker('{{ name }}', {{ selected_users }})"
-  class="space-y-2"
+  class="flex flex-col gap-2.5"
   @click.outside="open = false"
 >
   <div
@@ -9,14 +9,27 @@
     x-ref="searchArea"
     @focusout="$nextTick(() => { if (!$refs.searchArea.contains(document.activeElement)) open = false })"
   >
+    <svg
+      class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-3"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="11" cy="11" r="6" />
+      <path d="M20 20l-4.5-4.5" />
+    </svg>
     <input
       type="text"
       x-ref="searchInput"
       x-model="query"
       @focus="open = true"
       @input="open = true"
-      placeholder="{{ placeholder|default:'Search users...' }}"
-      class="block w-full rounded-md border px-3 py-2 text-sm"
+      placeholder="{{ placeholder|default:'Search users' }}"
+      aria-label="{{ placeholder|default:'Search users' }}"
+      class="input pl-9"
       hx-get="{{ search_url }}"
       hx-trigger="focus, input changed delay:200ms"
       hx-target="#{{ name }}-results"
@@ -27,14 +40,31 @@
       id="{{ name }}-results"
       x-show="open"
       x-cloak
-      class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md border bg-white"
+      class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-[10px] border border-line bg-surface p-1 shadow-[0_12px_32px_rgb(11_13_16/0.14)]"
     ></div>
   </div>
-  <div class="flex flex-wrap gap-2">
+  <div class="flex flex-wrap gap-1.5">
     <template x-for="u in selectedUsers" :key="u.id">
-      <span class="inline-flex items-center gap-2 rounded-full border px-2 py-1 text-xs">
+      <span class="inline-flex h-7 items-center gap-1.5 rounded-full bg-subtle pr-1 pl-3 text-[13px] text-ink">
         <span x-text="u.username"></span>
-        <button type="button" @click="remove(u.id)">×</button>
+        <button
+          type="button"
+          @click="remove(u.id)"
+          class="inline-flex size-5 cursor-pointer items-center justify-center rounded-full text-ink-3 hover:bg-line hover:text-ink"
+          :aria-label="'Remove ' + u.username"
+        >
+          <svg
+            class="size-3"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" />
+          </svg>
+        </button>
       </span>
     </template>
   </div>

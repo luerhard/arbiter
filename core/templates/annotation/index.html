@@ -1,29 +1,43 @@
-{% extends "base.html" %}
-{% load markdownify %}
+{% extends "layouts/focus.html" %}
+{% block title %}
+Annotate · Batch
+{{ batch.batch_number }}
+·
+{{ batch.project.name }}
+{% endblock title %}
+{% block focus_back_url %}{% url 'project-detail' batch.project.id %}{% endblock focus_back_url %}
+{% block focus_context %}
+<span class="text-ink-3">{{ batch.project.name }}</span>
+<span class="text-line-strong">/</span>
+<span class="font-semibold"
+  >Batch
+  {{ batch.batch_number }}</span
+>
+{% endblock focus_context %}
+{% block focus_phase %}
+<span class="phase-badge" data-phase="A">Annotation</span>
+{% endblock focus_phase %}
+{% block focus_progress %}
+{% include "annotation/partials/progress.html" %}
+{% endblock focus_progress %}
+{% block focus_actions %}
+<button
+  type="button"
+  id="skip-annotated-toggle"
+  x-data="skipAnnotatedToggle()"
+  @click="toggle()"
+  :aria-pressed="on ? 'true' : 'false'"
+  :class="on ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink'"
+  class="btn btn-sm border"
+  title="Only show samples you have not labeled yet"
+>
+  Skip labeled
+</button>
+<c-codebook.panel_toggle />
+{% endblock focus_actions %}
 {% block content %}
-<div class="flex items-center gap-2 px-4 py-5 sm:px-6">
-  <button
-    command="show-modal"
-    commandfor="drawer"
-    class="rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20"
-  >
-    Open Codebook
-  </button>
-  <button
-    type="button"
-    id="skip-annotated-toggle"
-    x-data="skipAnnotatedToggle()"
-    @click="toggle()"
-    :aria-pressed="on ? 'true' : 'false'"
-    :class="on
-      ? 'rounded-md bg-indigo-600 px-2.5 py-1.5 text-sm font-semibold text-white hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400'
-      : 'rounded-md bg-gray-950/5 px-2.5 py-1.5 text-sm font-semibold text-gray-900 hover:bg-gray-950/10 dark:bg-white/10 dark:text-white dark:inset-ring dark:inset-ring-white/5 dark:hover:bg-white/20'"
-  >
-    Hide finished
-  </button>
-  <c-drawer id="drawer" title="Codebook">
-    <c-codebook.view content="{{ codebook.content }}" />
-  </c-drawer>
-</div>
-{% include "annotation/panel.html" %}
+<main class="flex min-w-0 flex-1 justify-center px-14 py-12">
+  <div class="w-full max-w-3xl">{% include "annotation/panel.html" %}</div>
+</main>
+<c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
 {% endblock content %}

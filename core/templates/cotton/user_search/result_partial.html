@@ -1,7 +1,7 @@
 {% for user in users %}
 <button
   type="button"
-  class="block w-full px-3 py-2 text-left text-sm hover:bg-gray-100"
+  class="menu-item"
   onclick="
     const root = this.closest('[x-data]');
     if (!root || !window.Alpine) return;
@@ -14,5 +14,5 @@
   {{ user.username }}
 </button>
 {% empty %}
-<div class="px-3 py-2 text-sm text-gray-500">No matches</div>
+<div class="px-2.5 py-2 text-[13px] text-ink-3">No matches</div>
 {% endfor %}

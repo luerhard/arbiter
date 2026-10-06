@@ -13,7 +13,7 @@ class BatchPhase(models.TextChoices):
     SETUP = "S", "Setup"
     ANNOTATION = "A", "Annotation"
     DISCUSSION = "D", "Discussion"
-    EXPERT = "E", "ExpertDecision"
+    EXPERT = "E", "Expert decision"
     FINAL = "F", "Finalized"
 
 

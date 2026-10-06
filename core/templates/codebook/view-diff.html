@@ -1,14 +1,41 @@
 {% extends "base.html" %}
+{% block title %}
+Codebook changes ·
+{{ codebook.project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mt-4">
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold">
-        Project:
-        {{ object.project }}
-      </h2>
+<div class="flex flex-col gap-7">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div class="flex flex-col gap-1.5">
+      <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
+        <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
+        <a href="{% url 'project-detail' codebook.project.id %}" class="hover:text-ink hover:underline"
+          >{{ codebook.project.name }}</a
+        >
+        / <a href="{% url 'codebook-view' codebook.pk %}" class="hover:text-ink hover:underline">Codebook</a> / Changes
+      </nav>
+      <h1 class="page-title">Codebook changes</h1>
+      <p class="page-subtitle">
+        {% if batch_old %}What changed between batch
+        {{ batch_old }}
+        and batch
+        {{ batch_new }}.{% else %}What changed up to batch
+        {{ batch_new }}.{% endif %}
+      </p>
     </div>
-    <div class="p-4">{% include "codebook/partials/view-diff-codebook.html" %}</div>
-  </div>
+    <div class="flex items-center gap-4 text-[13px] text-ink-2">
+      <span class="flex items-center gap-1.5"
+        ><span class="rounded bg-success-soft px-1.5 text-success">added</span> new text</span
+      >
+      <span class="flex items-center gap-1.5"
+        ><span class="rounded bg-danger-soft px-1.5 text-danger line-through">removed</span> deleted text</span
+      >
+    </div>
+  </header>
+
+  <article class="card px-12 py-10">
+    <div class="max-w-3xl">{% include "codebook/partials/view-diff-codebook.html" %}</div>
+  </article>
 </div>
 {% endblock content %}

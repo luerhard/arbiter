@@ -1,0 +1,163 @@
+{% load custom_tags %}
+{# Main navigation. Data comes from core.context_processors.navigation. #}
+<nav
+  aria-label="Main"
+  class="sticky top-0 flex h-screen w-62 shrink-0 dark:border-r dark:border-night-line flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line"
+>
+  <a href="{% url 'home' %}" class="flex items-center gap-2.5 px-2 py-1 text-white">
+    <c-logo.mark size="size-[26px]" tone="night" />
+    <span class="text-xl font-semibold tracking-[-0.02em]">arbiter</span>
+  </a>
+
+  <div class="flex flex-col gap-0.5">
+    <a
+      href="{% url 'home' %}"
+      class="nav-item {% if nav_url_name == 'home' %}nav-item-active{% endif %}"
+      {% if nav_url_name == 'home' %}aria-current="page"
+      {% endif %}
+    >
+      <svg
+        class="size-[18px]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />
+      </svg>
+      Home
+    </a>
+    <a
+      href="{% url 'project-list' %}"
+      class="nav-item {% if nav_url_name == 'project-list' %}nav-item-active{% endif %}"
+      {% if nav_url_name == 'project-list' %}aria-current="page"
+      {% endif %}
+    >
+      <svg
+        class="size-[18px]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M3 9h18" />
+      </svg>
+      All projects
+    </a>
+  </div>
+
+  <div class="flex flex-col gap-0.5">
+    <div
+      class="flex items-center justify-between px-2.5 pb-1.5 text-[11px] font-semibold tracking-[0.08em] text-night-ink-2 uppercase"
+    >
+      Projects
+      <a
+        href="{% url 'project-create' %}"
+        aria-label="New project"
+        title="New project"
+        class="rounded p-0.5 text-night-ink-2 hover:bg-night-2 hover:text-white"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </a>
+    </div>
+    {% for membership in nav_projects %}
+    {% with project=membership.project %}
+    {% if project.id == nav_project_id %}
+    <a
+      href="{% url 'project-detail' project.id %}"
+      class="nav-item nav-item-active"
+      data-phase="{{ membership.latest_phase|default:'' }}"
+    >
+      <span class="phase-dot"></span>
+      <span class="truncate">{{ project.name }}</span>
+    </a>
+    <div class="flex flex-col gap-0.5 pl-7">
+      <a
+        href="{% url 'project-detail' project.id %}"
+        class="nav-subitem {% if nav_url_name == 'project-detail-expert' or nav_url_name == 'project-detail-annotator' or nav_url_name == 'project-batch-create' %}nav-subitem-active{% endif %}"
+        >Batches</a
+      >
+      {% if nav_codebook_id %}
+      <a
+        href="{% url 'codebook-view' nav_codebook_id %}"
+        class="nav-subitem {% if nav_url_name == 'codebook-view' or nav_url_name == 'codebook-edit' or nav_url_name == 'codebook-diff' %}nav-subitem-active{% endif %}"
+        >Codebook</a
+      >
+      {% endif %}
+    </div>
+    {% else %}
+    <a
+      href="{% url 'project-detail' project.id %}"
+      class="nav-item"
+      data-phase="{{ membership.latest_phase|default:'' }}"
+    >
+      <span class="phase-dot"></span>
+      <span class="truncate">{{ project.name }}</span>
+    </a>
+    {% endif %}
+    {% endwith %}
+    {% empty %}
+    <p class="px-2.5 text-[13px] text-night-ink-2">No projects yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="mt-auto flex items-center gap-2.5 border-t border-night-line px-1.5 pt-3">
+    <span class="avatar">{{ user.username|initials }}</span>
+    <div class="flex min-w-0 flex-1 flex-col">
+      <a href="{% url 'user-profile' %}" class="truncate font-medium text-white hover:underline">{{ user.username }}</a>
+      <a href="{% url 'logout' %}" class="text-xs text-night-ink-2 hover:text-white">Log out</a>
+    </div>
+    <button
+      type="button"
+      aria-label="Toggle dark mode"
+      title="Toggle dark mode"
+      onclick="
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      "
+      class="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-night-ink-2 hover:bg-night-2 hover:text-white"
+    >
+      <svg
+        class="size-[18px] dark:hidden"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+      </svg>
+      <svg
+        class="size-[18px] not-dark:hidden"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+      </svg>
+    </button>
+  </div>
+</nav>

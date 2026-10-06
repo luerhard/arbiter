@@ -1,0 +1,20 @@
+{# Progress in the top bar. Re-sent out-of-band with each assignment swap (see assignment.html). #}
+<div
+  id="expert-progress"
+  class="flex flex-1 items-center gap-3"
+  data-phase="E"
+  {% if oob %}hx-swap-oob="true"
+  {% endif %}
+>
+  {% if disagreements_total %}
+  <div class="progress flex-1">
+    <div class="progress-bar" style="width: {% widthratio disagreements_decided disagreements_total 100 %}%"></div>
+  </div>
+  <span class="font-mono text-[13px] whitespace-nowrap text-ink-2"
+    >{{ disagreements_decided }}
+    /
+    {{ disagreements_total }}
+    decided</span
+  >
+  {% endif %}
+</div>

@@ -1,55 +1,50 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
-  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
-    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight dark:text-white">Sign in to your account</h2>
+{% block title %}
+Sign in · Arbiter
+{% endblock title %}
+{% block layout %}
+<div class="flex min-h-full">
+  <div class="flex w-[44%] flex-col justify-between bg-night p-12 text-night-ink">
+    <div class="flex items-center gap-3 text-white">
+      <c-logo.mark size="size-8" tone="night" />
+      <span class="text-2xl font-semibold tracking-[-0.02em]">arbiter</span>
+    </div>
+    <p class="max-w-md font-serif text-[26px] leading-snug text-white">
+      From divergent to shared understanding: annotate, discuss disagreements, revise the codebook, keep the record.
+    </p>
+    <p class="text-[13px] text-night-ink-2">Open-source annotation tool for research teams.</p>
   </div>
-  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    <form action="#" method="POST" class="space-y-6">
+  <main class="flex flex-1 items-center justify-center p-10">
+    <form method="post" class="flex w-full max-w-sm flex-col gap-5">
       {% csrf_token %}
+      <div class="flex flex-col gap-1.5">
+        <h1 class="page-title">Sign in</h1>
+        <p class="page-subtitle">Use the account your project lead created for you.</p>
+      </div>
+      {% if form.non_field_errors %}
+      <div class="rounded-lg bg-danger-soft px-3.5 py-2.5 text-[13px] text-danger" role="alert">
+        Wrong username or password. Please try again.
+      </div>
+      {% endif %}
       <div>
-        <label for="username" class="block text-sm/6 font-medium">Username</label>
-        <div class="mt-2">
-          <input
-            id="username"
-            type="username"
-            name="username"
-            required
-            class="block w-full rounded-md bg-white px-3 py-1.5 text-base outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-          />
-        </div>
+        <label for="username" class="field-label">Username</label>
+        <input
+          id="username"
+          type="text"
+          name="username"
+          value="{{ form.username.value|default:'' }}"
+          autocomplete="username"
+          autofocus
+          required
+          class="input"
+        />
       </div>
       <div>
-        <div class="flex items-center justify-between">
-          <label for="password" class="block text-sm/6 font-medium">Password</label>
-          <div class="text-sm">
-            <a
-              href="#"
-              class="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
-              >Forgot password?</a
-            >
-          </div>
-        </div>
-        <div class="mt-2">
-          <input
-            id="password"
-            type="password"
-            name="password"
-            required
-            autocomplete="current-password"
-            class="block w-full rounded-md bg-white px-3 py-1.5 text-base outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6 dark:bg-white/5 dark:text-white dark:outline-white/10 dark:placeholder:text-gray-500 dark:focus:outline-indigo-500"
-          />
-        </div>
+        <label for="password" class="field-label">Password</label>
+        <input id="password" type="password" name="password" required autocomplete="current-password" class="input" />
       </div>
-      <div>
-        <button
-          type="submit"
-          class="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:shadow-none dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
-        >
-          Sign in
-        </button>
-      </div>
+      <button type="submit" class="btn btn-primary w-full">Sign in</button>
     </form>
-  </div>
+  </main>
 </div>
-{% endblock content %}
+{% endblock layout %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load custom_tags %}
+{% comment %}
+Layout for the work screens (annotate, discuss, expert decision): no sidebar, a slim top bar with context, and the full
+width for the task. Blocks: focus_back_url, focus_context, focus_phase, focus_progress, focus_actions, content.
+{% endcomment %}
+{% block layout %}
+<script>
+  // Whether the codebook side panel is open; remembered across pages.
+  document.addEventListener('alpine:init', () => {
+    let open = true;
+    try {
+      open = localStorage.getItem('codebookPanel') !== 'closed';
+    } catch (e) {}
+    Alpine.store('codebookPanel', {
+      open,
+      toggle() {
+        this.open = !this.open;
+        try {
+          localStorage.setItem('codebookPanel', this.open ? 'open' : 'closed');
+        } catch (e) {}
+      },
+    });
+  });
+</script>
+<div class="flex min-h-full flex-col">
+  <header class="sticky top-0 z-20 flex h-15 shrink-0 items-center gap-4 border-b border-line bg-surface px-5">
+    <a
+      href="{% block focus_back_url %}{% url 'home' %}{% endblock focus_back_url %}"
+      aria-label="Back to project"
+      title="Back to project"
+      class="flex items-center gap-1.5 rounded-lg py-1 pr-1.5 pl-1 text-ink-2 hover:bg-subtle hover:text-ink"
+    >
+      <svg
+        class="size-[18px]"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M15 18l-6-6 6-6" />
+      </svg>
+      <c-logo.mark />
+    </a>
+    <div class="flex items-center gap-2 whitespace-nowrap">{% block focus_context %}{% endblock focus_context %}</div>
+    {% block focus_phase %}{% endblock focus_phase %}
+    <div class="mx-auto flex max-w-md flex-1 items-center gap-3">
+      {% block focus_progress %}{% endblock focus_progress %}
+    </div>
+    <div class="flex items-center gap-2">{% block focus_actions %}{% endblock focus_actions %}</div>
+    <a href="{% url 'user-profile' %}" class="avatar" title="{{ user.username }}">{{ user.username|initials }}</a>
+  </header>
+  <div class="flex min-h-0 flex-1">
+    {% block content %}
+    {% endblock content %}
+  </div>
+</div>
+{% endblock layout %}

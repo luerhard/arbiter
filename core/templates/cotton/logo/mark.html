@@ -1,0 +1,17 @@
+{# The Arbiter mark: two readings that merge into one line. tone="night" for dark backgrounds. #}
+<c-vars size="size-6" tone="light" />
+<svg class="{{ size }}" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+  <path
+    d="M4 7C10 7 11 16 17 16"
+    stroke="{% if tone == 'night' %}#8a919c{% else %}#b4bac3{% endif %}"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+  <path
+    d="M4 25C10 25 11 16 17 16H27"
+    stroke="{% if tone == 'night' %}#f5a524{% else %}#e8950f{% endif %}"
+    stroke-width="3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

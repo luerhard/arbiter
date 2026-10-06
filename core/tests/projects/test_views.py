@@ -29,7 +29,9 @@ URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
 @pytest.mark.django_db
 class TestProjectListIndicators:
     def _project_row(self, content, project_name):
-        rows = [row for row in content.split("<tr") if project_name in row]
+        # only look at the table; the sidebar lists the project names too
+        table = content.split("<tbody", 1)[1]
+        rows = [row for row in table.split("<tr") if project_name in row]
         assert rows, f"no project list row found for {project_name}"
         return rows[0]
 
@@ -66,7 +68,7 @@ class TestProjectListIndicators:
         response = client.get(reverse("project-list"))
 
         row = self._project_row(response.content.decode(), project.name)
-        assert f'<span class="font-semibold">{project.annotator_n_active_batches}</span>' in row
+        assert f'<span class="font-mono">{project.annotator_n_active_batches}</span>' in row
         assert project.annotator_n_active_batches == 1
 
 

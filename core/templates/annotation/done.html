@@ -1,51 +1,89 @@
-{% extends "base.html" %}
-{% block content %}
-<div
-  class="mx-auto max-w-3xl rounded-lg bg-white p-8 shadow-sm dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10"
+{% extends "layouts/focus.html" %}
+{% block title %}
+Batch
+{{ batch.batch_number }}
+done ·
+{{ project.name }}
+{% endblock title %}
+{% block focus_back_url %}{% url 'project-detail' project.id %}{% endblock focus_back_url %}
+{% block focus_context %}
+<span class="text-ink-3">{{ project.name }}</span>
+<span class="text-line-strong">/</span>
+<span class="font-semibold"
+  >Batch
+  {{ batch.batch_number }}</span
 >
-  <div class="flex items-start justify-between gap-6">
-    <div>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">All done</h1>
-      <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
-        You have completed all available assignments for this batch.
-      </p>
-      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-        Progress:
-        {{ progress.done }}
-        /
-        {{ progress.total }}
-      </p>
-      {% if phase_advanced %}
-      <p class="mt-4 text-sm font-medium text-green-700 dark:text-green-400">
-        This batch has moved on to the next phase. Thanks for your work!
-      </p>
-      {% elif finalized %}
-      <p class="mt-4 text-sm text-gray-600 dark:text-gray-300">
-        You have finalized your annotations. Waiting for the other annotators ({{ finalized_count }}/{{ annotator_count }}
-        finalized).
-      </p>
-      {% endif %}
+{% endblock focus_context %}
+{% block focus_phase %}
+<span class="phase-badge" data-phase="{{ batch.current_phase }}">{{ batch.get_current_phase_display }}</span>
+{% endblock focus_phase %}
+{% block focus_progress %}
+{% include "annotation/partials/progress.html" %}
+{% endblock focus_progress %}
+{% block content %}
+<main class="flex flex-1 items-start justify-center px-14 py-16">
+  <section class="card flex w-full max-w-xl flex-col gap-6 p-9">
+    <div class="flex items-start gap-4">
+      <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
+        <svg
+          class="size-6"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M5 12l5 5L20 7" />
+        </svg>
+      </span>
+      <div class="flex flex-col gap-1.5">
+        <h1 class="text-2xl font-semibold tracking-[-0.01em]">
+          {% if progress.done >= progress.total %}All samples labeled{% else %}End of the batch{% endif %}
+        </h1>
+        <p class="text-ink-2">
+          You labeled
+          <span class="font-mono text-ink"
+            >{{ progress.done }}
+            /
+            {{ progress.total }}</span
+          >
+          samples in batch
+          {{ batch.batch_number }}.
+        </p>
+      </div>
     </div>
-  </div>
-  <div class="mt-6 flex flex-wrap gap-3">
-    {% if not phase_advanced and not finalized %}
-    <form method="post" action="{% url 'annotate-done' batch.id %}">
-      {% csrf_token %}
-      <button type="submit" class="rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-600">
-        Finalize annotation
-      </button>
-    </form>
+
+    {% if phase_advanced %}
+    <p class="rounded-lg bg-success-soft px-4 py-3 text-success">
+      This batch has moved on to the next phase. Thanks for your work!
+    </p>
+    {% elif finalized %}
+    <p class="rounded-lg bg-subtle px-4 py-3 text-ink-2">
+      You have finalized your annotations. Waiting for the other annotators (<span class="font-mono"
+        >{{ finalized_count }}
+        /
+        {{ annotator_count }}</span
+      >
+      finalized).
+    </p>
+    {% else %}
+    <p class="text-ink-2">
+      When you finalize, your labels are locked in. The discussion starts once every annotator has finalized.
+    </p>
     {% endif %}
-    <a
-      class="rounded bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-800"
-      href="{% url 'project-detail-annotator' project.id %}"
-      >Back to project</a
-    >
-    <a
-      class="rounded border border-gray-300 px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50"
-      href="{% url 'project-list' %}"
-      >All projects</a
-    >
-  </div>
-</div>
+
+    <div class="flex flex-wrap items-center gap-2.5 border-t border-line pt-5">
+      {% if not phase_advanced and not finalized %}
+      <form method="post" action="{% url 'annotate-done' batch.id %}">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Finalize my annotations</button>
+      </form>
+      <a href="{% url 'annotate-batch' batch.id %}" class="btn btn-secondary">Review my labels</a>
+      {% endif %}
+      <a href="{% url 'project-detail' project.id %}" class="btn btn-ghost">Back to project</a>
+    </div>
+  </section>
+</main>
 {% endblock content %}

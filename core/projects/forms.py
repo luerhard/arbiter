@@ -21,11 +21,7 @@ class ProjectCreateForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        base_input = (
-            "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "
-            "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "
-            "dark:border-white/10 dark:bg-gray-900 dark:text-white"
-        )
+        base_input = "input"
         self.fields["name"].widget.attrs.update(
             {
                 "class": base_input,
@@ -37,7 +33,7 @@ class ProjectCreateForm(forms.Form):
         )
         for field in ("annotators", "experts"):
             self.fields[field].widget.attrs.update(
-                {"class": "space-y-2 text-sm text-gray-700 dark:text-gray-300"},
+                {"class": "space-y-2 text-sm text-ink-2"},
             )
 
     def clean(self):
@@ -79,15 +75,13 @@ class BatchCreateForm(forms.ModelForm):
         self.fields["experts"].queryset = members
         self.fields["file"].widget.attrs.update(
             {
-                "class": "block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm "  # noqa: E501
-                "text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 "  # noqa: E501
-                "dark:border-white/10 dark:bg-gray-900 dark:text-white",
+                "class": "file-input",
                 "accept": ".csv,.xlsx",
             },
         )
         for field in ("annotators", "experts"):
             self.fields[field].widget.attrs.update(
-                {"class": "space-y-2 text-sm text-gray-700 dark:text-gray-300"},
+                {"class": "space-y-2 text-sm text-ink-2"},
             )
 
     def clean(self):

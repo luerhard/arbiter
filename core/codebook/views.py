@@ -48,6 +48,8 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
         batch_old = self.request.GET.get("batch_old", max(0, batch_new - 1))
         batch_old = int(batch_old)
         context["content_diff"] = self.object.diff(batch_old, batch_new)
+        context["batch_old"] = batch_old
+        context["batch_new"] = batch_new
         return context
 
 

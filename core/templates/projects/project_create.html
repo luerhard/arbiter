@@ -1,78 +1,112 @@
 {% extends "base.html" %}
+{% block title %}
+New project · Arbiter
+{% endblock title %}
 {% block content %}
 {% url "project-user-search" as project_user_search_url %}
-<div class="mx-auto max-w-4xl">
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Create project</h1>
-      <p class="mt-1 text-sm text-gray-600 dark:text-gray-300">
-        Define the project title, assign users, and add labels.
-      </p>
-    </div>
-  </div>
-  <form
-    method="post"
-    class="mt-6 space-y-8 rounded-lg bg-white p-6 shadow-sm dark:bg-gray-800/50 dark:shadow-none dark:outline dark:-outline-offset-1 dark:outline-white/10"
-  >
+<div class="mx-auto flex max-w-3xl flex-col gap-7">
+  <header class="flex flex-col gap-1.5">
+    <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
+      <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> / New project
+    </nav>
+    <h1 class="page-title">New project</h1>
+    <p class="page-subtitle">Name the project, choose who annotates and who decides, and define the labels.</p>
+  </header>
+
+  <form method="post" class="flex flex-col gap-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
-    <div class="rounded-md bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-900/30 dark:text-rose-200">
+    <div class="rounded-lg bg-danger-soft px-4 py-3 text-[13px] text-danger" role="alert">
       {{ form.non_field_errors }}
     </div>
     {% endif %}
-    <div>
-      <c-element-header>Project title</c-element-header>
-      <div class="mt-2">{{ form.name }}</div>
-      {% if form.name.errors %}
-      <p class="mt-1 text-sm text-rose-600">{{ form.name.errors }}</p>
-      {% endif %}
-    </div>
-    <div>
-      <c-element-header>Description</c-element-header>
-      <div class="mt-2">{{ form.description }}</div>
-      {% if form.description.errors %}
-      <p class="mt-1 text-sm text-rose-600">{{ form.description.errors }}</p>
-      {% endif %}
-    </div>
-    <div class="grid gap-6 md:grid-cols-2">
+
+    <section class="card flex flex-col gap-5 p-6">
+      <h2 class="card-title">About</h2>
       <div>
-        <c-element-header sub_text="Select users who will annotate">Annotators</c-element-header>
-        <c-user-search name="annotators" search_url="{{ project_user_search_url }}" placeholder="Add annotators" />
-        {% if form.annotators.errors %}
-        <p class="mt-1 text-sm text-rose-600">{{ form.annotators.errors }}</p>
+        <label for="{{ form.name.id_for_label }}" class="field-label">Project title</label>
+        {{ form.name }}
+        {% if form.name.errors %}
+        <p class="field-error">{{ form.name.errors|join:" " }}</p>
         {% endif %}
       </div>
       <div>
-        <c-element-header sub_text="Select users who will resolve disagreements">Experts</c-element-header>
-        <c-user-search
-          name="experts"
-          search_url="{{ project_user_search_url }}"
-          :selected_ids="form.experts.value|default:'[]'"
-          :selected_users="experts_selected_users|default:'[]'"
-          placeholder="Add Experts"
-        />
-        {% if form.experts.errors %}
-        <p class="mt-1 text-sm text-rose-600">{{ form.experts.errors }}</p>
+        <label for="{{ form.description.id_for_label }}" class="field-label"
+          >Description <span class="font-normal text-ink-3">· optional</span></label
+        >
+        {{ form.description }}
+        {% if form.description.errors %}
+        <p class="field-error">{{ form.description.errors|join:" " }}</p>
         {% endif %}
       </div>
-    </div>
-    <div>
-      <c-element-header sub_text="Add labels with colors and hotkeys">Labels</c-element-header>
-      <div id="label-rows" class="m-4 space-y-3">{% include "projects/partials/label_row.html" with index=0 %}</div>
-      <c-button.secondary
-        type="button"
-        hx-get="{% url 'project-label-row' %}"
-        hx-target="#label-rows"
-        hx-swap="beforeend"
-        hx-vals="js:{index: document.querySelectorAll('#label-rows .label-row').length}"
-      >
-        <span class="text-base leading-none">+</span>
-        Add label
-      </c-button.secondary>
-    </div>
-    <div class="flex items-center gap-3">
-      <c-button.primary variant="button" type="submit">Create Project</c-button.primary>
-      <c-button.secondary variant="link" href="{% url 'project-list' %}">Cancel</c-button.secondary>
+    </section>
+
+    <section class="card flex flex-col gap-5 p-6">
+      <h2 class="card-title">Team</h2>
+      <div class="grid grid-cols-2 gap-6">
+        <div>
+          <c-element-header sub_text="They label every sample independently and discuss disagreements."
+            >Annotators</c-element-header
+          >
+          <c-user-search name="annotators" search_url="{{ project_user_search_url }}" placeholder="Search users" />
+          {% if form.annotators.errors %}
+          <p class="field-error">{{ form.annotators.errors|join:" " }}</p>
+          {% endif %}
+        </div>
+        <div>
+          <c-element-header sub_text="They decide what discussion could not settle and edit the codebook."
+            >Experts</c-element-header
+          >
+          <c-user-search
+            name="experts"
+            search_url="{{ project_user_search_url }}"
+            :selected_ids="form.experts.value|default:'[]'"
+            :selected_users="experts_selected_users|default:'[]'"
+            placeholder="Search users"
+          />
+          {% if form.experts.errors %}
+          <p class="field-error">{{ form.experts.errors|join:" " }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card flex flex-col gap-4 p-6">
+      <div>
+        <h2 class="card-title">Labels</h2>
+        <p class="field-help">Each label gets a color and an optional one-key shortcut for annotating.</p>
+      </div>
+      <div id="label-rows" class="flex flex-col gap-3">
+        {% include "projects/partials/label_row.html" with index=0 %}
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-secondary btn-sm"
+          hx-get="{% url 'project-label-row' %}"
+          hx-target="#label-rows"
+          hx-swap="beforeend"
+          hx-vals="js:{index: document.querySelectorAll('#label-rows .label-row').length}"
+        >
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add label
+        </button>
+      </div>
+    </section>
+
+    <div class="flex items-center justify-end gap-2.5">
+      <a href="{% url 'project-list' %}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Create project</button>
     </div>
   </form>
 </div>

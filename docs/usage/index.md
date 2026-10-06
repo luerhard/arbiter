@@ -137,7 +137,7 @@ After creating a batch, the Expert writes the initial annotation guidelines (Cod
 
 ### 4. Resolve Disagreements and Edit the Codebook
 
-When annotators complete peer discussion without reaching consensus on a sample, the batch transitions to the `ExpertDecision` phase.
+When annotators complete peer discussion without reaching consensus on a sample, the batch transitions to the _Expert decision_ phase.
 
 1. Click **Resolve** on the batch card to open the adjudication panel.
 2. Review the sample text, individual annotator labels, and the Annotators chat transcript.

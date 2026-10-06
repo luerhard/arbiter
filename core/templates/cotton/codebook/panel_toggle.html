@@ -1,0 +1,24 @@
+{# Header button that shows/hides the codebook side panel (store defined in layouts/focus.html). #}
+<button
+  type="button"
+  x-data
+  @click="$store.codebookPanel.toggle()"
+  :aria-pressed="$store.codebookPanel.open ? 'true' : 'false'"
+  :class="$store.codebookPanel.open ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink'"
+  class="btn btn-sm border"
+>
+  <svg
+    class="size-4"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
+    <path d="M4 19V5" />
+  </svg>
+  Codebook
+</button>

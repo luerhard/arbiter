@@ -59,6 +59,7 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
 
     context = {
         "batch": batch,
+        "assignment": assignment,
         "assignment_id": assignment.id,
         "example": assignment.example,
         "label_form": MultiLabelForm(assignment=assignment),

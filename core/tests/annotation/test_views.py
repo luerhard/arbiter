@@ -464,7 +464,7 @@ class TestSkipAnnotatedToggle:
         assert resp.context["skip_annotated"] is False
         assert b'id="skip-annotated-toggle"' in resp.content
         assert b'x-data="skipAnnotatedToggle()"' in resp.content
-        assert b"Hide finished" in resp.content
+        assert b"Skip labeled" in resp.content
 
     def test_toggle_button_present_when_on(self, client):
         first = self.assignments[0]
@@ -472,7 +472,7 @@ class TestSkipAnnotatedToggle:
         assert resp.status_code == 200
         assert resp.context["skip_annotated"] is True
         assert b'id="skip-annotated-toggle"' in resp.content
-        assert b"Hide finished" in resp.content
+        assert b"Skip labeled" in resp.content
 
     def test_get_redirects_to_next_unfinished_when_landing_on_done_with_skip(self, client):
         # Simulates the bug: user finished item 0, navigated back to it, then

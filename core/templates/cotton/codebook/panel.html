@@ -1,0 +1,87 @@
+{% comment %}
+Codebook side panel for the work screens. Shows the codebook and, when given, what changed for this batch. Usage:
+<c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
+{% endcomment %}
+<c-vars codebook content_diff />
+<aside
+  x-data="{ tab: 'read' }"
+  x-show="$store.codebookPanel.open"
+  x-cloak
+  aria-label="Codebook"
+  class="sticky top-15 flex h-[calc(100vh-3.75rem)] w-[440px] shrink-0 flex-col border-l border-line bg-surface"
+>
+  <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+    <div role="tablist" aria-label="Codebook view" class="inline-flex rounded-[9px] bg-subtle p-[3px]">
+      <button
+        type="button"
+        role="tab"
+        @click="tab = 'read'"
+        :aria-selected="tab === 'read'"
+        :class="tab === 'read' ? 'bg-surface text-ink font-semibold shadow-xs' : 'text-ink-2'"
+        class="h-7 cursor-pointer rounded-[7px] px-3 text-[13px]"
+      >
+        Codebook
+      </button>
+      {% if content_diff %}
+      <button
+        type="button"
+        role="tab"
+        @click="tab = 'changes'"
+        :aria-selected="tab === 'changes'"
+        :class="tab === 'changes' ? 'bg-surface text-ink font-semibold shadow-xs' : 'text-ink-2'"
+        class="h-7 cursor-pointer rounded-[7px] px-3 text-[13px]"
+      >
+        Changes for this batch
+      </button>
+      {% endif %}
+    </div>
+    <div class="flex items-center gap-1">
+      <a
+        href="{% url 'codebook-view' codebook.pk %}"
+        target="_blank"
+        rel="noopener"
+        class="btn btn-ghost btn-sm btn-icon"
+        aria-label="Open codebook in a new tab"
+        title="Open in a new tab"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+        </svg>
+      </a>
+      <button
+        type="button"
+        class="btn btn-ghost btn-sm btn-icon"
+        @click="$store.codebookPanel.toggle()"
+        aria-label="Close codebook"
+        title="Close"
+      >
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  <div class="flex-1 overflow-y-auto px-6 py-5 text-[15px] scrollbar-thin scrollbar-thumb-line-strong">
+    <div x-show="tab === 'read'"><c-codebook.view content="{{ codebook.content }}" /></div>
+    {% if content_diff %}
+    <div x-show="tab === 'changes'" x-cloak>{% include "codebook/partials/view-diff-codebook.html" %}</div>
+    {% endif %}
+  </div>
+</aside>

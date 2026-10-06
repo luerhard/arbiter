@@ -1,198 +1,251 @@
 {% load custom_tags %}
-<div id="expert-assignment" class="container mx-auto mt-4 px-4">
+<div id="expert-assignment" class="flex min-w-0 flex-1">
   {% if not assignment %}
-  <div
-    class="rounded-2xl border border-emerald-300/60 bg-emerald-50 p-6 text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-950/40 dark:text-emerald-200"
-  >
-    <h2 class="text-xl font-semibold">All disagreements are resolved.</h2>
-    <p class="mt-2 text-sm">No open expert assignments remain in this batch.</p>
-    <a
-      href="{% url 'project-detail' batch.project_id %}"
-      class="mt-4 inline-block rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500"
-      >Back to project</a
-    >
-  </div>
-  {% else %}
-  <div class="flex items-center justify-center gap-3 my-4">
-    <!-- Prev -->
-    {% if prev_assignment %}
-    <button
-      hx-get="{% url 'expert-assignment' batch_id prev_assignment.id %}"
-      hx-target="#expert-assignment"
-      hx-swap="outerHTML"
-      hx-push-url="true"
-      class="min-w-[2.5rem] rounded border px-3 py-2 text-sm bg-gray-50 hover:bg-gray-300 border-gray-300 text-gray-800 dark:border-white/10 dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-      aria-label="Previous"
-    >
-      <i class="bi bi-arrow-left"></i>
-    </button>
-    {% endif %}
-    {% if review %}
-    <span
-      class="inline-flex items-center rounded-md bg-emerald-50 px-3 py-1 text-sm font-medium text-emerald-700 ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-500/50"
-      >Decision saved</span
-    >
-    <h2 class="text-2xl font-bold">Review</h2>
-    {% else %}
-    <span class="bg-blue-600/20 ring-1 ring-blue-600 text-3xl font-bold px-4 py-1 rounded-2xl"
-      >{{ disagreements_remaining }}</span
-    >
-    <h2 class="text-2xl font-bold">Remaining Disagreements</h2>
-    {% endif %}
-    <!-- Next -->
-    {% if next_assignment %}
-    <button
-      hx-get="{% url 'expert-assignment' batch_id next_assignment.id %}"
-      hx-target="#expert-assignment"
-      hx-swap="outerHTML"
-      hx-push-url="true"
-      class="min-w-[2.5rem] rounded border px-3 py-2 text-sm bg-gray-50 hover:bg-gray-300 border-gray-300 text-gray-800 dark:border-white/10 dark:text-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
-      aria-label="Next"
-    >
-      <i class="bi bi-arrow-right"></i>
-    </button>
-    {% endif %}
-  </div>
-  <div class="grid grid-cols-1 gap-4">
-    <div class="mt-4">
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden"
-      >
-        <div class="px-4 py-2 font-semibold">Text/Sentence</div>
-        <div class="p-4">
-          <div id="current-example" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg text-gray-700 dark:text-gray-300">
-            {{ sentence }}
-          </div>
+  <main class="flex flex-1 items-start justify-center px-14 py-16">
+    <section class="card flex w-full max-w-xl flex-col gap-5 p-9">
+      <div class="flex items-start gap-4">
+        <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
+          <svg
+            class="size-6"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12l5 5L20 7" />
+          </svg>
+        </span>
+        <div class="flex flex-col gap-1.5">
+          <h2 class="text-2xl font-semibold tracking-[-0.01em]">All disagreements are resolved.</h2>
+          <p class="text-ink-2">No open expert assignments remain in this batch.</p>
         </div>
       </div>
+      <div class="border-t border-line pt-5">
+        <a href="{% url 'project-detail' batch.project_id %}" class="btn btn-primary">Back to project</a>
+      </div>
+    </section>
+  </main>
+  {% else %}
+  <main class="flex min-w-0 flex-1 flex-col gap-5.5 px-11 py-9">
+    <div class="flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span class="eyebrow">Case</span>
+        {% if review %}
+        <span
+          class="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success"
+        >
+          <svg
+            class="size-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12l5 5L20 7" />
+          </svg>
+          Decision saved
+        </span>
+        {% else %}
+        <span class="text-[13px] text-ink-2"
+          >{{ disagreements_remaining }}
+          still open</span
+        >
+        {% endif %}
+      </div>
+      <div class="flex gap-1.5">
+        <button
+          {% if prev_assignment %}hx-get="{% url 'expert-assignment' batch_id prev_assignment.id %}"
+          {% else %}disabled{% endif %}
+          hx-target="#expert-assignment"
+          hx-swap="outerHTML"
+          hx-push-url="true"
+          class="btn btn-secondary btn-sm btn-icon"
+          aria-label="Previous case"
+          title="Previous case"
+        >
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+        <button
+          {% if next_assignment %}hx-get="{% url 'expert-assignment' batch_id next_assignment.id %}"
+          {% else %}disabled{% endif %}
+          hx-target="#expert-assignment"
+          hx-swap="outerHTML"
+          hx-push-url="true"
+          class="btn btn-secondary btn-sm btn-icon"
+          aria-label="Next case"
+          title="Next case"
+        >
+          <svg
+            class="size-4"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <div class="mt-4">
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mb-4"
-      >
-        <div class="px-4 py-2 font-semibold">Labels Before Discussion</div>
-        <div class="p-4">
+
+    <article class="card px-8 py-7">
+      <p id="current-example" class="reading text-[22px] leading-normal">{{ sentence }}</p>
+    </article>
+
+    <section aria-label="How the team got here" class="flex flex-col">
+      <div class="flex gap-4">
+        <div class="flex w-6 shrink-0 flex-col items-center" data-phase="A">
+          <span
+            class="flex size-6 items-center justify-center rounded-full text-xs font-semibold"
+            style="background: var(--phase-soft); color: var(--phase-ink)"
+            >1</span
+          >
+          <span class="w-0.5 flex-1 bg-line"></span>
+        </div>
+        <div class="flex flex-1 flex-col gap-2.5 pb-5">
+          <h2 class="mt-0.5 font-semibold">Independent annotation</h2>
           <c-expert.grouped_labels
             :annotations_by_user="prev_annotations"
             empty_text="No labels assigned before the discussion."
           />
         </div>
       </div>
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="overflow-auto scrollbar {% if chat_messages|length != 0 %}h-[250px] resize-y{% endif %} px-4">
-          <div class="px-4 py-2 font-semibold bg-white/30 dark:bg-gray-900/30 backdrop-blur-sm sticky top-0 z-10">
-            Chat History
-          </div>
-          {% for message in chat_messages %}
-          <div
-            type="other-message"
-            class="other-message flex items-start gap-2.5 mb-3"
-            {% if message.user == annotator %}dir="rtl"
-            {% endif %}
+      <div class="flex gap-4">
+        <div class="flex w-6 shrink-0 flex-col items-center" data-phase="D">
+          <span
+            class="flex size-6 items-center justify-center rounded-full text-xs font-semibold"
+            style="background: var(--phase-soft); color: var(--phase-ink)"
+            >2</span
           >
-            <div
-              class="flex flex-col max-w-[320px] leading-1.5 p-3 border-gray-200 rounded-e-xl rounded-es-xl bg-gray-300/80 dark:bg-gray-700/80"
-            >
-              <div class="flex items-center space-x-2" dir="ltr">
-                <span class="text-sm font-semibold text-gray-900 dark:text-white">{{ message.user }}</span>
-              </div>
-              <p class="self-start text-sm font-normal text-gray-900 dark:text-white py-1" dir="ltr">
-                {{ message.message }}
-              </p>
-            </div>
+          <span class="w-0.5 flex-1 bg-line"></span>
+        </div>
+        <div class="flex min-w-0 flex-1 flex-col gap-2.5 pb-5">
+          <h2 class="mt-0.5 font-semibold">Discussion</h2>
+          {% if chat_messages %}
+          <div
+            class="card flex max-h-64 flex-col gap-2.5 overflow-y-auto px-4 py-3.5 leading-normal scrollbar-thin scrollbar-thumb-line-strong"
+          >
+            {% for message in chat_messages %}
+            <p>
+              <span class="font-semibold {% if message.user == annotator %}text-ink{% else %}text-accent-ink{% endif %}"
+                >{{ message.user }}</span
+              >
+              <span class="text-ink-2">{{ message.message }}</span>
+            </p>
+            {% endfor %}
           </div>
-          {% endfor %}
+          {% else %}
+          <p class="text-[13px] text-ink-3">The annotators did not write anything.</p>
+          {% endif %}
         </div>
       </div>
-      <div
-        class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="px-4 py-2 font-semibold">Labels After Discussion</div>
-        <div class="p-4">
-          <c-expert.grouped-labels
+      <div class="flex gap-4">
+        <div class="flex w-6 shrink-0 flex-col items-center" data-phase="E">
+          <span
+            class="flex size-6 items-center justify-center rounded-full text-xs font-semibold"
+            style="background: var(--phase-soft); color: var(--phase-ink)"
+            >3</span
+          >
+        </div>
+        <div class="flex flex-1 flex-col gap-2.5">
+          <h2 class="mt-0.5 font-semibold">After discussion</h2>
+          <c-expert.grouped_labels
             :annotations_by_user="post_annotations"
             empty_text="No labels assigned after the discussion."
           />
         </div>
       </div>
-      {% if review %}
-      <div
-        class="border border-emerald-300/60 bg-white dark:border-emerald-700/60 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
-      >
-        <div class="px-4 py-2 font-semibold">Final Decision</div>
-        <div class="p-4">
-          <div class="flex flex-wrap gap-2">
-            {% for annotation in decision_annotations %}
-            <c-label
-              id="decision_label_{{ annotation.label_id }}"
-              value="{{ annotation.label_id }}"
-              text="{{ annotation.label.name }}"
-              color="{{ annotation.label.color }}"
-              checked
-              disabled
-            />
-            {% empty %}
-            <span class="text-sm text-gray-600 dark:text-gray-300">No labels (non-offensive).</span>
-            {% endfor %}
-          </div>
-          <button
-            hx-get="{% url 'expert-assignment' batch_id assignment.id %}?edit=1"
-            hx-target="#expert-assignment"
-            hx-swap="outerHTML"
-            class="mt-4 cursor-pointer rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm"
-          >
-            Edit decision
-          </button>
-        </div>
+    </section>
+
+    {% if review %}
+    <section class="card flex flex-col gap-3.5 border-success/40 px-5.5 py-5">
+      <h2 class="card-title">Your decision</h2>
+      <div class="flex flex-wrap gap-2">
+        {% for annotation in decision_annotations %}
+        <c-label
+          id="decision_label_{{ annotation.label_id }}"
+          value="{{ annotation.label_id }}"
+          text="{{ annotation.label.name }}"
+          color="{{ annotation.label.color }}"
+          checked
+          disabled
+        />
+        {% empty %}
+        <span class="text-ink-2">No labels.</span>
+        {% endfor %}
       </div>
-      {% else %}
-      <form
-        id="expert-form"
-        method="post"
-        action="{% url 'expert-assignment' batch_id assignment.id %}"
-        hx-post="{% url 'expert-assignment' batch_id assignment.id %}"
-        hx-target="#expert-assignment"
-        hx-swap="outerHTML"
-      >
-        {% csrf_token %}
-        {% if editing %}<input type="hidden" name="edit" value="1" />{% endif %}
-        <div
-          class="border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 rounded-2xl shadow-sm overflow-hidden mt-4"
+      <div>
+        <button
+          hx-get="{% url 'expert-assignment' batch_id assignment.id %}?edit=1"
+          hx-target="#expert-assignment"
+          hx-swap="outerHTML"
+          class="btn btn-secondary btn-sm"
         >
-          <div class="px-4 py-2 font-semibold">Select Labels for Sentence</div>
-          <div class="p-4">
-            <div class="flex flex-wrap gap-2">
-              {% for checkbox, detail in labels_form.labels|zip_lists:labels_form.label_details %}
-              <c-label
-                id="{{ checkbox.id_for_label }}"
-                value="{{ checkbox.data.value }}"
-                text="{{ checkbox.choice_label }}"
-                color="{{ detail.color }}"
-                hotkey="{{ detail.hotkey|default:'' }}"
-                name="{{ checkbox.data.name }}"
-                :checked="checkbox.data.selected"
-              />
-              {% endfor %}
-            </div>
-          </div>
-        </div>
-        <div class="flex justify-center items-center my-8">
-          <input
-            type="submit"
-            value="{% if editing %}Save Correction{% else %}Save & Next{% endif %}"
-            class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-          />
-        </div>
-      </form>
+          Edit decision
+        </button>
+      </div>
+    </section>
+    {% else %}
+    <form
+      id="expert-form"
+      method="post"
+      action="{% url 'expert-assignment' batch_id assignment.id %}"
+      hx-post="{% url 'expert-assignment' batch_id assignment.id %}"
+      hx-target="#expert-assignment"
+      hx-swap="outerHTML"
+      class="card flex flex-col gap-3.5 border-[1.5px] px-5.5 py-5"
+      data-phase="E"
+      style="border-color: color-mix(in srgb, var(--phase) 45%, transparent)"
+    >
+      {% csrf_token %}
+      {% if editing %}<input type="hidden" name="edit" value="1" />{% endif %}
+      <h2 class="card-title">{% if editing %}Correct your decision{% else %}Your decision{% endif %}</h2>
+      <div class="flex flex-wrap items-center gap-3">
+        {% for checkbox, detail in labels_form.labels|zip_lists:labels_form.label_details %}
+        <c-label
+          id="{{ checkbox.id_for_label }}"
+          value="{{ checkbox.data.value }}"
+          text="{{ checkbox.choice_label }}"
+          color="{{ detail.color }}"
+          hotkey="{{ detail.hotkey|default:'' }}"
+          name="{{ checkbox.data.name }}"
+          :checked="checkbox.data.selected"
+        />
+        {% endfor %}
+        <button type="submit" class="btn btn-primary btn-lg ml-auto">
+          {% if editing %}Save correction{% else %}Save and next case{% endif %}
+        </button>
+      </div>
+      {% if draft_has_changes %}
+      <p class="text-[13px] text-ink-2">Saving also commits your codebook draft together with its rationale.</p>
       {% endif %}
-    </div>
-    <div class="mt-4">
-      {% include "expert/partials/codebook_panel.html" %}
-    </div>
-  </div>
+    </form>
+    {% endif %}
+  </main>
+
+  {% include "expert/partials/codebook_panel.html" %}
   {% endif %}
 </div>
+{% if request.htmx %}
+{% include "expert/partials/progress.html" with oob=True %}
+{% endif %}

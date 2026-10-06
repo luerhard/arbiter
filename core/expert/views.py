@@ -89,12 +89,13 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         Message.objects.filter(example=example).exclude(user="system").order_by("created_at")
     )
 
-    open_count = ExampleAssignment.objects.filter(
+    expert_assignments = ExampleAssignment.objects.filter(
         batch=batch,
         user=assignment.user,
         phase=BatchPhase.EXPERT,
-        done__isnull=True,
-    ).count()
+    )
+    open_count = expert_assignments.filter(done__isnull=True).count()
+    total_count = expert_assignments.count()
 
     return {
         "batch": batch,
@@ -109,6 +110,8 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         "annotator": next(iter(before_by_user), None),
         "chat_messages": chat_messages,
         "disagreements_remaining": open_count,
+        "disagreements_total": total_count,
+        "disagreements_decided": total_count - open_count,
         "prev_assignment": assignment.previous(),
         "next_assignment": assignment.next(),
     }

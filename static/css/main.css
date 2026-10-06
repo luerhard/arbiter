@@ -1,122 +1,504 @@
 @import "tailwindcss";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+/* Fonts are bundled with the app (no requests to Google). */
+@import "@fontsource/ibm-plex-sans/400.css";
+@import "@fontsource/ibm-plex-sans/500.css";
+@import "@fontsource/ibm-plex-sans/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource-variable/source-serif-4/opsz.css";
+@import "@fontsource-variable/source-serif-4/opsz-italic.css";
+
 @plugin "tailwind-scrollbar";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ==========================================================================
+   Design tokens
+   Every color in the templates should come from here, so that light and
+   dark mode (and any later restyling) only need changes in this block.
+   Usage in templates: bg-surface, text-ink-2, border-line, bg-accent, ...
+   ========================================================================== */
+
+@theme {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Source Serif 4 Variable", Georgia, serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* Palette: graphite neutrals with one amber accent (direction "Instrument",
+   colors from "Console"). Light is the default, .dark is the Console look. */
+:root {
+  /* surfaces */
+  --c-canvas: #f6f7f9; /* page background */
+  --c-surface: #ffffff; /* cards, panels */
+  --c-subtle: #f1f2f4; /* hover rows, quiet fills */
+  --c-line: #e4e6ea; /* borders, dividers */
+  --c-line-strong: #cdd1d7; /* input and button borders */
+
+  /* text */
+  --c-ink: #111419;
+  --c-ink-2: #4b525c;
+  --c-ink-3: #6b727d;
+
+  /* the one accent: main action per screen. Amber needs dark text on top
+     (on-accent); for amber-colored text on white use accent-ink. */
+  --c-accent: #f5a524;
+  --c-accent-hover: #e8950f;
+  --c-accent-soft: #fef3dc;
+  --c-accent-ink: #8f5506;
+  --c-on-accent: #111419;
+
+  /* dark sidebar */
+  --c-night: #0b0d10;
+  --c-night-2: #1b2029;
+  --c-night-line: #23272f;
+  --c-night-ink: #c3c8cf;
+  --c-night-ink-2: #8a919c;
+
+  --c-danger: #c8322f;
+  --c-danger-soft: #fdeceb;
+  --c-danger-line: #f3c5c3;
+  --c-success: #17834c;
+  --c-success-soft: #e3f6ec;
+  --c-warning: #9a5b04;
+  --c-warning-soft: #fff1d6;
+}
+
+.dark {
+  --c-canvas: #0b0d10;
+  --c-surface: #111419;
+  --c-subtle: #181c22;
+  --c-line: #23272f;
+  --c-line-strong: #2e333c;
+
+  --c-ink: #e6e8eb;
+  --c-ink-2: #b4bac3;
+  --c-ink-3: #8a919c;
+
+  --c-accent: #f5a524;
+  --c-accent-hover: #ffb84a;
+  --c-accent-soft: #2a2111;
+  --c-accent-ink: #ffc35c;
+  --c-on-accent: #0b0d10;
+
+  --c-night: #0e1014;
+  --c-night-2: #1b2029;
+  --c-night-line: #23272f;
+
+  --c-danger: #ff6369;
+  --c-danger-soft: #3a1518;
+  --c-danger-line: #6b2a2d;
+  --c-success: #3dd68c;
+  --c-success-soft: #13301f;
+  --c-warning: #f5a524;
+  --c-warning-soft: #2a2111;
+}
+
+@theme inline {
+  --color-canvas: var(--c-canvas);
+  --color-surface: var(--c-surface);
+  --color-subtle: var(--c-subtle);
+  --color-line: var(--c-line);
+  --color-line-strong: var(--c-line-strong);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-accent: var(--c-accent);
+  --color-accent-hover: var(--c-accent-hover);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-ink: var(--c-accent-ink);
+  --color-on-accent: var(--c-on-accent);
+  --color-night: var(--c-night);
+  --color-night-2: var(--c-night-2);
+  --color-night-line: var(--c-night-line);
+  --color-night-ink: var(--c-night-ink);
+  --color-night-ink-2: var(--c-night-ink-2);
+  --color-danger: var(--c-danger);
+  --color-danger-soft: var(--c-danger-soft);
+  --color-danger-line: var(--c-danger-line);
+  --color-success: var(--c-success);
+  --color-success-soft: var(--c-success-soft);
+  --color-warning: var(--c-warning);
+  --color-warning-soft: var(--c-warning-soft);
+}
+
+/* Batch phases. Set data-phase="{{ batch.current_phase }}" on an element;
+   the phase-* classes below then pick up its color. */
+[data-phase] {
+  --phase: #8a919c;
+  --phase-soft: #f1f2f4;
+  --phase-ink: #4b525c;
+}
+[data-phase="A"] {
+  --phase: #3b7bf0;
+  --phase-soft: #e7effe;
+  --phase-ink: #1c4fb5;
+}
+[data-phase="D"] {
+  --phase: #ef7d22;
+  --phase-soft: #fdeee1;
+  --phase-ink: #9c450a;
+}
+[data-phase="E"] {
+  --phase: #9466f0;
+  --phase-soft: #f1eafe;
+  --phase-ink: #5a2fb5;
+}
+[data-phase="F"] {
+  --phase: #1fae68;
+  --phase-soft: #e3f6ec;
+  --phase-ink: #136b40;
+}
+.dark [data-phase="A"] {
+  --phase: #4c8dff;
+}
+.dark [data-phase="E"] {
+  --phase: #b38cff;
+}
+.dark [data-phase="F"] {
+  --phase: #3dd68c;
+}
+.dark [data-phase] {
+  --phase-soft: color-mix(in srgb, var(--phase) 16%, var(--c-surface));
+  --phase-ink: color-mix(in srgb, var(--phase) 55%, #ffffff);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    @apply bg-canvas font-sans text-sm text-ink;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-ink;
+  }
+  [x-cloak] {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Components
+   Small set of reusable classes. Prefer these over long utility strings so
+   that a button looks the same everywhere.
+   ========================================================================== */
+
+@layer components {
+  /* Buttons: <a class="btn btn-primary">, <button class="btn btn-secondary btn-sm"> */
+  .btn {
+    @apply inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-lg px-4 text-sm font-medium whitespace-nowrap transition-colors select-none disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply bg-accent font-semibold text-on-accent hover:bg-accent-hover;
+  }
+  .btn-secondary {
+    @apply border border-line-strong bg-surface text-ink hover:bg-subtle;
+  }
+  .btn-ghost {
+    @apply text-ink-2 hover:bg-subtle hover:text-ink;
+  }
+  .btn-danger {
+    @apply border border-danger-line bg-surface text-danger hover:bg-danger-soft;
+  }
+  .btn-sm {
+    @apply h-8 gap-1.5 rounded-md px-3 text-[13px];
+  }
+  .btn-lg {
+    @apply h-12 rounded-[10px] px-5 text-[15px];
+  }
+  .btn-icon {
+    @apply w-10 px-0;
+  }
+  .btn-icon.btn-sm {
+    @apply w-8;
+  }
+
+  /* Sidebar navigation */
+  .nav-item {
+    @apply flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-night-ink hover:bg-night-2 hover:text-white;
+  }
+  .nav-item-active {
+    @apply bg-night-2 font-medium text-white;
+  }
+  .nav-subitem {
+    @apply flex h-[30px] items-center rounded-md px-2.5 text-[13px] text-night-ink-2 hover:text-white;
+  }
+  .nav-subitem-active {
+    @apply bg-white/5 text-white shadow-[inset_2px_0_0_var(--c-accent)];
+  }
+
+  /* Cards */
+  .card {
+    @apply rounded-[14px] border border-line bg-surface;
+  }
+  .card-header {
+    @apply flex items-center justify-between gap-4 border-b border-line px-5 py-4;
+  }
+  .card-title {
+    @apply text-[15px] font-semibold text-ink;
+  }
+  .card-body {
+    @apply p-5;
+  }
+
+  /* Text helpers */
+  .page-title {
+    @apply text-[28px] leading-tight font-semibold tracking-[-0.01em] text-ink;
+  }
+  .page-subtitle {
+    @apply text-sm text-ink-2;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+  }
+  .reading {
+    @apply font-serif leading-normal text-ink;
+  }
+  .link {
+    @apply font-medium text-accent-ink underline-offset-2 hover:underline;
+  }
+
+  /* Forms */
+  .input {
+    @apply block h-10 w-full rounded-lg border border-line-strong bg-surface px-3 text-sm text-ink placeholder:text-ink-3 focus:border-accent-ink focus:outline-3 focus:outline-offset-0 focus:outline-accent/30;
+  }
+  textarea.input {
+    @apply h-auto py-2 leading-relaxed;
+  }
+  .file-input {
+    @apply block w-full cursor-pointer rounded-lg border border-line-strong bg-surface text-sm text-ink-2 file:mr-4 file:h-10 file:cursor-pointer file:border-0 file:border-r file:border-line-strong file:bg-subtle file:px-4 file:font-medium file:text-ink hover:file:bg-line;
+  }
+  .field-label {
+    @apply mb-1.5 block text-[13px] font-medium text-ink;
+  }
+  .field-help {
+    @apply mt-1 text-xs text-ink-3;
+  }
+  .field-error {
+    @apply mt-1 text-xs text-danger;
+  }
+
+  /* Small bits */
+  .kbd {
+    @apply inline-flex h-[22px] min-w-[22px] items-center justify-center rounded-md border border-b-2 border-line-strong bg-surface px-1.5 font-mono text-xs text-ink-2;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full bg-subtle px-2.5 py-0.5 text-xs font-medium text-ink-2;
+  }
+  .avatar {
+    @apply inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent-ink uppercase;
+  }
+
+  /* Phase: <span class="phase-badge" data-phase="{{ batch.current_phase }}"> */
+  .phase-badge {
+    @apply inline-flex items-center gap-2 rounded-full py-0.5 pr-2.5 pl-2 text-xs font-medium whitespace-nowrap;
+    background: var(--phase-soft);
+    color: var(--phase-ink);
+  }
+  .phase-badge::before {
+    @apply size-[7px] rounded-full content-[''];
+    background: var(--phase);
+  }
+  .phase-dot {
+    @apply inline-block size-2 shrink-0 rounded-full;
+    background: var(--phase);
+  }
+
+  /* Rendered codebook markdown: <div class="prose-codebook">{{ content|markdownify }}</div> */
+  .prose-codebook {
+    @apply font-serif text-base leading-[1.65] text-ink;
+  }
+  .prose-codebook > * + * {
+    @apply mt-3;
+  }
+  .prose-codebook :is(h1, h2, h3, h4, h5, h6) {
+    @apply font-sans font-semibold tracking-[-0.01em] text-ink;
+  }
+  .prose-codebook h1 {
+    @apply text-2xl;
+  }
+  .prose-codebook h2 {
+    @apply mt-8 text-xl;
+  }
+  .prose-codebook h3 {
+    @apply mt-6 text-[17px];
+  }
+  .prose-codebook :is(h4, h5, h6) {
+    @apply mt-5 text-[15px];
+  }
+  .prose-codebook ul {
+    @apply list-disc pl-6;
+  }
+  .prose-codebook ol {
+    @apply list-decimal pl-6;
+  }
+  .prose-codebook li + li {
+    @apply mt-1;
+  }
+  .prose-codebook blockquote {
+    @apply border-l-2 border-line-strong pl-4 text-ink-2;
+  }
+  .prose-codebook code {
+    @apply rounded bg-subtle px-1 font-mono text-[0.85em];
+  }
+  .prose-codebook a {
+    @apply text-accent-ink underline underline-offset-2;
+  }
+  /* git diff markers: {+added+} renders as <text>, [-removed-] as <del> */
+  .prose-codebook text {
+    @apply rounded bg-success-soft px-0.5 text-success;
+  }
+  .prose-codebook del {
+    @apply rounded bg-danger-soft px-0.5 text-danger;
+  }
+
+  /* Dropdown menu (Tailwind Plus <el-dropdown>/<el-menu>) */
+  .menu {
+    @apply w-60 rounded-[10px] border border-line bg-surface p-1.5 text-sm shadow-[0_12px_32px_rgb(11_13_16/0.14)] transition transition-discrete [--anchor-gap:--spacing(1.5)] data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in;
+  }
+  .menu-section {
+    @apply flex flex-col border-line py-1 not-first:border-t;
+  }
+  .menu-heading {
+    @apply px-2.5 pt-1 pb-1.5 text-[11px] font-semibold tracking-[0.08em] text-ink-3 uppercase;
+  }
+  .menu-item {
+    @apply flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-ink hover:bg-subtle focus:bg-subtle focus:outline-hidden disabled:cursor-default disabled:hover:bg-transparent;
+  }
+
+  /* Phase stepper: <span class="step step-done|step-current|step-todo"> inside a [data-phase] */
+  .step {
+    @apply inline-flex items-center gap-2 text-[13px] whitespace-nowrap text-ink-2;
+  }
+  .step-icon {
+    @apply flex size-5 shrink-0 items-center justify-center rounded-full;
+  }
+  .step-done .step-icon {
+    @apply text-white;
+    background: var(--phase);
+  }
+  .step-current {
+    @apply font-semibold;
+    color: var(--phase-ink);
+  }
+  .step-current .step-icon {
+    @apply border-2;
+    border-color: var(--phase);
+  }
+  .step-current .step-icon::after {
+    @apply size-2 rounded-full content-[''];
+    background: var(--phase);
+  }
+  .step-todo {
+    @apply text-ink-3;
+  }
+  .step-todo .step-icon {
+    @apply border-2 border-line-strong;
+  }
+
+  /* Read-only label: <span class="label-tag" style="--label-color: #155596"> */
+  .label-tag {
+    @apply inline-flex h-7 items-center gap-2 rounded-lg px-2.5 text-[13px] font-medium whitespace-nowrap;
+    background: color-mix(in srgb, var(--label-color) 13%, var(--c-surface));
+    color: color-mix(in srgb, var(--label-color) 65%, var(--c-ink));
+  }
+  .label-tag::before {
+    @apply size-2 shrink-0 rounded-[2px] content-[''];
+    background: var(--label-color);
+  }
+  .dark .label-tag {
+    background: color-mix(in srgb, var(--label-color) 22%, var(--c-surface));
+    color: color-mix(in srgb, var(--label-color) 40%, #ffffff);
+  }
+
+  /* Progress: <div class="progress" data-phase="A"><div class="progress-bar" style="width: 40%"></div></div> */
+  .progress {
+    @apply h-1.5 w-full overflow-hidden rounded-full bg-line;
+  }
+  .progress-bar {
+    @apply h-full rounded-full bg-accent transition-[width] duration-300;
+  }
+  [data-phase] > .progress-bar,
+  .progress[data-phase] > .progress-bar {
+    background: var(--phase);
+  }
+}
+
+/* ==========================================================================
+   Label buttons (cotton/label.html)
+   A hidden checkbox (.label-input) followed by its <label class="label">.
+   --label-color is the color the project chose for the label.
+   ========================================================================== */
+
 .label {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.375rem;
-  border: 1px solid color-mix(in srgb, var(--label-color) 45%, #d1d5db);
-  border-radius: 0.375rem;
-  padding: 0.5rem 1.725rem 0.5rem 0.875rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.25rem;
-  cursor: pointer;
-  user-select: none;
-  color: #1f2937;
-  background: color-mix(in srgb, var(--label-color) 32%, #ffffff);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
+  @apply inline-flex h-11 cursor-pointer items-center gap-2.5 rounded-[10px] border border-line-strong bg-surface pr-2.5 pl-3.5 text-sm font-medium text-ink transition-colors select-none hover:border-ink-3;
 }
-
-.label:hover {
-  background: color-mix(in srgb, var(--label-color) 16%, #ffffff);
-  border-color: color-mix(in srgb, var(--label-color) 55%, #9ca3af);
+.label::before {
+  @apply size-2.5 shrink-0 rounded-[3px] content-[''];
+  background: var(--label-color);
 }
-
-.label:focus-visible {
-  outline: 2px solid #4f46e5;
-  outline-offset: 2px;
+.label .check-icon {
+  @apply hidden size-4 shrink-0;
+  color: var(--label-color);
 }
-
 .label-content {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  transform: translateX(0);
-  transition: transform 0.2s ease;
+  @apply inline-flex items-center gap-2.5;
 }
-
-.check-icon {
-  position: absolute;
-  left: 0.5rem;
-  top: 50%;
-  font-size: 1.3rem;
-  line-height: 1;
-  opacity: 0;
-  transform: translateY(-50%) scale(0.9);
-  transition:
-    opacity 0.2s ease,
-    transform 0.2s ease;
-}
-
 .label-hotkey {
-  margin-left: 0.25rem;
-  font-size: 0.65rem;
-  line-height: 1;
-  opacity: 0.7;
+  @apply inline-flex h-5 min-w-5 items-center justify-center rounded-[5px] border border-line-strong px-1 font-mono text-[11px] font-normal text-ink-3;
+}
+.label-input:focus-visible + .label {
+  @apply outline-2 outline-offset-2 outline-accent-ink;
 }
 
+/* selected */
 .label-input:checked + .label {
-  background: color-mix(in srgb, var(--label-color) 92%, #4f46e5);
-  border-color: color-mix(in srgb, var(--label-color) 92%, #4f46e5);
-  color: #ffffff;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.18);
+  @apply pl-3 font-semibold;
+  border-width: 1.5px;
+  border-color: var(--label-color);
+  background: color-mix(in srgb, var(--label-color) 12%, var(--c-surface));
+  color: color-mix(in srgb, var(--label-color) 65%, var(--c-ink));
 }
-
-.label-input:checked + .label:hover {
-  background: color-mix(in srgb, var(--label-color) 84%, #6366f1);
-  border-color: color-mix(in srgb, var(--label-color) 84%, #6366f1);
+.label-input:checked + .label::before {
+  @apply hidden;
 }
-
 .label-input:checked + .label .check-icon {
-  opacity: 1;
-  transform: translateY(-50%) scale(1);
+  @apply block;
+}
+.label-input:checked + .label .label-hotkey {
+  border-color: color-mix(in srgb, var(--label-color) 35%, transparent);
+  color: inherit;
+}
+.dark .label-input:checked + .label {
+  background: color-mix(in srgb, var(--label-color) 24%, var(--c-surface));
+  color: color-mix(in srgb, var(--label-color) 35%, #ffffff);
+}
+.dark .label-input:checked + .label .check-icon {
+  color: color-mix(in srgb, var(--label-color) 45%, #ffffff);
 }
 
-.label-input:checked + .label .label-content {
-  transform: translateX(0.95rem);
-}
-
+/* read-only (someone else's labels, saved decisions) */
 .label-input:disabled + .label {
-  cursor: not-allowed;
-  background: #f3f4f6;
-  border-color: #d1d5db;
-  color: #6b7280;
-  box-shadow: none;
+  @apply h-8 cursor-default rounded-lg pr-2.5 text-[13px] hover:border-line-strong;
 }
-
+.label-input:disabled + .label .label-hotkey {
+  @apply hidden;
+}
+.label-input:disabled:not(:checked) + .label {
+  @apply border-dashed text-ink-3;
+}
+.label-input:disabled:not(:checked) + .label::before {
+  @apply opacity-40;
+}
 .label-input:disabled:checked + .label {
-  background: color-mix(in srgb, var(--label-color) 72%, #ffffff);
-  border-color: color-mix(in srgb, var(--label-color) 92%, #ffffff);
-  color: #ffffff;
-  box-shadow: none;
-}
-
-.dark .label {
-  background: color-mix(in srgb, var(--label-color) 30%, #0f172a);
-  border-color: color-mix(in srgb, var(--label-color) 58%, #334155);
-  color: #ffffff;
-  box-shadow: none;
-}
-
-.dark .label:hover {
-  background: color-mix(in srgb, var(--label-color) 36%, #0f172a);
-  border-color: color-mix(in srgb, var(--label-color) 66%, #475569);
-}
-
-.dark .label-input:disabled + .label {
-  background: #4b5563;
-  border-color: #4b5563;
-  color: #d1d5db;
+  border-width: 1px;
+  border-color: transparent;
 }

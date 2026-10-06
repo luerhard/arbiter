@@ -1,15 +1,52 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% block title %}
+Edit codebook ·
+{{ object.project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mt-4">
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-        Project:
-        {{ object.project }}
-      </h2>
+<form method="post" class="flex flex-col gap-7">
+  {% csrf_token %}
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div class="flex flex-col gap-1.5">
+      <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
+        <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
+        <a href="{% url 'project-detail' object.project.id %}" class="hover:text-ink hover:underline"
+          >{{ object.project.name }}</a
+        >
+        / <a href="{% url 'codebook-view' object.pk %}" class="hover:text-ink hover:underline">Codebook</a> / Edit
+      </nav>
+      <h1 class="page-title">Edit codebook</h1>
+      <p class="page-subtitle">Written in Markdown. Your rationale is saved with the change and shown to annotators.</p>
     </div>
-    <div class="p-4">{% crispy form %}</div>
+    <div class="flex gap-2.5">
+      <a href="{% url 'codebook-view' object.pk %}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+  </header>
+
+  {% if form.non_field_errors %}
+  <div class="rounded-lg bg-danger-soft px-4 py-3 text-[13px] text-danger" role="alert">
+    {{ form.non_field_errors }}
   </div>
-</div>
+  {% endif %}
+
+  <section class="card flex flex-col gap-5 p-6">
+    <div>
+      <label for="{{ form.content.id_for_label }}" class="field-label">Codebook</label>
+      {{ form.content }}
+      {% if form.content.errors %}
+      <p class="field-error">{{ form.content.errors|join:" " }}</p>
+      {% endif %}
+    </div>
+    <div>
+      <label for="{{ form.rationale.id_for_label }}" class="field-label">Rationale</label>
+      {{ form.rationale }}
+      <p class="field-help">Why does the codebook need this change? For example, which disagreement it settles.</p>
+      {% if form.rationale.errors %}
+      <p class="field-error">{{ form.rationale.errors|join:" " }}</p>
+      {% endif %}
+    </div>
+  </section>
+</form>
 {% endblock content %}

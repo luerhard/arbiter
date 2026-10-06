@@ -1,161 +1,260 @@
 {% extends "base.html" %}
-{% load widget_tweaks %}
+{% block title %}
+{{ project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
 {% url "project-batch-create" project.id as project_batch_create_url %}
 {% url "project-export-project" project.id as project_export_project_url %}
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 grid gap-6 lg:grid-cols-3">
-  <!-- Sidebar -->
-  <aside class="lg:col-span-1">
-    {% include "projects/partials/detail-sidebar.html" with is_expert_view=True %}
-  </aside>
-  <!-- Main content -->
-  <section class="lg:col-span-2">
-    <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-      <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800">
-        <h2 class="text-xl font-bold">Batches</h2>
-        {% if has_annotation_work %}
-        <a
-          href="{% url 'project-detail-annotator' project.id %}"
-          class="mt-1 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400"
-          >You also annotate in this project: go to my batches</a
+<div class="flex flex-col gap-7">
+  <header class="flex flex-wrap items-end justify-between gap-4">
+    <div class="flex flex-col gap-1.5">
+      <nav aria-label="Breadcrumb" class="text-[13px] text-ink-3">
+        <a href="{% url 'project-list' %}" class="hover:text-ink hover:underline">Projects</a> /
+        {{ project.name }}
+      </nav>
+      <h1 class="page-title">{{ project.name }}</h1>
+      <p class="page-subtitle">
+        {% if project.description %}{{ project.description }}
+        ·
+        {% endif %}{{ project.labels.count }}
+        label{{ project.labels.count|pluralize }}
+        ·
+        {{ annotators|length }}
+        annotator{{ annotators|length|pluralize }}
+        ·
+        {{ experts|length }}
+        expert{{ experts|length|pluralize }}
+      </p>
+    </div>
+    <div class="flex gap-2.5">
+      <a href="{{ project_export_project_url }}" class="btn btn-secondary">
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-        {% endif %}
-      </div>
-      <div class="py-2 isolate z-10">
-        {% if batches %}
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-          <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-            {% for batch in batches %}
-            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-              <td class="p-4 align-top">
-                <h3 class="text-lg font-semibold">
-                  Batch
-                  {{ batch.batch.batch_number }}
-                </h3>
-                <dl class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                  <div class="flex justify-between">
-                    <dt class="font-medium">Batch Phase</dt>
-                    <dd>
-                      <!-- Batch Phase Form -->
-                      <div class="relative inline-block text-left" x-data="{ open: false }">
-                        <button
-                          @click="open = !open"
-                          type="button"
-                          class="inline-flex w-full justify-between gap-x-1.5 rounded-md bg-transparent px-4 py-2 text-sm font-semibold shadow-sm ring-1 ring-inset ring-gray-200 dark:ring-gray-800 hover:bg-gray-200 dark:hover:bg-white/5"
-                        >
-                          {{ batch.batch.get_current_phase_display }}
-                          <svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path
-                              fill-rule="evenodd"
-                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
-                              clip-rule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                        <div
-                          x-show="open"
-                          @click.away="open = false"
-                          class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-gray-50 dark:bg-gray-900 shadow-lg ring-1 ring-gray-200 dark:ring-gray-800 focus:outline-none"
-                        >
-                          <form
-                            hx-post="{% url 'change-batch-phase' batch_id=batch.batch.id %}"
-                            hx-swap="none"
-                            class="py-1"
-                          >
-                            {% csrf_token %}
-                            {% for value, text in batch.batch_phase_form.fields.current_phase.choices %}
-                            <button
-                              type="submit"
-                              name="current_phase"
-                              value="{{ value }}"
-                              @click="open = false"
-                              class="block w-full px-4 py-2 text-left text-sm {% if batch.batch.current_phase == value %} bg-gray-200 dark:bg-gray-800 text-black dark:text-white {% else %} text-gray-700 dark:text-gray-300 {% endif %} hover:bg-gray-200 dark:hover:bg-gray-800 hover:text-black dark:hover:text-white"
-                            >
-                              {{ text }}
-                            </button>
-                            {% endfor %}
-                          </form>
-                        </div>
-                      </div>
-                      <!-- End of Form -->
-                    </dd>
-                  </div>
-                </dl>
-              </td>
-              <!-- Batch Status -->
-              <td>
-                <table class="border-x border-gray-200 dark:border-gray-800 border-separate border-spacing-2">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>Annotation</th>
-                      <th>Discussion</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for user in batch.users %}
-                    <tr>
-                      <td>{{ user.user.username }}</td>
-                      <td class="text-end">
-                        {{ user.annotated }}
-                        /
-                        {{ batch.length }}
-                      </td>
-                      {% if user == batch.users.0 %}
-                      <td rowspan="{{ batch.users|length }}" class="text-end">
-                        {{ user.discussed }}
-                        /
-                        {{ batch.disagreement }}
-                      </td>
-                      {% endif %}
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </td>
-              <!-- Actions -->
-              <td class="flex flex-col items-end p-4 align-top text-right space-y-2 whitespace-nowrap">
-                {% url "project-export-batch" batch_id=batch.batch.id as project_export_batch_url %}
-                <c-button.secondary
-                  href="{{ project_export_batch_url }}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}"
-                  >Export</c-button.secondary
-                >
-                {% if batch.batch.current_phase == "E" and batch.is_batch_expert %}
-                {% url "expert-batch" batch.batch.id as expert_dialogue_url %}
-                <c-button.primary href="{{ expert_dialogue_url }}">
-                  Resolve ({{ batch.expert_dec}}/{{ batch.disc_disagreement }})</c-button.primary
-                >
-                {% endif %}
-                <form
-                  hx-post="{% url 'delete-batch' batch_id=batch.batch.id %}"
-                  hx-confirm="Delete Batch {{ batch.batch.batch_number }}? This permanently removes all of its examples, annotations and discussions."
-                  hx-swap="none"
-                >
+          <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
+        </svg>
+        Export project
+      </a>
+      <a href="{{ project_batch_create_url }}" class="btn btn-primary">
+        <svg
+          class="size-4"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          aria-hidden="true"
+        >
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        New batch
+      </a>
+    </div>
+  </header>
+
+  <div class="flex items-start gap-6">
+    <section class="flex min-w-0 flex-1 flex-col gap-3.5" aria-label="Batches">
+      {% if has_annotation_work %}
+      <a
+        href="{% url 'project-detail-annotator' project.id %}"
+        class="flex items-center justify-between rounded-[14px] border border-accent/40 bg-accent-soft px-5 py-3 text-accent-ink hover:border-accent"
+      >
+        <span>You also annotate in this project.</span>
+        <span class="font-semibold">Go to my batches →</span>
+      </a>
+      {% endif %}
+
+      {% for batch in batches %}
+      {% with b=batch.batch %}
+      <article class="card flex flex-col gap-5 px-6 py-5.5" data-phase="{{ b.current_phase }}">
+        <div class="flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <h2 class="text-lg font-semibold">
+              Batch
+              {{ b.batch_number }}
+            </h2>
+            <span class="text-[13px] text-ink-3"
+              >{{ batch.length }}
+              sample{{ batch.length|pluralize }}</span
+            >
+            {% if b.current_phase == "S" %}<span class="phase-badge">Setup</span>{% endif %}
+          </div>
+          <div class="flex items-center gap-2">
+            {% if b.current_phase == "E" and batch.is_batch_expert and batch.expert_open > 0 %}
+            <a href="{% url 'expert-batch' b.id %}" class="btn btn-primary btn-sm">
+              Resolve
+              {{ batch.expert_open }}
+              disagreement{{ batch.expert_open|pluralize }}
+            </a>
+            {% elif b.current_phase == "E" and batch.is_batch_expert %}
+            <a href="{% url 'expert-batch' b.id %}" class="btn btn-secondary btn-sm">Review decisions</a>
+            {% endif %}
+
+            {% url "project-export-batch" batch_id=b.id as project_export_batch_url %}
+            <el-dropdown class="inline-block">
+              <button
+                type="button"
+                class="btn btn-secondary btn-sm btn-icon"
+                aria-label="Actions for batch {{ b.batch_number }}"
+              >
+                <svg class="size-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="5" cy="12" r="1.8" />
+                  <circle cx="12" cy="12" r="1.8" />
+                  <circle cx="19" cy="12" r="1.8" />
+                </svg>
+              </button>
+              <el-menu anchor="bottom end" popover class="menu">
+                <div class="menu-section">
+                  <a
+                    href="{{ project_export_batch_url }}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
+                    class="menu-item"
+                    >Export batch</a
+                  >
+                  <a
+                    href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
+                    class="menu-item"
+                    >Codebook changes</a
+                  >
+                </div>
+                <form hx-post="{% url 'change-batch-phase' batch_id=b.id %}" hx-swap="none" class="menu-section">
                   {% csrf_token %}
+                  <div class="menu-heading">Move to phase</div>
+                  {% for value, text in batch.batch_phase_form.fields.current_phase.choices %}
                   <button
                     type="submit"
-                    class="rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 shadow-sm hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-600 dark:bg-gray-800 dark:text-red-300 dark:hover:bg-gray-700"
+                    name="current_phase"
+                    value="{{ value }}"
+                    class="menu-item"
+                    data-phase="{{ value }}"
+                    {% if b.current_phase == value %}aria-current="true"
+                    disabled{% endif %}
                   >
-                    Delete
+                    <span class="phase-dot"></span>
+                    {{ text }}
+                    {% if b.current_phase == value %}<span class="ml-auto text-xs text-ink-3">current</span>{% endif %}
                   </button>
+                  {% endfor %}
                 </form>
-              </td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-        {% else %}
-        <div class="rounded-xl border border-dashed border-gray-400 p-12 text-center dark:border-gray-600">
-          <h3 class="text-sm font-medium">No batches available</h3>
-          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Batches will appear here when created.</p>
+                <form
+                  hx-post="{% url 'delete-batch' batch_id=b.id %}"
+                  hx-confirm="Delete Batch {{ b.batch_number }}? This permanently removes all of its examples, annotations and discussions."
+                  hx-swap="none"
+                  class="menu-section"
+                >
+                  {% csrf_token %}
+                  <button type="submit" class="menu-item text-danger">Delete batch</button>
+                </form>
+              </el-menu>
+            </el-dropdown>
+          </div>
         </div>
-        {% endif %}
-        <div class="flex justify-end gap-3 px-6 py-4">
-          <c-button.primary href="{{ project_batch_create_url }}">Create Batch</c-button.primary>
-          <c-button.secondary href="{{ project_export_project_url }}">Export Project</c-button.secondary>
-        </div>
+
+        <ol class="flex items-center" aria-label="Phase">
+          {% for step in batch.steps %}
+          <li class="flex items-center {% if not forloop.last %}flex-1{% endif %}" data-phase="{{ step.phase }}">
+            <span class="step step-{{ step.state }}" {% if step.state == "current" %}aria-current="step" {% endif %}>
+              <span class="step-icon">
+                {% if step.state == "done" %}
+                <svg
+                  class="size-[11px]"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3.2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M5 12l5 5L20 7" />
+                </svg>
+                {% endif %}
+              </span>
+              {{ step.label }}
+            </span>
+            {% if not forloop.last %}<span
+              class="mx-3 h-0.5 flex-1 {% if step.state == 'done' %}bg-line-strong{% else %}bg-line{% endif %}"
+            ></span
+            >{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+
+        <dl class="grid grid-cols-3 gap-4 border-t border-line pt-4">
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-ink-3">Annotated</dt>
+            <dd class="font-mono text-[15px]">
+              {{ batch.annotated_total }}
+              /
+              {{ batch.annotated_max }}
+            </dd>
+            <dd class="text-xs text-ink-2">
+              {% for row in batch.users %}{{ row.user.username }}
+              {{ row.annotated }}{% if not forloop.last %}
+              ·
+              {% endif %}{% empty %}No annotators{% endfor %}
+            </dd>
+          </div>
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-ink-3">Discussed</dt>
+            {% if b.current_phase == "A" or b.current_phase == "S" %}
+            <dd class="text-ink-3">–</dd>
+            {% elif batch.disagreement %}
+            <dd class="font-mono text-[15px]">
+              {{ batch.discussed }}
+              /
+              {{ batch.disagreement }}
+            </dd>
+            <dd class="text-xs text-ink-2">disagreements after annotation</dd>
+            {% else %}
+            <dd class="text-ink-2">No disagreements</dd>
+            {% endif %}
+          </div>
+          <div class="flex flex-col gap-1">
+            <dt class="text-xs text-ink-3">Expert decisions</dt>
+            {% if b.current_phase == "E" or b.current_phase == "F" %}
+            {% if batch.disc_disagreement %}
+            <dd class="font-mono text-[15px]">
+              {{ batch.expert_dec }}
+              /
+              {{ batch.disc_disagreement }}
+            </dd>
+            <dd data-phase="E" class="progress mt-1">
+              <div
+                class="progress-bar"
+                style="width: {% widthratio batch.expert_dec batch.disc_disagreement 100 %}%"
+              ></div>
+            </dd>
+            {% else %}
+            <dd class="text-ink-2">None needed</dd>
+            {% endif %}
+            {% else %}
+            <dd class="text-ink-3">–</dd>
+            {% endif %}
+          </div>
+        </dl>
+      </article>
+      {% endwith %}
+      {% empty %}
+      <div class="card flex flex-col items-center gap-3 px-6 py-14 text-center">
+        <h2 class="text-[15px] font-semibold">No batches yet</h2>
+        <p class="max-w-sm text-ink-2">
+          Upload a CSV or Excel file with a <code class="font-mono text-[13px]">text</code> column to create the first
+          batch.
+        </p>
+        <a href="{{ project_batch_create_url }}" class="btn btn-primary mt-1">New batch</a>
       </div>
-    </div>
-  </section>
+      {% endfor %}
+    </section>
+
+    {% include "projects/partials/detail-sidebar.html" with is_expert_view=True %}
+  </div>
 </div>
 {% endblock content %}

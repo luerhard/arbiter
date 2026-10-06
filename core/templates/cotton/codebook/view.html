@@ -1,7 +1,2 @@
 {% load markdownify %}
-<div
-  id="codebook-html"
-  class="[&_:is(p,h1,h2,h3,h4,h5,h6)]:block [&_p]:my-1 [&_:is(p,li)]:indent-5 [&_:is(p,li)]:leading-7 [&_:is(ul,ol)>li]:list-inside [&_ul>li]:list-disc [&_ol>li]:list-decimal [&_:is(h1,h2,h3,h4,h5,h6)]:font-bold [&_p]:text-base [&_h6]:text-xs [&_h6]:my-9 [&_h5]:text-sm [&_h5]:my-6 [&_h4]:text-lg [&_h4]:my-5 [&_h3]:text-xl [&_h3]:my-4 [&_h2]:text-2xl [&_h2]:my-3.5 [&_h1]:text-3xl [&_h1]:my-2.5 [&_h1]:text-bold [&_text]:text-emerald-700 [&_text]:dark:text-emerald-300 [&_text]:bg-emerald-500/30 [&_text]:rounded-md [&_del]:dark:text-rose-300 [&_del]:text-rose-700 [&_del]:bg-rose-500/30 [&_del]:rounded-md"
->
-  {{ content|markdownify }}
-</div>
+<div id="codebook-html" class="prose-codebook">{{ content|markdownify }}</div>

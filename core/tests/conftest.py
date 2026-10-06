@@ -1,3 +1,6 @@
+from pathlib import Path
+import shutil
+import tempfile
 import uuid
 
 from django.conf import settings
@@ -23,6 +26,15 @@ def run_sql(sql):
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_blocker):  # noqa: PT004
+    # Codebooks are git repositories on disk, stored by codebook id. Keep the
+    # test ones in a temporary folder: the test database reuses the ids of the
+    # dev database, and creating a codebook wipes an existing folder.
+    import core.settings as project_settings
+
+    dev_codebooks_root = project_settings.CODEBOOKS_ROOT
+    test_codebooks_root = Path(tempfile.mkdtemp(prefix="arbiter-test-codebooks-"))
+    project_settings.CODEBOOKS_ROOT = test_codebooks_root
+
     settings.DATABASES["default"]["NAME"] = "postgres"
     connection.close()
 
@@ -44,6 +56,9 @@ def django_db_setup(django_db_blocker):  # noqa: PT004
     settings.DATABASES["default"]["NAME"] = "postgres"
     with django_db_blocker.unblock():
         run_sql("DROP DATABASE test_annotationtool")
+
+    project_settings.CODEBOOKS_ROOT = dev_codebooks_root
+    shutil.rmtree(test_codebooks_root, ignore_errors=True)
 
 
 @pytest.fixture

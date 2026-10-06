@@ -1,43 +1,42 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block title %}
-User Profile
+Profile · Arbiter
 {% endblock title %}
 {% block content %}
-<div
-  class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800/50 dark:shadow-none dark:inset-ring dark:inset-ring-white/10"
->
-  <div class="px-4 py-6 sm:px-6">
-    <h3 class="text-base/7 font-semibold text-gray-900 dark:text-white">Your profile</h3>
-    <!--<p class="mt-1 max-w-2xl text-sm/6 text-gray-500 dark:text-gray-300"></p>-->
-  </div>
-  <div class="border-t border-gray-100 dark:border-white/5">
-    <dl class="divide-y divide-gray-100 dark:divide-white/5">
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-        <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Username</dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">
-          {{ username }}
+<div class="mx-auto flex max-w-3xl flex-col gap-7">
+  <header class="flex items-center gap-4">
+    <span class="avatar size-14 text-lg">{{ username|initials }}</span>
+    <div class="flex flex-col gap-0.5">
+      <h1 class="page-title">{{ username }}</h1>
+      <p class="page-subtitle">Your account</p>
+    </div>
+  </header>
+
+  <section class="card">
+    <dl class="divide-y divide-line">
+      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+        <dt class="text-ink-3">Username</dt>
+        <dd class="col-span-2">{{ username }}</dd>
+      </div>
+      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+        <dt class="text-ink-3">Full name</dt>
+        <dd class="col-span-2">
+          {% if first_name or last_name %}{{ first_name }}
+          {{ last_name }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
         </dd>
       </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-        <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Full name</dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">
-          {{ first_name }}
-          {{ last_name }}
+      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+        <dt class="text-ink-3">Email address</dt>
+        <dd class="col-span-2">
+          {% if email %}{{ email }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
         </dd>
       </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-        <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">Email address</dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">
-          {{ email }}
-        </dd>
-      </div>
-      <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-        <dt class="text-sm font-medium text-gray-900 dark:text-gray-100">User id</dt>
-        <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0 dark:text-gray-300">
-          {{ user_id }}
-        </dd>
+      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+        <dt class="text-ink-3">User ID</dt>
+        <dd class="col-span-2 font-mono">{{ user_id }}</dd>
       </div>
     </dl>
-  </div>
+  </section>
 </div>
 {% endblock content %}

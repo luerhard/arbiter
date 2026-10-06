@@ -1,7 +1,25 @@
-{% extends "base.html" %}
+{% extends "layouts/focus.html" %}
 {% block title %}
-Expert Decision
+Expert decision · Batch
+{{ batch.batch_number }}
+·
+{{ batch.project.name }}
 {% endblock title %}
+{% block focus_back_url %}{% url 'project-detail' batch.project_id %}{% endblock focus_back_url %}
+{% block focus_context %}
+<span class="text-ink-3">{{ batch.project.name }}</span>
+<span class="text-line-strong">/</span>
+<span class="font-semibold"
+  >Batch
+  {{ batch.batch_number }}</span
+>
+{% endblock focus_context %}
+{% block focus_phase %}
+<span class="phase-badge" data-phase="E">Expert decision</span>
+{% endblock focus_phase %}
+{% block focus_progress %}
+{% include "expert/partials/progress.html" %}
+{% endblock focus_progress %}
 {% block content %}
 {% include "expert/partials/assignment.html" %}
 {% endblock content %}
