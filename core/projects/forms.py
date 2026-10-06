@@ -1,5 +1,6 @@
 from django import forms
 from django.core.exceptions import ValidationError
+import pandas as pd
 
 from projects.models import Batch
 from users.models import User
@@ -96,11 +97,21 @@ class BatchCreateForm(forms.ModelForm):
         return cleaned
 
     def clean_file(self):
+        """Read the uploaded table; its "text" column becomes the batch's samples (self.texts)."""
         file = self.cleaned_data["file"]
         name = (file.name or "").lower()
         if not (name.endswith(".csv") or name.endswith(".xlsx")):
             msg = "Please upload a .csv or .xlsx file."
             raise ValidationError(msg)
+        try:
+            table = pd.read_csv(file) if name.endswith(".csv") else pd.read_excel(file)
+        except ValueError as exc:
+            msg = "The file could not be read."
+            raise ValidationError(msg) from exc
+        if "text" not in table.columns:
+            msg = "The file needs a column named 'text'."
+            raise ValidationError(msg)
+        self.texts = table["text"].tolist()
         return file
 
 

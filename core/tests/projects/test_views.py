@@ -504,3 +504,40 @@ class TestPageHeader:
         crumb = self._breadcrumb(response)
         assert reverse("codebook-view", args=(codebook.pk,)) in crumb
         assert "Changes" in crumb
+
+
+@pytest.mark.django_db
+class TestBatchUploadValidation:
+    def _post(self, client, data, upload):
+        client.login(username=data["expert"].username, password="123")
+        return client.post(
+            reverse("project-batch-create", args=(data["project"].id,)),
+            {
+                "file": upload,
+                "annotators": [a.id for a in data["annotators"]],
+                "experts": [data["expert"].id],
+            },
+        )
+
+    def test_unsupported_file_type_shows_error(self, client, project_annotation):
+        project = project_annotation["project"]
+        batches_before = project.batches.count()
+        upload = SimpleUploadedFile("examples.txt", b"text\nFirst\n", content_type="text/plain")
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 200
+        assert ".csv or .xlsx" in response.context["form"].errors["file"][0]
+        assert project.batches.count() == batches_before
+
+    def test_missing_text_column_shows_error(self, client, project_annotation):
+        # Regression: the error was recorded but the batch was created anyway.
+        project = project_annotation["project"]
+        batches_before = project.batches.count()
+        upload = SimpleUploadedFile("examples.csv", b"content\nFirst\n", content_type="text/csv")
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 200
+        assert "column named 'text'" in response.context["form"].errors["file"][0]
+        assert project.batches.count() == batches_before

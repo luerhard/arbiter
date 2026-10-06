@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import reverse
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.views.generic import DetailView
 from django.views.generic import FormView
@@ -22,7 +23,7 @@ from .forms import ProjectCreateForm
 from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
-from data.models import ExampleAssignment
+from data.models import Label
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
@@ -37,6 +38,11 @@ User = get_user_model()
 log = logging.getLogger(__name__)
 
 
+def _users_json(users) -> str:
+    """Users as JSON for the preselected entries of the user search."""
+    return json.dumps([{"id": user.id, "username": user.username} for user in users])
+
+
 class ProjectListView(ListView):
     template_name = "projects/project_list.html"
     model = ProjectUser
@@ -45,7 +51,7 @@ class ProjectListView(ListView):
     def get_queryset(self):
         return (
             ProjectUser.objects.filter(user=self.request.user)
-            .prefetch_related("project")
+            .select_related("project")
             .order_by("-project__pk")
         )
 
@@ -53,13 +59,6 @@ class ProjectListView(ListView):
         context = super().get_context_data(**kwargs)
         context["create_url"] = reverse("project-create") if self.request.user.is_staff else None
         return context
-
-    @staticmethod
-    def _jsonify_users(users):
-        out = []
-        for user in users:
-            out.append({"id": user.id, "username": user.username})
-        return json.dumps(out)
 
 
 class ProjectCreateView(FormView):
@@ -69,142 +68,86 @@ class ProjectCreateView(FormView):
     def get_success_url(self):
         return reverse("project-detail", kwargs={"project_id": self.project.id})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form = context.get("form")
-        if form is not None:
-            context["form"] = form
-        return context
-
     def form_valid(self, form):
-
         self.project = Project.objects.create(
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
             owner=self.request.user,
         )
-
-        project_users = []
-        for user in form.cleaned_data["annotators"]:
-            project_users.append(
-                ProjectUser(
-                    project=self.project,
-                    user=user,
-                    default_role=ProjectRole.ANNOTATOR,
-                ),
-            )
-        for user in form.cleaned_data["experts"]:
-            project_users.append(
-                ProjectUser(
-                    project=self.project,
-                    user=user,
-                    default_role=ProjectRole.EXPERT,
-                ),
-            )
-        if project_users:
-            ProjectUser.objects.bulk_create(project_users)
-
-        label_names = self.request.POST.getlist("label_name")
-        label_colors = self.request.POST.getlist("label_color")
-        label_hotkeys = self.request.POST.getlist("label_hotkey")
-
-        labels = []
-        seen_names = set()
-        seen_hotkeys = set()
-        for name, color, hotkey in zip(label_names, label_colors, label_hotkeys, strict=False):
-            name = (name or "").strip()
-            if not name:
-                continue
-            name_key = name.lower()
-            if name_key in seen_names:
-                continue
-            seen_names.add(name_key)
-            hotkey = (hotkey or "").strip() or None
-            if hotkey and hotkey.lower() in seen_hotkeys:
-                continue
-            if hotkey:
-                seen_hotkeys.add(hotkey.lower())
-            color = (color or "").strip() or None
-            labels.append({"name": name, "color": color, "hotkey": hotkey})
-
-        if labels:
-            from data.models import Label
-
-            Label.objects.bulk_create(
-                [
-                    Label(
-                        project=self.project,
-                        name=label["name"],
-                        color=label["color"] or Label._meta.get_field("color").default,
-                        hotkey=label["hotkey"],
-                    )
-                    for label in labels
-                ],
-            )
-
+        ProjectUser.objects.bulk_create(
+            [
+                ProjectUser(project=self.project, user=user, default_role=role)
+                for field, role in (
+                    ("annotators", ProjectRole.ANNOTATOR),
+                    ("experts", ProjectRole.EXPERT),
+                )
+                for user in form.cleaned_data[field]
+            ],
+        )
+        Label.objects.bulk_create(
+            Label(project=self.project, **label) for label in _labels_from_post(self.request.POST)
+        )
         return super().form_valid(form)
+
+
+def _labels_from_post(post) -> list[dict]:
+    """The label rows of the project form, minus empty names and duplicate names or keys."""
+    default_color = Label._meta.get_field("color").default
+    labels = []
+    seen_names, seen_hotkeys = set(), set()
+    rows = zip(
+        post.getlist("label_name"),
+        post.getlist("label_color"),
+        post.getlist("label_hotkey"),
+        strict=False,
+    )
+    for name, color, hotkey in rows:
+        name = (name or "").strip()
+        hotkey = (hotkey or "").strip() or None
+        if not name or name.lower() in seen_names:
+            continue
+        seen_names.add(name.lower())
+        if hotkey and hotkey.lower() in seen_hotkeys:
+            continue
+        if hotkey:
+            seen_hotkeys.add(hotkey.lower())
+        labels.append(
+            {"name": name, "color": (color or "").strip() or default_color, "hotkey": hotkey}
+        )
+    return labels
 
 
 class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
     template_name = "projects/batch_create.html"
     form_class = BatchCreateForm
 
+    @cached_property
+    def project(self):
+        return get_object_or_404(Project, id=self.kwargs["project_id"])
+
     def get_success_url(self):
-        return reverse("project-detail", kwargs={"project_id": self.kwargs.get("project_id")})
+        return reverse("project-detail", kwargs={"project_id": self.project.id})
 
     def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["project"] = get_object_or_404(Project, id=self.kwargs.get("project_id"))
-        return kwargs
-
-    @staticmethod
-    def _jsonify_users(users):
-        out = []
-        for user in users:
-            out.append({"id": user.id, "username": user.username})
-        return json.dumps(out)
+        return {**super().get_form_kwargs(), "project": self.project}
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = context.get("form")
-        project_id = self.kwargs.get("project_id")
-        project = get_object_or_404(Project, id=project_id)
-        if form is not None:
-            context["project"] = project
-            context["annotators_selected_users"] = self._jsonify_users(project.annotators.all())
-            context["experts_selected_users"] = self._jsonify_users(project.experts.all())
+        context["project"] = self.project
+        context["annotators_selected_users"] = _users_json(self.project.annotators)
+        context["experts_selected_users"] = _users_json(self.project.experts)
         return context
 
     def form_valid(self, form):
-
-        project_id = self.kwargs.get("project_id")
-        project = get_object_or_404(Project, id=project_id)
-
-        file = form.cleaned_data["file"]
-        if file.name.endswith(".csv"):
-            df = pd.read_csv(file)
-        elif file.name.endswith(".xlsx"):
-            df = pd.read_excel(file)
-        else:
-            form.add_error("file", "Unsupported file type.")
-        if "text" not in df.columns:
-            form.add_error("file", "Missing required 'text' column.")
-
-        batch = Batch.objects.create(project=project)
-
-        examples = []
-        for _, row in df.iterrows():
-            examples.append(Example(batch=batch, content=row["text"]))
-        Example.objects.bulk_create(examples)
-
-        annotators = form.cleaned_data["annotators"]
-        batch.users.add(*annotators, through_defaults={"role": ProjectRole.ANNOTATOR})
-
-        experts = form.cleaned_data["experts"]
-        batch.users.add(*experts, through_defaults={"role": ProjectRole.EXPERT})
-
+        batch = Batch.objects.create(project=self.project)
+        Example.objects.bulk_create(Example(batch=batch, content=text) for text in form.texts)
+        batch.users.add(
+            *form.cleaned_data["annotators"], through_defaults={"role": ProjectRole.ANNOTATOR}
+        )
+        batch.users.add(
+            *form.cleaned_data["experts"], through_defaults={"role": ProjectRole.EXPERT}
+        )
         batch.set_phase(BatchPhase.ANNOTATION)
-
         return super().form_valid(form)
 
 
@@ -215,97 +158,18 @@ class ProjectLabelRowView(View):
 
 
 class ProjectDetailView(RedirectView):
-    model = Project
+    """Experts land on the page that manages the project, annotators on their batches."""
 
     def get_redirect_url(self, *args, **kwargs):  # noqa: ARG002
-        project_id = kwargs.get("project_id")
-        project = get_object_or_404(Project, id=project_id)
-        project_user = get_object_or_404(ProjectUser, project=project, user=self.request.user)
-
-        if project_user.default_role == ProjectRole.ANNOTATOR:
-            return reverse("project-detail-annotator", kwargs={"project_id": project_id})
-        elif project_user.default_role == ProjectRole.EXPERT:
-            return reverse("project-detail-expert", kwargs={"project_id": project_id})
-        else:
-            return reverse("home")
-
-
-class ProjectExpertDetailView(ExpertRequiredMixin, DetailView):
-    pk_url_kwarg = "project_id"
-    model = Project
-    template_name = "projects/project_detail_expert.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        project = self.get_object()
-        all_project_users = User.objects.filter(projectuser__project=project)
-
-        # get assigned users
-        context["annotators"] = all_project_users.filter(
-            projectuser__project=project,
-            projectuser__default_role=ProjectRole.ANNOTATOR,
+        member = get_object_or_404(
+            ProjectUser, project_id=kwargs["project_id"], user=self.request.user
         )
-        context["experts"] = all_project_users.filter(
-            projectuser__project=project,
-            projectuser__default_role=ProjectRole.EXPERT,
+        page = (
+            "project-detail-expert"
+            if member.default_role == ProjectRole.EXPERT
+            else "project-detail-annotator"
         )
-        context["codebook"] = project.codebook.get()
-
-        my_roles = _batch_roles(self.request.user, project)
-        context["has_annotation_work"] = ProjectRole.ANNOTATOR in my_roles.values()
-
-        # get associated batches
-        batches = project.batches.order_by("-batch_number")
-        context["batches"] = []
-        for batch in batches:
-            batch_data = {
-                "batch": batch,
-                "batch_phase_form": BatchPhaseForm(instance=batch),
-                "length": batch.examples.count(),
-                "users": [],
-                "is_batch_expert": my_roles.get(batch.id) == ProjectRole.EXPERT,
-            }
-
-            # Query examples with disagreements and no expert decisions
-            ann_disagr_ex = batch.disagreements(BatchPhase.ANNOTATION)
-            ann_disagr_count = ann_disagr_ex.count()
-            batch_data["disagreement"] = ann_disagr_count
-
-            disc_disagr_ex = batch.disagreements(BatchPhase.DISCUSSION)
-            batch_data["disc_disagreement"] = disc_disagr_ex.count()
-            batch_data["expert_dec"] = disc_disagr_ex.filter(
-                assignments__phase=BatchPhase.EXPERT,
-                assignments__done__isnull=False,
-            ).count()
-
-            for annotator in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username"):
-                annotated = ExampleAssignment.objects.filter(
-                    user=annotator,
-                    batch=batch,
-                    phase=BatchPhase.ANNOTATION,
-                    done__isnull=False,
-                ).count()
-                discussed = ExampleAssignment.objects.filter(
-                    user=annotator,
-                    phase=BatchPhase.DISCUSSION,
-                    done__isnull=False,
-                    example_id__in=ann_disagr_ex.values_list("id"),
-                ).count()
-                user_data = {"user": annotator, "annotated": annotated, "discussed": discussed}
-                batch_data["users"].append(user_data)
-
-            # totals for the batch card
-            batch_data["steps"] = _phase_steps(batch)
-            batch_data["annotated_total"] = sum(u["annotated"] for u in batch_data["users"])
-            batch_data["annotated_max"] = batch_data["length"] * len(batch_data["users"])
-            batch_data["discussed"] = (
-                batch_data["users"][0]["discussed"] if batch_data["users"] else 0
-            )
-            batch_data["expert_open"] = batch_data["disc_disagreement"] - batch_data["expert_dec"]
-            context["batches"].append(batch_data)
-
-        log.debug(f"Providing the following context to the Expert: {context}")
-        return context
+        return reverse(page, kwargs={"project_id": kwargs["project_id"]})
 
 
 _PHASE_FLOW = [BatchPhase.ANNOTATION, BatchPhase.DISCUSSION, BatchPhase.EXPERT, BatchPhase.FINAL]
@@ -327,60 +191,105 @@ def _phase_steps(batch) -> list[dict]:
     return steps
 
 
-def _batch_roles(user, project) -> dict[int, str]:
-    """Map batch id -> the user's role in that batch, for all batches of the project."""
-    return dict(
-        BatchUser.objects.filter(user=user, batch__project=project).values_list("batch_id", "role"),
-    )
-
-
-class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, DetailView):
-    """The batches the user works on, in whatever role they have per batch."""
+class _ProjectPageMixin:
+    """Shared by both project pages: the team and codebook for the side column, and the
+    user's role per batch (self.batch_roles: batch id -> role)."""
 
     pk_url_kwarg = "project_id"
     model = Project
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        project = self.object
+        context["annotators"] = project.annotators
+        context["experts"] = project.experts
+        context["codebook"] = project.codebook.get()
+        self.batch_roles = dict(
+            BatchUser.objects.filter(user=self.request.user, batch__project=project).values_list(
+                "batch_id",
+                "role",
+            ),
+        )
+        return context
+
+
+class ProjectExpertDetailView(ExpertRequiredMixin, _ProjectPageMixin, DetailView):
+    template_name = "projects/project_detail_expert.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["has_annotation_work"] = ProjectRole.ANNOTATOR in self.batch_roles.values()
+        context["batches"] = [
+            self._batch_card(batch) for batch in self.object.batches.order_by("-batch_number")
+        ]
+        return context
+
+    def _batch_card(self, batch) -> dict:
+        """Everything a batch card shows: phase stepper, progress per annotator, open decisions."""
+        annotation_disagreements = batch.disagreements(BatchPhase.ANNOTATION)
+        discussion_disagreements = batch.disagreements(BatchPhase.DISCUSSION)
+        length = batch.examples.count()
+
+        users = []
+        for annotator in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username"):
+            done = batch.assignments.filter(user=annotator).done()
+            users.append(
+                {
+                    "user": annotator,
+                    "annotated": done.filter(phase=BatchPhase.ANNOTATION).count(),
+                    "discussed": done.filter(
+                        phase=BatchPhase.DISCUSSION,
+                        example__in=annotation_disagreements,
+                    ).count(),
+                },
+            )
+
+        disc_disagreement = discussion_disagreements.count()
+        expert_dec = discussion_disagreements.filter(
+            assignments__phase=BatchPhase.EXPERT,
+            assignments__done__isnull=False,
+        ).count()
+        return {
+            "batch": batch,
+            "batch_phase_form": BatchPhaseForm(instance=batch),
+            "is_batch_expert": self.batch_roles.get(batch.id) == ProjectRole.EXPERT,
+            "steps": _phase_steps(batch),
+            "length": length,
+            "users": users,
+            "annotated_total": sum(u["annotated"] for u in users),
+            "annotated_max": length * len(users),
+            "disagreement": annotation_disagreements.count(),
+            "discussed": users[0]["discussed"] if users else 0,
+            "disc_disagreement": disc_disagreement,
+            "expert_dec": expert_dec,
+            "expert_open": disc_disagreement - expert_dec,
+        }
+
+
+class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, DetailView):
+    """The batches the user works on, in whatever role they have per batch."""
+
     template_name = "projects/project_detail_annotator.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        project = self.get_object()
-        all_project_users = User.objects.filter(projectuser__project=project)
-
-        # get assigned users
-        context["annotators"] = all_project_users.filter(
-            projectuser__project=project,
-            projectuser__default_role=ProjectRole.ANNOTATOR,
-        )
-        context["experts"] = all_project_users.filter(
-            projectuser__project=project,
-            projectuser__default_role=ProjectRole.EXPERT,
-        )
-        context["codebook"] = project.codebook.get()
-
-        my_roles = _batch_roles(self.request.user, project)
-        context["batches"] = []
-        batches = project.batches.filter(
-            id__in=my_roles.keys(),
-            current_phase__in=[
-                BatchPhase.ANNOTATION,
-                BatchPhase.DISCUSSION,
-                BatchPhase.EXPERT,
-            ],
+        batches = self.object.batches.filter(
+            id__in=self.batch_roles,
+            current_phase__in=[BatchPhase.ANNOTATION, BatchPhase.DISCUSSION, BatchPhase.EXPERT],
         ).order_by("-batch_number")
-        for batch in batches:
-            batch_data = {
+        context["batches"] = [
+            {
                 "batch": batch,
-                "role": my_roles[batch.id],
-                "done": ExampleAssignment.objects.filter(
-                    user=self.request.user,
-                    batch=batch,
-                    phase=BatchPhase.ANNOTATION,
-                    done__isnull=False,
-                ).count(),
+                "role": self.batch_roles[batch.id],
+                "done": batch.assignments.filter(
+                    user=self.request.user, phase=BatchPhase.ANNOTATION
+                )
+                .done()
+                .count(),
                 "length": batch.examples.count(),
             }
-            context["batches"].append(batch_data)
-        log.debug(f"Providing the following context to the Annotator: {context}")
+            for batch in batches
+        ]
         return context
 
 
