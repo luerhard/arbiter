@@ -90,3 +90,10 @@ def delete_state(batch_id: int | str) -> None:
             r.delete(_key(batch_id))
     except RedisError:
         log.warning("Could not delete the chat state of batch %s", batch_id, exc_info=True)
+
+
+def delete_all_states() -> int:
+    """Forget the chat state of every batch, e.g. after the database was reset."""
+    with SyncRedis.from_url(REDIS_URL) as r:
+        keys = list(r.scan_iter(_key("*")))
+        return r.delete(*keys) if keys else 0
