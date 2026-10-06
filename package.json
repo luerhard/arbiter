@@ -28,13 +28,9 @@
     "@tailwindcss/vite": "^4.3.3",
     "@tailwindplus/elements": "^1.0.22",
     "alpinejs": "^3.17.4",
-    "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
     "htmx-ext-alpine-morph": "^2.0.2",
     "htmx-ext-ws": "^2.0.4",
     "htmx.org": "^2.0.11",
-    "mousetrap": "^1.6.5",
-    "sortablejs": "^1.15.7",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.3.3"
   }

@@ -14,7 +14,6 @@ window.htmx = htmx;
 import "htmx-ext-ws";
 import "htmx-ext-alpine-morph";
 
-import Mousetrap from "mousetrap";
 import "./vendor/coloris.min.js";
 
 window.Coloris({
@@ -58,13 +57,11 @@ window.Coloris({
 
 import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import * as ui from "./ui.js";
-import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
 import { initToasts } from "./toasts.js";
 
 window.lib = window.lib || {};
 window.lib.ui = ui;
-window.lib.funcs = funcs;
 window.lib.discuss = discuss;
 
 Alpine.data("labelButton", labelButton);
