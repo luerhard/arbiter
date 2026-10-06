@@ -5,18 +5,7 @@
     <section class="card flex w-full max-w-xl flex-col gap-5 p-9">
       <div class="flex items-start gap-4">
         <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
-          <svg
-            class="size-6"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12l5 5L20 7" />
-          </svg>
+          {% heroicon_outline "check" class="size-6" stroke_width=2 %}
         </span>
         <div class="flex flex-col gap-1.5">
           <h2 class="text-2xl font-semibold tracking-[-0.01em]">All disagreements are resolved.</h2>
@@ -37,18 +26,7 @@
         <span
           class="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success"
         >
-          <svg
-            class="size-3.5"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M5 12l5 5L20 7" />
-          </svg>
+          {% heroicon_micro "check" class="size-3.5" %}
           Decision saved
         </span>
         {% else %}
@@ -69,18 +47,7 @@
           aria-label="Previous case"
           title="Previous case"
         >
-          <svg
-            class="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
+          {% heroicon_micro "chevron-left" class="size-4" %}
         </button>
         <button
           {% if next_assignment %}hx-get="{% url 'expert-assignment' batch_id next_assignment.id %}"
@@ -92,18 +59,7 @@
           aria-label="Next case"
           title="Next case"
         >
-          <svg
-            class="size-4"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-          >
-            <path d="M9 6l6 6-6 6" />
-          </svg>
+          {% heroicon_micro "chevron-right" class="size-4" %}
         </button>
       </div>
     </div>

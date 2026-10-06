@@ -11,17 +11,7 @@ Projects · Arbiter
     </div>
     {% if create_url %}
     <a href="{{ create_url }}" class="btn btn-primary">
-      <svg
-        class="size-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        aria-hidden="true"
-      >
-        <path d="M12 5v14M5 12h14" />
-      </svg>
+      {% heroicon_micro "plus" class="size-4" %}
       New project
     </a>
     {% endif %}

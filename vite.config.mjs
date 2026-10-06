@@ -1,7 +1,6 @@
 import { defineConfig } from "vite";
 import { resolve } from "path";
 import tailwindcss from "@tailwindcss/vite";
-import inject from "@rollup/plugin-inject";
 
 export default defineConfig(({ command }) => ({
   base: "/static/",
@@ -29,8 +28,5 @@ export default defineConfig(({ command }) => ({
   },
   plugins: [
     tailwindcss(),
-    inject({
-      htmx: "htmx.org",
-    }),
   ],
 }));

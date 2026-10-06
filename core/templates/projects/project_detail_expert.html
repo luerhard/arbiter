@@ -29,32 +29,11 @@
     </div>
     <div class="flex gap-2.5">
       <a href="{{ project_export_project_url }}" class="btn btn-secondary">
-        <svg
-          class="size-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M12 4v11M7 10l5 5 5-5M5 20h14" />
-        </svg>
+        {% heroicon_micro "arrow-down-tray" class="size-4" %}
         Export project
       </a>
       <a href="{{ project_batch_create_url }}" class="btn btn-primary">
-        <svg
-          class="size-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+        {% heroicon_micro "plus" class="size-4" %}
         New batch
       </a>
     </div>
@@ -105,11 +84,7 @@
                 class="btn btn-secondary btn-sm btn-icon"
                 aria-label="Actions for batch {{ b.batch_number }}"
               >
-                <svg class="size-[18px]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <circle cx="5" cy="12" r="1.8" />
-                  <circle cx="12" cy="12" r="1.8" />
-                  <circle cx="19" cy="12" r="1.8" />
-                </svg>
+                {% heroicon_mini "ellipsis-horizontal" class="size-5" %}
               </button>
               <el-menu anchor="bottom end" popover class="menu">
                 <div class="menu-section">
@@ -163,18 +138,7 @@
             <span class="step step-{{ step.state }}" {% if step.state == "current" %}aria-current="step" {% endif %}>
               <span class="step-icon">
                 {% if step.state == "done" %}
-                <svg
-                  class="size-[11px]"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3.2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M5 12l5 5L20 7" />
-                </svg>
+                {% heroicon_micro "check" class="size-3" %}
                 {% endif %}
               </span>
               {{ step.label }}

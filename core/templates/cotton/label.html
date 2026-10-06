@@ -16,18 +16,7 @@
     x-ref="input"
   />
   <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}; --label-text: #ffffff">
-    <svg
-      class="check-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 12l5 5L20 7" />
-    </svg>
+    {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span>{{ text }}</span>
       {% if hotkey %}<span class="label-hotkey">{{ hotkey }}</span>{% endif %}
@@ -49,18 +38,7 @@
     x-ref="input"
   />
   <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }}, '--label-text': '#ffffff' }">
-    <svg
-      class="check-icon"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <path d="M5 12l5 5L20 7" />
-    </svg>
+    {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span x-text="{{ text }}"></span>
       <template x-if="typeof hotkey !== 'undefined' && hotkey">

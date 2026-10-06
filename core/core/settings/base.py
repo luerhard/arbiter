@@ -103,6 +103,8 @@ TEMPLATES = [
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",
+                # {% heroicon_micro "plus" class="size-4" %} etc. in every template
+                "heroicons.templatetags.heroicons",
             ],
         },
     },

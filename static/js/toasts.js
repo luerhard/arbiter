@@ -13,43 +13,9 @@ function resolveToastVariant(tags) {
   return "info";
 }
 
-function iconSvg(icon, className) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "1.8");
-  svg.setAttribute("aria-hidden", "true");
-  svg.setAttribute("class", className);
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("stroke-linecap", "round");
-  path.setAttribute("stroke-linejoin", "round");
-
-  if (icon === "check-circle") {
-    path.setAttribute("d", "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  } else if (icon === "x-circle") {
-    path.setAttribute("d", "m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  } else {
-    path.setAttribute("d", "M12 16v-4.5m0-3h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  }
-
-  svg.appendChild(path);
-  return svg;
-}
-
 function applyToastVariant(element, tags) {
-  if (!element) return;
-
-  // colors come from .toast[data-variant=...] in main.css
-  const variant = resolveToastVariant(tags);
-  element.dataset.variant = variant;
-
-  const iconHost = element.querySelector("[data-toast-icon]");
-  if (iconHost) {
-    const icon = { success: "check-circle", error: "x-circle" }[variant] ?? "info-circle";
-    iconHost.replaceChildren(iconSvg(icon, "toast-icon"));
-  }
+  // colors and the matching icon come from .toast[data-variant=...] in main.css
+  if (element) element.dataset.variant = resolveToastVariant(tags);
 }
 
 function showToastElement(element, { delay = 2000 } = {}) {

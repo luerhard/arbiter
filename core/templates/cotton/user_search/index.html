@@ -9,18 +9,7 @@
     x-ref="searchArea"
     @focusout="$nextTick(() => { if (!$refs.searchArea.contains(document.activeElement)) open = false })"
   >
-    <svg
-      class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-3"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      aria-hidden="true"
-    >
-      <circle cx="11" cy="11" r="6" />
-      <path d="M20 20l-4.5-4.5" />
-    </svg>
+    {% heroicon_micro "magnifying-glass" class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-3" %}
     <input
       type="text"
       x-ref="searchInput"
@@ -53,17 +42,7 @@
           class="inline-flex size-5 cursor-pointer items-center justify-center rounded-full text-ink-3 hover:bg-line hover:text-ink"
           :aria-label="'Remove ' + u.username"
         >
-          <svg
-            class="size-3"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            stroke-linecap="round"
-            aria-hidden="true"
-          >
-            <path d="M6 6l12 12M18 6L6 18" />
-          </svg>
+          {% heroicon_micro "x-mark" class="size-3" %}
         </button>
       </span>
     </template>

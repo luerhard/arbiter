@@ -53,19 +53,7 @@ Home · Arbiter
   </section>
   {% else %}
   <section class="card flex flex-col items-center gap-2 px-6 py-14 text-center">
-    <svg
-      class="size-8 text-success"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.8"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      aria-hidden="true"
-    >
-      <circle cx="12" cy="12" r="9" />
-      <path d="M8 12.5l2.5 2.5L16 9.5" />
-    </svg>
+    {% heroicon_outline "check-circle" class="size-8 text-success" %}
     <h2 class="text-[15px] font-semibold">Nothing to do right now</h2>
     <p class="text-ink-2">New work shows up here when a batch reaches a phase you are part of.</p>
   </section>
@@ -75,17 +63,7 @@ Home · Arbiter
     <div class="flex items-end justify-between">
       <h2 class="text-lg font-semibold">Your projects</h2>
       <a href="{% url 'project-create' %}" class="btn btn-secondary btn-sm">
-        <svg
-          class="size-4"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          aria-hidden="true"
-        >
-          <path d="M12 5v14M5 12h14" />
-        </svg>
+        {% heroicon_micro "plus" class="size-4" %}
         New project
       </a>
     </div>
