@@ -1,0 +1,25 @@
+{% comment %}
+Labels per person, e.g. the result of Example.labels_by_user(phase): username -> annotations, or None if the person has
+not labeled the example yet. <c-sample.labels :by_user="before" empty_text="Nobody labeled this." />
+{% endcomment %}
+<c-vars by_user="" empty_text="No labels assigned." />
+{% if by_user %}
+<div class="grid grid-cols-[130px_1fr] items-center gap-x-4 gap-y-2.5">
+  {% for user, annotations in by_user.items %}
+  <span class="truncate text-ink-2">{{ user }}</span>
+  <div class="flex flex-wrap gap-1.5">
+    {% if annotations is None %}
+    <span class="text-[13px] text-ink-3">Not labeled yet</span>
+    {% else %}
+    {% for annotation in annotations %}
+    <span class="label-tag" style="--label-color: {{ annotation.label.color }}">{{ annotation.label.name }}</span>
+    {% empty %}
+    <span class="text-[13px] text-ink-3 italic">No label</span>
+    {% endfor %}
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<p class="text-[13px] text-ink-3">{{ empty_text }}</p>
+{% endif %}

@@ -57,7 +57,7 @@
     <div class="flex flex-col gap-0.5 pl-7">
       <a
         href="{% url 'project-detail' project.id %}"
-        class="nav-subitem {% if nav_url_name == 'project-detail-expert' or nav_url_name == 'project-detail-annotator' or nav_url_name == 'project-batch-create' %}nav-subitem-active{% endif %}"
+        class="nav-subitem {% if nav_url_name == 'project-detail-expert' or nav_url_name == 'project-detail-annotator' or nav_url_name == 'project-batch-create' or nav_url_name == 'project-batch-detail' or nav_url_name == 'project-sample-detail' %}nav-subitem-active{% endif %}"
         >Batches</a
       >
       {% if nav_codebook_id %}

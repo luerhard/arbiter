@@ -4,9 +4,11 @@ import "../css/main.css";
 import Alpine from "alpinejs";
 import focus from "@alpinejs/focus";
 import morph from "@alpinejs/morph";
+import sort from "@alpinejs/sort";
 window.Alpine = Alpine;
 Alpine.plugin(focus);
 Alpine.plugin(morph);
+Alpine.plugin(sort);
 
 import "@tailwindplus/elements";
 import htmx from "htmx.org";

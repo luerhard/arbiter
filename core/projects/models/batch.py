@@ -3,6 +3,7 @@ from collections import defaultdict
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db import transaction
 
 from .project_user import ProjectRole
 
@@ -106,6 +107,34 @@ class Batch(models.Model):
                 disagreements.append(example_id)
 
         return Example.objects.filter(id__in=disagreements)
+
+    @property
+    def can_reorder(self) -> bool:
+        """The order can change until the discussion starts; afterwards it is part of the record."""
+        return self.current_phase in (BatchPhase.SETUP, BatchPhase.ANNOTATION)
+
+    def set_example_order(self, example_ids: list[int]) -> None:
+        """Put the examples in this order. Annotators get them in it right away, and every
+        later phase follows it (see _create_example_assignments)."""
+        Example = apps.get_model("data", "Example")  # noqa: N806
+        ExampleAssignment = apps.get_model("data", "ExampleAssignment")  # noqa: N806
+
+        examples = {example.id: example for example in self.examples.all()}
+        if sorted(example_ids) != sorted(examples):
+            msg = "The new order must contain every example of the batch exactly once."
+            raise ValueError(msg)
+
+        with transaction.atomic():
+            for position, example_id in enumerate(example_ids, start=1):
+                examples[example_id].position = position
+            Example.objects.bulk_update(examples.values(), ["position"])
+
+            assignments = list(
+                ExampleAssignment.objects.filter(batch=self, phase=BatchPhase.ANNOTATION),
+            )
+            for assignment in assignments:
+                assignment.order = examples[assignment.example_id].position
+            ExampleAssignment.objects.bulk_update(assignments, ["order"])
 
     def all_annotators_finalized(self) -> bool:
         """True if every annotator has confirmed they are done annotating."""

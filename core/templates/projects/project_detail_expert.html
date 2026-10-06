@@ -51,8 +51,10 @@
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center gap-3.5">
             <h2 class="text-lg font-semibold">
-              Batch
-              {{ b.batch_number }}
+              <a href="{% url 'project-batch-detail' b.id %}" class="hover:underline"
+                >Batch
+                {{ b.batch_number }}</a
+              >
             </h2>
             <span class="text-[13px] text-ink-3"
               >{{ batch.length }}
@@ -82,6 +84,7 @@
               </button>
               <el-menu anchor="bottom end" popover class="menu">
                 <div class="menu-section">
+                  <a href="{% url 'project-batch-detail' b.id %}" class="menu-item">View samples</a>
                   <a
                     href="{{ project_export_batch_url }}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
                     class="menu-item"

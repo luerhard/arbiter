@@ -3,6 +3,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseBadRequest
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
@@ -141,8 +142,8 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
     def form_valid(self, form):
         batch = Batch.objects.create(project=self.project)
         Example.objects.bulk_create(
-            Example(batch=batch, content=text, metadata=metadata)
-            for text, metadata in form.examples
+            Example(batch=batch, content=text, metadata=metadata, position=position)
+            for position, (text, metadata) in enumerate(form.examples, start=1)
         )
         batch.users.add(
             *form.cleaned_data["annotators"], through_defaults={"role": ProjectRole.ANNOTATOR}
@@ -294,6 +295,109 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
             for batch in batches
         ]
         return context
+
+
+def _samples_table(batch) -> dict:
+    """The examples of a batch as table rows: metadata spread over one column per key, and
+    one column per person with their labels (None = not labeled yet, [] = no label).
+    Annotators always get a column, experts once they have decided something."""
+    examples = list(batch.examples.all())
+    columns = list(dict.fromkeys(key for example in examples for key in example.metadata))
+
+    people = {
+        (BatchPhase.ANNOTATION, user.id): {"name": user.username, "role": "Annotator"}
+        for user in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
+    }
+    labels = {}  # (example id, phase, user id) -> labels
+    done = (
+        batch.assignments.filter(
+            done__isnull=False,
+            phase__in=[BatchPhase.ANNOTATION, BatchPhase.EXPERT],
+        )
+        .select_related("user")
+        .prefetch_related("annotations__label")
+        .order_by("user__username")
+    )
+    for assignment in done:
+        key = (assignment.phase, assignment.user_id)
+        people.setdefault(key, {"name": assignment.user.username, "role": "Expert"})
+        found = sorted((a.label for a in assignment.annotations.all()), key=lambda lb: lb.name)
+        labels[(assignment.example_id, *key)] = found
+
+    annotators = [key for key in people if key[0] == BatchPhase.ANNOTATION]
+
+    def disagree(example) -> bool:
+        """Every annotator has labeled the example, and not all chose the same labels."""
+        chosen = [labels.get((example.id, *key)) for key in annotators]
+        if len(chosen) < 2 or None in chosen:
+            return False
+        return len({frozenset(label.id for label in found) for found in chosen}) > 1
+
+    return {
+        "batch": batch,
+        "examples": examples,
+        "metadata_columns": columns,
+        "people": list(people.values()),
+        "rows": [
+            {
+                "example": example,
+                "values": [example.metadata.get(c) for c in columns],
+                "labels": [labels.get((example.id, *key)) for key in people],
+                "disagreement": disagree(example),
+            }
+            for example in examples
+        ],
+    }
+
+
+class BatchSamplesView(ExpertRequiredMixin, DetailView):
+    """All examples of a batch as a table; while it can still change, experts drag rows
+    into the order in which annotators get them."""
+
+    model = Batch
+    pk_url_kwarg = "batch_id"
+    template_name = "projects/batch_samples.html"
+
+    def get_context_data(self, **kwargs):
+        return {**super().get_context_data(**kwargs), **_samples_table(self.object)}
+
+
+class SampleDetailView(ExpertRequiredMixin, View):
+    """One example with everything that happened to it: metadata, labels per phase, the chat
+    and the expert decision. Previous/next follow the batch order."""
+
+    def get(self, request, batch_id, example_id):
+        batch = get_object_or_404(Batch.objects.select_related("project"), id=batch_id)
+        examples = list(batch.examples.all())
+        example = get_object_or_404(Example, id=example_id, batch=batch)
+        index = examples.index(example)
+        context = {
+            "batch": batch,
+            "example": example,
+            "number": index + 1,
+            "previous": examples[index - 1] if index > 0 else None,
+            "next": examples[index + 1] if index + 1 < len(examples) else None,
+            "before": example.labels_by_user(BatchPhase.ANNOTATION),
+            "after": example.labels_by_user(BatchPhase.DISCUSSION),
+            "decision": example.labels_by_user(BatchPhase.EXPERT),
+            "chat": Message.objects.filter(example=example)
+            .exclude(user="system")
+            .order_by("created_at"),
+        }
+        return render(request, "projects/sample_detail.html", context)
+
+
+class BatchOrderView(ExpertRequiredMixin, View):
+    def post(self, request, batch_id):
+        batch = get_object_or_404(Batch, id=batch_id)
+        if not batch.can_reorder:
+            return HttpResponse("The order is fixed once the discussion has started.", status=409)
+        try:
+            batch.set_example_order([int(i) for i in request.POST.getlist("example")])
+        except ValueError as exc:
+            return HttpResponseBadRequest(str(exc))
+        messages.success(request, "Order saved.")
+        return render(request, "projects/partials/samples_rows.html", _samples_table(batch))
 
 
 class ChangeBatchPhase(ExpertRequiredMixin, View):

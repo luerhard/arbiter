@@ -92,6 +92,7 @@ Once a project is created, data samples must be grouped and uploaded in batches:
 2. In the modal dialog, select a dataset file (`CSV` or `XLSX` containing a `text` column) and select the designated annotators and experts for that batch.
    Every other column (for example an `id`, the source or a date) is kept as metadata of the sample and included in the exports, so you can join the labels back to your data.
    Every row needs a text; the upload is rejected and names the rows that are empty.
+   Put each piece of metadata in its own column, and save files from pandas with `df.to_csv(..., index=False)`; otherwise the row index is stored as an extra column called `Unnamed: 0`.
 3. Upon upload, the new batch appears in the project's **Batches** list in `Annotation` mode.
 
 :::{figure} screenshots/expert_upload_first_batch.png

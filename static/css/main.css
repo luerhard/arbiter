@@ -412,6 +412,11 @@
     @apply -mt-0.5 -mr-0.5 inline-flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-ink-3 hover:bg-subtle hover:text-ink;
   }
 
+  /* Row being dragged in a sortable list (Alpine x-sort) */
+  .sortable-ghost {
+    @apply bg-accent-soft opacity-60;
+  }
+
   /* Dropdown menu (Tailwind Plus <el-dropdown>/<el-menu>) */
   .menu {
     @apply w-60 rounded-[10px] border border-line bg-surface p-1.5 text-sm shadow-[0_12px_32px_rgb(11_13_16/0.14)] transition transition-discrete [--anchor-gap:--spacing(1.5)] data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in;

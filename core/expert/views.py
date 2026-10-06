@@ -74,16 +74,7 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
     batch = assignment.batch
     example = assignment.example
 
-    def annotations_by_user(phase: BatchPhase):
-        assignments = (
-            ExampleAssignment.objects.filter(batch=batch, example=example, phase=phase)
-            .select_related("user")
-            .prefetch_related("annotations__label")
-            .order_by("user__username")
-        )
-        return {a.user.username: list(a.annotations.all()) for a in assignments}
-
-    before_by_user = annotations_by_user(BatchPhase.ANNOTATION)
+    before_by_user = example.labels_by_user(BatchPhase.ANNOTATION)
 
     chat_messages = (
         Message.objects.filter(example=example).exclude(user="system").order_by("created_at")
@@ -104,7 +95,7 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         "example": example,
         "sentence": example,
         "prev_annotations": before_by_user,
-        "post_annotations": annotations_by_user(BatchPhase.DISCUSSION),
+        "post_annotations": example.labels_by_user(BatchPhase.DISCUSSION),
         # Presentational only (right-aligns this user's chat messages); an
         # example without annotation-phase assignments must not crash.
         "annotator": next(iter(before_by_user), None),

@@ -1,0 +1,72 @@
+{% comment %}
+Rows of the samples table. Dragging a row (Alpine x-sort) fires "reordered"; the form around the table then posts the
+example ids in their new order and swaps in these rows again.
+{% endcomment %}
+<tbody
+  id="samples"
+  class="divide-y divide-line"
+  {% if batch.can_reorder %}x-data
+  x-sort="$dispatch('reordered')"
+  x-sort:config="{ forceFallback: true }"
+  {% endif %}
+>
+  {% for row in rows %}
+  <tr class="bg-surface hover:bg-subtle" {% if batch.can_reorder %}x-sort:item{% endif %}>
+    {% if batch.can_reorder %}
+    <td class="py-2 pl-3">
+      <button
+        type="button"
+        x-sort:handle
+        class="btn btn-ghost btn-sm btn-icon cursor-grab"
+        aria-label="Move sample {{ forloop.counter }}"
+        title="Drag to move"
+      >
+        {% heroicon_mini "bars-3" class="size-5" %}
+      </button>
+      <input type="hidden" name="example" value="{{ row.example.id }}" />
+    </td>
+    {% endif %}
+    <td class="px-4 py-3 font-mono text-[13px] text-ink-3">
+      {# fixed slots, so the dot stays in place when the number gets more digits #}
+      <span class="flex items-center justify-end gap-2">
+        <span
+          class="size-2 shrink-0 rounded-full {% if row.disagreement %}bg-warning{% endif %}"
+          {% if row.disagreement %}title="The annotators disagree"
+          role="img"
+          aria-label="The annotators disagree"
+          {% endif %}
+        ></span>
+        <span class="w-8 text-right tabular-nums">{{ forloop.counter }}</span>
+      </span>
+    </td>
+    <td class="px-4 py-3">
+      <a
+        href="{% url 'project-sample-detail' batch.id row.example.id %}"
+        class="reading block max-w-md min-w-64 truncate text-[15px] hover:underline"
+        title="{{ row.example.content }}"
+        >{{ row.example.content }}</a
+      >
+    </td>
+    {% for labels in row.labels %}
+    <td class="px-4 py-3">
+      {% if labels is None %}
+      <span class="text-ink-3" title="Not labeled yet">–</span>
+      {% elif not labels %}
+      <span class="text-[13px] text-ink-3 italic">No label</span>
+      {% else %}
+      <div class="flex gap-1">
+        {% for label in labels %}
+        <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </td>
+    {% endfor %}
+    {% for value in row.values %}
+    <td class="max-w-56 truncate px-4 py-3 font-mono text-[13px] text-ink-2" title="{{ value|default_if_none:'' }}">
+      {{ value|default_if_none:"–" }}
+    </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>

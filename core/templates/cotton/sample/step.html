@@ -1,0 +1,19 @@
+{% comment %}
+One step of the trace: numbered circle in the phase color, a line down to the next step, a title and the content.
+<c-sample.step number="1" phase="A" title="Independent annotation" :last="False"> content </c-sample.step>
+{% endcomment %}
+<c-vars number="" phase="" title="" :last="False" />
+<div class="flex gap-4">
+  <div class="flex w-6 shrink-0 flex-col items-center" data-phase="{{ phase }}">
+    <span
+      class="flex size-6 items-center justify-center rounded-full text-xs font-semibold"
+      style="background: var(--phase-soft); color: var(--phase-ink)"
+      >{{ number }}</span
+    >
+    {% if not last %}<span class="w-0.5 flex-1 bg-line"></span>{% endif %}
+  </div>
+  <div class="flex min-w-0 flex-1 flex-col gap-2.5 {% if not last %}pb-5{% endif %}">
+    <h2 class="mt-0.5 font-semibold">{{ title }}</h2>
+    {{ slot }}
+  </div>
+</div>
