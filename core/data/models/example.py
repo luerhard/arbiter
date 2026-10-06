@@ -49,6 +49,8 @@ class Example(models.Model):
     objects = ExampleQuerySet.as_manager()
     batch = models.ForeignKey(Batch, related_name="examples", on_delete=models.CASCADE)
     content = models.TextField()
+    # the other columns of the uploaded file, by column name; exported next to the labels
+    metadata = models.JSONField(default=dict, blank=True)
 
     class Meta:
         ordering = ["pk"]

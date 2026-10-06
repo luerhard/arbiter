@@ -90,6 +90,8 @@ Once a project is created, data samples must be grouped and uploaded in batches:
 
 1. Navigate to the project dashboard and click **Create Batch**.
 2. In the modal dialog, select a dataset file (`CSV` or `XLSX` containing a `text` column) and select the designated annotators and experts for that batch.
+   Every other column (for example an `id`, the source or a date) is kept as metadata of the sample and included in the exports, so you can join the labels back to your data.
+   Every row needs a text; the upload is rejected and names the rows that are empty.
 3. Upon upload, the new batch appears in the project's **Batches** list in `Annotation` mode.
 
 :::{figure} screenshots/expert_upload_first_batch.png
@@ -171,6 +173,7 @@ When all annotations, discussions, and expert adjudications for a batch are comp
 
 - Click **Export** on an individual batch card to download its final labels, discussion transcripts, and revision history.
 - Click **Export Project** to download the complete dataset and full Git-backed audit trail for the entire project.
+- Both exports are JSON Lines files with one sample per line. The extra columns of the uploaded file appear under `metadata`, e.g. `"metadata": {"id": 4711, "source": "twitter"}`.
 
 :::{figure} screenshots/expert_export_project.png
 :width: 650px

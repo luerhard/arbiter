@@ -140,7 +140,10 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
 
     def form_valid(self, form):
         batch = Batch.objects.create(project=self.project)
-        Example.objects.bulk_create(Example(batch=batch, content=text) for text in form.texts)
+        Example.objects.bulk_create(
+            Example(batch=batch, content=text, metadata=metadata)
+            for text, metadata in form.examples
+        )
         batch.users.add(
             *form.cleaned_data["annotators"], through_defaults={"role": ProjectRole.ANNOTATOR}
         )
@@ -348,6 +351,7 @@ def _generate_batch_data(batch):
             row = {
                 "text_id": ex.id,
                 "text": ex.content,
+                "metadata": ex.metadata,
                 "labels_annotation": [],
                 "labels_discussion": [],
                 "messages_discussion": [],

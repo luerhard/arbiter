@@ -1,3 +1,4 @@
+import io
 import json
 import re
 import uuid
@@ -5,6 +6,7 @@ import uuid
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils.text import slugify
+import pandas as pd
 import pytest
 
 from data.models import ExampleAssignment
@@ -425,6 +427,25 @@ class TestExportBatchView:
             assert set(msg.keys()) == {"user", "at", "content"}
             assert self.ISO_WITH_MS_TZ_RE.match(msg["at"])
 
+    def test_export_batch_includes_example_metadata(self, client, project_annotation):
+        data = project_annotation
+        batch, example = data["batch"], data["example"]
+        example.metadata = {"id": 7, "source": "twitter"}
+        example.save()
+        assignment = ExampleAssignment.objects.get(
+            batch=batch,
+            user=data["annotators"][0],
+            example=example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        assignment.set_user_annotations(label_ids=[data["labels"][0].id])
+
+        client.login(username=data["expert"].username, password="123")
+        response = client.get(reverse("project-export-batch", args=(batch.id,)))
+
+        row = json.loads(response.content.decode("utf-8").splitlines()[0])
+        assert row["metadata"] == {"id": 7, "source": "twitter"}
+
     def test_export_batch_empty_when_no_assignment_completed(self, client, project_annotation):
         data = project_annotation
         batch = data["batch"]
@@ -540,4 +561,65 @@ class TestBatchUploadValidation:
 
         assert response.status_code == 200
         assert "column named 'text'" in response.context["form"].errors["file"][0]
+        assert project.batches.count() == batches_before
+
+    def test_other_columns_are_stored_as_metadata(self, client, project_annotation):
+        project = project_annotation["project"]
+        upload = SimpleUploadedFile(
+            "examples.csv",
+            b"id,text,source,score\n7,First,twitter,0.5\n8,Second,,\n",
+            content_type="text/csv",
+        )
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 302
+        batch = project.batches.order_by("-batch_number").first()
+        examples = list(batch.examples.order_by("pk"))
+        assert [e.content for e in examples] == ["First", "Second"]
+        assert examples[0].metadata == {"id": 7, "source": "twitter", "score": 0.5}
+        # empty cells are stored as None, not as NaN
+        assert examples[1].metadata == {"id": 8, "source": None, "score": None}
+
+    def test_excel_upload_stores_metadata(self, client, project_annotation):
+        # Regression: reading .xlsx needs openpyxl, which was not installed.
+        project = project_annotation["project"]
+        buffer = io.BytesIO()
+        pd.DataFrame({"text": ["First"], "speaker": ["A"], "year": [2020]}).to_excel(
+            buffer,
+            index=False,
+        )
+        upload = SimpleUploadedFile("examples.xlsx", buffer.getvalue())
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 302
+        example = project.batches.order_by("-batch_number").first().examples.get()
+        assert example.content == "First"
+        assert example.metadata == {"speaker": "A", "year": 2020}
+
+    def test_numeric_text_is_stored_as_text(self, client, project_annotation):
+        project = project_annotation["project"]
+        upload = SimpleUploadedFile("examples.csv", b"text\n123\n", content_type="text/csv")
+
+        self._post(client, project_annotation, upload)
+
+        example = project.batches.order_by("-batch_number").first().examples.get()
+        assert example.content == "123"
+        assert example.metadata == {}
+
+    def test_rows_without_text_are_rejected(self, client, project_annotation):
+        # Regression: an empty text cell became an example with the text "nan".
+        project = project_annotation["project"]
+        batches_before = project.batches.count()
+        upload = SimpleUploadedFile(
+            "examples.csv",
+            b"text,id\nFirst,1\n,2\n",
+            content_type="text/csv",
+        )
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 200
+        assert "Row 3" in response.context["form"].errors["file"][0]
         assert project.batches.count() == batches_before

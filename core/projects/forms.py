@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.core.exceptions import ValidationError
 import pandas as pd
@@ -97,7 +99,8 @@ class BatchCreateForm(forms.ModelForm):
         return cleaned
 
     def clean_file(self):
-        """Read the uploaded table; its "text" column becomes the batch's samples (self.texts)."""
+        """Read the uploaded table into self.examples: one (text, metadata) pair per row, where
+        metadata holds the row's other columns, e.g. {"id": 7, "source": "twitter"}."""
         file = self.cleaned_data["file"]
         name = (file.name or "").lower()
         if not (name.endswith(".csv") or name.endswith(".xlsx")):
@@ -111,7 +114,17 @@ class BatchCreateForm(forms.ModelForm):
         if "text" not in table.columns:
             msg = "The file needs a column named 'text'."
             raise ValidationError(msg)
-        self.texts = table["text"].tolist()
+
+        # via JSON, so that empty cells become None and dates/numbers plain JSON values
+        rows = json.loads(table.to_json(orient="records", date_format="iso"))
+        empty = [number for number, row in enumerate(rows, start=2) if row["text"] in (None, "")]
+        if empty:
+            listed = ", ".join(str(number) for number in empty[:5])
+            msg = (
+                f"Row {listed} has no text." if len(empty) == 1 else f"Rows {listed} have no text."
+            )
+            raise ValidationError(msg)
+        self.examples = [(str(row.pop("text")), row) for row in rows]
         return file
 
 
