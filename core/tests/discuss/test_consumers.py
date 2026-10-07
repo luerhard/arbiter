@@ -1,3 +1,4 @@
+import json
 import os
 import uuid
 
@@ -677,6 +678,150 @@ def test_discuss_resyncs_stale_room_state(redis_test_state, discussion_three_exa
         comm2 = await _connect(batch, user2)
         state = await _state_where(comm1, lambda s: s["cur_example_id"] == third.id)
         assert state["page"] == 2
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+
+async def _message_where(communicator, predicate):
+    while True:
+        message = await communicator.receive_json_from(timeout=3)
+        if predicate(message):
+            return message
+
+
+async def _save_one_after_the_other(comm1, comm2, user1, label_ids):
+    """Only the second save completes the example, so exactly one consumer saves."""
+    await comm1.send_json_to({"clicked-done": True, "labels": label_ids})
+    await _state_where(comm1, lambda s: s["clicked_done"].get(user1.username) == 1)
+    await comm2.send_json_to({"clicked-done": True, "labels": label_ids})
+
+
+def _system_messages(state):
+    return [m["text"] for m in state["messages"] if m["user"] == "system"]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_failed_save_keeps_room_usable(
+    redis_test_state,
+    discussion_three_examples,
+    monkeypatch,
+):
+    # Saving the decisions fails (here: once, for the second annotator). Before, the
+    # exception ended the consumer and left both Done flags set with locked buttons:
+    # the room could never continue. Now nothing is saved, everyone is told, the
+    # buttons unlock, and saving again works.
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+    original = ExampleAssignment.set_user_annotations
+    failures = []
+
+    def flaky(self, label_ids):
+        if self.phase == BatchPhase.DISCUSSION and self.user_id == user2.id and not failures:
+            failures.append(self)
+            msg = "database hiccup"
+            raise RuntimeError(msg)
+        return original(self, label_ids)
+
+    monkeypatch.setattr(ExampleAssignment, "set_user_annotations", flaky)
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+        await _state_where(comm2, lambda s: s["cur_example_id"])
+
+        await _save_one_after_the_other(comm1, comm2, user1, [label1.id])
+        for communicator in (comm1, comm2):
+            await _message_where(communicator, lambda m: m.get("save_failed"))
+        state = await room_state.get_state(batch.id)
+        assert set(state["clicked_done"].values()) == {0}
+        assert state["cur_example_id"] == first.id
+        assert "Saving failed. Please save your labels again." in _system_messages(state)
+        assert set(state["online_users"]) == {user1.username, user2.username}
+
+        # both connections are still alive: saving again works and moves on
+        state = await _both_decide(comm1, comm2, [label1.id], first.id)
+        assert state["cur_example_id"] == third.id
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    assert failures
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label1.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_failed_save_is_all_or_nothing(
+    redis_test_state,
+    discussion_three_examples,
+    monkeypatch,
+):
+    # the first annotator's decision must not stay saved when the second one fails
+    user1, user2, batch, (first, *_), (label1, _label2) = discussion_three_examples
+    original = ExampleAssignment.set_user_annotations
+
+    def failing(self, label_ids):
+        if self.phase == BatchPhase.DISCUSSION and self.user_id == user2.id:
+            msg = "database hiccup"
+            raise RuntimeError(msg)
+        return original(self, label_ids)
+
+    monkeypatch.setattr(ExampleAssignment, "set_user_annotations", failing)
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+        await _save_one_after_the_other(comm1, comm2, user1, [label1.id])
+        await _message_where(comm1, lambda m: m.get("save_failed"))
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert assignment.done is None
+        assert not assignment.annotations.exists()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "not json",
+        json.dumps({"clicked-done": True}),
+        json.dumps({"clicked-done": True, "labels": "1"}),
+        json.dumps({"clicked-done": True, "labels": [999_999_999]}),
+        json.dumps({"message": 123}),
+    ],
+)
+def test_discuss_bad_message_keeps_room_usable(redis_test_state, discussion_three_examples, bad):
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+
+        await comm1.send_to(text_data=bad)
+        state = await _state_where(
+            comm1,
+            lambda s: any("Saving failed" in t or "went wrong" in t for t in _system_messages(s)),
+        )
+        assert set(state["clicked_done"].values()) == {0}
+
+        state = await _both_decide(comm1, comm2, [label1.id], first.id)
+        assert state["cur_example_id"] == third.id
+
         await comm1.disconnect()
         await comm2.disconnect()
 

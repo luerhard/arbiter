@@ -6,6 +6,7 @@ from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
+from django.db import transaction
 
 from .models import Message
 from .models import Room
@@ -95,12 +96,51 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close(code=1000)
 
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        # An exception escaping here would end the consumer: the socket closes, disconnect()
+        # never runs, and a half-done save leaves both Done flags set with locked buttons,
+        # so the room can never continue. Recover instead and let the users retry.
+        saving = False
+        try:
+            data = json.loads(text_data)
+            saving = isinstance(data, dict) and "clicked-done" in data
+            await self._handle(data)
+        except Exception:
+            log.exception(f"Batch {self.batch_id}: handling a message of {self.username} failed")
+            await self._recover(saving)
+
+    async def _recover(self, saving: bool):
+        """Put the room back into a state the users can retry from, and tell them."""
+        try:
+            if saving:
+
+                async def mut(state):
+                    state["clicked_done"] = dict.fromkeys(state["clicked_done"], 0)
+                    return state
+
+                await update_state(self.batch_id, mut)
+                msg = "Saving failed. Please save your labels again."
+            else:
+                msg = f"Something went wrong with the last action of {self.username}."
+            await self._append_chat_message(username="system", message=msg)
+            await self.group_send_state()
+            if saving:
+                await self.channel_layer.group_send(  # type: ignore
+                    self.room_group_name,
+                    {"type": "save_failed"},
+                )
+        except Exception:
+            # e.g. Redis is down: nothing more to do here, the users can reload
+            log.exception(f"Batch {self.batch_id}: recovering from the error failed")
+
+    async def _handle(self, data):
         log.debug(f"Received: {data}")
 
         if "message" in data.keys():
             message = data["message"]
             username = self.user.username
+            if not isinstance(message, str):
+                msg = f"message must be a string, got {message!r}"
+                raise TypeError(msg)
 
             # return instantly if message is empty
             if not message.strip():
@@ -121,7 +161,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
 
         elif "clicked-done" in data.keys():
-            labels = list(data["labels"])
+            labels = await self._validated_labels(data.get("labels"))
 
             await self._store_discussion_labels(self.username, labels)
             log.debug(f"{self.username} clicked done.")
@@ -138,25 +178,40 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # ---------- LABEL HELPERS -----------------
     @database_sync_to_async
+    def _validated_labels(self, labels) -> list[int]:
+        """The label ids a client sent, if they all are labels of this project."""
+        if not isinstance(labels, list) or not all(
+            isinstance(i, int) and not isinstance(i, bool) for i in labels
+        ):
+            msg = f"labels must be a list of label ids, got {labels!r}"
+            raise ValueError(msg)
+        unknown = set(labels) - set(self.batch.labels.values_list("id", flat=True))
+        if unknown:
+            msg = f"labels {sorted(unknown)} are not labels of this project"
+            raise ValueError(msg)
+        return labels
+
+    @database_sync_to_async
     def save_labels_to_db(self):
-        """Write cached labels to DB for all users for the given example."""
+        """Write cached labels to DB for all users for the given example: for all of them
+        or, if anything fails, for none."""
         state = async_to_sync(self._get_state)()
 
         example = Example.objects.get(pk=state["cur_example_id"])
 
-        # save per user
-        for username, label_ids in (state["discussion_labels"] or {}).items():
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
-                continue
-            assignment = ExampleAssignment.objects.filter(
-                user=user,
-                example=example,
-                batch=self.batch,
-                phase=BatchPhase.DISCUSSION,
-            ).get()
-            assignment.set_user_annotations(label_ids=label_ids)
+        with transaction.atomic():
+            for username, label_ids in (state["discussion_labels"] or {}).items():
+                try:
+                    user = User.objects.get(username=username)
+                except User.DoesNotExist:
+                    continue
+                assignment = ExampleAssignment.objects.filter(
+                    user=user,
+                    example=example,
+                    batch=self.batch,
+                    phase=BatchPhase.DISCUSSION,
+                ).get()
+                assignment.set_user_annotations(label_ids=label_ids)
 
     async def _store_discussion_labels(self, username, labels):
         async def mut(state):
@@ -288,6 +343,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 ensure_ascii=False,
             ),
         )
+
+    async def save_failed(self, event):  # noqa: ARG002
+        """Saving failed: the clients unlock their labels so the users can save again."""
+        await self.send(text_data=json.dumps({"save_failed": True}))
 
     async def chat_typing(self, event):
         if event["user"] == self.username:

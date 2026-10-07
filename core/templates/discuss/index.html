@@ -244,6 +244,13 @@ Discuss · Batch
 
     console.log('WebSocket Message Received: ', data);
 
+    if ('save_failed' in data) {
+      // nothing was saved and the server reset everyone's Done: let the users save again
+      Alpine.store('save_disabled', false);
+      window.dispatchEvent(new CustomEvent('unlock-labels'));
+      return;
+    }
+
     if ('done' in data) {
       const intervalID = setInterval(close_room, 60000, data);
       console.log(intervalID);
