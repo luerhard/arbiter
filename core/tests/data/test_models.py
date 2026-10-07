@@ -1,6 +1,9 @@
+import threading
+import time
 import uuid
 
 from django.contrib.auth import get_user_model
+from django.db import connection
 from django.utils import timezone
 import pytest
 
@@ -83,6 +86,54 @@ def test_example_assignment_set_user_annotations_replaces_labels_only():
     assert labels == [label2.id]
     assert assignment.phase == BatchPhase.ANNOTATION
     assert assignment.done is not None
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("second", ["same", "other"])
+def test_concurrent_saves_of_an_assignment_keep_the_last_one(monkeypatch, second):
+    # Two saves of the same assignment at once (double click, two tabs): before, both
+    # deleted the old labels and both inserted theirs. With a label in common, the
+    # second failed on the unique constraint (a 500, seen in production); with
+    # different labels, the labels of both stayed. Now the second waits for the first.
+    data = _setup_example_assignment()
+    assignment = data["assignment"]
+    label1, label2 = data["labels"]
+    labels_b = [label1.id] if second == "same" else [label2.id]
+
+    first_inside = threading.Event()
+    let_first_finish = threading.Event()
+    original_bulk_create = Annotation.objects.bulk_create
+
+    def bulk_create(objs, *args, **kwargs):
+        if threading.current_thread().name == "first":
+            first_inside.set()
+            let_first_finish.wait(timeout=10)
+        return original_bulk_create(objs, *args, **kwargs)
+
+    monkeypatch.setattr(Annotation.objects, "bulk_create", bulk_create)
+    errors = []
+
+    def save(label_ids):
+        try:
+            ExampleAssignment.objects.get(pk=assignment.pk).set_user_annotations(label_ids)
+        except Exception as e:  # noqa: BLE001
+            errors.append(e)
+        finally:
+            connection.close()
+
+    first = threading.Thread(target=save, args=([label1.id],), name="first")
+    first.start()
+    assert first_inside.wait(timeout=10)
+    second_save = threading.Thread(target=save, args=(labels_b,), name="second")
+    second_save.start()
+    time.sleep(0.5)  # the second save is now waiting for the first, or racing it
+    let_first_finish.set()
+    first.join(timeout=10)
+    second_save.join(timeout=10)
+
+    assert errors == []
+    labels = Annotation.objects.filter(assignment=assignment).values_list("label_id", flat=True)
+    assert list(labels) == labels_b
 
 
 @pytest.mark.django_db
