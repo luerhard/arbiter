@@ -136,37 +136,8 @@ class ProjectCreateView(FormView):
                 for user in form.cleaned_data[field]
             ],
         )
-        Label.objects.bulk_create(
-            Label(project=self.project, **label) for label in _labels_from_post(self.request.POST)
-        )
+        Label.objects.bulk_create(Label(project=self.project, **label) for label in form.labels)
         return super().form_valid(form)
-
-
-def _labels_from_post(post) -> list[dict]:
-    """The label rows of the project form, minus empty names and duplicate names or keys."""
-    default_color = Label._meta.get_field("color").default
-    labels = []
-    seen_names, seen_hotkeys = set(), set()
-    rows = zip(
-        post.getlist("label_name"),
-        post.getlist("label_color"),
-        post.getlist("label_hotkey"),
-        strict=False,
-    )
-    for name, color, hotkey in rows:
-        name = (name or "").strip()
-        hotkey = (hotkey or "").strip() or None
-        if not name or name.lower() in seen_names:
-            continue
-        seen_names.add(name.lower())
-        if hotkey and hotkey.lower() in seen_hotkeys:
-            continue
-        if hotkey:
-            seen_hotkeys.add(hotkey.lower())
-        labels.append(
-            {"name": name, "color": (color or "").strip() or default_color, "hotkey": hotkey}
-        )
-    return labels
 
 
 class ProjectBatchCreateView(ExpertRequiredMixin, FormView):

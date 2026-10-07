@@ -13,6 +13,7 @@ import pytest
 
 from data.models import Example
 from data.models import ExampleAssignment
+from data.models import Label
 from discuss.models import Message
 from discuss.models import Room
 from projects.models import Batch
@@ -243,6 +244,70 @@ class TestProjectAndBatchCreationViews:
         assert 'value="#457b9d"' in content
         # the user search shows them again (a template filter here used to swallow them)
         assert f"userPicker('annotators', [{{\"id\": {annotator.id}," in content
+
+    @pytest.mark.parametrize(
+        ("names", "hotkeys", "error"),
+        [
+            (
+                ["Positive", "Sarcasm"],
+                ["p", "P"],
+                "The key 'p' is used for more than one label: Positive, Sarcasm.",
+            ),
+            (
+                ["Irony", "irony "],
+                ["", ""],
+                "The label name 'irony' is used for more than one label: Irony, irony.",
+            ),
+        ],
+        ids=["key", "name"],
+    )
+    def test_create_project_refuses_labels_used_twice(self, client, names, hotkeys, error):
+        # Regression: one of the labels was dropped without a word
+        suffix = uuid.uuid4().hex[:8]
+        annotator = User.objects.create_user(username=f"ann_dup_{suffix}", password="123")
+        expert = User.objects.create_user(username=f"exp_dup_{suffix}", password="123")
+        assert client.login(username="expert1", password="123")
+
+        response = client.post(
+            reverse("project-create"),
+            {
+                "name": f"Duplicate Labels {suffix}",
+                "annotators": [annotator.id],
+                "experts": [expert.id],
+                "label_name": names,
+                "label_color": ["", ""],
+                "label_hotkey": hotkeys,
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.context["form"].non_field_errors() == [error]
+        assert not Project.objects.filter(name=f"Duplicate Labels {suffix}").exists()
+
+    def test_create_project_labels_without_color_or_key(self, client):
+        suffix = uuid.uuid4().hex[:8]
+        annotator = User.objects.create_user(username=f"ann_lab_{suffix}", password="123")
+        expert = User.objects.create_user(username=f"exp_lab_{suffix}", password="123")
+        assert client.login(username="expert1", password="123")
+
+        client.post(
+            reverse("project-create"),
+            {
+                "name": f"Plain Labels {suffix}",
+                "annotators": [annotator.id],
+                "experts": [expert.id],
+                "label_name": [" Irony ", "", "Offensive"],
+                "label_color": ["", "#000000", "#d64545"],
+                "label_hotkey": ["", "x", "o"],
+            },
+        )
+
+        project = Project.objects.get(name=f"Plain Labels {suffix}")
+        default_color = Label._meta.get_field("color").default
+        assert sorted(project.labels.values_list("name", "color", "hotkey")) == [
+            ("Irony", default_color, None),
+            ("Offensive", "#d64545", "o"),
+        ]
 
     def test_create_project_form_starts_with_one_empty_label_row(self, client):
         assert client.login(username="expert1", password="123")

@@ -4,6 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 import pandas as pd
 
+from data.models import Label
 from projects.models import Batch
 from users.models import User
 
@@ -41,6 +42,7 @@ class ProjectCreateForm(forms.Form):
 
     def clean(self):
         cleaned = super().clean()
+        self.labels = self._clean_labels()
         annotators = set(cleaned.get("annotators") or [])
         experts = set(cleaned.get("experts") or [])
         overlap = annotators & experts
@@ -49,6 +51,39 @@ class ProjectCreateForm(forms.Form):
             msg = f"Users cannot be both annotator and expert: {names}"
             raise ValidationError(msg)
         return cleaned
+
+    def _clean_labels(self) -> list[dict]:
+        """The label rows (not Django form fields), without empty rows. A name or key used
+        twice is an error: dropping one of the labels would go unnoticed."""
+        default_color = Label._meta.get_field("color").default
+        rows = zip(
+            self.data.getlist("label_name"),
+            self.data.getlist("label_color"),
+            self.data.getlist("label_hotkey"),
+            strict=False,
+        )
+        labels = []
+        for name, color, hotkey in rows:
+            name = (name or "").strip()
+            if name:
+                labels.append(
+                    {
+                        "name": name,
+                        "color": (color or "").strip() or default_color,
+                        "hotkey": (hotkey or "").strip() or None,
+                    },
+                )
+        for field, what in (("name", "label name"), ("hotkey", "key")):
+            used = {}
+            for label in labels:
+                if label[field]:
+                    used.setdefault(label[field].lower(), []).append(label["name"])
+            for value, names in used.items():
+                if len(names) > 1:
+                    listed = ", ".join(names)
+                    msg = f"The {what} '{value}' is used for more than one label: {listed}."
+                    self.add_error(None, msg)
+        return labels
 
 
 class BatchCreateForm(forms.ModelForm):
