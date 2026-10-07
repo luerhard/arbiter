@@ -4,6 +4,7 @@ import shutil
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.db.models import Count
 from django.http import HttpResponseBadRequest
 from django.http import HttpResponseForbidden
 from django.shortcuts import HttpResponse
@@ -11,6 +12,7 @@ from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
+from django.template.defaultfilters import pluralize
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
@@ -218,6 +220,61 @@ def _phase_steps(batch) -> list[dict]:
     return steps
 
 
+def _open_work(batch) -> str:
+    """What is still open in the batch's current phase, for the confirmation before an
+    expert moves it on by hand; empty when the phase is complete."""
+    phase = batch.current_phase
+    if phase == BatchPhase.ANNOTATION:
+        open_per_user = (
+            batch.assignments.filter(phase=phase, done__isnull=True)
+            .values_list("user__username")
+            .annotate(n=Count("id"))
+            .order_by("user__username")
+        )
+        if not open_per_user:
+            return ""
+        who = ", ".join(
+            f"{name} has {n} unlabeled sample{pluralize(n)}" for name, n in open_per_user
+        )
+        return f"{who}. Samples that not every annotator labeled count as disagreements."
+    if phase == BatchPhase.DISCUSSION:
+        open_count = batch.open_discussion_examples().count()
+        if not open_count:
+            return ""
+        total = batch.discussion_examples().count()
+        return (
+            f"{open_count} of {total} disagreements {pluralize(open_count, 'is,are')} not "
+            "discussed yet. They stay disagreements."
+        )
+    if phase == BatchPhase.EXPERT:
+        open_count = (
+            batch.assignments.filter(phase=phase, done__isnull=True)
+            .values("example")
+            .distinct()
+            .count()
+        )
+        if open_count:
+            are = pluralize(open_count, "is,are")
+            return f"{open_count} expert decision{pluralize(open_count)} {are} still open."
+    return ""
+
+
+def _phase_menu(batch, open_work: str) -> list[dict]:
+    """The phase menu of a batch card. Moving on to a later phase while the current one is
+    unfinished asks for confirmation first (confirm=True: the menu item opens a dialog)."""
+    phases = list(BatchPhase)
+    current = phases.index(batch.current_phase)
+    return [
+        {
+            "phase": phase,
+            "label": phase.label,
+            "current": index == current,
+            "confirm": bool(open_work) and index > current,
+        }
+        for index, phase in enumerate(phases)
+    ]
+
+
 class _ProjectPageMixin:
     """Shared by both project pages: the team and codebook for the side column, and the
     user's role per batch (self.batch_roles: batch id -> role)."""
@@ -276,9 +333,11 @@ class ProjectExpertDetailView(ExpertRequiredMixin, _ProjectPageMixin, DetailView
             assignments__phase=BatchPhase.EXPERT,
             assignments__done__isnull=False,
         ).count()
+        open_work = _open_work(batch)
         return {
             "batch": batch,
-            "batch_phase_form": BatchPhaseForm(instance=batch),
+            "phase_menu": _phase_menu(batch, open_work),
+            "open_work": open_work,
             "is_batch_expert": self.batch_roles.get(batch.id) == ProjectRole.EXPERT,
             "steps": _phase_steps(batch),
             "length": length,
@@ -440,6 +499,8 @@ class ChangeBatchPhase(ExpertRequiredMixin, View):
             batch.set_phase(new.current_phase, actor=request.user)
             phase = batch.get_current_phase_display()
             messages.success(request, f"Phase updated to {phase}.")
+            if not request.htmx:  # the confirmation dialog posts a plain form
+                return redirect("project-detail", project_id=batch.project_id)
             response = HttpResponse(status=204)
             response["HX-Refresh"] = "true"
             return response

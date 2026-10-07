@@ -313,7 +313,7 @@ class TestViews:
         login = client.login(username="expert1", password="123")
         assert login == True
         data = {"current_phase": "A"}
-        req = client.post(url, data)
+        req = client.post(url, data, HTTP_HX_REQUEST="true")  # the phase menu uses htmx
         assert req.status_code == 204
 
     def test_delete_batch_as_annotator(self, client):
@@ -734,3 +734,68 @@ class TestBatchUploadValidation:
         assert response.status_code == 200
         assert "Row 3" in response.context["form"].errors["file"][0]
         assert project.batches.count() == batches_before
+
+
+@pytest.mark.django_db
+class TestPhaseMenu:
+    """Moving a batch on by hand while its phase is unfinished asks for confirmation."""
+
+    def _card(self, client, data):
+        client.login(username=data["expert"].username, password="123")
+        response = client.get(reverse("project-detail-expert", args=(data["project"].id,)))
+        [card] = response.context["batches"]
+        confirm = {item["phase"] for item in card["phase_menu"] if item["confirm"]}
+        return card, confirm, response.content.decode()
+
+    def test_unlabeled_samples_need_confirmation_to_move_on(self, client, project_annotation):
+        a1, a2 = project_annotation["annotators"]
+        label1, _ = project_annotation["labels"]
+        batch = project_annotation["batch"]
+        ExampleAssignment.objects.get(user=a1, phase=BatchPhase.ANNOTATION).set_user_annotations(
+            [label1.id]
+        )
+
+        card, confirm, content = self._card(client, project_annotation)
+
+        # moving back leaves nothing open behind
+        assert confirm == {BatchPhase.DISCUSSION, BatchPhase.EXPERT, BatchPhase.FINAL}
+        assert card["open_work"].startswith(f"{a2.username} has 1 unlabeled sample.")
+        assert a1.username not in card["open_work"]
+        dialog = f'id="move-batch-{batch.id}-D"'
+        assert dialog in content
+        assert f'commandfor="move-batch-{batch.id}-D"' in content
+        assert '<input type="hidden" name="current_phase" value="D"' in content
+
+    def test_finished_annotation_moves_on_without_confirmation(self, client, project_annotation):
+        label1, _ = project_annotation["labels"]
+        for assignment in ExampleAssignment.objects.filter(phase=BatchPhase.ANNOTATION):
+            assignment.set_user_annotations([label1.id])
+
+        card, confirm, content = self._card(client, project_annotation)
+
+        assert (card["open_work"], confirm) == ("", set())
+        assert "move-batch-" not in content
+
+    def test_open_discussion_needs_confirmation_to_move_on(self, client, project_discussion):
+        card, confirm, _ = self._card(client, project_discussion)
+
+        assert confirm == {BatchPhase.EXPERT, BatchPhase.FINAL}
+        assert card["open_work"].startswith("1 of 1 disagreements is not discussed yet.")
+
+    @pytest.mark.parametrize("htmx", [True, False], ids=["menu", "dialog"])
+    def test_moving_the_batch(self, client, project_annotation, htmx):
+        batch = project_annotation["batch"]
+        client.login(username=project_annotation["expert"].username, password="123")
+        headers = {"HTTP_HX_REQUEST": "true"} if htmx else {}
+
+        response = client.post(
+            reverse("change-batch-phase", args=(batch.id,)),
+            {"current_phase": BatchPhase.DISCUSSION},
+            **headers,
+        )
+
+        # the dialog posts a plain form: back to the project page instead of an empty page
+        expected = 204 if htmx else 302
+        assert response.status_code == expected
+        batch.refresh_from_db()
+        assert batch.current_phase == BatchPhase.DISCUSSION

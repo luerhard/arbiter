@@ -79,6 +79,10 @@ class Batch(models.Model):
         return self.users.filter(batchuser__role=role).distinct()
 
     def disagreements(self, phase):
+        """The examples the annotators have not agreed on in this phase: different labels, or
+        someone has not saved theirs yet. Normally everyone has saved before the batch moves
+        on; when an expert moves it on by hand earlier, a missing label must not count as
+        "no labels", which would turn it into an agreement nobody made."""
         Example = apps.get_model("data", "Example")
         ExampleAssignment = apps.get_model("data", "ExampleAssignment")
 
@@ -93,9 +97,12 @@ class Batch(models.Model):
         ).prefetch_related("annotations")
 
         by_example = defaultdict(dict)
+        unsaved = set()
         for assignment in assignments:
             label_ids = [annotation.label_id for annotation in assignment.annotations.all()]
             by_example[assignment.example_id][assignment.user_id] = label_ids
+            if assignment.done is None:
+                unsaved.add(assignment.example_id)
 
         disagreements = []
         required_user_count = len(annotators)
@@ -103,7 +110,7 @@ class Batch(models.Model):
             if len(user_labels) != required_user_count:
                 continue
             unique_label_sets = {frozenset(labels) for labels in user_labels.values()}
-            if len(unique_label_sets) > 1:
+            if len(unique_label_sets) > 1 or example_id in unsaved:
                 disagreements.append(example_id)
 
         return Example.objects.filter(id__in=disagreements)

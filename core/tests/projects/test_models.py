@@ -9,7 +9,6 @@ import pytest
 
 from data.models import Example
 from data.models.example_assignment import ExampleAssignment
-from data.models.models import Annotation
 from data.models.models import Label
 from projects.models import Batch
 from projects.models import BatchPhase
@@ -70,10 +69,10 @@ def _create_project_with_batch():
     a22 = ExampleAssignment.objects.filter(example=ex2, user=annotator2).get()
 
     # disagreement on ex1, agreement on ex2
-    Annotation.objects.create(assignment=a11, label=label1)
-    Annotation.objects.create(assignment=a12, label=label2)
-    Annotation.objects.create(assignment=a21, label=label1)
-    Annotation.objects.create(assignment=a22, label=label1)
+    a11.set_user_annotations([label1.id])
+    a12.set_user_annotations([label2.id])
+    a21.set_user_annotations([label1.id])
+    a22.set_user_annotations([label1.id])
 
     return {
         "project": project,
@@ -150,8 +149,8 @@ def test_batch_set_phase_expert_creates_assignments_for_discussion_disagreements
     assert disc_ex1.count() == 2
     assert disc_ex2.count() == 0
 
-    Annotation.objects.create(assignment=disc_ex1[0], label=label1)
-    Annotation.objects.create(assignment=disc_ex1[1], label=label2)
+    disc_ex1[0].set_user_annotations([label1.id])
+    disc_ex1[1].set_user_annotations([label2.id])
 
     batch.set_phase(BatchPhase.EXPERT)
 
@@ -216,8 +215,7 @@ def test_advance_to_final_when_no_disagreements():
 
     # remove the only disagreement so both annotators agree on every example
     a12 = ExampleAssignment.objects.get(example=ex1, user=annotator2)
-    a12.annotations.all().delete()
-    Annotation.objects.create(assignment=a12, label=label1)
+    a12.set_user_annotations([label1.id])
     assert batch.disagreements(BatchPhase.ANNOTATION).count() == 0
 
     _finalize(batch, annotator1, annotator2)
@@ -260,8 +258,7 @@ def _resolve_all_disagreements(data):
     ex1 = data["examples"][0]
     label1 = data["labels"][0]
     a12 = ExampleAssignment.objects.get(example=ex1, user=data["annotators"][1])
-    a12.annotations.all().delete()
-    Annotation.objects.create(assignment=a12, label=label1)
+    a12.set_user_annotations([label1.id])
 
 
 @pytest.mark.django_db
@@ -342,8 +339,8 @@ def test_advance_from_discussion_to_expert_when_disagreements_remain():
         "id",
     )
     # still disagreeing after discussion
-    Annotation.objects.create(assignment=disc[0], label=label1)
-    Annotation.objects.create(assignment=disc[1], label=label2)
+    disc[0].set_user_annotations([label1.id])
+    disc[1].set_user_annotations([label2.id])
 
     result = batch.advance_from_discussion()
 
@@ -368,7 +365,7 @@ def test_advance_from_discussion_to_final_when_resolved_starts_next_batch():
     disc = ExampleAssignment.objects.filter(example=ex1, phase=BatchPhase.DISCUSSION)
     # both annotators agree after discussion -> no expert decisions needed
     for assignment in disc:
-        Annotation.objects.create(assignment=assignment, label=label1)
+        assignment.set_user_annotations([label1.id])
 
     result = batch.advance_from_discussion()
 
@@ -409,6 +406,46 @@ def test_project_batch_state_indicators():
     assert project.annotator_n_active_batches == 0
     assert project.annotator_any_annotation_batches is False
     assert project.annotator_any_discussion_batches is False
+
+
+@pytest.mark.django_db
+def test_moving_on_by_hand_discusses_what_an_annotator_has_not_labeled():
+    """The expert moves the batch on while annotator2 has not labeled example 3, which
+    annotator1 saved without labels: that must not count as both choosing no labels."""
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1, ex2 = data["examples"]
+    annotator1, annotator2 = data["annotators"]
+    ex3 = Example.objects.create(batch=batch, content="Example 3")
+    batch.set_phase(BatchPhase.ANNOTATION)  # hands out example 3
+    _assignment(batch, ex3, annotator1, BatchPhase.ANNOTATION).set_user_annotations([])
+
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    assert set(batch.discussion_examples()) == {ex1, ex3}
+    assert set(batch.disagreements(BatchPhase.ANNOTATION)) == {ex1, ex3}
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("saved_by", [(), (0,)], ids=["nobody-saved", "one-saved"])
+def test_moving_to_expert_by_hand_sends_undiscussed_examples_to_the_expert(saved_by):
+    data = _create_project_with_batch()
+    batch = data["batch"]
+    ex1, _ = data["examples"]
+    label1, _ = data["labels"]
+    batch.set_phase(BatchPhase.DISCUSSION)
+    for index in saved_by:
+        annotator = data["annotators"][index]
+        _assignment(batch, ex1, annotator, BatchPhase.DISCUSSION).set_user_annotations([label1.id])
+
+    batch.set_phase(BatchPhase.EXPERT)
+
+    assert ExampleAssignment.objects.filter(
+        batch=batch,
+        phase=BatchPhase.EXPERT,
+        example=ex1,
+        user=data["expert"],
+    ).exists()
 
 
 @pytest.mark.django_db

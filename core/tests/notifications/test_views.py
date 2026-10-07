@@ -43,6 +43,7 @@ class TestPhaseChangeCreatesNotifications:
         response = client.post(
             reverse("change-batch-phase", args=[batch.id]),
             data={"current_phase": BatchPhase.DISCUSSION},
+            HTTP_HX_REQUEST="true",
         )
 
         assert response.status_code == 204

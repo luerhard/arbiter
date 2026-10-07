@@ -4,8 +4,9 @@ with a button that has command="show-modal" and commandfor set to the dialog id,
 <c-confirm-dialog id="delete-project-1" title="Delete project?" action="/projects/1/delete" confirm="Delete project">
   What will be lost.
 </c-confirm-dialog>
+Hidden inputs for the form go into the optional "fields" slot: <c-slot name="fields">...</c-slot>
 {% endcomment %}
-<c-vars id="" title="" action="" confirm="Delete" />
+<c-vars id="" title="" action="" confirm="Delete" fields="" />
 <el-dialog>
   <dialog
     id="{{ id }}"
@@ -30,6 +31,7 @@ with a button that has command="show-modal" and commandfor set to the dialog id,
         </div>
         <form method="post" action="{{ action }}" class="mt-6 flex flex-row-reverse gap-2.5">
           {% csrf_token %}
+          {{ fields }}
           <button type="submit" class="btn btn-danger-solid">{{ confirm }}</button>
           <button type="button" command="close" commandfor="{{ id }}" class="btn btn-secondary">Cancel</button>
         </form>
