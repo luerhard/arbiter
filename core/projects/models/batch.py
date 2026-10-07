@@ -108,6 +108,24 @@ class Batch(models.Model):
 
         return Example.objects.filter(id__in=disagreements)
 
+    def discussion_examples(self):
+        """The examples to discuss, in batch order: the disagreements as they were when
+        the batch entered the discussion, i.e. the examples with DISCUSSION assignments.
+        Unlike disagreements(), this does not change when labels change afterwards."""
+        Example = apps.get_model("data", "Example")  # noqa: N806
+        return Example.objects.filter(
+            assignments__batch=self,
+            assignments__phase=BatchPhase.DISCUSSION,
+        ).distinct()
+
+    def open_discussion_examples(self):
+        """Discussion examples where not every annotator has saved a decision yet."""
+        return self.discussion_examples().filter(
+            assignments__batch=self,
+            assignments__phase=BatchPhase.DISCUSSION,
+            assignments__done__isnull=True,
+        )
+
     @property
     def can_reorder(self) -> bool:
         """The order can change until the discussion starts; afterwards it is part of the record."""

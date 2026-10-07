@@ -253,7 +253,10 @@ class ProjectExpertDetailView(ExpertRequiredMixin, _ProjectPageMixin, DetailView
 
     def _batch_card(self, batch) -> dict:
         """Everything a batch card shows: phase stepper, progress per annotator, open decisions."""
-        annotation_disagreements = batch.disagreements(BatchPhase.ANNOTATION)
+        # once the discussion started, its examples are fixed; before, count live
+        discussion_examples = batch.discussion_examples()
+        if not discussion_examples.exists():
+            discussion_examples = batch.disagreements(BatchPhase.ANNOTATION)
         discussion_disagreements = batch.disagreements(BatchPhase.DISCUSSION)
         length = batch.examples.count()
 
@@ -264,10 +267,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, _ProjectPageMixin, DetailView
                 {
                     "user": annotator,
                     "annotated": done.filter(phase=BatchPhase.ANNOTATION).count(),
-                    "discussed": done.filter(
-                        phase=BatchPhase.DISCUSSION,
-                        example__in=annotation_disagreements,
-                    ).count(),
+                    "discussed": done.filter(phase=BatchPhase.DISCUSSION).count(),
                 },
             )
 
@@ -285,7 +285,7 @@ class ProjectExpertDetailView(ExpertRequiredMixin, _ProjectPageMixin, DetailView
             "users": users,
             "annotated_total": sum(u["annotated"] for u in users),
             "annotated_max": length * len(users),
-            "disagreement": annotation_disagreements.count(),
+            "disagreement": discussion_examples.count(),
             "discussed": users[0]["discussed"] if users else 0,
             "disc_disagreement": disc_disagreement,
             "expert_dec": expert_dec,

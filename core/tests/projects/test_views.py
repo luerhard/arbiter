@@ -82,6 +82,32 @@ class TestProjectListIndicators:
         assert annotate_link not in content
         assert done_link in content
 
+    def test_expert_page_counts_the_examples_to_discuss(self, client, project_discussion):
+        # once the discussion started, its examples are fixed (DISCUSSION assignments);
+        # a label changing afterwards must not change the counts on the batch card
+        a1, a2 = project_discussion["annotators"]
+        label1, _label2 = project_discussion["labels"]
+        example = project_discussion["example"]
+        ExampleAssignment.objects.get(
+            user=a2,
+            example=example,
+            phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([label1.id])
+        for annotator in (a1, a2):  # the room saves both decisions together
+            ExampleAssignment.objects.get(
+                user=annotator,
+                example=example,
+                phase=BatchPhase.DISCUSSION,
+            ).set_user_annotations([label1.id])
+        client.login(username=project_discussion["expert"].username, password="123")
+
+        response = client.get(
+            reverse("project-detail-expert", args=(project_discussion["project"].id,)),
+        )
+
+        [card] = response.context["batches"]
+        assert (card["disagreement"], card["discussed"]) == (1, 1)
+
     def test_active_batch_count_rendered(self, client, project_annotation):
         annotator = project_annotation["annotators"][0]
         project = project_annotation["project"]

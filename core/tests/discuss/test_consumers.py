@@ -2,6 +2,7 @@ import os
 import uuid
 
 from asgiref.sync import async_to_sync
+from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
@@ -205,6 +206,7 @@ def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_populates_annotation_labels(redis_test_state, discussion_with_disagreement):
     user1, user2, batch, _example, labels = discussion_with_disagreement
+    batch.set_phase(BatchPhase.DISCUSSION)
 
     async def run():
         comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
@@ -530,3 +532,152 @@ def test_discuss_required_users_are_batch_annotators(redis_test_state, discussio
     state = async_to_sync(run)()
 
     assert set(state["required_users"]) == {user.username, expert.username}
+
+
+@pytest.fixture
+def discussion_three_examples(discussion_with_disagreement):
+    """Three examples in batch order: 0 and 2 are disagreements, 1 is agreed on. The
+    batch is in the discussion, so 0 and 2 have DISCUSSION assignments."""
+    user1, user2, batch, first, labels = discussion_with_disagreement
+    label1, label2 = labels
+    second = Example.objects.create(batch=batch, content="Agreed example", position=2)
+    third = Example.objects.create(batch=batch, content="Second disagreement", position=3)
+    Example.objects.filter(pk=first.pk).update(position=1)
+    batch.set_phase(BatchPhase.ANNOTATION)  # assignments for the new examples
+    for example, (labels1, labels2) in (
+        (second, ([label1.id], [label1.id])),
+        (third, ([label1.id], [label1.id, label2.id])),
+    ):
+        _annotation(batch, example, user1).set_user_annotations(labels1)
+        _annotation(batch, example, user2).set_user_annotations(labels2)
+    batch.set_phase(BatchPhase.DISCUSSION)
+    examples = [Example.objects.get(pk=e.pk) for e in (first, second, third)]
+    return user1, user2, batch, examples, labels
+
+
+def _annotation(batch, example, user, phase=BatchPhase.ANNOTATION):
+    return ExampleAssignment.objects.get(batch=batch, example=example, user=user, phase=phase)
+
+
+async def _connect(batch, user):
+    communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+    communicator.scope["user"] = user
+    connected, _ = await communicator.connect()
+    assert connected is True
+    return communicator
+
+
+async def _state_where(communicator, predicate):
+    """Read states until one matches; the number of broadcasts per action varies."""
+    while True:
+        response = await communicator.receive_json_from(timeout=3)
+        state = response.get("state")
+        if state and predicate(state):
+            return state
+
+
+async def _both_decide(comm1, comm2, label_ids, cur_example_id):
+    """Both annotators save labels for the current example; returns the next state."""
+    for communicator in (comm1, comm2):
+        await communicator.send_json_to({"clicked-done": True, "labels": label_ids})
+    return await _state_where(
+        comm1,
+        lambda s: s["cur_example_id"] != cur_example_id or s["discussion_ended"],
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_follows_discussion_assignments_not_live_labels(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # Labels that change after the discussion started (e.g. a deleted label, a phase
+    # moved back and forth) must not change what the room discusses: it discusses
+    # exactly the examples that got DISCUSSION assignments, in order, and never one
+    # without (production, 7 Oct 2026: the room crashed on such an example).
+    user1, user2, batch, (first, second, third), (label1, label2) = discussion_three_examples
+    _annotation(batch, first, user2).set_user_annotations([label1.id])  # now agreed
+    _annotation(batch, second, user2).set_user_annotations([label2.id])  # now disagreed
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+
+        state = await _state_where(comm1, lambda s: s["cur_example_id"])
+        assert (state["cur_example_id"], state["page"], state["total_pages"]) == (first.id, 1, 2)
+
+        state = await _both_decide(comm1, comm2, [label1.id], first.id)
+        assert (state["cur_example_id"], state["page"], state["total_pages"]) == (third.id, 2, 2)
+
+        state = await _both_decide(comm1, comm2, [label2.id], third.id)
+        assert state["discussion_ended"] == "DISCUSSION_END"
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for example, label in ((first, label1), (third, label2)):
+        for user in (user1, user2):
+            assignment = _annotation(batch, example, user, BatchPhase.DISCUSSION)
+            assert assignment.done is not None
+            assert list(assignment.annotations.values_list("label_id", flat=True)) == [label.id]
+    assert not ExampleAssignment.objects.filter(example=second, phase=BatchPhase.DISCUSSION)
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.FINAL
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_resumes_after_room_state_lost(redis_test_state, discussion_three_examples):
+    # The first example was discussed, then the Redis room state got lost (Redis
+    # restarted, resetdb, ...). The room must resume at the next open example
+    # instead of starting over and overwriting the decisions already saved.
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+    for user in (user1, user2):
+        _annotation(batch, first, user, BatchPhase.DISCUSSION).set_user_annotations([label1.id])
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        state = await _state_where(comm1, lambda s: s["cur_example_id"])
+        await comm1.disconnect()
+        await comm2.disconnect()
+        return state
+
+    state = async_to_sync(run)()
+
+    assert (state["cur_example_id"], state["page"], state["total_pages"]) == (third.id, 2, 2)
+    assert not any(m["text"] == "All done. Next Sentence." for m in state["messages"])
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_resyncs_stale_room_state(redis_test_state, discussion_three_examples):
+    # The room state still shows the first example, but it was decided in the
+    # meantime (e.g. the room crashed after saving): joining moves on to the next one.
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+
+    def decide_first():
+        for user in (user1, user2):
+            _annotation(batch, first, user, BatchPhase.DISCUSSION).set_user_annotations([label1.id])
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        state = await _state_where(comm1, lambda s: s["cur_example_id"])
+        assert state["cur_example_id"] == first.id
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+        await database_sync_to_async(decide_first)()
+
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        state = await _state_where(comm1, lambda s: s["cur_example_id"] == third.id)
+        assert state["page"] == 2
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()

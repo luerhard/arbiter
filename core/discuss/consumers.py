@@ -6,7 +6,6 @@ from asgiref.sync import async_to_sync
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
 
 from .models import Message
 from .models import Room
@@ -67,7 +66,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if (set(state["online_users"]) == set(state["required_users"])) and not state[
             "discussion_ended"
         ]:
-            if state["page"] == 0:
+            # start, or resync a room state whose example was decided in the meantime
+            if state["page"] == 0 or not await self._is_open(state["cur_example_id"]):
                 await self._set_next_and_reset()
         await self.group_send_state()
 
@@ -234,22 +234,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug("Discussion ended.")
             return
 
-        next_page = int(state.get("page", 0)) + 1
-        state["page"] = next_page
-        example, annotations, total_pages = await database_sync_to_async(self.get_example)(
-            state=state,
-        )
+        example, annotations, page, total_pages = await database_sync_to_async(
+            self.get_example,
+        )(state=state)
 
         end_reason = None
         msg = None
         if example is None:
-            had_any = await database_sync_to_async(
-                lambda: any(
-                    e.has_disagreement for e in Example.objects.filter(batch=self.batch_id)
-                ),
-            )()
-
-            if not had_any:
+            if total_pages == 0:
                 end_reason = "NO_EXAMPLES"
                 msg = "No disagreements exist."
 
@@ -257,15 +249,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 end_reason = "DISCUSSION_END"
                 msg = "All Examples discussed."
 
-        else:
-            if state["page"] != 1:
-                msg = "All done. Next Sentence."
+        elif state["page"] != 0:
+            msg = "All done. Next Sentence."
 
         async def mut(state):
             if end_reason:
                 state["discussion_ended"] = end_reason
             else:
-                state["page"] = next_page
+                state["page"] = page
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
                 state["annotation_labels"] = annotations
@@ -322,17 +313,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # ---------- EXAMPLE HELPERS -----------------
 
     def get_example(self, state):
+        """The next example to discuss: the first one (in batch order) that not every
+        annotator has decided yet. The DISCUSSION assignments in the database are the
+        source of truth, so a lost or stale room state resumes at the right example.
+
+        Returns (example, annotation labels by user, page, total pages); example is
+        None when nothing is left to discuss."""
         log.debug("Getting example")
-        examples = self.batch.disagreements(BatchPhase.ANNOTATION)
-        log.debug(f"{examples =}")
-        paginator = Paginator(examples, 1)
-        page_obj = paginator.get_page(state["page"])
-        total_pages = paginator.count
-
-        if page_obj.number < state["page"] or not examples:
-            return None, None, total_pages + 1
-
-        example = page_obj.object_list[0]
+        total_pages = self.batch.discussion_examples().count()
+        open_examples = self.batch.open_discussion_examples()
+        example = open_examples.first()
+        if example is None:
+            return None, None, total_pages, total_pages
+        page = total_pages - open_examples.count() + 1
 
         log.debug("Getting annotations")
         all_labels = example.labels.all()
@@ -357,7 +350,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 by_user[user].append(label)
 
-        return example, by_user, total_pages
+        return example, by_user, page, total_pages
+
+    @database_sync_to_async
+    def _is_open(self, example_id):
+        return self.batch.open_discussion_examples().filter(id=example_id).exists()
 
     @database_sync_to_async
     def is_batch_annotator(self):

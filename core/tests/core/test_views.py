@@ -1,6 +1,9 @@
 from django.urls import reverse
 import pytest
 
+from data.models import ExampleAssignment
+from projects.models import BatchPhase
+
 
 @pytest.mark.django_db
 class TestCoreViews:
@@ -29,3 +32,21 @@ class TestCoreViews:
 
         assert response.status_code == 200
         assert response.context["tasks"] == []
+
+    def test_home_discussion_task_counts_the_examples_to_discuss(self, client, project_discussion):
+        # The discussion works through the examples that got DISCUSSION assignments.
+        # A label changing afterwards (here: the disagreement disappears from the
+        # annotation labels) must not make the discussion task vanish.
+        a1, a2 = project_discussion["annotators"]
+        label1, _label2 = project_discussion["labels"]
+        ExampleAssignment.objects.get(
+            user=a2,
+            example=project_discussion["example"],
+            phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([label1.id])
+        client.login(username=a1.username, password="123")
+
+        [task] = client.get(reverse("home")).context["tasks"]
+
+        assert task["kind"] == "discuss"
+        assert (task["done"], task["total"]) == (0, 1)

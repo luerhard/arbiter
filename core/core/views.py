@@ -34,10 +34,9 @@ def open_tasks(user) -> list[dict]:
             kind, url = "annotate", reverse("annotate-batch", args=(batch.id,))
             done, total = mine.done().count(), mine.count()
         elif batch_user.role == ProjectRole.ANNOTATOR and phase == BatchPhase.DISCUSSION:
-            disagreements = batch.disagreements(BatchPhase.ANNOTATION)
+            # one DISCUSSION assignment per example to discuss
             kind, url = "discuss", reverse("discuss-batch", args=(batch.id,))
-            done = mine.done().filter(example__in=disagreements).count()
-            total = disagreements.count()
+            done, total = mine.done().count(), mine.count()
         elif batch_user.role == ProjectRole.EXPERT and phase == BatchPhase.EXPERT:
             kind, url = "decide", reverse("expert-batch", args=(batch.id,))
             done, total = mine.done().count(), mine.count()
