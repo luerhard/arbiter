@@ -100,9 +100,10 @@ class TestExpertNavigation:
         content = response.content.decode()
         html_name = response.context["labels_form"]["labels"].html_name
         assert content.count(f'name="{html_name}"') >= len(self.data["labels"])
-        # Discussion-union pre-selection comes from the form's initial data.
+        # Pre-selected are the labels both annotators kept after the discussion
+        # (label 1), not the contested one (label 2, only the second annotator).
         initial = response.context["labels_form"].fields["labels"].initial
-        assert initial == sorted(label.id for label in self.data["labels"])
+        assert initial == [self.data["labels"][0].id]
         assert "checked" in content
 
 
