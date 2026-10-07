@@ -64,8 +64,9 @@ def _annotate_via_http(user, batch, example, label_ids):
     assignment = _assignment(batch, user, example, BatchPhase.ANNOTATION)
     url = reverse("annotate-assignment", args=(batch.id, assignment.id))
     response = client.post(url, data={"labels": label_ids}, HTTP_HX_REQUEST="true")
-    # Single-example batch: saving the last assignment redirects to done.
-    assert response.status_code in (200, 302)
+    # Single-example batch: saving the last assignment tells htmx to load the done page.
+    assert response.status_code == 204
+    assert response["HX-Redirect"] == reverse("annotate-done", args=(batch.id,))
     return assignment
 
 

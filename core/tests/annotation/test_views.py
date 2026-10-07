@@ -633,6 +633,32 @@ class TestSkipAnnotatedToggle:
         assert resp.status_code == 302
         assert resp.url == reverse("annotate-done", args=(self.batch_id,))
 
+    def test_get_with_skip_from_the_panel_loads_the_done_page(self, client):
+        # Previous/Next are htmx requests: a plain redirect would put the whole done page
+        # inside the annotation panel
+        first = self.assignments[0]
+        for a in self.assignments:
+            a.done = timezone.now()
+            a.save()
+
+        resp = client.get(self._url(first, "?skip_annotated=1"), HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_saving_the_last_open_sample_without_htmx_redirects_to_done(self, client):
+        last = self.assignments[-1]
+        for a in self.assignments[:-1]:
+            a.done = timezone.now()
+            a.save()
+
+        resp = client.post(self._url(last), data={"labels": []})
+
+        assert resp.status_code == 302
+        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+        last.refresh_from_db()
+        assert last.done is not None
+
     def test_get_without_skip_renders_done_assignment(self, client):
         # Without skip on, viewing a done assignment is a valid review action and
         # should NOT redirect.
@@ -743,8 +769,9 @@ class TestSkipAnnotatedToggle:
             data={"labels": label_ids},
             HTTP_HX_REQUEST="true",
         )
-        assert resp.status_code == 302
-        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+        # not a plain redirect: htmx would show the done page inside the annotation panel
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == reverse("annotate-done", args=(self.batch_id,))
 
     def test_post_last_without_skip_jumps_to_first_unfinished(self, client):
         # Regression: saving the last sample while earlier ones were still open

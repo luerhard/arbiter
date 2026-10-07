@@ -144,9 +144,6 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         context = _annotation_panel_context(batch, assignment, skip_annotated=skip_annotated)
         context["progress"] = get_progress(request.user, batch)
 
-        if context["has_next"] and context["progress"]["done"] >= context["progress"]["total"]:
-            redirect("annotate-done", batch_id=batch.id)
-
         if request.htmx:
             return render(request, "annotation/panel.html", context)
 
@@ -178,7 +175,7 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             if skip_annotated and assignment.done is not None:
                 target = _next_unfinished_with_wraparound(assignment)
                 if target is None:
-                    return redirect("annotate-done", batch_id=batch.id)
+                    return _redirect_to_done(request, batch)
                 return redirect(
                     reverse(
                         "annotate-assignment",
@@ -238,7 +235,7 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             # go back to the first open one
             next_assignment = _next_unfinished_with_wraparound(assignment)
         if next_assignment is None:
-            return redirect("annotate-done", batch_id=batch.id)
+            return _redirect_to_done(request, batch)
 
         context = _annotation_panel_context(batch, next_assignment, skip_annotated=skip_annotated)
         context["progress"] = progress
