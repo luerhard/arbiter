@@ -344,11 +344,36 @@ class TestCodebookDraft:
         assert "labels_after_discussion" in commit
         assert "chat_history" in commit
 
+    def test_draft_without_rationale_is_refused_and_kept_in_the_editor(self):
+        typed = self.codebook.content + "\n# needs rationale"
+
+        response = self._save_draft(typed, rationale="  ")
+
+        assert response.status_code == 200
+        assert not CodebookDraft.objects.filter(assignment=self.assignment).exists()
+        content = response.content.decode()
+        assert 'id="rationale-error"' in content
+        assert "# needs rationale" in content  # still in the editor
+        assert 'name="rationale"' in content
+
+    def test_draft_rationale_stays_when_editing_again(self):
+        self._save_draft(self.codebook.content + "\n# edit", rationale="my reason")
+
+        response = self.client.get(self.panel_url + "?mode=edit")
+
+        assert "my reason" in response.content.decode()
+
     def test_decision_without_rationale_is_rejected_not_dropped(self):
         # A codebook change without rationale must fail loudly and save
         # nothing -- never silently discard the edit (the bug users hit).
+        # Saving such a draft is refused; this guards drafts from before that.
         original = self.codebook.content
-        self._save_draft(original + "\n# needs rationale")
+        CodebookDraft.objects.create(
+            assignment=self.assignment,
+            content=original + "\n# needs rationale",
+            rationale="",
+            base_revision=self.codebook.repo.head.commit.hexsha,
+        )
 
         response = self.client.post(
             self.decision_url,
@@ -388,6 +413,18 @@ class TestCodebookDraft:
         assert self.assignment.done is None
         assert "# based on old revision" not in self.codebook.content
         assert CodebookDraft.objects.filter(assignment=self.assignment).exists()
+
+    def test_corrected_decision_does_not_block_a_draft(self):
+        # correcting another decision logs a commit, but the codebook text is the same
+        self._save_draft(self.codebook.content + "\n# my edit", rationale="why")
+        self.codebook.commit_decision_revision(json.dumps({"rationale": "", "revises": True}))
+
+        response = self.client.post(self.decision_url, data={"labels": [self.data["labels"][0].id]})
+
+        assert response.status_code == 302
+        self.codebook.refresh_from_db()
+        assert "# my edit" in self.codebook.content
+        assert not CodebookDraft.objects.filter(assignment=self.assignment).exists()
 
     def test_decision_without_draft_commits_nothing(self):
         commits_before = len(list(self.codebook.repo.iter_commits()))

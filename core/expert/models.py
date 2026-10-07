@@ -1,4 +1,5 @@
 from django.db import models
+from git import GitCommandError
 
 
 class CodebookDraft(models.Model):
@@ -24,3 +25,14 @@ class CodebookDraft(models.Model):
 
     def __str__(self):
         return f"CodebookDraft for assignment {self.assignment_id}"
+
+    def is_based_on_current(self, codebook) -> bool:
+        """Whether the codebook text is still the one the draft started from. Compares
+        the text, not the commit: corrected decisions are logged as commits too."""
+        from codebook.utils import normalize_content  # noqa: PLC0415
+
+        try:
+            base = codebook.repo.git.show(f"{self.base_revision}:{codebook.file.name}")
+        except GitCommandError:
+            return False
+        return normalize_content(base) == normalize_content(codebook.content)

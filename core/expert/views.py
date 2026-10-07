@@ -118,6 +118,7 @@ def _codebook_panel_context(assignment: ExampleAssignment, mode: str = "view") -
         "draft": draft,
         "panel_mode": mode,
         "panel_content": draft.content if draft else codebook.content,
+        "panel_rationale": draft.rationale if draft else "",
         "draft_has_changes": bool(draft)
         and normalize_content(draft.content) != normalize_content(codebook.content),
     }
@@ -247,11 +248,11 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
                     labels_form=labels_form,
                 )
                 return self._render(request, context)
-            if draft.base_revision != codebook.repo.head.commit.hexsha:
+            if not draft.is_based_on_current(codebook):
                 messages.error(
                     request,
-                    "The codebook changed since this draft was started. "
-                    "Review your draft against the current version.",
+                    "The codebook was changed since you started this draft. Discard the "
+                    "draft and make your change again on the current version.",
                 )
                 context = self._build_context(
                     assignment,
@@ -377,6 +378,16 @@ class CodebookDraftSaveView(_AssignmentAccessMixin, View):
         if normalize_content(content) == normalize_content(codebook.content):
             # Saving an unchanged codebook equals discarding the draft.
             CodebookDraft.objects.filter(assignment=assignment).delete()
+        elif not rationale.strip():
+            # refused here, not only when the decision is saved: keep what was typed
+            context = _codebook_panel_context(assignment, mode="edit")
+            context.update(
+                panel_content=content,
+                panel_rationale=rationale,
+                rationale_error="Add a rationale: it is saved with the change and shown "
+                "to the annotators.",
+            )
+            return render(request, "expert/partials/codebook_panel.html", context)
         else:
             CodebookDraft.objects.update_or_create(
                 assignment=assignment,
