@@ -65,7 +65,7 @@
     </div>
 
     <article class="card px-8 py-7">
-      <p id="current-example" class="reading text-[22px] leading-normal">{{ sentence }}</p>
+      <p id="current-example" class="reading text-[22px] leading-normal whitespace-pre-line">{{ sentence }}</p>
     </article>
 
     <c-sample.trace :before="prev_annotations" :chat="chat_messages" :after="post_annotations" :highlight="annotator" />

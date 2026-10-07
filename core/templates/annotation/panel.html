@@ -21,8 +21,9 @@
     {% endif %}
   </div>
 
-  <article class="card px-11 py-10">
-    <p class="reading text-[28px] leading-normal tracking-[-0.005em]">{{ example.content }}</p>
+  {# long texts scroll inside the card, so the labels and buttons stay in view #}
+  <article class="card max-h-[55vh] overflow-y-auto px-11 py-10 scrollbar-thin scrollbar-thumb-line-strong">
+    <p class="reading text-[28px] leading-normal tracking-[-0.005em] whitespace-pre-line">{{ example.content }}</p>
   </article>
 
   <form
