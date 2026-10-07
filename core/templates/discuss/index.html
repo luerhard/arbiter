@@ -117,18 +117,20 @@ Discuss · Batch
         </span>
       </template>
     </div>
-    <form class="flex gap-2 border-t border-line p-3.5" ws-send>
+    <form x-data class="flex gap-2 border-t border-line p-3.5" ws-send>
       <input
         type="text"
         id="message-input"
         class="input h-[42px]"
         autocomplete="off"
         name="message"
-        placeholder="Write a message"
+        :placeholder="$store.chat_hint || 'Write a message'"
+        :disabled="!!$store.chat_hint"
         aria-label="Message"
       />
       <button
         type="submit"
+        :disabled="!!$store.chat_hint"
         class="btn btn-primary btn-icon h-[42px] w-[42px] shrink-0"
         aria-label="Send"
         aria-describedby="message-input"
@@ -173,6 +175,9 @@ Discuss · Batch
       ratio: 0,
     });
     Alpine.store('typing_user', '');
+    // why the chat is closed, empty while it is open: only while an example is open, so that
+    // every message belongs to an example (the export and the expert see the chat per example)
+    Alpine.store('chat_hint', 'The chat opens once everyone is here.');
   });
 
   let chatSocket = null;
@@ -252,6 +257,11 @@ Discuss · Batch
     const saved = state.clicked_done?.[user_self] === 1;
     Alpine.store('saved', saved);
     Alpine.store('save_disabled', !!Alpine.store('room_closed') || !state.cur_example_id || !!state.discussion_ended);
+    if (Alpine.store('room_closed') || state.discussion_ended) {
+      Alpine.store('chat_hint', 'The discussion has ended.');
+    } else {
+      Alpine.store('chat_hint', state.cur_example_id ? '' : 'The chat opens once everyone is here.');
+    }
     window.dispatchEvent(new CustomEvent(saved ? 'lock-labels' : 'unlock-labels'));
   }
 
@@ -285,6 +295,7 @@ Discuss · Batch
       // the server closes the connection right after this, without a reconnect
       Alpine.store('room_closed', data.room_closed);
       Alpine.store('save_disabled', true);
+      Alpine.store('chat_hint', 'The discussion has ended.');
       window.dispatchEvent(new CustomEvent('lock-labels'));
       return;
     }

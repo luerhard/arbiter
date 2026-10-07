@@ -172,6 +172,33 @@ def test_discuss_message_appends_to_state(redis_test_state, discussion_with_disa
 
 @pytest.mark.django_db(transaction=True)
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_message_needs_an_open_example(redis_test_state, discussion_with_disagreement):
+    # Before the room starts there is no example a message could belong to; the page does
+    # not let users chat then, and the server ignores what arrives anyway.
+    user, user2, batch, example, _labels = discussion_with_disagreement
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        communicator = await _connect(batch, user)
+        await communicator.send_json_to({"message": "anyone here?"})
+        other = await _connect(batch, user2)
+        await _state_where(communicator, lambda s: s["cur_example_id"] == example.id)
+        await communicator.send_json_to({"message": "let's start"})
+        state = await _state_where(
+            communicator, lambda s: any(m["text"] == "let's start" for m in s["messages"])
+        )
+        await communicator.disconnect()
+        await other.disconnect()
+        return state
+
+    state = async_to_sync(run)()
+    assert "anyone here?" not in [m["text"] for m in state["messages"]]
+    stored = Message.objects.filter(room_id=batch.id, user=user.username)
+    assert [(m.message, m.example) for m in stored] == [("let's start", example)]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_clicked_done_updates_state(redis_test_state, discussion_with_disagreement):
     user1, user2, batch, example, (label1, _label2) = discussion_with_disagreement
     batch.set_phase(BatchPhase.DISCUSSION)

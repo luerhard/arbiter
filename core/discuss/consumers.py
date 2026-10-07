@@ -154,6 +154,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # return instantly if message is empty
             if not message.strip():
                 return
+            state = await self._get_state()
+            if not state["cur_example_id"] or state["discussion_ended"]:
+                # the page only lets users chat while an example is open: a message without
+                # one would be missing from the export and from the expert's view
+                log.info(f"Batch {self.batch_id}: ignored a message of {username}, no open example")
+                return
             await self._append_chat_message(username=username, message=message)
 
             # send to all users
