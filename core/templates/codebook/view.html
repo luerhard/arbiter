@@ -13,7 +13,12 @@ Codebook ·
     subtitle="The shared instructions for {{ codebook.project.name }}. Every change is kept with its rationale."
   >
     <c-slot name="actions">
-      <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}" class="btn btn-secondary">Latest changes</a>
+      {% if since %}
+      <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}" class="btn btn-secondary"
+        >Changes since batch
+        {{ since }}</a
+      >
+      {% endif %}
       {% if role == "E" %}
       <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary">
         {% heroicon_micro "arrow-down-tray" class="size-4" %}
@@ -27,10 +32,21 @@ Codebook ·
     </c-slot>
   </c-page-header>
 
-  <article class="card px-12 py-10">
-    <div class="max-w-3xl">
-      <c-codebook.view content="{{ codebook.content }}" />
-    </div>
-  </article>
+  <div class="flex flex-col items-start gap-6 lg:flex-row">
+    <article class="card w-full min-w-0 flex-1 px-12 py-10">
+      <div class="max-w-3xl">
+        <c-codebook.view content="{{ codebook.content }}" />
+      </div>
+    </article>
+
+    <aside id="codebook-history" class="card flex w-full shrink-0 flex-col gap-4 px-5.5 py-5 lg:w-80">
+      <h2 class="card-title">History</h2>
+      {% if changes %}
+      {% include "codebook/partials/change-list.html" with links=True %}
+      {% else %}
+      <p class="text-[14px] text-ink-2">No changes yet.</p>
+      {% endif %}
+    </aside>
+  </div>
 </div>
 {% endblock content %}

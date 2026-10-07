@@ -91,11 +91,13 @@
                     class="menu-item"
                     >Export batch</a
                   >
+                  {% if b.current_phase != "S" %}{# the codebook version is kept when annotation starts #}
                   <a
                     href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
                     class="menu-item"
                     >Codebook changes</a
                   >
+                  {% endif %}
                 </div>
                 {# moving on while the phase is unfinished opens a confirmation dialog (below) #}
                 <div class="menu-section">

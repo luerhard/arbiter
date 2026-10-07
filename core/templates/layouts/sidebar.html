@@ -63,7 +63,7 @@
       {% if nav_codebook_id %}
       <a
         href="{% url 'codebook-view' nav_codebook_id %}"
-        class="nav-subitem {% if nav_url_name == 'codebook-view' or nav_url_name == 'codebook-edit' or nav_url_name == 'codebook-diff' %}nav-subitem-active{% endif %}"
+        class="nav-subitem {% if nav_url_name == 'codebook-view' or nav_url_name == 'codebook-edit' or nav_url_name == 'codebook-diff' or nav_url_name == 'codebook-change' %}nav-subitem-active{% endif %}"
         >Codebook</a
       >
       {% endif %}

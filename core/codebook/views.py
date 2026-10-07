@@ -33,6 +33,8 @@ class CodebookView(AnyRoleRequiredMixin, DetailView):
         project_user = get_object_or_404(ProjectUser, user=user, project=self.object.project)
         context["role"] = project_user.default_role
         context["content"] = context["codebook"].content
+        context["changes"] = context["codebook"].changes()
+        context["since"] = context["codebook"].last_batch_of(user)
         return context
 
 
@@ -44,24 +46,51 @@ class CodebookDiffView(AnyRoleRequiredMixin, DetailView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        batch_new = self.request.GET.get("batch_new", self.object.project.max_batch_number)
-        batch_new = int(batch_new)
-        batch_old = self.request.GET.get("batch_old", max(0, batch_new - 1))
-        batch_old = int(batch_old)
-        # every batch tags its codebook version as batch_N; deleting a batch removes its tag
-        tagged = {
-            int(number)
-            for tag in self.object.repo.tags
-            if (number := tag.name.removeprefix("batch_")).isdigit()
-        }
-        if batch_new not in tagged:
+        # batch_old and batch_new: what changed between the versions two batches started
+        # with; batch_old alone or nothing: since then (by default since the reader's last
+        # batch) up to the current text
+        try:
+            batch_new = self._batch_param("batch_new")
+            batch_old = self._batch_param("batch_old")
+        except ValueError as exc:
+            raise Http404(str(exc)) from exc
+        tagged = self.object.tagged_batches()
+        if batch_new is not None and batch_new not in tagged:
             msg = f"Batch {batch_new} has no codebook version."
             raise Http404(msg)
-        # if the previous batch was deleted, compare with the one before it
+        if batch_old is None:
+            if batch_new is None:
+                batch_old = self.object.last_batch_of(self.request.user) or 0
+            else:
+                batch_old = batch_new - 1
+        # if that batch was deleted (or has not started), compare with the one before it
         batch_old = max((number for number in tagged if number <= batch_old), default=0)
         context["content_diff"] = self.object.diff(batch_old, batch_new)
+        context["changes"] = self.object.changes_between(batch_old, batch_new)
         context["batch_old"] = batch_old
         context["batch_new"] = batch_new
+        return context
+
+    def _batch_param(self, name) -> int | None:
+        value = self.request.GET.get(name, "")
+        return int(value) if value else None
+
+
+class CodebookChangeView(AnyRoleRequiredMixin, DetailView):
+    """One change of the codebook text with its rationale."""
+
+    pk_url_kwarg = "codebook_id"
+    model = Codebook
+    context_object_name = "codebook"
+    template_name = "codebook/change.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        found = self.object.change(self.kwargs["sha"])
+        if found is None:
+            msg = "No such change of this codebook."
+            raise Http404(msg)
+        context["change"], context["content_diff"] = found
         return context
 
 

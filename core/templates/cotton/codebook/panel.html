@@ -1,8 +1,14 @@
 {% comment %}
 Codebook side panel for the work screens. Shows the codebook and, when given, what changed for this batch. Usage:
-<c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
+<c-codebook.panel
+  :codebook="codebook"
+  :content_diff="content_diff"
+  :changes="codebook_changes"
+  :since="codebook_since"
+/>
+content_diff and changes: what changed since batch since started, up to the current text.
 {% endcomment %}
-<c-vars codebook="" content_diff="" />
+<c-vars codebook="" content_diff="" changes="" since="" />
 <aside
   x-data="{ tab: 'read' }"
   x-show="$store.codebookPanel.open"
@@ -31,7 +37,8 @@ Codebook side panel for the work screens. Shows the codebook and, when given, wh
         :class="tab === 'changes' ? 'bg-surface text-ink font-semibold shadow-xs' : 'text-ink-2'"
         class="h-7 cursor-pointer rounded-[7px] px-3 text-[13px]"
       >
-        Changes for this batch
+        Changes since batch
+        {{ since }}
       </button>
       {% endif %}
     </div>
@@ -60,7 +67,15 @@ Codebook side panel for the work screens. Shows the codebook and, when given, wh
   <div class="flex-1 overflow-y-auto px-6 py-5 text-[15px] scrollbar-thin scrollbar-thumb-line-strong">
     <div x-show="tab === 'read'"><c-codebook.view content="{{ codebook.content }}" /></div>
     {% if content_diff %}
-    <div x-show="tab === 'changes'" x-cloak>{% include "codebook/partials/view-diff-codebook.html" %}</div>
+    <div x-show="tab === 'changes'" x-cloak class="flex flex-col gap-5">
+      {% if changes %}
+      <section class="flex flex-col gap-3 border-b border-line pb-5" aria-label="Why it changed">
+        <h3 class="text-[13px] font-semibold text-ink-2">Why it changed</h3>
+        {% include "codebook/partials/change-list.html" %}
+      </section>
+      {% endif %}
+      {% include "codebook/partials/view-diff-codebook.html" %}
+    </div>
     {% endif %}
   </div>
 </aside>

@@ -1,0 +1,29 @@
+{% comment %}
+Codebook changes with their rationales, newest first. Needs changes and codebook; links adds "Show changes" to each.
+{% endcomment %}
+<ol class="flex flex-col gap-4" aria-label="Codebook changes">
+  {% for change in changes %}
+  <li class="flex flex-col gap-1" data-change="{{ change.sha }}">
+    <span class="text-xs text-ink-3"
+      >{{ change.date|date:"j M Y, H:i" }}
+      ·
+      {{ change.when }}</span
+    >
+    {% if change.rationale %}
+    <p class="text-[14px] whitespace-pre-line text-ink">{{ change.rationale }}</p>
+    {% else %}
+    <p class="text-[14px] text-ink-3 italic">No rationale given.</p>
+    {% endif %}
+    {% if change.decision_text %}
+    <p class="text-xs text-ink-2">Saved with the decision on “{{ change.decision_text|truncatechars:80 }}”</p>
+    {% endif %}
+    {% if links %}
+    <a
+      href="{% url 'codebook-change' codebook.pk change.sha %}"
+      class="text-[13px] font-medium text-accent-ink hover:underline"
+      >Show changes →</a
+    >
+    {% endif %}
+  </li>
+  {% endfor %}
+</ol>

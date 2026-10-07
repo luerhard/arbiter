@@ -148,7 +148,11 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             return render(request, "annotation/panel.html", context)
 
         codebook = batch.project.codebook.get()
-        context.update(codebook.get_as_context(batch.batch_number))
+        # what changed since the annotator's previous batch started; in their first batch,
+        # since this one started
+        since = codebook.last_batch_of(request.user, before=batch.batch_number)
+        since = batch.batch_number if since is None else since
+        context.update(codebook.get_as_context(since))
         return render(request, "annotation/index.html", context)
 
     def get(

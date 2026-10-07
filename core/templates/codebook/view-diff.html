@@ -8,22 +8,44 @@ Codebook changes ·
 <div class="flex flex-col gap-7">
   <c-page-header title="Codebook changes" :project="codebook.project" :codebook="codebook" crumb="Changes">
     <c-slot name="subtitle">
-      {% if batch_old %}What changed between batch
+      {% if batch_new is None and batch_old %}What changed since batch
       {{ batch_old }}
-      and batch
-      {{ batch_new }}.{% else %}What changed up to batch
+      started, up to now.
+      {% elif batch_new is None %}Everything written so far.
+      {% elif batch_old %}What changed between the start of batch
+      {{ batch_old }}
+      and the start of batch
+      {{ batch_new }}.
+      {% else %}What changed up to batch
       {{ batch_new }}.{% endif %}
     </c-slot>
-    <c-slot name="actions">
-      <span class="flex items-center gap-4 text-[13px] text-ink-2">
-        <span><span class="rounded bg-success-soft px-1.5 text-success">added</span> new text</span>
-        <span><span class="rounded bg-danger-soft px-1.5 text-danger line-through">removed</span> deleted text</span>
-      </span>
-    </c-slot>
+    <c-slot name="actions">{% include "codebook/partials/diff-legend.html" %}</c-slot>
   </c-page-header>
+
+  {% if content_diff %}
+  <section class="card flex flex-col gap-4 px-6 py-5" aria-label="Rationales">
+    <h2 class="card-title">Why it changed</h2>
+    {% include "codebook/partials/change-list.html" with links=True %}
+  </section>
 
   <article class="card px-12 py-10">
     <div class="max-w-3xl">{% include "codebook/partials/view-diff-codebook.html" %}</div>
   </article>
+  {% else %}
+  <c-empty-state title="No changes">
+    {% if batch_new is None and batch_old %}Nothing changed since batch
+    {{ batch_old }}
+    started.
+    {% elif batch_new is None %}The codebook is still empty.
+    {% elif batch_old %}The codebook was the same when batch
+    {{ batch_new }}
+    started as when batch
+    {{ batch_old }}
+    started.
+    {% else %}The codebook was empty when batch
+    {{ batch_new }}
+    started.{% endif %}
+  </c-empty-state>
+  {% endif %}
 </div>
 {% endblock content %}

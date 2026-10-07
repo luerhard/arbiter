@@ -31,6 +31,7 @@ class DiscussView(BatchAnnotatorRequiredMixin, View):
         context["batch"] = batch
 
         codebook = batch.project.codebook.get()
+        # the annotators last worked on this batch: what changed since it started
         context.update(codebook.get_as_context(batch.batch_number))
 
         return render(request, "discuss/index.html", context)

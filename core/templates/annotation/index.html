@@ -27,5 +27,10 @@ Annotate · Batch
 <main class="flex min-w-0 flex-1 justify-center px-14 py-12">
   <div class="w-full max-w-3xl">{% include "annotation/panel.html" %}</div>
 </main>
-<c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
+<c-codebook.panel
+  :codebook="codebook"
+  :content_diff="content_diff"
+  :changes="codebook_changes"
+  :since="codebook_since"
+/>
 {% endblock content %}

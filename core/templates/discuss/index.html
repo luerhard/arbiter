@@ -140,7 +140,12 @@ Discuss · Batch
     </form>
   </aside>
 </div>
-<c-codebook.panel :codebook="codebook" :content_diff="content_diff" />
+<c-codebook.panel
+  :codebook="codebook"
+  :content_diff="content_diff"
+  :changes="codebook_changes"
+  :since="codebook_since"
+/>
 <script>
   window.local_state = {
     version: -1,
