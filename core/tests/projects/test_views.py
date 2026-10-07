@@ -5,6 +5,7 @@ import uuid
 
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.text import slugify
 import pandas as pd
 import pytest
@@ -15,6 +16,7 @@ from discuss.models import Message
 from discuss.models import Room
 from projects.models import Batch
 from projects.models import BatchPhase
+from projects.models import BatchUser
 from projects.models import Project
 from projects.models import ProjectRole
 from projects.models import ProjectUser
@@ -62,6 +64,23 @@ class TestProjectListIndicators:
         row = self._project_row(response.content.decode(), project.name)
         assert "Open" in row
         assert row.count("Closed") == 1  # annotation column now closed
+
+    def test_finalized_annotator_is_not_offered_annotating(self, client, project_annotation):
+        annotator = project_annotation["annotators"][0]
+        batch = project_annotation["batch"]
+        url = reverse("project-detail-annotator", args=(project_annotation["project"].id,))
+        client.login(username=annotator.username, password="123")
+
+        annotate_link = f'href="{reverse("annotate-batch", args=(batch.id,))}"'
+        done_link = f'href="{reverse("annotate-done", args=(batch.id,))}"'
+
+        content = client.get(url).content.decode()
+        assert annotate_link in content
+
+        BatchUser.objects.filter(batch=batch, user=annotator).update(finalized_at=timezone.now())
+        content = client.get(url).content.decode()
+        assert annotate_link not in content
+        assert done_link in content
 
     def test_active_batch_count_rendered(self, client, project_annotation):
         annotator = project_annotation["annotators"][0]

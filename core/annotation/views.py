@@ -35,6 +35,30 @@ def get_progress(user, batch):
     return {"done": done, "total": total, "current": current}
 
 
+def annotation_locked(user, batch) -> bool:
+    """Labels can only change while the batch is in the annotation phase and the
+    annotator has not finalized yet. Later phases (discussion, expert decision) are
+    built from the annotation labels at the moment of the phase change, so a late
+    edit would change the disagreements underneath a running discussion."""
+    if batch.current_phase != BatchPhase.ANNOTATION:
+        return True
+    return BatchUser.objects.filter(
+        batch=batch,
+        user=user,
+        finalized_at__isnull=False,
+    ).exists()
+
+
+def _redirect_to_done(request, batch):
+    url = reverse("annotate-done", kwargs={"batch_id": batch.id})
+    if request.htmx:
+        # a plain redirect would be followed by htmx and swapped into the panel
+        response = HttpResponse(status=204)
+        response["HX-Redirect"] = url
+        return response
+    return redirect(url)
+
+
 def _next_unfinished_with_wraparound(assignment):
     nxt = assignment.next(skip_annotated=True)
     if nxt is not None:
@@ -141,6 +165,9 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         except PermissionError:
             return HttpResponseForbidden()
 
+        if annotation_locked(request.user, batch):
+            return _redirect_to_done(request, batch)
+
         if assignment_id:
             try:
                 assignment = self._get_assignment(request, batch, assignment_id)
@@ -188,6 +215,10 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             assignment = self._get_assignment(request, batch, assignment_id)
         except PermissionError:
             return HttpResponseForbidden()
+
+        if annotation_locked(request.user, batch):
+            messages.warning(request, "Not saved: your annotations for this batch are locked.")
+            return _redirect_to_done(request, batch)
 
         form = MultiLabelForm(request.POST, assignment=assignment)
         if form.is_valid():

@@ -47,7 +47,9 @@
             class="btn btn-ghost btn-sm"
             >Codebook changes</a
           >
-          {% if batch.role == "A" and b.current_phase == "A" %}
+          {% if batch.role == "A" and b.current_phase == "A" and batch.finalized %}
+          <a href="{% url 'annotate-done' batch_id=b.id %}" class="btn btn-secondary btn-sm">Finalized</a>
+          {% elif batch.role == "A" and b.current_phase == "A" %}
           <a href="{% url 'annotate-batch' batch_id=b.id %}" class="btn btn-primary btn-sm">
             {% if batch.done %}Continue annotating{% else %}Start annotating{% endif %}
           </a>

@@ -304,6 +304,13 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
             id__in=self.batch_roles,
             current_phase__in=[BatchPhase.ANNOTATION, BatchPhase.DISCUSSION, BatchPhase.EXPERT],
         ).order_by("-batch_number")
+        finalized = set(
+            BatchUser.objects.filter(
+                batch__in=batches,
+                user=self.request.user,
+                finalized_at__isnull=False,
+            ).values_list("batch_id", flat=True),
+        )
         context["batches"] = [
             {
                 "batch": batch,
@@ -314,6 +321,7 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
                 .done()
                 .count(),
                 "length": batch.examples.count(),
+                "finalized": batch.id in finalized,
             }
             for batch in batches
         ]

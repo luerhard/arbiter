@@ -6,6 +6,7 @@ import pytest
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
+from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models.batch import BatchUser
 from users.models import User
@@ -20,8 +21,13 @@ def _first_non_annotator_user():
 
 
 def _first_annotation_batch_for_user(user):
+    # only batches still in the annotation phase: later phases lock annotating
     batch = (
-        ExampleAssignment.objects.filter(user=user, phase=BatchPhase.ANNOTATION)
+        ExampleAssignment.objects.filter(
+            user=user,
+            phase=BatchPhase.ANNOTATION,
+            batch__current_phase=BatchPhase.ANNOTATION,
+        )
         .order_by("example__batch_id")
         .values_list("example__batch_id", flat=True)
         .first()
@@ -72,6 +78,18 @@ def _ensure_next_assignment_exists(assignment):
         phase=assignment.phase,
         order=next_order,
     )
+
+
+def _add_discussion_assignment(assignment):
+    """A DISCUSSION-phase twin of an annotation assignment (same example and order)."""
+    discussion_assignment, _ = ExampleAssignment.objects.get_or_create(
+        batch=assignment.batch,
+        user=assignment.user,
+        example=assignment.example,
+        phase=BatchPhase.DISCUSSION,
+        defaults={"order": assignment.order},
+    )
+    return discussion_assignment
 
 
 @pytest.mark.django_db
@@ -236,6 +254,120 @@ class TestAnnotationDoneFinalize:
 
 
 @pytest.mark.django_db
+class TestAnnotationLock:
+    """Annotating is locked once the annotator finalized or the batch left the
+    annotation phase: later phases are built from the labels at the phase change."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, client, project_annotation):
+        self.data = project_annotation
+        self.a1, self.a2 = project_annotation["annotators"]
+        self.batch = project_annotation["batch"]
+        self.example = project_annotation["example"]
+        self.label1, self.label2 = project_annotation["labels"]
+        self.assignment = ExampleAssignment.objects.get(
+            user=self.a1,
+            example=self.example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        self.assignment.set_user_annotations([self.label1.id])
+        self.url = reverse("annotate-assignment", args=(self.batch.id, self.assignment.id))
+        self.done_url = reverse("annotate-done", args=(self.batch.id,))
+        client.login(username=self.a1.username, password="123")
+
+    def _labels(self):
+        return set(self.assignment.annotations.values_list("label_id", flat=True))
+
+    def _finalize(self, user):
+        BatchUser.objects.filter(batch=self.batch, user=user).update(finalized_at=timezone.now())
+
+    def _finalize_a1(self):
+        self._finalize(self.a1)
+
+    def _leave_annotation_phase(self):
+        Batch.objects.filter(pk=self.batch.pk).update(current_phase=BatchPhase.DISCUSSION)
+
+    def test_open_while_annotating(self, client):
+        assert client.get(self.url).status_code == 200
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+        assert self._labels() == {self.label2.id}
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_post_is_not_saved(self, client, lock):
+        getattr(self, lock)()
+
+        resp = client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == self.done_url
+        assert self._labels() == {self.label1.id}
+        # htmx drops HX-Trigger events on a redirect: the warning must wait for the done page
+        assert "HX-Trigger" not in resp
+        assert "Not saved" in client.get(self.done_url).content.decode()
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_post_without_htmx_redirects_to_done(self, client, lock):
+        getattr(self, lock)()
+
+        resp = client.post(self.url, data={"labels": [self.label2.id]})
+
+        assert resp.status_code == 302
+        assert resp.url == self.done_url
+        assert self._labels() == {self.label1.id}
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_get_redirects_to_done(self, client, lock):
+        getattr(self, lock)()
+
+        for url in (self.url, reverse("annotate-batch", args=(self.batch.id,))):
+            resp = client.get(url)
+            assert resp.status_code == 302
+            assert resp.url == self.done_url
+
+        resp = client.get(self.url, HTTP_HX_REQUEST="true")
+        assert resp["HX-Redirect"] == self.done_url
+
+    def test_other_annotator_finalizing_does_not_lock(self, client):
+        self._finalize(self.a2)
+
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert self._labels() == {self.label2.id}
+
+    def test_late_edit_cannot_change_the_discussion(self, client):
+        # Regression (production, 7 Oct 2026): an annotator finalized, kept
+        # editing, and changed labels after the batch had moved to the
+        # discussion. That created a disagreement without discussion
+        # assignments and the discussion room crashed on it.
+        ExampleAssignment.objects.get(
+            user=self.a2,
+            example=self.example,
+            phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([self.label2.id])
+        for annotator in (self.a1, self.a2):
+            client.login(username=annotator.username, password="123")
+            client.post(self.done_url)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+        # a1 now agrees with a2: must not be saved
+        client.login(username=self.a1.username, password="123")
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert self._labels() == {self.label1.id}
+        disagreements = set(
+            self.batch.disagreements(BatchPhase.ANNOTATION).values_list("id", flat=True),
+        )
+        discussed = set(
+            ExampleAssignment.objects.filter(
+                batch=self.batch,
+                phase=BatchPhase.DISCUSSION,
+            ).values_list("example_id", flat=True),
+        )
+        assert disagreements == discussed == {self.example.id}
+
+
+@pytest.mark.django_db
 class TestEditAssignmentView:
     @pytest.fixture(autouse=True)
     def _setup(self, client):
@@ -364,19 +496,10 @@ class TestEditAssignmentView:
         assert self.assignment.annotations.count() == 0
 
     def test_post_to_non_annotation_phase_assignment_forbidden(self, client):
-        # Regression: batch 1 of the populated DB also has DISCUSSION-phase
-        # assignments for this user. The annotation view must never save into
-        # them, otherwise annotation-phase input overwrites discussion labels.
-        discussion_assignment = (
-            ExampleAssignment.objects.filter(
-                user=self.user,
-                example__batch_id=self.batch_id,
-                phase=BatchPhase.DISCUSSION,
-            )
-            .order_by("order")
-            .first()
-        )
-        assert discussion_assignment is not None
+        # Regression: a batch can hold DISCUSSION-phase assignments for this
+        # user. The annotation view must never save into them, otherwise
+        # annotation-phase input overwrites discussion labels.
+        discussion_assignment = _add_discussion_assignment(self.assignment)
         labels_before = sorted(
             discussion_assignment.annotations.values_list("label_id", flat=True),
         )
@@ -403,6 +526,7 @@ class TestEditAssignmentView:
         # Regression: the entry redirect must pick the ANNOTATION-phase
         # assignment even though a DISCUSSION-phase assignment with the same
         # order exists in this batch.
+        _add_discussion_assignment(self.assignment)
         resp = client.get(reverse("annotate-batch", args=(self.batch_id,)))
         assert resp.status_code == 302
         assignment_id = int(resp.url.rstrip("/").split("/")[-1])

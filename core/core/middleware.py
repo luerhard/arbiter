@@ -9,10 +9,10 @@ class HtmxMessageMiddleware(MiddlewareMixin):
         if "HX-Request" not in request.headers:
             return response
 
-        # When the response asks htmx for a full page refresh, it reloads and
-        # discards any HX-Trigger events. Leave the messages unconsumed so they
-        # survive in storage and render server-side on the reloaded page.
-        if response.headers.get("HX-Refresh") == "true":
+        # When the response asks htmx for a full page refresh or a redirect, it
+        # loads a new page and discards any HX-Trigger events. Leave the messages
+        # unconsumed so they survive in storage and render server-side there.
+        if response.headers.get("HX-Refresh") == "true" or "HX-Redirect" in response.headers:
             return response
 
         messages = [
