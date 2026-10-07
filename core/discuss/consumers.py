@@ -98,7 +98,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             state["online_users"] = list(connections)
             return state
 
-        state = await update_state(self.batch_id, _leave)
+        await update_state(self.batch_id, _leave)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
         if not last_connection:
             return  # another connection of this user is still in the room
@@ -107,10 +107,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             message=f"{self.username} has disconnected.",
         )
         await self.group_send_state()
-
-        if len(state["online_users"]) == 0:
-            log.debug("No users, closing websocket.")
-            await self.close(code=1000)
 
     async def receive(self, text_data):
         # An exception escaping here would end the consumer: the socket closes, disconnect()

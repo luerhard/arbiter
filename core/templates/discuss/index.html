@@ -160,9 +160,11 @@ Discuss · Batch
     });
     Alpine.store('save_disabled', true);
     Alpine.store('saved', false);
-    Alpine.store('room_closed', null);
-    Alpine.store('user_self', undefined);
-    Alpine.store('user_other', undefined);
+    // Never null: Alpine.store() throws on it (after setting the value), which would end this
+    // init before the stores below exist. undefined does not set a store at all.
+    Alpine.store('room_closed', false);
+    Alpine.store('user_self', '');
+    Alpine.store('user_other', '');
     Alpine.store('labels_self', []);
     Alpine.store('labels_other', []);
     Alpine.store('progress', {
@@ -170,8 +172,7 @@ Discuss · Batch
       total: 0,
       ratio: 0,
     });
-    Alpine.store('codebook', false);
-    Alpine.store('typing_user', null);
+    Alpine.store('typing_user', '');
   });
 
   let chatSocket = null;
@@ -265,10 +266,10 @@ Discuss · Batch
         Alpine.store('typing_user', t.user);
         clearTimeout(typingClearTimer);
         typingClearTimer = setTimeout(() => {
-          Alpine.store('typing_user', null);
+          Alpine.store('typing_user', '');
         }, 5000);
       } else if (Alpine.store('typing_user') === t.user) {
-        Alpine.store('typing_user', null);
+        Alpine.store('typing_user', '');
         clearTimeout(typingClearTimer);
       }
       return;
