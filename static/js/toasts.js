@@ -18,7 +18,12 @@ function applyToastVariant(element, tags) {
   if (element) element.dataset.variant = resolveToastVariant(tags);
 }
 
-function showToastElement(element, { delay = 2000 } = {}) {
+// errors stay longer: they usually mean the user has to do something
+function toastDelay(element) {
+  return element?.dataset.variant === "error" ? 8000 : 2000;
+}
+
+function showToastElement(element, { delay = toastDelay(element) } = {}) {
   if (!element) return;
 
   const closeButton = element.querySelector("[data-toast-close]");
@@ -54,6 +59,11 @@ function createToast(htmx, message) {
   showToastElement(element);
 }
 
+function showErrorOnce(htmx, message) {
+  const shown = [...document.querySelectorAll("[data-toast-body]")].some((body) => body.innerText === message);
+  if (!shown) createToast(htmx, { message, tags: "error" });
+}
+
 export function initToasts(htmx) {
   document.querySelectorAll("[data-toast]").forEach((element) => {
     applyToastVariant(element, element.dataset.toastTags);
@@ -62,5 +72,25 @@ export function initToasts(htmx) {
 
   htmx.on("messages", (e) => {
     (e?.detail?.value ?? []).forEach((message) => createToast(htmx, message));
+  });
+
+  // A request that never reaches the server, or fails on it, swaps nothing: without a
+  // message the page just stays as it is, and the user believes the change was saved.
+  // The notification polling stays quiet, it tries again on its own.
+  const polling = (e) => e.detail.elt?.id === "notification-stack";
+  htmx.on("htmx:sendError", (e) => {
+    if (polling(e)) return;
+    const saving = e.detail.requestConfig?.verb !== "get";
+    showErrorOnce(
+      htmx,
+      saving
+        ? "Not saved: the server could not be reached. Check your connection and try again."
+        : "The server could not be reached. Check your connection and try again.",
+    );
+  });
+  htmx.on("htmx:responseError", (e) => {
+    // 4xx answers bring their own message (e.g. "This decision is already saved")
+    if (polling(e) || e.detail.xhr.status < 500) return;
+    showErrorOnce(htmx, "Something went wrong on the server. Please try again.");
   });
 }
