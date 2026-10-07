@@ -1,6 +1,9 @@
 """The samples table of a batch: experts see every example with its metadata
 and can rearrange the order in which annotators get them."""
 
+import json
+
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 import pytest
@@ -12,6 +15,9 @@ from discuss.models import Room
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import ProjectRole
+from projects.models import ProjectUser
+
+User = get_user_model()
 
 
 @pytest.fixture
@@ -172,25 +178,31 @@ class TestAnnotationsInTable:
         )
         assignment.set_user_annotations(label_ids=[label.id for label in labels])
 
-    def test_one_column_per_annotator_with_their_labels(self, client, batch_with_three):
+    def test_status_and_label_instead_of_a_column_per_person(self, client, batch_with_three):
+        # as wide for two annotators as for six: who chose what is on the sample's page
         data = batch_with_three
-        batch, (a, b, c) = data["batch"], data["examples"]
-        first, second = data["annotators"]
-        label_1, label_2 = data["labels"]
-        self._label(batch, first, a, [label_1])
-        self._label(batch, second, a, [])
+        _login(client, data["expert"])
 
-        context = self._table(client, data)
+        response = client.get(reverse("project-batch-detail", args=(data["batch"].id,)))
 
-        # columns are sorted by username
-        names = [p["name"] for p in context["people"]]
-        assert names == sorted([first.username, second.username])
-        row_a, row_b, _ = context["rows"]
-        by_name = dict(zip(names, row_a["labels"], strict=True))
-        assert [label.name for label in by_name[first.username]] == [label_1.name]
-        assert by_name[second.username] == []
-        # not labeled yet is different from labeled with no label
-        assert row_b["labels"] == [None, None]
+        content = response.content.decode()
+        thead = content[content.index("<thead>") : content.index("</thead>")]
+        assert "Status" in thead
+        assert "Label" in thead
+        for annotator in data["annotators"]:
+            assert annotator.username not in thead
+        assert "people" not in response.context
+
+    def test_rows_link_to_the_sample(self, client, batch_with_three):
+        data = batch_with_three
+        _login(client, data["expert"])
+
+        response = client.get(reverse("project-batch-detail", args=(data["batch"].id,)))
+
+        for example in data["examples"]:
+            url = reverse("project-sample-detail", args=(data["batch"].id, example.id))
+            assert f"window.location = '{url}'" in response.content.decode()
+        assert "{#" not in response.content.decode()  # a template comment shown as text
 
     def test_rows_where_annotators_disagree_are_marked(self, client, batch_with_three):
         data = batch_with_three
@@ -332,3 +344,192 @@ class TestDisagreementMarker:
         self._label(batch, second, b, [])
 
         assert self._marked(client, data) == [True, False, False]
+
+
+def _label(batch, user, example, labels, phase=BatchPhase.ANNOTATION):
+    ExampleAssignment.objects.get(
+        batch=batch,
+        user=user,
+        example=example,
+        phase=phase,
+    ).set_user_annotations(label_ids=[label.id for label in labels])
+
+
+@pytest.mark.django_db
+class TestSampleStatus:
+    """How far each sample got and its label so far: the expert decision, else what the
+    discussion agreed on, else what the annotators agreed on."""
+
+    def _rows(self, client, data):
+        _login(client, data["expert"])
+        response = client.get(reverse("project-batch-detail", args=(data["batch"].id,)))
+        return [
+            (row["status"], None if row["labels"] is None else [x.name for x in row["labels"]])
+            for row in response.context["rows"]
+        ]
+
+    def test_during_annotation(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, b, c) = data["batch"], data["examples"]
+        first, second = data["annotators"]
+        label_1, _label_2 = data["labels"]
+        assert self._rows(client, data) == [("Labeled 0 of 2", None)] * 3
+
+        _label(batch, first, a, [label_1])
+        _label(batch, second, a, [label_1])
+        _label(batch, first, b, [label_1])
+        _label(batch, second, b, [])
+        _label(batch, first, c, [])
+
+        assert self._rows(client, data) == [
+            ("Agreed", [label_1.name]),
+            ("To be discussed", None),
+            ("Labeled 1 of 2", None),
+        ]
+
+    def test_agreed_on_no_label(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, _b, _c) = data["batch"], data["examples"]
+        for annotator in data["annotators"]:
+            _label(batch, annotator, a, [])
+
+        assert self._rows(client, data)[0] == ("Agreed", [])
+
+    def test_through_discussion_and_expert(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, b, c) = data["batch"], data["examples"]
+        first, second = data["annotators"]
+        label_1, label_2 = data["labels"]
+        for example, (labels_1, labels_2) in (
+            (a, ([label_1], [label_2])),
+            (b, ([label_1], [label_1])),
+            (c, ([label_1], [label_2])),
+        ):
+            _label(batch, first, example, labels_1)
+            _label(batch, second, example, labels_2)
+        batch.set_phase(BatchPhase.DISCUSSION)
+        assert self._rows(client, data) == [
+            ("In discussion", None),
+            ("Agreed", [label_1.name]),
+            ("In discussion", None),
+        ]
+
+        discussed = BatchPhase.DISCUSSION
+        _label(batch, first, a, [label_1], discussed)
+        _label(batch, second, a, [label_1], discussed)
+        _label(batch, first, c, [label_1], discussed)
+        _label(batch, second, c, [label_2], discussed)
+        assert self._rows(client, data) == [
+            ("Agreed in discussion", [label_1.name]),
+            ("Agreed", [label_1.name]),
+            ("Disagree after discussion", None),
+        ]
+
+        batch.set_phase(BatchPhase.EXPERT)
+        assert self._rows(client, data)[2] == ("Waiting for expert", None)
+        _label(batch, data["expert"], c, [label_2], BatchPhase.EXPERT)
+        assert self._rows(client, data)[2] == ("Expert decided", [label_2.name])
+
+    def test_experts_who_decide_differently(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, _b, _c) = data["batch"], data["examples"]
+        first, second = data["annotators"]
+        label_1, label_2 = data["labels"]
+        other_expert = User.objects.create_user(username=f"x_{first.username}", password="123")
+        ProjectUser.objects.create(
+            project=data["project"], user=other_expert, default_role=ProjectRole.EXPERT
+        )
+        batch.users.add(other_expert, through_defaults={"role": ProjectRole.EXPERT})
+        for example in data["examples"]:
+            _label(batch, first, example, [label_1])
+            _label(batch, second, example, [label_2])
+        batch.set_phase(BatchPhase.DISCUSSION)
+        for example in data["examples"]:
+            _label(batch, first, example, [label_1], BatchPhase.DISCUSSION)
+            _label(batch, second, example, [label_2], BatchPhase.DISCUSSION)
+        batch.set_phase(BatchPhase.EXPERT)
+        _label(batch, data["expert"], a, [label_1], BatchPhase.EXPERT)
+        _label(batch, other_expert, a, [label_2], BatchPhase.EXPERT)
+
+        assert self._rows(client, data)[0] == ("Experts disagree", None)
+
+    def test_three_annotators(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, _b, _c) = data["batch"], data["examples"]
+        third = User.objects.create_user(username=f"t_{data['expert'].username}", password="123")
+        ProjectUser.objects.create(
+            project=data["project"], user=third, default_role=ProjectRole.ANNOTATOR
+        )
+        batch.users.add(third, through_defaults={"role": ProjectRole.ANNOTATOR})
+        batch.set_phase(BatchPhase.ANNOTATION)  # assignments for the third annotator
+        label_1, _label_2 = data["labels"]
+        for annotator in data["annotators"]:
+            _label(batch, annotator, a, [label_1])
+
+        assert self._rows(client, data)[0] == ("Labeled 2 of 3", None)
+        _label(batch, third, a, [label_1])
+        assert self._rows(client, data)[0] == ("Agreed", [label_1.name])
+
+
+@pytest.mark.django_db
+class TestSamplePageCodebookChanges:
+    """The sample's page shows the codebook changes saved with the decision on it."""
+
+    def _page(self, client, data, example):
+        _login(client, data["expert"])
+        url = reverse("project-sample-detail", args=(example.batch_id, example.id))
+        return client.get(url)
+
+    def _change(self, data, rationale, **info):
+        codebook = data["project"].codebook.get()
+        version = len(codebook.changes()) + 1
+        codebook.save(
+            content=f"Version {version}",
+            commit_message=json.dumps({"rationale": rationale, **info}),
+        )
+
+    def test_change_saved_with_the_decision(self, client, batch_with_three):
+        data = batch_with_three
+        a, b, _c = data["examples"]
+        self._change(data, "Because of sample A.", example_id=a.id, text=a.content)
+        self._change(data, "Because of sample B.", example_id=b.id, text=b.content)
+
+        response = self._page(client, data, a)
+
+        assert [c.rationale for c in response.context["changes"]] == ["Because of sample A."]
+        content = " ".join(response.content.decode().split())
+        assert "Codebook changed with this decision" in content
+        assert "Because of sample A." in content
+
+    def test_older_decisions_are_matched_by_text(self, client, batch_with_three):
+        data = batch_with_three
+        a, _b, _c = data["examples"]
+        self._change(data, "Logged before the id was.", text=a.content)
+
+        response = self._page(client, data, a)
+
+        assert [c.rationale for c in response.context["changes"]] == ["Logged before the id was."]
+
+    def test_same_text_in_another_sample_is_not_matched(self, client, batch_with_three):
+        data = batch_with_three
+        a, b, _c = data["examples"]
+        Example.objects.filter(pk=b.pk).update(content=a.content)
+        self._change(data, "Because of sample B.", example_id=b.id, text=a.content)
+
+        response = self._page(client, data, a)
+
+        assert response.context["changes"] == []
+        assert "Codebook changed with this decision" not in response.content.decode()
+
+    def test_status_and_label_on_the_page(self, client, batch_with_three):
+        data = batch_with_three
+        batch, (a, _b, _c) = data["batch"], data["examples"]
+        label_1, _label_2 = data["labels"]
+        for annotator in data["annotators"]:
+            _label(batch, annotator, a, [label_1])
+
+        response = self._page(client, data, a)
+
+        assert response.context["state"]["status"] == "Agreed"
+        section = response.content.decode().split('id="sample-state"')[1].split("</section>")[0]
+        assert label_1.name in section

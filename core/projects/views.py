@@ -398,53 +398,86 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
         return context
 
 
-def _samples_table(batch) -> dict:
-    """The examples of a batch as table rows: metadata spread over one column per key, and
-    one column per person with their labels (None = not labeled yet, [] = no label).
-    Annotators always get a column, experts once they have decided something."""
-    examples = list(batch.examples.all())
-    columns = list(dict.fromkeys(key for example in examples for key in example.metadata))
+def _sample_state(by_phase: dict, n_annotators: int) -> tuple[str, list | None]:
+    """How far one sample got, and its label so far: (status, labels), labels None while
+    open, [] for no label. by_phase: phase -> {username: sorted labels, None if not done}.
+    The furthest phase counts: expert decision, discussion, annotation."""
 
-    people = {
-        (BatchPhase.ANNOTATION, user.id): {"name": user.username, "role": "Annotator"}
-        for user in batch.assignees(role=ProjectRole.ANNOTATOR).order_by("username")
-    }
-    labels = {}  # (example id, phase, user id) -> labels
-    done = (
+    def same(found):
+        return len({frozenset(label.id for label in labels) for labels in found}) == 1
+
+    expert = by_phase.get(BatchPhase.EXPERT, {})
+    decided = [labels for labels in expert.values() if labels is not None]
+    if decided:
+        return ("Expert decided", decided[0]) if same(decided) else ("Experts disagree", None)
+    if expert:
+        return "Waiting for expert", None
+
+    discussion = by_phase.get(BatchPhase.DISCUSSION, {})
+    if discussion:
+        if None in discussion.values():
+            return "In discussion", None
+        found = list(discussion.values())
+        if same(found):
+            return "Agreed in discussion", found[0]
+        return "Disagree after discussion", None
+
+    labeled = [
+        labels for labels in by_phase.get(BatchPhase.ANNOTATION, {}).values() if labels is not None
+    ]
+    if len(labeled) < n_annotators or not labeled:
+        return f"Labeled {len(labeled)} of {n_annotators}", None
+    if same(labeled):
+        return "Agreed", labeled[0]
+    return "To be discussed", None
+
+
+def _sample_states(batch, examples) -> dict[int, dict]:
+    """_sample_state for every example of a batch, with whether its annotators disagree."""
+    by_example = {example.id: {} for example in examples}
+    assignments = (
         batch.assignments.filter(
-            done__isnull=False,
-            phase__in=[BatchPhase.ANNOTATION, BatchPhase.EXPERT],
+            phase__in=[BatchPhase.ANNOTATION, BatchPhase.DISCUSSION, BatchPhase.EXPERT],
         )
         .select_related("user")
         .prefetch_related("annotations__label")
-        .order_by("user__username")
     )
-    for assignment in done:
-        key = (assignment.phase, assignment.user_id)
-        people.setdefault(key, {"name": assignment.user.username, "role": "Expert"})
-        found = sorted((a.label for a in assignment.annotations.all()), key=lambda lb: lb.name)
-        labels[(assignment.example_id, *key)] = found
+    for assignment in assignments:
+        labels = sorted((a.label for a in assignment.annotations.all()), key=lambda lb: lb.name)
+        phases = by_example.setdefault(assignment.example_id, {})
+        phases.setdefault(assignment.phase, {})[assignment.user.username] = (
+            labels if assignment.done else None
+        )
+    n_annotators = batch.assignees(role=ProjectRole.ANNOTATOR).count()
+    states = {}
+    for example_id, phases in by_example.items():
+        status, labels = _sample_state(phases, n_annotators)
+        annotated = list(phases.get(BatchPhase.ANNOTATION, {}).values())
+        disagreement = (
+            len(annotated) >= 2  # noqa: PLR2004
+            and None not in annotated
+            and len({frozenset(label.id for label in found) for found in annotated}) > 1
+        )
+        states[example_id] = {"status": status, "labels": labels, "disagreement": disagreement}
+    return states
 
-    annotators = [key for key in people if key[0] == BatchPhase.ANNOTATION]
 
-    def disagree(example) -> bool:
-        """Every annotator has labeled the example, and not all chose the same labels."""
-        chosen = [labels.get((example.id, *key)) for key in annotators]
-        if len(chosen) < 2 or None in chosen:
-            return False
-        return len({frozenset(label.id for label in found) for found in chosen}) > 1
-
+def _samples_table(batch) -> dict:
+    """The examples of a batch as table rows: how far each got and its label so far, then
+    its metadata, one column per key. Who chose what is on the sample's own page, so the
+    table is as wide for two annotators as for six."""
+    examples = list(batch.examples.all())
+    columns = list(dict.fromkeys(key for example in examples for key in example.metadata))
+    states = _sample_states(batch, examples)
     return {
         "batch": batch,
         "examples": examples,
         "metadata_columns": columns,
-        "people": list(people.values()),
         "rows": [
             {
                 "example": example,
                 "values": [example.metadata.get(c) for c in columns],
-                "labels": [labels.get((example.id, *key)) for key in people],
-                "disagreement": disagree(example),
+                **states[example.id],
             }
             for example in examples
         ],
@@ -472,6 +505,7 @@ class SampleDetailView(ExpertRequiredMixin, View):
         examples = list(batch.examples.all())
         example = get_object_or_404(Example, id=example_id, batch=batch)
         index = examples.index(example)
+        codebook = batch.project.codebook.get()
         context = {
             "batch": batch,
             "example": example,
@@ -484,6 +518,9 @@ class SampleDetailView(ExpertRequiredMixin, View):
             "chat": Message.objects.filter(example=example)
             .exclude(user="system")
             .order_by("created_at"),
+            "state": _sample_states(batch, [example])[example.id],
+            "codebook": codebook,
+            "changes": codebook.changes_for(example),
         }
         return render(request, "projects/sample_detail.html", context)
 

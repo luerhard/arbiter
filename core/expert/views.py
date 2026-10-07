@@ -63,6 +63,7 @@ def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dic
     )
 
     return {
+        "example_id": example.id,
         "text": example.content,
         "labels_before_discussion": labels_by_user(BatchPhase.ANNOTATION),
         "labels_after_discussion": labels_by_user(BatchPhase.DISCUSSION),

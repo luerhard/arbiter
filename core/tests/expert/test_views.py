@@ -340,6 +340,7 @@ class TestCodebookDraft:
             label.name for label in self.data["labels"]
         )
         assert commit["text"] == self.data["example"].content
+        assert commit["example_id"] == self.data["example"].id
         assert "labels_before_discussion" in commit
         assert "labels_after_discussion" in commit
         assert "chat_history" in commit

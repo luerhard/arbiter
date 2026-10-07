@@ -33,23 +33,47 @@ Sample
         <p class="reading text-[22px] leading-normal whitespace-pre-line">{{ example.content }}</p>
       </article>
       <c-sample.trace :before="before" :chat="chat" :after="after" :decision="decision" />
+      {% if changes %}
+      <section class="card flex flex-col gap-4 px-6 py-5" aria-label="Codebook changes">
+        <h2 class="card-title">Codebook changed with this decision</h2>
+        {% include "codebook/partials/change-list.html" with links=True %}
+      </section>
+      {% endif %}
     </div>
 
-    <aside class="card flex w-80 shrink-0 flex-col gap-3 p-5">
-      <h2 class="card-title">Metadata</h2>
-      {% if example.metadata %}
-      <dl class="flex flex-col gap-3">
-        {% for key, value in example.metadata.items %}
-        <div class="flex flex-col gap-0.5">
-          <dt class="text-xs text-ink-3">{{ key }}</dt>
-          <dd class="font-mono text-[13px] break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+    <div class="flex w-80 shrink-0 flex-col gap-4">
+      <section id="sample-state" class="card flex flex-col gap-3 p-5" aria-label="Status">
+        <h2 class="card-title">Status</h2>
+        <p class="text-[14px] text-ink">{{ state.status }}</p>
+        <div class="flex flex-wrap gap-1">
+          {% if state.labels is None %}
+          <span class="text-[13px] text-ink-3">No label yet</span>
+          {% elif not state.labels %}
+          <span class="text-[13px] text-ink-3 italic">No label</span>
+          {% else %}
+          {% for label in state.labels %}
+          <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+          {% endfor %}
+          {% endif %}
         </div>
-        {% endfor %}
-      </dl>
-      {% else %}
-      <p class="text-[13px] text-ink-3">The uploaded file had no other columns.</p>
-      {% endif %}
-    </aside>
+      </section>
+
+      <aside class="card flex flex-col gap-3 p-5">
+        <h2 class="card-title">Metadata</h2>
+        {% if example.metadata %}
+        <dl class="flex flex-col gap-3">
+          {% for key, value in example.metadata.items %}
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-xs text-ink-3">{{ key }}</dt>
+            <dd class="font-mono text-[13px] break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+          </div>
+          {% endfor %}
+        </dl>
+        {% else %}
+        <p class="text-[13px] text-ink-3">The uploaded file had no other columns.</p>
+        {% endif %}
+      </aside>
+    </div>
   </div>
 </div>
 {% endblock content %}

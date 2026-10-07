@@ -23,6 +23,7 @@ class CodebookChange:
     date: datetime
     rationale: str
     decision_text: str  # the sample an expert decided when saving the change, if any
+    example_id: int | None  # its id; older decisions only name the text
     when: str  # "before batch 1", "during batch 2"
 
 
@@ -139,6 +140,9 @@ class Codebook(models.Model):
                     date=datetime.fromisoformat(date),
                     rationale=str(info.get("rationale", "")).strip(),
                     decision_text=str(info.get("text", "")),
+                    example_id=info.get("example_id")
+                    if isinstance(info.get("example_id"), int)
+                    else None,
                     when=when,
                 ),
             )
@@ -168,6 +172,16 @@ class Codebook(models.Model):
         )
         candidates = tagged & own if own or before is not None else tagged
         return max(candidates, default=None)
+
+    def changes_for(self, example) -> list[CodebookChange]:
+        """The changes an expert saved together with the decision on example. Decisions
+        saved before the log named the example are matched by its text."""
+        return [
+            change
+            for change in self.changes()
+            if change.example_id == example.id
+            or (change.example_id is None and change.decision_text == example.content)
+        ]
 
     def change(self, sha: str) -> tuple[CodebookChange, str] | None:
         """One change and what it changed, None if sha is not a change of the text."""

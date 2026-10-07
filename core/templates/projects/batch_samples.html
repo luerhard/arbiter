@@ -47,12 +47,8 @@ Batch
           {% endif %}
           <th class="w-12 border-b border-line px-4 py-3.5 text-right font-semibold">#</th>
           <th class="border-b border-line px-4 py-3.5 font-semibold">Text</th>
-          {% for person in people %}
-          <th class="border-b border-line px-4 py-3 font-semibold whitespace-nowrap normal-case tracking-normal">
-            <span class="block text-ink-2">{{ person.name }}</span>
-            <span class="block text-[11px] font-normal text-ink-3">{{ person.role }}</span>
-          </th>
-          {% endfor %}
+          <th class="border-b border-line px-4 py-3.5 font-semibold">Status</th>
+          <th class="border-b border-line px-4 py-3.5 font-semibold">Label</th>
           {% for column in metadata_columns %}
           <th class="border-b border-line px-4 py-3.5 font-semibold whitespace-nowrap normal-case tracking-normal">
             {{ column }}
