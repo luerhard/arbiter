@@ -256,7 +256,11 @@ Discuss · Batch
   }
 
   // handle everything after receiving data
-  document.body.addEventListener('htmx:wsAfterMessage', function (event) {
+  document.body.addEventListener('htmx:wsBeforeMessage', function (event) {
+    // The server sends JSON, never HTML. Without this, htmx-ext-ws parses every message as
+    // HTML and swaps elements with an id into the page: a chat message like
+    // <img id=x onerror=...> would run in every participant's browser.
+    event.preventDefault();
     // parse JSON data to object
     const data = JSON.parse(event.detail.message);
 
