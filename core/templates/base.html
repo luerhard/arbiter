@@ -40,7 +40,7 @@
         id="notification-stack"
         class="contents"
         hx-get="{% url 'notifications-unread' %}"
-        hx-trigger="load, every 15s"
+        hx-trigger="load, every 15s, notifications-changed from:body"
         hx-swap="innerHTML"
       ></div>
       {% endif %}
