@@ -184,11 +184,14 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
                     + "?skip_annotated=1",
                 )
         else:
+            # continue where the annotator left off; with everything labeled, what is left
+            # is finalizing
             assignment = (
                 ExampleAssignment.objects.filter(
                     user=request.user,
                     example__batch=batch,
                     phase=BatchPhase.ANNOTATION,
+                    done__isnull=True,
                 )
                 .order_by("order")
                 .first()
@@ -257,9 +260,21 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
 class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
     def _context(self, request, batch):
         batch_user = BatchUser.objects.filter(batch=batch, user=request.user).first()
+        first = (
+            ExampleAssignment.objects.filter(
+                batch=batch,
+                user=request.user,
+                phase=BatchPhase.ANNOTATION,
+            )
+            .order_by("order")
+            .first()
+        )
         return {
             "batch": batch,
             "project": batch.project,
+            "review_url": (
+                reverse("annotate-assignment", args=(batch.id, first.id)) if first else ""
+            ),
             "progress": get_progress(request.user, batch),
             "finalized": batch_user is not None and batch_user.finalized_at is not None,
             "finalized_count": BatchUser.objects.filter(

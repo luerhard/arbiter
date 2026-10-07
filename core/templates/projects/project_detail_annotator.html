@@ -51,7 +51,8 @@
           <a href="{% url 'annotate-done' batch_id=b.id %}" class="btn btn-secondary btn-sm">Finalized</a>
           {% elif batch.role == "A" and b.current_phase == "A" %}
           <a href="{% url 'annotate-batch' batch_id=b.id %}" class="btn btn-primary btn-sm">
-            {% if batch.done %}Continue annotating{% else %}Start annotating{% endif %}
+            {% if batch.done >= batch.length %}Finalize{% elif batch.done %}Continue annotating{% else %}Start
+            annotating{% endif %}
           </a>
           {% elif batch.role == "A" and b.current_phase == "D" %}
           <a href="{% url 'discuss-batch' batch_id=b.pk %}" class="btn btn-primary btn-sm">Join discussion</a>

@@ -39,7 +39,7 @@ Home · Arbiter
       </div>
       <a href="{{ task.url }}" class="btn {% if forloop.first %}btn-primary{% else %}btn-secondary{% endif %}">
         {% if task.kind == "annotate" %}
-        {% if task.done %}Continue annotating{% else %}Start annotating{% endif %}
+        {% if task.done >= task.total %}Finalize{% elif task.done %}Continue annotating{% else %}Start annotating{% endif %}
         {% elif task.kind == "discuss" %}
         Join discussion
         {% else %}

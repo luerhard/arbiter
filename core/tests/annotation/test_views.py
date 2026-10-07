@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
@@ -806,3 +808,82 @@ class TestSkipAnnotatedToggle:
 
         assert resp.status_code == 302
         assert resp.url == self._url(first_open)
+
+
+@pytest.mark.django_db
+class TestFindingFinalize:
+    """Annotators continue where they left off, and find Finalize once everything is labeled."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, client):
+        self.user = _first_annotator_user()
+        self.batch_id = _first_annotation_batch_for_user(self.user)
+        _ensure_batch_unfinished_for_user(self.batch_id, self.user)
+        mine = ExampleAssignment.objects.filter(
+            user=self.user,
+            example__batch_id=self.batch_id,
+            phase=BatchPhase.ANNOTATION,
+        ).order_by("order")
+        while mine.count() < 3:
+            _ensure_next_assignment_exists(mine.last())
+        self.assignments = list(mine)
+        self.entry_url = reverse("annotate-batch", args=(self.batch_id,))
+        self.done_url = reverse("annotate-done", args=(self.batch_id,))
+        assert client.login(username=self.user.username, password="123")
+
+    def _label(self, assignments):
+        for assignment in assignments:
+            assignment.done = timezone.now()
+            assignment.save()
+
+    def _url(self, assignment):
+        return reverse("annotate-assignment", args=(self.batch_id, assignment.id))
+
+    def _button_text(self, content, href):
+        match = re.search(rf'href="{re.escape(href)}"[^>]*>(.*?)</a\s*>', content, re.DOTALL)
+        return " ".join(match[1].split())
+
+    def test_entry_continues_at_the_first_open_sample(self, client):
+        self._label(self.assignments[:2])
+
+        resp = client.get(self.entry_url)
+
+        assert resp.url == self._url(self.assignments[2])
+
+    def test_entry_with_everything_labeled_opens_the_done_page(self, client):
+        self._label(self.assignments)
+
+        resp = client.get(self.entry_url)
+
+        assert resp.url == self.done_url
+
+    def test_annotation_page_points_to_finalize_once_everything_is_labeled(self, client):
+        first = self.assignments[0]
+        self._label(self.assignments[1:])
+        assert b'id="all-labeled"' not in client.get(self._url(first)).content
+
+        self._label([first])
+
+        content = client.get(self._url(first)).content.decode()
+        assert 'id="all-labeled"' in content
+        assert f'href="{self.done_url}"' in content
+
+    def test_review_on_the_done_page_starts_at_the_first_sample(self, client):
+        self._label(self.assignments)
+
+        content = client.get(self.done_url).content.decode()
+
+        assert self._button_text(content, self._url(self.assignments[0])) == "Review my labels"
+
+    @pytest.mark.parametrize("page", ["home", "project-detail-annotator"])
+    def test_button_says_finalize_once_everything_is_labeled(self, client, page):
+        batch = Batch.objects.get(id=self.batch_id)
+        url = reverse(page, args=(batch.project_id,)) if page != "home" else reverse(page)
+        assert self._button_text(client.get(url).content.decode(), self.entry_url) in (
+            "Start annotating",
+            "Continue annotating",
+        )
+
+        self._label(self.assignments)
+
+        assert self._button_text(client.get(url).content.decode(), self.entry_url) == "Finalize"
