@@ -174,31 +174,38 @@ def test_discuss_message_appends_to_state(redis_test_state, discussion_setup):
 
 @pytest.mark.django_db(transaction=True)
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
-def test_discuss_clicked_done_updates_state(redis_test_state, discussion_setup):
-    user, batch = discussion_setup
-    label = Label.objects.create(project=batch.project, name="L1")
+def test_discuss_clicked_done_updates_state(redis_test_state, discussion_with_disagreement):
+    user1, user2, batch, example, (label1, _label2) = discussion_with_disagreement
+    batch.set_phase(BatchPhase.DISCUSSION)
 
     async def run():
-        communicator = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
-        communicator.scope["user"] = user
-
-        connected, _ = await communicator.connect()
+        comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm1.scope["user"] = user1
+        connected, _ = await comm1.connect()
         assert connected is True
+        await comm1.receive_json_from()
 
-        await communicator.receive_json_from()
+        comm2 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
+        comm2.scope["user"] = user2
+        connected, _ = await comm2.connect()
+        assert connected is True
+        await comm1.receive_json_from()
 
-        await communicator.send_json_to({"clicked-done": True, "labels": [label.id]})
-        response = await communicator.receive_json_from()
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": [label1.id], "example_id": example.id},
+        )
+        response = await comm1.receive_json_from()
         state = response["state"]
-        assert state["clicked_done"][user.username] == 1
-        assert state["discussion_labels"][user.username] == [label.id]
+        assert state["clicked_done"][user1.username] == 1
+        assert state["discussion_labels"][user1.username] == [label1.id]
         assert any(
             msg.get("user") == "system"
-            and msg.get("text") == f"{user.username} finalized their decision: ['{label.name}']"
+            and msg.get("text") == f"{user1.username} finalized their decision: ['{label1.name}']"
             for msg in state["messages"]
         )
 
-        await communicator.disconnect()
+        await comm1.disconnect()
+        await comm2.disconnect()
 
     async_to_sync(run)()
 
@@ -275,11 +282,15 @@ def test_discuss_two_users_save_discussion_decisions(
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm1.send_json_to({"clicked-done": True, "labels": [label1.id]})
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": [label1.id], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm2.send_json_to({"clicked-done": True, "labels": [label2.id]})
+        await comm2.send_json_to(
+            {"clicked-done": True, "labels": [label2.id], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
@@ -336,11 +347,15 @@ def test_discuss_agreement_finalizes_batch(redis_test_state, discussion_with_dis
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm1.send_json_to({"clicked-done": True, "labels": [label1.id]})
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": [label1.id], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm2.send_json_to({"clicked-done": True, "labels": [label1.id]})
+        await comm2.send_json_to(
+            {"clicked-done": True, "labels": [label1.id], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
@@ -388,11 +403,15 @@ def test_discuss_saves_multiple_and_zero_labels(redis_test_state, discussion_wit
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm1.send_json_to({"clicked-done": True, "labels": [label1.id, label2.id]})
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": [label1.id, label2.id], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm2.send_json_to({"clicked-done": True, "labels": []})
+        await comm2.send_json_to(
+            {"clicked-done": True, "labels": [], "example_id": example.id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
@@ -577,10 +596,14 @@ async def _state_where(communicator, predicate):
             return state
 
 
+def _save(label_ids, example_id):
+    return {"clicked-done": True, "labels": label_ids, "example_id": example_id}
+
+
 async def _both_decide(comm1, comm2, label_ids, cur_example_id):
     """Both annotators save labels for the current example; returns the next state."""
     for communicator in (comm1, comm2):
-        await communicator.send_json_to({"clicked-done": True, "labels": label_ids})
+        await communicator.send_json_to(_save(label_ids, cur_example_id))
     return await _state_where(
         comm1,
         lambda s: s["cur_example_id"] != cur_example_id or s["discussion_ended"],
@@ -684,18 +707,15 @@ def test_discuss_resyncs_stale_room_state(redis_test_state, discussion_three_exa
     async_to_sync(run)()
 
 
-async def _message_where(communicator, predicate):
-    while True:
-        message = await communicator.receive_json_from(timeout=3)
-        if predicate(message):
-            return message
+def _save_failed(state):
+    return "Saving failed. Please save your labels again." in _system_messages(state)
 
 
-async def _save_one_after_the_other(comm1, comm2, user1, label_ids):
+async def _save_one_after_the_other(comm1, comm2, user1, label_ids, example_id):
     """Only the second save completes the example, so exactly one consumer saves."""
-    await comm1.send_json_to({"clicked-done": True, "labels": label_ids})
+    await comm1.send_json_to(_save(label_ids, example_id))
     await _state_where(comm1, lambda s: s["clicked_done"].get(user1.username) == 1)
-    await comm2.send_json_to({"clicked-done": True, "labels": label_ids})
+    await comm2.send_json_to(_save(label_ids, example_id))
 
 
 def _system_messages(state):
@@ -712,7 +732,7 @@ def test_discuss_failed_save_keeps_room_usable(
     # Saving the decisions fails (here: once, for the second annotator). Before, the
     # exception ended the consumer and left both Done flags set with locked buttons:
     # the room could never continue. Now nothing is saved, everyone is told, the
-    # buttons unlock, and saving again works.
+    # Done flags reset (the buttons follow them), and saving again works.
     user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
     original = ExampleAssignment.set_user_annotations
     failures = []
@@ -732,11 +752,11 @@ def test_discuss_failed_save_keeps_room_usable(
         await _state_where(comm1, lambda s: s["cur_example_id"])
         await _state_where(comm2, lambda s: s["cur_example_id"])
 
-        await _save_one_after_the_other(comm1, comm2, user1, [label1.id])
+        await _save_one_after_the_other(comm1, comm2, user1, [label1.id], first.id)
         for communicator in (comm1, comm2):
-            await _message_where(communicator, lambda m: m.get("save_failed"))
-        state = await room_state.get_state(batch.id)
+            state = await _state_where(communicator, _save_failed)
         assert set(state["clicked_done"].values()) == {0}
+        assert state["saving_example"] is None
         assert state["cur_example_id"] == first.id
         assert "Saving failed. Please save your labels again." in _system_messages(state)
         assert set(state["online_users"]) == {user1.username, user2.username}
@@ -779,8 +799,8 @@ def test_discuss_failed_save_is_all_or_nothing(
         comm1 = await _connect(batch, user1)
         comm2 = await _connect(batch, user2)
         await _state_where(comm1, lambda s: s["cur_example_id"])
-        await _save_one_after_the_other(comm1, comm2, user1, [label1.id])
-        await _message_where(comm1, lambda m: m.get("save_failed"))
+        await _save_one_after_the_other(comm1, comm2, user1, [label1.id], first.id)
+        await _state_where(comm1, _save_failed)
         await comm1.disconnect()
         await comm2.disconnect()
 
@@ -797,11 +817,24 @@ def test_discuss_failed_save_is_all_or_nothing(
 @pytest.mark.parametrize(
     "bad",
     [
-        "not json",
-        json.dumps({"clicked-done": True}),
-        json.dumps({"clicked-done": True, "labels": "1"}),
-        json.dumps({"clicked-done": True, "labels": [999_999_999]}),
-        json.dumps({"message": 123}),
+        lambda _: "not json",
+        lambda example_id: json.dumps({"clicked-done": True, "example_id": example_id}),
+        lambda example_id: json.dumps(_save("1", example_id)),
+        lambda example_id: json.dumps(_save([999_999_999], example_id)),
+        lambda _: json.dumps({"clicked-done": True, "labels": []}),
+        lambda example_id: json.dumps(_save([], str(example_id))),
+        lambda _: json.dumps({"undo-done": True}),
+        lambda _: json.dumps({"message": 123}),
+    ],
+    ids=[
+        "not-json",
+        "no-labels",
+        "labels-not-a-list",
+        "unknown-label",
+        "no-example",
+        "example-not-an-id",
+        "undo-no-example",
+        "message-not-text",
     ],
 )
 def test_discuss_bad_message_keeps_room_usable(redis_test_state, discussion_three_examples, bad):
@@ -812,7 +845,7 @@ def test_discuss_bad_message_keeps_room_usable(redis_test_state, discussion_thre
         comm2 = await _connect(batch, user2)
         await _state_where(comm1, lambda s: s["cur_example_id"])
 
-        await comm1.send_to(text_data=bad)
+        await comm1.send_to(text_data=bad(first.id))
         state = await _state_where(
             comm1,
             lambda s: any("Saving failed" in t or "went wrong" in t for t in _system_messages(s)),
@@ -894,3 +927,198 @@ def test_discuss_online_users_follow_open_connections(redis_test_state, discussi
         await comm1.disconnect()
 
     async_to_sync(run)()
+
+
+def _undo(example_id):
+    return {"undo-done": True, "example_id": example_id}
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_saved_decision_survives_leaving_the_room(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # Before, leaving (a reload, a network drop) silently reset the Done flag while the
+    # page kept the button locked: the room waited for a save nobody could click. Now a
+    # save stays saved until it is undone or the example is decided.
+    user1, user2, batch, (first, _second, third), (label1, label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+
+        await comm1.send_json_to(_save([label2.id], first.id))
+        await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 1)
+        await comm1.disconnect()
+
+        comm1 = await _connect(batch, user1)
+        state = await _state_where(comm1, lambda s: user1.username in s["online_users"])
+        assert state["clicked_done"][user1.username] == 1
+        assert state["discussion_labels"][user1.username] == [label2.id]
+        await comm1.disconnect()
+
+        # both decisions exist, so the example is decided even with user1 away
+        await comm2.send_json_to(_save([label1.id], first.id))
+        state = await _state_where(comm2, lambda s: s["cur_example_id"] == third.id)
+        assert state["clicked_done"] == {user1.username: 0, user2.username: 0}
+        assert state["discussion_labels"] == {}
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user, label in ((user1, label2), (user2, label1)):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_undo_withdraws_a_saved_decision(redis_test_state, discussion_three_examples):
+    user1, user2, batch, (first, _second, third), (label1, label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+
+        await comm1.send_json_to(_save([label1.id], first.id))
+        await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 1)
+        await comm1.send_json_to(_undo(first.id))
+        state = await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 0)
+        assert f"{user1.username} withdrew their decision." in _system_messages(state)
+
+        # the other one saving no longer completes the example
+        await comm2.send_json_to(_save([label2.id], first.id))
+        state = await _state_where(comm1, lambda s: s["clicked_done"][user2.username] == 1)
+        assert state["cur_example_id"] == first.id
+
+        # user1 saves again, with another label: that one counts
+        await comm1.send_json_to(_save([label2.id], first.id))
+        state = await _state_where(comm1, lambda s: s["cur_example_id"] != first.id)
+        assert state["cur_example_id"] == third.id
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label2.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_repeated_save_does_not_withdraw(redis_test_state, discussion_three_examples):
+    # Before, a second save toggled the Done flag back to 0, and the chat still
+    # announced a finalized decision.
+    user1, user2, batch, (first, *_), (label1, _label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+
+        await comm1.send_json_to(_save([label1.id], first.id))
+        await comm1.send_json_to(_save([label1.id], first.id))
+        await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 1)
+        await comm1.send_json_to({"message": "after the saves"})
+        state = await _state_where(comm1, lambda s: s["messages"][-1]["text"] == "after the saves")
+        assert state["clicked_done"][user1.username] == 1
+        finalized = [t for t in _system_messages(state) if "finalized their decision" in t]
+        assert len(finalized) == 1
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_late_save_and_undo_do_not_touch_the_next_example(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # A save or undo that arrives after the room moved on (double click, a message
+    # queued during a reconnect) refers to the previous example and is ignored.
+    user1, user2, batch, (first, _second, third), (label1, label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+        await _both_decide(comm1, comm2, [label1.id], first.id)
+
+        await comm1.send_json_to(_save([label2.id], first.id))
+        await comm1.send_json_to(_save([label2.id], 0))  # the room before it started
+        await comm1.send_json_to({"message": "after the late save"})
+        state = await _state_where(
+            comm1,
+            lambda s: s["messages"][-1]["text"] == "after the late save",
+        )
+        assert state["cur_example_id"] == third.id
+        assert state["clicked_done"][user1.username] == 0
+        assert state["discussion_labels"] == {}
+
+        # user2 saved the current example; user1's undo for the old one must not touch it
+        await comm2.send_json_to(_save([label1.id], third.id))
+        await _state_where(comm1, lambda s: s["clicked_done"][user2.username] == 1)
+        await comm2.send_json_to(_undo(first.id))
+        await comm2.send_json_to({"message": "after the late undo"})
+        state = await _state_where(
+            comm1,
+            lambda s: s["messages"][-1]["text"] == "after the late undo",
+        )
+        assert state["clicked_done"][user2.username] == 1
+        assert "withdrew their decision" not in " ".join(_system_messages(state))
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label1.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_double_save_completes_the_example_once(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # The second annotator's save arrives twice at once (double click, two tabs): only
+    # one of them may write the decisions and move on, never skip an example.
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        tab_a = await _connect(batch, user2)
+        tab_b = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"])
+
+        await comm1.send_json_to(_save([label1.id], first.id))
+        await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 1)
+        await tab_a.send_json_to(_save([label1.id], first.id))
+        await tab_b.send_json_to(_save([label1.id], first.id))
+        await _state_where(comm1, lambda s: s["cur_example_id"] == third.id)
+        await comm1.send_json_to({"message": "after the double save"})
+        state = await _state_where(
+            comm1,
+            lambda s: s["messages"][-1]["text"] == "after the double save",
+        )
+        assert (state["cur_example_id"], state["page"]) == (third.id, 2)
+        assert _system_messages(state).count("All done. Next Sentence.") == 1
+
+        for communicator in (comm1, tab_a, tab_b):
+            await communicator.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, third, user, BatchPhase.DISCUSSION)
+        assert assignment.done is None

@@ -41,7 +41,8 @@ def _defaults() -> dict[str, Any]:
         "cur_example": "",
         "annotation_labels": {},
         "discussion_labels": {},
-        "clicked_done": {},  # {username: 0|1}
+        "clicked_done": {},  # {username: 0|1}, a saved decision for the current example
+        "saving_example": None,  # example whose decisions are being written to the database
         "messages": [],  # dict-keys: username, msg
         "total_pages": 0,
     }

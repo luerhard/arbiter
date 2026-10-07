@@ -43,25 +43,37 @@ Discuss · Batch
       <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
         <span class="inline-flex items-center gap-2 text-[13px] text-ink-2">
           {% heroicon_micro "information-circle" class="size-4" %}
-          The next disagreement opens once you both save.
+          <span
+            x-text="$store.saved ? `Saved. The next disagreement opens once ${$store.user_other} saves.` : 'The next disagreement opens once you both save.'"
+          >
+            The next disagreement opens once you both save.
+          </span>
         </span>
         <div>
-          <input
-            type="checkbox"
-            class="peer sr-only"
+          {# Save and Undo name the example they are meant for: the server ignores them once the room moved on. #}
+          <button
+            type="button"
             id="save-done"
-            name="clicked-done"
-            value="done"
-            hx-vals="js:{'clicked-done': 'done', 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+            class="btn btn-primary btn-lg"
+            x-show="!$store.saved"
+            hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
             :disabled="$store.save_disabled"
             ws-send
-          />
-          <label
-            for="save-done"
-            class="btn btn-primary btn-lg peer-disabled:cursor-default peer-disabled:opacity-50 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent-ink"
           >
             Save my label
-          </label>
+          </button>
+          <button
+            type="button"
+            id="undo-done"
+            class="btn btn-secondary btn-lg"
+            x-show="$store.saved"
+            x-cloak
+            hx-vals="js:{'undo-done': 'undo', 'example_id': local_state.cur_example_id}"
+            :disabled="$store.save_disabled"
+            ws-send
+          >
+            Undo save
+          </button>
         </div>
       </div>
     </div>
@@ -135,6 +147,7 @@ Discuss · Batch
       last_render_id: 0,
     });
     Alpine.store('save_disabled', true);
+    Alpine.store('saved', false);
     Alpine.store('user_self', undefined);
     Alpine.store('user_other', undefined);
     Alpine.store('labels_self', []);
@@ -219,6 +232,15 @@ Discuss · Batch
     });
   });
 
+  // The Save/Undo button and the labels follow the server: saved or not is the user's
+  // Done flag in the room state, which survives reconnects and reloads.
+  function applySaveState(state) {
+    const saved = state.clicked_done?.[user_self] === 1;
+    Alpine.store('saved', saved);
+    Alpine.store('save_disabled', !state.cur_example_id || !!state.discussion_ended);
+    window.dispatchEvent(new CustomEvent(saved ? 'lock-labels' : 'unlock-labels'));
+  }
+
   function close_room(data) {
     window.location = data['done'];
   }
@@ -243,13 +265,6 @@ Discuss · Batch
     }
 
     console.log('WebSocket Message Received: ', data);
-
-    if ('save_failed' in data) {
-      // nothing was saved and the server reset everyone's Done: let the users save again
-      Alpine.store('save_disabled', false);
-      window.dispatchEvent(new CustomEvent('unlock-labels'));
-      return;
-    }
 
     if ('done' in data) {
       const intervalID = setInterval(close_room, 60000, data);
@@ -294,12 +309,14 @@ Discuss · Batch
 
           // The property `checked` should be modifiable and then read when saving.
           // Flatten, then add checked property to each label, then pass it to Alpine.store.
+          // Start from the user's saved decision if there is one (e.g. after a reload).
           let labels = server_state.annotation_labels;
+          const decided = server_state.discussion_labels?.[user_self];
           Alpine.store(
             'labels_self',
             labels[user_self].flat().map((i) => ({
               ...i,
-              checked: i.is_set,
+              checked: decided ? decided.includes(i.id) : i.is_set,
             })),
           );
           Alpine.store(
@@ -315,11 +332,6 @@ Discuss · Batch
             total: server_state['total_pages'],
             ratio: (100 * server_state['page']) / server_state['total_pages'],
           });
-
-          console.log('Unlocking save button.');
-          Alpine.store('save_disabled', false);
-          console.log('Unlocking labels.');
-          window.dispatchEvent(new CustomEvent('unlock-labels'));
         }
 
         Alpine.store('chat').last_render_id = server_state.messages.length - 1;
@@ -336,7 +348,11 @@ Discuss · Batch
         lib.discuss.renderOnlineStatus(server_state.online_users);
       }
 
-      local_state = server_state;
+      if (server_version >= local_version) {
+        // also for an unchanged state: it answers a save or undo the server ignored
+        local_state = server_state;
+        applySaveState(server_state);
+      }
     } else {
       // what do do when no server state?
     }
@@ -359,8 +375,8 @@ Discuss · Batch
       clearTimeout(typingSendTimer);
     }
 
-    if ('clicked-done' in data) {
-      console.log('Locking labels.');
+    if ('clicked-done' in data || 'undo-done' in data) {
+      // wait for the server's answer, which sets button and labels again
       window.dispatchEvent(new CustomEvent('lock-labels'));
       Alpine.store('save_disabled', true);
     }

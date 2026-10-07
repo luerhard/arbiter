@@ -85,14 +85,18 @@ def _discuss_via_websocket(user1, user2, batch, labels_user1, labels_user2):
         assert connected is True
 
         # Both users receive a state after the second user joins.
+        example_id = (await comm1.receive_json_from())["state"]["cur_example_id"]
+        await comm2.receive_json_from()
+
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": labels_user1, "example_id": example_id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm1.send_json_to({"clicked-done": True, "labels": labels_user1})
-        await comm1.receive_json_from()
-        await comm2.receive_json_from()
-
-        await comm2.send_json_to({"clicked-done": True, "labels": labels_user2})
+        await comm2.send_json_to(
+            {"clicked-done": True, "labels": labels_user2, "example_id": example_id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
