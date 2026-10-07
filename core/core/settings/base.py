@@ -205,6 +205,12 @@ MARKDOWNIFY = {
             "ul",
             "del",
             "text",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "th",
+            "td",
         ],
         "WHITELIST_ATTRS": [
             "href",
@@ -215,6 +221,9 @@ MARKDOWNIFY = {
             "codebook.markdown_extensions.git_diff_preprocess",
             "codebook.markdown_extensions.git_diff_del",
             "codebook.markdown_extensions.git_diff_insertion",
+            "codebook.markdown_extensions.block_spacing",
+            "tables",
+            "sane_lists",
         ],
     },
 }
