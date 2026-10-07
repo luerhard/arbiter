@@ -19,61 +19,73 @@ Discuss · Batch
 <div class="flex min-w-0 flex-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
   <main class="flex min-w-0 flex-1 justify-center px-12 py-10">
     <div class="flex w-full max-w-3xl flex-col gap-6" x-data>
-      <span class="eyebrow">Disagreement</span>
+      {# the batch left the discussion phase: replaces sentence, labels and Save, the chat stays #}
+      <div
+        id="room-closed"
+        class="card flex flex-col items-center gap-4 px-6 py-14 text-center"
+        x-show="$store.room_closed"
+        x-cloak
+      >
+        <p class="max-w-md text-[15px] font-semibold" x-text="$store.room_closed?.message"></p>
+        <a class="btn btn-primary" :href="$store.room_closed?.project_url">Back to project</a>
+      </div>
+      <div class="contents" x-show="!$store.room_closed">
+        <span class="eyebrow">Disagreement</span>
 
-      <article class="card px-9 py-8">
-        <p id="current-example" class="reading text-2xl leading-normal" x-text="$store.example"></p>
-      </article>
+        <article class="card px-9 py-8">
+          <p id="current-example" class="reading text-2xl leading-normal" x-text="$store.example"></p>
+        </article>
 
-      <section class="card flex flex-col gap-4 p-5">
-        <h2 class="card-title">How you labeled it before the discussion</h2>
-        <div class="grid grid-cols-[130px_1fr] items-center gap-x-4 gap-y-3">
-          <span class="text-ink-2">You</span>
-          <c-discuss.labels user="self" id="prev-labels-self" />
-          <span class="truncate text-ink-2" x-text="$store.user_other"></span>
-          <c-discuss.labels user="other" id="prev-labels-other" />
-        </div>
-      </section>
+        <section class="card flex flex-col gap-4 p-5">
+          <h2 class="card-title">How you labeled it before the discussion</h2>
+          <div class="grid grid-cols-[130px_1fr] items-center gap-x-4 gap-y-3">
+            <span class="text-ink-2">You</span>
+            <c-discuss.labels user="self" id="prev-labels-self" />
+            <span class="truncate text-ink-2" x-text="$store.user_other"></span>
+            <c-discuss.labels user="other" id="prev-labels-other" />
+          </div>
+        </section>
 
-      <section class="flex flex-col gap-3">
-        <h2 class="text-[15px] font-semibold">Your label after discussing</h2>
-        <c-discuss.labels user="self" id="current-labels" enabled />
-      </section>
+        <section class="flex flex-col gap-3">
+          <h2 class="text-[15px] font-semibold">Your label after discussing</h2>
+          <c-discuss.labels user="self" id="current-labels" enabled />
+        </section>
 
-      <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
-        <span class="inline-flex items-center gap-2 text-[13px] text-ink-2">
-          {% heroicon_micro "information-circle" class="size-4" %}
-          <span
-            x-text="$store.saved ? `Saved. The next disagreement opens once ${$store.user_other} saves.` : 'The next disagreement opens once you both save.'"
-          >
-            The next disagreement opens once you both save.
+        <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
+          <span class="inline-flex items-center gap-2 text-[13px] text-ink-2">
+            {% heroicon_micro "information-circle" class="size-4" %}
+            <span
+              x-text="$store.saved ? `Saved. The next disagreement opens once ${$store.user_other} saves.` : 'The next disagreement opens once you both save.'"
+            >
+              The next disagreement opens once you both save.
+            </span>
           </span>
-        </span>
-        <div>
-          {# Save and Undo name the example they are meant for: the server ignores them once the room moved on. #}
-          <button
-            type="button"
-            id="save-done"
-            class="btn btn-primary btn-lg"
-            x-show="!$store.saved"
-            hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
-            :disabled="$store.save_disabled"
-            ws-send
-          >
-            Save my label
-          </button>
-          <button
-            type="button"
-            id="undo-done"
-            class="btn btn-secondary btn-lg"
-            x-show="$store.saved"
-            x-cloak
-            hx-vals="js:{'undo-done': 'undo', 'example_id': local_state.cur_example_id}"
-            :disabled="$store.save_disabled"
-            ws-send
-          >
-            Undo save
-          </button>
+          <div>
+            {# Save and Undo name the example they are meant for: the server ignores them once the room moved on. #}
+            <button
+              type="button"
+              id="save-done"
+              class="btn btn-primary btn-lg"
+              x-show="!$store.saved"
+              hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+              :disabled="$store.save_disabled"
+              ws-send
+            >
+              Save my label
+            </button>
+            <button
+              type="button"
+              id="undo-done"
+              class="btn btn-secondary btn-lg"
+              x-show="$store.saved"
+              x-cloak
+              hx-vals="js:{'undo-done': 'undo', 'example_id': local_state.cur_example_id}"
+              :disabled="$store.save_disabled"
+              ws-send
+            >
+              Undo save
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -148,6 +160,7 @@ Discuss · Batch
     });
     Alpine.store('save_disabled', true);
     Alpine.store('saved', false);
+    Alpine.store('room_closed', null);
     Alpine.store('user_self', undefined);
     Alpine.store('user_other', undefined);
     Alpine.store('labels_self', []);
@@ -237,13 +250,10 @@ Discuss · Batch
   function applySaveState(state) {
     const saved = state.clicked_done?.[user_self] === 1;
     Alpine.store('saved', saved);
-    Alpine.store('save_disabled', !state.cur_example_id || !!state.discussion_ended);
+    Alpine.store('save_disabled', !!Alpine.store('room_closed') || !state.cur_example_id || !!state.discussion_ended);
     window.dispatchEvent(new CustomEvent(saved ? 'lock-labels' : 'unlock-labels'));
   }
 
-  function close_room(data) {
-    window.location = data['done'];
-  }
   // handle everything after receiving data
   document.body.addEventListener('htmx:wsAfterMessage', function (event) {
     // parse JSON data to object
@@ -266,13 +276,12 @@ Discuss · Batch
 
     console.log('WebSocket Message Received: ', data);
 
-    if ('done' in data) {
-      const intervalID = setInterval(close_room, 60000, data);
-      console.log(intervalID);
-    }
-
-    if ('no_examples' in data) {
-      Alpine.store('example', 'No examples have disagreements.');
+    if ('room_closed' in data) {
+      // the server closes the connection right after this, without a reconnect
+      Alpine.store('room_closed', data.room_closed);
+      Alpine.store('save_disabled', true);
+      window.dispatchEvent(new CustomEvent('lock-labels'));
+      return;
     }
 
     console.log('setting user');

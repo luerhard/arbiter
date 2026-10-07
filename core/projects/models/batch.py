@@ -239,6 +239,12 @@ class Batch(models.Model):
 
         if old_phase != phase:
             self._reset_phase(phase)
+            if old_phase == BatchPhase.DISCUSSION:
+                from discuss import room_state  # noqa: PLC0415
+
+                # open discussion pages show that the room is closed
+                batch_id = self.pk
+                transaction.on_commit(lambda: room_state.close_room(batch_id, phase))
             self._notify_phase_change(phase, actor=actor)
 
     def _reset_phase(self, phase: BatchPhase):

@@ -6,6 +6,8 @@ import logging
 import os
 from typing import Any
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from redis import Redis as SyncRedis
 from redis.asyncio import Redis
 from redis.exceptions import RedisError
@@ -83,6 +85,18 @@ async def update_state(
         except WatchError:
             # state changed between WATCH and EXEC, retry
             continue
+
+
+def close_room(batch_id: int | str, phase: str) -> None:
+    """Tell the clients in a room that the batch left the discussion phase. A failing
+    channel layer must not block the phase change."""
+    try:
+        async_to_sync(get_channel_layer().group_send)(
+            f"chat_{batch_id}",
+            {"type": "room_closed", "phase": phase},
+        )
+    except Exception:
+        log.warning("Could not close the chat room of batch %s", batch_id, exc_info=True)
 
 
 def delete_state(batch_id: int | str) -> None:

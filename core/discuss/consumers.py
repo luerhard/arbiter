@@ -7,6 +7,7 @@ from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.urls import reverse
 
 from .models import Message
 from .models import Room
@@ -370,11 +371,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await update_state(self.batch_id, mut)
 
-        if end_reason:
-            await database_sync_to_async(self._advance_batch_after_discussion)()
-
         if msg:
             await self._append_chat_message(username="system", message=msg)
+
+        if end_reason:
+            # closes the room (Batch.set_phase), so the message above goes first
+            await database_sync_to_async(self._advance_batch_after_discussion)()
 
     def _advance_batch_after_discussion(self):
         # Re-fetch: self.batch was loaded at connect time and may be stale.
@@ -391,6 +393,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 ensure_ascii=False,
             ),
         )
+
+    async def room_closed(self, event):
+        """The batch left the discussion phase: show the end, then close the connection
+        (code 1000, so the client does not reconnect)."""
+        state = await self._get_state()
+        phase = event["phase"]
+        if state["discussion_ended"] == "NO_EXAMPLES":
+            message = "There was nothing to discuss."
+        elif state["discussion_ended"]:
+            message = "All disagreements discussed."
+        else:
+            message = f"This batch was moved to the {BatchPhase(phase).label} phase."
+        if state["discussion_ended"]:
+            message += {
+                BatchPhase.EXPERT: " The batch moves on to expert decisions.",
+                BatchPhase.FINAL: " The batch is finalized.",
+            }.get(phase, "")
+        else:
+            message += " The discussion is closed."
+        await self.send(
+            text_data=json.dumps({"state": state, "user": self.username}, ensure_ascii=False),
+        )
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "room_closed": {
+                        "message": message,
+                        "project_url": reverse("project-detail", args=(self.batch.project_id,)),
+                    },
+                },
+            ),
+        )
+        await self.close(code=1000)
 
     async def chat_typing(self, event):
         if event["user"] == self.username:
