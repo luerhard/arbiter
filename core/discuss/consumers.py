@@ -44,25 +44,32 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
         await self.accept()
 
-        # Initialize / update room state in Redis
+        # Initialize / update room state in Redis. A user can be connected more than once
+        # (two tabs, or a reconnect while the server has not yet noticed the old socket
+        # died), so the room tracks connections and a user is online while one is open.
+        first_connection = False
+
         async def _init(state):
+            nonlocal first_connection
             # required users (usernames) once
             if not state["required_users"]:
                 annotators = await self.get_assigned_annotators()
                 state["required_users"] = sorted({u.username for u in annotators})
-            # join online users
-            if self.username not in state["online_users"]:
-                state["online_users"].append(self.username)
+            connections = state.setdefault("connections", {})
+            first_connection = not connections.get(self.username)
+            connections.setdefault(self.username, []).append(self.channel_name)
+            state["online_users"] = list(connections)
             # init clicked_done entry
             state["clicked_done"].setdefault(self.username, 0)
             return state
 
-        await self._append_chat_message(
-            username="system",
-            message=f"{self.username} is now connected.",
-        )
         state = await update_state(self.batch_id, _init)
         log.debug(f"Current {state=} ")
+        if first_connection:
+            await self._append_chat_message(
+                username="system",
+                message=f"{self.username} is now connected.",
+            )
 
         if (set(state["online_users"]) == set(state["required_users"])) and not state[
             "discussion_ended"
@@ -76,15 +83,25 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not self.joined:
             return
 
-        async def _leave(state):
-            if self.username in state["online_users"]:
-                state["online_users"].remove(self.username)
-            state["clicked_done"].pop(self.username, None)
+        last_connection = False
 
+        async def _leave(state):
+            nonlocal last_connection
+            connections = state.setdefault("connections", {})
+            mine = [c for c in connections.get(self.username, []) if c != self.channel_name]
+            last_connection = not mine
+            if mine:
+                connections[self.username] = mine
+            else:
+                connections.pop(self.username, None)
+                state["clicked_done"].pop(self.username, None)
+            state["online_users"] = list(connections)
             return state
 
         state = await update_state(self.batch_id, _leave)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
+        if not last_connection:
+            return  # another connection of this user is still in the room
         await self._append_chat_message(
             username="system",
             message=f"{self.username} has disconnected.",
@@ -225,7 +242,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         async def mut(state):
             log.debug(f"clicked done state: {state['clicked_done']}")
-            if state["clicked_done"][username]:
+            if state["clicked_done"].get(username):
                 # TODO: Looks like on reload the user can press Save & Done
                 # even after having pressed it previously.
                 # After pressing it again the boolean rotates.

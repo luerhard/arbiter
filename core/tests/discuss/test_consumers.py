@@ -826,3 +826,71 @@ def test_discuss_bad_message_keeps_room_usable(redis_test_state, discussion_thre
         await comm2.disconnect()
 
     async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_second_connection_of_a_user_keeps_the_room_working(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # A user is connected twice: two tabs, or a reconnect after a network drop while
+    # the server has not yet noticed the old socket died. Closing one connection must
+    # not take the user out of the room: before, it did, and the remaining one failed
+    # on every save (KeyError in clicked_done).
+    user1, user2, batch, (first, _second, third), (label1, _label2) = discussion_three_examples
+
+    async def run():
+        old = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm2, lambda s: s["cur_example_id"])
+        new = await _connect(batch, user1)
+        await _state_where(new, lambda s: s["cur_example_id"] == first.id)
+
+        await old.disconnect()
+        state = await room_state.get_state(batch.id)
+        assert set(state["online_users"]) == {user1.username, user2.username}
+        assert f"{user1.username} has disconnected." not in _system_messages(state)
+        assert _system_messages(state).count(f"{user1.username} is now connected.") == 1
+
+        state = await _both_decide(new, comm2, [label1.id], first.id)
+        assert state["cur_example_id"] == third.id
+        assert "Saving failed. Please save your labels again." not in _system_messages(state)
+
+        await new.disconnect()
+        state = await room_state.get_state(batch.id)
+        assert state["online_users"] == [user2.username]
+        assert f"{user1.username} has disconnected." in _system_messages(state)
+
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert list(assignment.annotations.values_list("label_id", flat=True)) == [label1.id]
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_online_users_follow_open_connections(redis_test_state, discussion_three_examples):
+    # A room state from before connections were tracked lists a user as online who
+    # is not (a disconnect that never ran). Joining must not start the room for them.
+    user1, user2, batch, *_ = discussion_three_examples
+
+    async def run():
+        await room_state.set_state(
+            batch.id,
+            {
+                **room_state._defaults(),
+                "online_users": [user1.username, user2.username],
+                "required_users": sorted([user1.username, user2.username]),
+            },
+        )
+        comm1 = await _connect(batch, user1)
+        state = (await comm1.receive_json_from())["state"]
+        assert state["online_users"] == [user1.username]
+        assert state["page"] == 0
+        await comm1.disconnect()
+
+    async_to_sync(run)()

@@ -32,7 +32,8 @@ def _key(batch_id: int | str) -> str:
 def _defaults() -> dict[str, Any]:
     return {
         "version": 0,
-        "online_users": [],
+        "online_users": [],  # users with at least one open connection
+        "connections": {},  # {username: [channel names]}
         "required_users": [],
         "page": 0,
         "discussion_ended": False,
