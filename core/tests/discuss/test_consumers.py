@@ -227,7 +227,7 @@ def test_discuss_clicked_done_updates_state(redis_test_state, discussion_with_di
         assert state["discussion_labels"][user1.username] == [label1.id]
         assert any(
             msg.get("user") == "system"
-            and msg.get("text") == f"{user1.username} finalized their decision: ['{label1.name}']"
+            and msg.get("text") == f"{user1.username} saved: {label1.name}"
             for msg in state["messages"]
         )
 
@@ -433,14 +433,16 @@ def test_discuss_saves_multiple_and_zero_labels(redis_test_state, discussion_wit
         await comm1.send_json_to(
             {"clicked-done": True, "labels": [label1.id, label2.id], "example_id": example.id},
         )
-        await comm1.receive_json_from()
+        state = (await comm1.receive_json_from())["state"]
         await comm2.receive_json_from()
+        assert f"{user1.username} saved: {label1.name}, {label2.name}" in _system_messages(state)
 
         await comm2.send_json_to(
             {"clicked-done": True, "labels": [], "example_id": example.id},
         )
-        await comm1.receive_json_from()
+        state = (await comm1.receive_json_from())["state"]
         await comm2.receive_json_from()
+        assert f"{user2.username} saved: no labels" in _system_messages(state)
 
         await comm1.disconnect()
         await comm2.disconnect()
@@ -701,7 +703,7 @@ def test_discuss_resumes_after_room_state_lost(redis_test_state, discussion_thre
     state = async_to_sync(run)()
 
     assert (state["cur_example_id"], state["page"], state["total_pages"]) == (third.id, 2, 2)
-    assert not any(m["text"] == "All done. Next Sentence." for m in state["messages"])
+    assert not any(m["text"] == "Both saved. Next disagreement." for m in state["messages"])
 
 
 @pytest.mark.django_db(transaction=True)
@@ -1015,7 +1017,7 @@ def test_discuss_undo_withdraws_a_saved_decision(redis_test_state, discussion_th
         await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 1)
         await comm1.send_json_to(_undo(first.id))
         state = await _state_where(comm1, lambda s: s["clicked_done"][user1.username] == 0)
-        assert f"{user1.username} withdrew their decision." in _system_messages(state)
+        assert f"{user1.username} undid their save." in _system_messages(state)
 
         # the other one saving no longer completes the example
         await comm2.send_json_to(_save([label2.id], first.id))
@@ -1055,7 +1057,7 @@ def test_discuss_repeated_save_does_not_withdraw(redis_test_state, discussion_th
         await comm1.send_json_to({"message": "after the saves"})
         state = await _state_where(comm1, lambda s: s["messages"][-1]["text"] == "after the saves")
         assert state["clicked_done"][user1.username] == 1
-        finalized = [t for t in _system_messages(state) if "finalized their decision" in t]
+        finalized = [t for t in _system_messages(state) if t.startswith(f"{user1.username} saved:")]
         assert len(finalized) == 1
 
         await comm1.disconnect()
@@ -1101,7 +1103,7 @@ def test_discuss_late_save_and_undo_do_not_touch_the_next_example(
             lambda s: s["messages"][-1]["text"] == "after the late undo",
         )
         assert state["clicked_done"][user2.username] == 1
-        assert "withdrew their decision" not in " ".join(_system_messages(state))
+        assert "undid their save" not in " ".join(_system_messages(state))
 
         await comm1.disconnect()
         await comm2.disconnect()
@@ -1140,7 +1142,7 @@ def test_discuss_double_save_completes_the_example_once(
             lambda s: s["messages"][-1]["text"] == "after the double save",
         )
         assert (state["cur_example_id"], state["page"]) == (third.id, 2)
-        assert _system_messages(state).count("All done. Next Sentence.") == 1
+        assert _system_messages(state).count("Both saved. Next disagreement.") == 1
 
         for communicator in (comm1, tab_a, tab_b):
             await communicator.disconnect()
@@ -1150,6 +1152,37 @@ def test_discuss_double_save_completes_the_example_once(
     for user in (user1, user2):
         assignment = _annotation(batch, third, user, BatchPhase.DISCUSSION)
         assert assignment.done is None
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_team_of_three_moves_on_when_everyone_saved(
+    redis_test_state,
+    discussion_three_examples,
+):
+    user1, user2, batch, (first, second, third), (label1, _label2) = discussion_three_examples
+    user3 = User.objects.create_user(username=f"third_{uuid.uuid4().hex[:8]}", password="123")
+    batch.users.add(user3, through_defaults={"role": ProjectRole.ANNOTATOR})
+    batch.set_phase(BatchPhase.ANNOTATION)
+    for example in (first, second, third):
+        _annotation(batch, example, user3).set_user_annotations([label1.id])
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        comms = [await _connect(batch, user) for user in (user1, user2, user3)]
+        await _state_where(comms[0], lambda s: s["cur_example_id"] == first.id)
+        for comm in comms[:2]:
+            await comm.send_json_to(_save([label1.id], first.id))
+        state = await _state_where(comms[0], lambda s: sum(s["clicked_done"].values()) == 2)
+        assert state["cur_example_id"] == first.id  # the third one has not saved yet
+
+        await comms[2].send_json_to(_save([label1.id], first.id))
+        state = await _state_where(comms[0], lambda s: s["cur_example_id"] == third.id)
+        assert "Everyone saved. Next disagreement." in _system_messages(state)
+        for comm in comms:
+            await comm.disconnect()
+
+    async_to_sync(run)()
 
 
 @pytest.mark.django_db(transaction=True)
@@ -1256,7 +1289,7 @@ def test_discuss_end_closes_the_room(
             assert closed["message"] == message
             assert closed["project_url"] == f"/projects/{batch.project_id}"
             last_state = [m["state"] for m in received if "state" in m][-1]
-            assert "All Examples discussed." in _system_messages(last_state)
+            assert "All disagreements discussed." in _system_messages(last_state)
 
     async_to_sync(run)()
 

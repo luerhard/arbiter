@@ -4,6 +4,6 @@
   </div>
   <span
     class="font-mono text-[13px] whitespace-nowrap text-ink-2"
-    x-text="$store.progress.done + ' / ' + $store.progress.total"
+    x-text="$store.progress.total ? `${$store.progress.done} / ${$store.progress.total} discussed` : ''"
   ></span>
 </div>

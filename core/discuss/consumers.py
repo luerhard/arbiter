@@ -293,8 +293,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return False
 
         label_dict = await database_sync_to_async(Label.objects.in_bulk)(labels)
-        label_names = [label_dict[i].name for i in labels]
-        msg = f"{self.username} finalized their decision: {label_names}"
+        label_names = ", ".join(label_dict[i].name for i in labels) or "no labels"
+        msg = f"{self.username} saved: {label_names}"
         await self._append_chat_message(username="system", message=msg)
         return "complete" in outcome
 
@@ -317,7 +317,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
         await self._append_chat_message(
             username="system",
-            message=f"{self.username} withdrew their decision.",
+            message=f"{self.username} undid their save.",
         )
 
     # ---------- CHAT HELPERS -----------------
@@ -361,14 +361,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if example is None:
             if total_pages == 0:
                 end_reason = "NO_EXAMPLES"
-                msg = "No disagreements exist."
+                msg = "There are no disagreements to discuss."
 
             else:
                 end_reason = "DISCUSSION_END"
-                msg = "All Examples discussed."
+                msg = "All disagreements discussed."
 
         elif state["page"] != 0:
-            msg = "All done. Next Sentence."
+            everyone = "Both" if len(state["required_users"]) == 2 else "Everyone"
+            msg = f"{everyone} saved. Next disagreement."
 
         async def mut(state):
             if end_reason:

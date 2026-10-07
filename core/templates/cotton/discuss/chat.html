@@ -15,8 +15,8 @@
           ></p>
         </div>
       </template>
-      <!-- Other user -->
-      <template x-if="message.user === $store.user_other">
+      <!-- Other users -->
+      <template x-if="message.user !== $store.user_self && message.user !== 'system'">
         <div type="other-message" class="other-message flex max-w-[85%] flex-col items-start gap-1">
           <span class="text-xs text-ink-3" x-text="message.user"></span>
           <p
