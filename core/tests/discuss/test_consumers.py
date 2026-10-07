@@ -3,6 +3,7 @@ import os
 import uuid
 
 from asgiref.sync import async_to_sync
+from autobahn.exception import Disconnected
 from channels.db import database_sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
@@ -17,6 +18,7 @@ from data.models import ExampleAssignment
 from data.models.models import Annotation
 from data.models.models import Label
 from discuss import room_state
+from discuss.consumers import ChatConsumer
 from discuss.models import Message
 from projects.models import Batch
 from projects.models import BatchPhase
@@ -1282,6 +1284,49 @@ def test_discuss_phase_change_closes_the_open_room(redis_test_state, discussion_
             )
 
     async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_closed_connection_gets_no_more_messages(
+    redis_test_state,
+    discussion_three_examples,
+):
+    # A broadcast that arrives after the room closed a connection, before the client is gone
+    # (here: the partner leaving first), must not be sent: daphne raises on the closed
+    # socket, which ended the consumer before disconnect() and left the user online.
+    user1, user2, batch, (first, *_), _labels = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"] == first.id)
+        await database_sync_to_async(batch.set_phase)(BatchPhase.ANNOTATION)
+        for communicator in (comm1, comm2):
+            await _until_closed(communicator)
+
+        await comm2.disconnect()  # broadcasts "... has disconnected"
+
+        assert await comm1.receive_nothing(timeout=0.5)
+        await comm1.disconnect()
+        return await room_state.get_state(batch.id)
+
+    state = async_to_sync(run)()
+    assert (state["online_users"], state["connections"]) == ([], {})
+
+
+def test_discuss_send_to_a_client_that_is_gone_keeps_the_consumer():
+    # e.g. a closed tab: the consumer has to live on until disconnect() cleans up
+    consumer = ChatConsumer()
+    consumer.batch_id, consumer.username = 1, "someone"
+
+    async def closed_socket(message):
+        msg = "Attempt to send on a closed protocol"
+        raise Disconnected(msg)
+
+    consumer.base_send = closed_socket
+
+    async_to_sync(consumer.send)(text_data="{}")  # does not raise
 
 
 @pytest.mark.django_db(transaction=True)

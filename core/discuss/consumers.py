@@ -3,6 +3,7 @@ import json
 import logging
 
 from asgiref.sync import async_to_sync
+from autobahn.exception import Disconnected
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
@@ -29,6 +30,19 @@ User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    closing = False  # this side closed the connection: nothing more to send
+
+    async def send(self, text_data=None, bytes_data=None, close=False):
+        # A group message can still arrive after the connection was closed, before
+        # disconnect() runs. Sending then raises, and the exception would end the consumer
+        # without disconnect(): the user would stay online in the room state for good.
+        if self.closing:
+            return
+        try:
+            await super().send(text_data=text_data, bytes_data=bytes_data, close=close)
+        except Disconnected:
+            log.debug(f"Batch {self.batch_id}: {self.username} is gone, dropped a message")
+
     async def connect(self):
         self.joined = False
         self.route = self.scope["url_route"]
@@ -427,6 +441,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 },
             ),
         )
+        # no more group messages for this connection; send() drops those already on the way
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
+        self.closing = True
         await self.close(code=1000)
 
     async def chat_typing(self, event):
