@@ -106,18 +106,25 @@ class BatchCreateForm(forms.ModelForm):
         if not (name.endswith(".csv") or name.endswith(".xlsx")):
             msg = "Please upload a .csv or .xlsx file."
             raise ValidationError(msg)
+        read = pd.read_csv if name.endswith(".csv") else pd.read_excel
         try:
-            table = pd.read_csv(file) if name.endswith(".csv") else pd.read_excel(file)
+            table = read(file)
+            if "text" not in table.columns:
+                msg = "The file needs a column named 'text'."
+                raise ValidationError(msg)
+            # The texts once more, exactly as written: pandas reads "NA", "None", "null" and
+            # the like as empty cells, and "007" as the number 7.
+            file.seek(0)
+            texts = read(file, usecols=["text"], dtype=str, keep_default_na=False)["text"]
         except ValueError as exc:
             msg = "The file could not be read."
             raise ValidationError(msg) from exc
-        if "text" not in table.columns:
-            msg = "The file needs a column named 'text'."
-            raise ValidationError(msg)
 
         # via JSON, so that empty cells become None and dates/numbers plain JSON values
         rows = json.loads(table.to_json(orient="records", date_format="iso"))
-        empty = [number for number, row in enumerate(rows, start=2) if row["text"] in (None, "")]
+        for row, text in zip(rows, texts, strict=True):
+            row["text"] = text if isinstance(text, str) else ""  # e.g. an Excel #N/A error cell
+        empty = [number for number, row in enumerate(rows, start=2) if not row["text"]]
         if empty:
             listed = ", ".join(str(number) for number in empty[:5])
             msg = (

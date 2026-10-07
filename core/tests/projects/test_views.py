@@ -719,6 +719,50 @@ class TestBatchUploadValidation:
         assert example.content == "123"
         assert example.metadata == {}
 
+    TEXTS_PANDAS_WOULD_CHANGE = ["NA", "None", "null", "#N/A", "nan", "007", "1.50", "true"]
+
+    def test_texts_are_stored_exactly_as_written_in_csv(self, client, project_annotation):
+        # Regression: "NA", "None" and the like were read as empty cells and rejected
+        project = project_annotation["project"]
+        rows = "".join(f"{i},{text},NA\n" for i, text in enumerate(self.TEXTS_PANDAS_WOULD_CHANGE))
+        upload = SimpleUploadedFile(
+            "examples.csv", f"id,text,region\n{rows}".encode(), content_type="text/csv"
+        )
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 302
+        examples = list(project.batches.order_by("-batch_number").first().examples.order_by("pk"))
+        assert [e.content for e in examples] == self.TEXTS_PANDAS_WOULD_CHANGE
+        # the other columns are read as before
+        assert examples[0].metadata == {"id": 0, "region": None}
+
+    def test_texts_are_stored_exactly_as_written_in_excel(self, client, project_annotation):
+        project = project_annotation["project"]
+        # in Excel, #N/A is an error value, not a text (see the next test)
+        texts = [text for text in self.TEXTS_PANDAS_WOULD_CHANGE if text != "#N/A"]
+        buffer = io.BytesIO()
+        pd.DataFrame({"text": texts}).to_excel(buffer, index=False)
+        upload = SimpleUploadedFile("examples.xlsx", buffer.getvalue())
+
+        response = self._post(client, project_annotation, upload)
+
+        assert response.status_code == 302
+        examples = project.batches.order_by("-batch_number").first().examples.order_by("pk")
+        assert [e.content for e in examples] == texts
+
+    def test_excel_error_cell_has_no_text(self, client, project_annotation):
+        project = project_annotation["project"]
+        batches_before = project.batches.count()
+        buffer = io.BytesIO()
+        pd.DataFrame({"text": ["First", "#N/A"]}).to_excel(buffer, index=False)
+        upload = SimpleUploadedFile("examples.xlsx", buffer.getvalue())
+
+        response = self._post(client, project_annotation, upload)
+
+        assert "Row 3 has no text." in response.context["form"].errors["file"][0]
+        assert project.batches.count() == batches_before
+
     def test_rows_without_text_are_rejected(self, client, project_annotation):
         # Regression: an empty text cell became an example with the text "nan".
         project = project_annotation["project"]
