@@ -445,6 +445,7 @@ def test_discuss_saves_multiple_and_zero_labels(redis_test_state, discussion_wit
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_typing_event_broadcast(redis_test_state, discussion_with_disagreement):
     user1, user2, batch, *_ = discussion_with_disagreement
+    batch.set_phase(BatchPhase.DISCUSSION)
 
     async def run():
         comm1 = WebsocketCommunicator(application, f"/ws/chat/{batch.id}")
@@ -1122,3 +1123,88 @@ def test_discuss_double_save_completes_the_example_once(
     for user in (user1, user2):
         assignment = _annotation(batch, third, user, BatchPhase.DISCUSSION)
         assert assignment.done is None
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_room_starts_again_after_moving_back(redis_test_state, discussion_three_examples):
+    # The discussion ended, the batch was moved back to annotation, a label changed, and
+    # the batch entered the discussion again. Before, the room state still said "ended"
+    # and the room never started again.
+    user1, user2, batch, (first, second, third), (label1, label2) = discussion_three_examples
+
+    def move_back_and_change_second():
+        batch.set_phase(BatchPhase.ANNOTATION)
+        _annotation(batch, second, user2).set_user_annotations([label2.id])
+        batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"] == first.id)
+        await _both_decide(comm1, comm2, [label1.id], first.id)
+        state = await _both_decide(comm1, comm2, [label1.id], third.id)
+        assert state["discussion_ended"] == "DISCUSSION_END"
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+        await database_sync_to_async(move_back_and_change_second)()
+
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        state = await _state_where(comm1, lambda s: s["cur_example_id"])
+        assert (state["cur_example_id"], state["page"], state["total_pages"]) == (second.id, 3, 3)
+        assert not state["discussion_ended"]
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_room_is_closed_outside_the_discussion_phase(
+    redis_test_state,
+    discussion_with_disagreement,
+):
+    user1, _user2, batch, *_ = discussion_with_disagreement  # in the annotation phase
+
+    assert async_to_sync(_try_connect)(batch, user1) is False
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+def test_discuss_save_after_the_phase_changed_is_not_stored(
+    redis_test_state,
+    discussion_three_examples,
+):
+    user1, user2, batch, (first, *_), (label1, _label2) = discussion_three_examples
+
+    async def run():
+        comm1 = await _connect(batch, user1)
+        comm2 = await _connect(batch, user2)
+        await _state_where(comm1, lambda s: s["cur_example_id"] == first.id)
+
+        await database_sync_to_async(batch.set_phase)(BatchPhase.ANNOTATION)
+        for communicator in (comm1, comm2):
+            await communicator.send_json_to(_save([label1.id], first.id))
+        state = await _state_where(
+            comm1,
+            lambda s: (
+                _system_messages(s).count(
+                    "This batch is no longer in the discussion phase. Nothing was saved.",
+                )
+                == 2
+            ),
+        )
+        assert state["clicked_done"][user1.username] == 0
+
+        await comm1.disconnect()
+        await comm2.disconnect()
+
+    async_to_sync(run)()
+
+    for user in (user1, user2):
+        assignment = _annotation(batch, first, user, BatchPhase.DISCUSSION)
+        assert assignment.done is None
+        assert not assignment.annotations.exists()

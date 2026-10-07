@@ -132,6 +132,15 @@ class TestDifferentRolePerBatch:
 
         assert response.status_code == 200
 
+    def test_discussion_page_only_in_discussion_phase(self, client, project_annotation):
+        batch = project_annotation["batch"]
+        _login(client, project_annotation["annotators"][0])
+
+        response = client.get(reverse("discuss-batch", args=(batch.id,)))
+
+        assert response.status_code == 302
+        assert response.url == reverse("project-detail", args=(batch.project_id,))
+
     def test_project_annotator_can_make_expert_decisions(self, client, project_expert):
         batch = project_expert["batch"]
         annotator3 = _project_member(batch.project, "annotator3", ProjectRole.ANNOTATOR)

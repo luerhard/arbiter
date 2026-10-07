@@ -33,7 +33,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.route = self.scope["url_route"]
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.user = self.scope["user"]
-        if not await self.is_batch_annotator():
+        if not await self.is_batch_annotator() or not await self._in_discussion():
             await self.close()
             return
 
@@ -171,6 +171,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "typing": bool(data["typing"]),
                 },
             )
+
+        elif ("clicked-done" in data or "undo-done" in data) and not await self._in_discussion():
+            # the phase was changed while the room was open
+            await self._append_chat_message(
+                username="system",
+                message="This batch is no longer in the discussion phase. Nothing was saved.",
+            )
+            await self.group_send_state()
 
         elif "clicked-done" in data.keys():
             example_id = self._validated_example_id(data.get("example_id"))
@@ -450,6 +458,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def _is_open(self, example_id):
         return self.batch.open_discussion_examples().filter(id=example_id).exists()
+
+    @database_sync_to_async
+    def _in_discussion(self):
+        return Batch.objects.filter(pk=self.batch_id, current_phase=BatchPhase.DISCUSSION).exists()
 
     @database_sync_to_async
     def is_batch_annotator(self):

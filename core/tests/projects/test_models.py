@@ -1,8 +1,10 @@
 from collections import defaultdict
+import json
 import uuid
 
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from expert.models import CodebookDraft
 import pytest
 
 from data.models import Example
@@ -418,3 +420,107 @@ def test_batch_disagreements_for_phase():
     disagreements = batch.disagreements(BatchPhase.ANNOTATION)
 
     assert list(disagreements.values_list("id", flat=True)) == [ex1.id]
+
+
+def _assignment(batch, example, user, phase):
+    return ExampleAssignment.objects.get(batch=batch, example=example, user=user, phase=phase)
+
+
+def _labels(assignment):
+    return sorted(assignment.annotations.values_list("label_id", flat=True))
+
+
+@pytest.fixture
+def batch_moved_back_to_annotation(project_annotation):
+    """Three examples: 1 and 2 disagreed, 3 agreed. Both annotators finalized, example
+    1 was decided in the discussion, then the batch was moved back to annotation."""
+    data = project_annotation
+    batch, (a1, a2), (l1, l2) = data["batch"], data["annotators"], data["labels"]
+    ex1 = data["example"]
+    ex2 = Example.objects.create(batch=batch, content="Example 2")
+    ex3 = Example.objects.create(batch=batch, content="Example 3")
+    batch.set_phase(BatchPhase.ANNOTATION)  # assignments for the new examples
+    for example, labels1, labels2 in (
+        (ex1, [l1.id], [l2.id]),
+        (ex2, [l1.id], [l2.id]),
+        (ex3, [l1.id], [l1.id]),
+    ):
+        _assignment(batch, example, a1, BatchPhase.ANNOTATION).set_user_annotations(labels1)
+        _assignment(batch, example, a2, BatchPhase.ANNOTATION).set_user_annotations(labels2)
+    _finalize(batch, a1, a2)
+    batch.set_phase(BatchPhase.DISCUSSION)
+    for user in (a1, a2):
+        _assignment(batch, ex1, user, BatchPhase.DISCUSSION).set_user_annotations([l1.id])
+    annotations_before = {
+        a.pk: (a.done, _labels(a))
+        for a in ExampleAssignment.objects.filter(batch=batch, phase=BatchPhase.ANNOTATION)
+    }
+    batch.set_phase(BatchPhase.ANNOTATION)
+    return {**data, "examples": [ex1, ex2, ex3], "annotations_before": annotations_before}
+
+
+@pytest.mark.django_db
+def test_moving_back_to_annotation_clears_finalize_but_keeps_labels(batch_moved_back_to_annotation):
+    # Before, everyone stayed finalized: nobody could change a label, and as only
+    # finalizing advances the batch, it was stuck in the annotation phase.
+    data = batch_moved_back_to_annotation
+    batch = data["batch"]
+
+    assert not batch.all_annotators_finalized()
+    for user in data["annotators"]:
+        assert BatchUser.objects.get(batch=batch, user=user).finalized_at is None
+    annotations_after = {
+        a.pk: (a.done, _labels(a))
+        for a in ExampleAssignment.objects.filter(batch=batch, phase=BatchPhase.ANNOTATION)
+    }
+    assert annotations_after == data["annotations_before"]
+
+
+@pytest.mark.django_db
+def test_entering_discussion_again_keeps_decisions_and_syncs_open_examples(
+    batch_moved_back_to_annotation,
+    redis_client,
+    django_capture_on_commit_callbacks,
+):
+    data = batch_moved_back_to_annotation
+    batch, (a1, a2), (l1, l2) = data["batch"], data["annotators"], data["labels"]
+    ex1, ex2, ex3 = data["examples"]
+    # the earlier discussion had ended: that room state must not survive
+    redis_client.set(f"room:{batch.id}", json.dumps({"discussion_ended": "DISCUSSION_END"}))
+    # the annotators changed their minds: 2 is agreed now, 3 disagreed
+    _assignment(batch, ex2, a2, BatchPhase.ANNOTATION).set_user_annotations([l1.id])
+    _assignment(batch, ex3, a2, BatchPhase.ANNOTATION).set_user_annotations([l2.id])
+
+    with django_capture_on_commit_callbacks(execute=True):
+        batch.set_phase(BatchPhase.DISCUSSION)
+
+    assert list(batch.discussion_examples().order_by("id")) == [ex1, ex3]
+    for user in (a1, a2):  # the decision on example 1 stays, it is not discussed again
+        decided = _assignment(batch, ex1, user, BatchPhase.DISCUSSION)
+        assert decided.done is not None
+        assert _labels(decided) == [l1.id]
+    assert list(batch.open_discussion_examples()) == [ex3]
+    assert redis_client.get(f"room:{batch.id}") is None
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("draft", [False, True])
+def test_entering_expert_phase_again_removes_only_untouched_stale_assignments(
+    project_expert,
+    draft,
+):
+    data = project_expert
+    batch, (a1, a2), (l1, _l2) = data["batch"], data["annotators"], data["labels"]
+    example, expert = data["example"], data["expert"]
+    stale = _assignment(batch, example, expert, BatchPhase.EXPERT)
+    if draft:
+        CodebookDraft.objects.create(assignment=stale, content="edited", base_revision="x")
+    # moved back to the discussion, where the pair now agrees
+    batch.set_phase(BatchPhase.DISCUSSION)
+    _assignment(batch, example, a2, BatchPhase.DISCUSSION).set_user_annotations([l1.id])
+
+    batch.set_phase(BatchPhase.EXPERT)
+
+    still_there = ExampleAssignment.objects.filter(pk=stale.pk).exists()
+    assert still_there == draft  # an expert's codebook draft is never deleted
+    assert _labels(_assignment(batch, example, a1, BatchPhase.DISCUSSION)) == [l1.id]

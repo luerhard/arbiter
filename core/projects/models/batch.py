@@ -238,7 +238,42 @@ class Batch(models.Model):
         self.save()
 
         if old_phase != phase:
+            self._reset_phase(phase)
             self._notify_phase_change(phase, actor=actor)
+
+    def _reset_phase(self, phase: BatchPhase):
+        """Entering a phase, also again after it was moved back by hand, starts it from a
+        clean state. Nothing anyone entered is deleted: labels, decisions, drafts stay."""
+        ExampleAssignment = apps.get_model("data", "ExampleAssignment")  # noqa: N806
+
+        if phase == BatchPhase.ANNOTATION:
+            # Finalized annotators can not change their labels, and only finalizing
+            # advances the batch: everyone finalizes again, their labels are kept.
+            BatchUser.objects.filter(batch=self, role=ProjectRole.ANNOTATOR).update(
+                finalized_at=None,
+            )
+            return
+
+        if phase == BatchPhase.DISCUSSION:
+            from discuss import room_state  # noqa: PLC0415
+
+            # a fresh room: one whose discussion had ended would never start again
+            batch_id = self.pk
+            transaction.on_commit(lambda: room_state.delete_state(batch_id))
+            disagreements = self.disagreements(BatchPhase.ANNOTATION)
+        elif phase == BatchPhase.EXPERT:
+            disagreements = self.disagreements(BatchPhase.DISCUSSION)
+        else:
+            return
+
+        # undecided assignments of examples that are no longer disagreements
+        ExampleAssignment.objects.filter(
+            batch=self,
+            phase=phase,
+            done__isnull=True,
+            annotations__isnull=True,
+            codebook_draft__isnull=True,
+        ).exclude(example__in=disagreements).delete()
 
     def _notify_phase_change(self, phase: BatchPhase, actor=None):
         """Create an unread notification for every batch user; the polling UI
