@@ -1,8 +1,8 @@
 import logging
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -20,6 +20,8 @@ from projects.models import ProjectRole
 from projects.models.batch import BatchUser
 
 log = logging.getLogger(__name__)
+
+NOT_YOURS = "This sample is not assigned to you."
 
 
 def get_progress(user, batch):
@@ -163,8 +165,8 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
     ):
         try:
             batch = self._get_batch(request, batch_id)
-        except PermissionError:
-            return HttpResponseForbidden()
+        except PermissionError as exc:
+            raise PermissionDenied(NOT_YOURS) from exc
 
         if annotation_locked(request.user, batch):
             return _redirect_to_done(request, batch)
@@ -172,8 +174,8 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         if assignment_id:
             try:
                 assignment = self._get_assignment(request, batch, assignment_id)
-            except PermissionError:
-                return HttpResponseForbidden()
+            except PermissionError as exc:
+                raise PermissionDenied(NOT_YOURS) from exc
 
             skip_annotated = request.GET.get("skip_annotated") == "1"
             if skip_annotated and assignment.done is not None:
@@ -217,8 +219,8 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         try:
             batch = self._get_batch(request, batch_id)
             assignment = self._get_assignment(request, batch, assignment_id)
-        except PermissionError:
-            return HttpResponseForbidden()
+        except PermissionError as exc:
+            raise PermissionDenied(NOT_YOURS) from exc
 
         if annotation_locked(request.user, batch):
             messages.warning(request, "Not saved: your annotations for this batch are locked.")

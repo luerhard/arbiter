@@ -4,9 +4,9 @@ import shutil
 
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import HttpResponseBadRequest
-from django.http import HttpResponseForbidden
 from django.shortcuts import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
@@ -79,7 +79,8 @@ class ProjectDeleteView(View):
     def post(self, request, project_id, *args, **kwargs):  # noqa: ARG002
         project = get_object_or_404(Project, id=project_id)
         if project.owner_id != request.user.id:
-            return HttpResponseForbidden("Only the owner can delete this project.")
+            msg = "Only the owner can delete this project."
+            raise PermissionDenied(msg)
 
         # the codebook's git repository is a folder on disk, deleted after the database rows
         codebook_dirs = [

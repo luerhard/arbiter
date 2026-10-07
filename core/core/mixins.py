@@ -1,4 +1,4 @@
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 
 from projects.models import ProjectRole
 from projects.models import ProjectUser
@@ -47,10 +47,12 @@ class RoleRequiredMixin:
                 default_role__in=self.roles,
             ).first()
         else:
-            return HttpResponseForbidden("Project ID not provided.")
+            msg = "This page belongs to no project."
+            raise PermissionDenied(msg)
 
         if not membership:
-            return HttpResponseForbidden("You do not have the required role in this project.")
+            msg = "You don't have the role this page needs in this project."
+            raise PermissionDenied(msg)
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -70,7 +72,8 @@ class BatchRoleRequiredMixin:
             role__in=self.roles,
         ).exists()
         if not has_role:
-            return HttpResponseForbidden("You do not have the required role in this batch.")
+            msg = "You are not part of this batch in the role this page needs."
+            raise PermissionDenied(msg)
 
         return super().dispatch(request, *args, **kwargs)
 

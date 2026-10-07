@@ -4,7 +4,7 @@ from typing import Any
 
 from codebook.utils import normalize_content
 from django.contrib import messages
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -21,6 +21,8 @@ from discuss.models import Message
 from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
+
+NOT_YOURS = "This case is not assigned to you."
 
 
 def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dict[str, Any]:
@@ -190,7 +192,7 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
     def get(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         editing = request.GET.get("edit") == "1" and assignment.done is not None
         review = assignment.done is not None and not editing
@@ -200,7 +202,7 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         editing = request.POST.get("edit") == "1" and assignment.done is not None
 
@@ -354,7 +356,7 @@ class CodebookPanelView(_AssignmentAccessMixin, View):
     def get(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
         mode = "edit" if request.GET.get("mode") == "edit" else "view"
         context = _codebook_panel_context(assignment, mode=mode)
         return render(request, "expert/partials/codebook_panel.html", context)
@@ -364,7 +366,7 @@ class CodebookDraftSaveView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         content = request.POST.get("content", "")
         rationale = request.POST.get("rationale", "")
@@ -407,7 +409,7 @@ class CodebookDraftDeleteView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
         CodebookDraft.objects.filter(assignment=assignment).delete()
         context = _codebook_panel_context(assignment, mode="view")
         return render(request, "expert/partials/codebook_panel.html", context)

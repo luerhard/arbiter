@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+No access · Arbiter
+{% endblock title %}
+{% block content %}
+<c-empty-state title="No access">
+  {{ exception|default:"You don't have access to this page." }}
+  <c-slot name="actions"><a href="{% url 'home' %}" class="btn btn-primary">Back to the start page</a></c-slot>
+</c-empty-state>
+{% endblock content %}
