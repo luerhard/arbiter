@@ -1,3 +1,17 @@
+// Keys typed into a text field are text, not shortcuts. A checkbox is an INPUT too, but it
+// is not typing: clicking a label focuses its hidden checkbox, and the shortcuts must keep
+// working after that.
+function isTyping(target) {
+  if (!target) return false;
+  if (target.isContentEditable || target.tagName === "TEXTAREA") return true;
+  return target.tagName === "INPUT" && !["checkbox", "radio"].includes(target.type);
+}
+
+// Ctrl/Cmd/Alt combinations belong to the browser (Ctrl+P prints, Alt+← goes back).
+function hasModifier(e) {
+  return e.ctrlKey || e.metaKey || e.altKey;
+}
+
 export function navBlock({ hasPrev, hasNext, saveFormId }) {
   return {
     hasPrev: !!hasPrev,
@@ -8,9 +22,7 @@ export function navBlock({ hasPrev, hasNext, saveFormId }) {
     init() {
       // global keybinds (ignore when typing)
       this._onKey = (e) => {
-        const t = e.target;
-        const typing = t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
-        if (typing) return;
+        if (isTyping(e.target) || hasModifier(e)) return;
 
         if (e.key === "ArrowLeft" && this.hasPrev && !this.busy) {
           e.preventDefault();
@@ -71,8 +83,7 @@ export function labelButton({ id, hotkey, disabled }) {
     init() {
       if (this.hotkey && !this.disabled) {
         this._onKey = (e) => {
-          const t = e.target;
-          if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+          if (isTyping(e.target) || hasModifier(e)) return;
           if (e.key.toLowerCase() === String(this.hotkey).toLowerCase()) {
             e.preventDefault();
             this.$refs.input?.click();
