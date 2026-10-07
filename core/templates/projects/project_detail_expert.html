@@ -60,8 +60,7 @@
               >{{ batch.length }}
               sample{{ batch.length|pluralize }}</span
             >
-            {% if b.current_phase == "S" %}<span class="phase-badge">Setup</span
-            >{% endif %}
+            {% if b.current_phase == "S" %}<span class="phase-badge">Setup</span>{% endif %}
           </div>
           <div class="flex items-center gap-2">
             {% if b.current_phase == "E" and batch.is_batch_expert and batch.expert_open > 0 %}
@@ -118,8 +117,7 @@
                   >
                     <span class="phase-dot"></span>
                     {{ item.label }}
-                    {% if item.current %}<span class="ml-auto text-xs text-ink-3">current</span
-                    >{% endif %}
+                    {% if item.current %}<span class="ml-auto text-xs text-ink-3">current</span>{% endif %}
                   </button>
                   {% endfor %}
                 </div>
