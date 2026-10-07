@@ -1,13 +1,21 @@
 <div class="label-row grid grid-cols-[1fr_200px_110px] gap-3">
   <div>
     <label class="field-label" for="label-name-{{ index }}">Label</label>
-    <input id="label-name-{{ index }}" name="label_name" type="text" class="input" placeholder="e.g. Offensive" />
+    <input
+      id="label-name-{{ index }}"
+      name="label_name"
+      type="text"
+      class="input"
+      placeholder="e.g. Offensive"
+      value="{{ row.name|default:'' }}"
+    />
   </div>
   <div>
     <label class="field-label" for="label-color-{{ index }}">Color</label>
     <input
       id="label-color-{{ index }}"
       name="label_color"
+      value="{{ row.color|default:'' }}"
       type="text"
       class="input"
       placeholder="#155596"
@@ -19,6 +27,7 @@
     <input
       id="label-hotkey-{{ index }}"
       name="label_hotkey"
+      value="{{ row.hotkey|default:'' }}"
       type="text"
       maxlength="1"
       class="input font-mono"

@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -209,6 +210,64 @@ class TestProjectAndBatchCreationViews:
             annotator_1.id,
             annotator_2.id,
         }
+
+    def test_create_project_invalid_keeps_labels_and_users(self, client):
+        # Regression: after an error the label rows and the picked annotators were gone
+        suffix = uuid.uuid4().hex[:8]
+        annotator = User.objects.create_user(username=f"ann_keep_{suffix}", password="123")
+        assert client.login(username="expert1", password="123")
+
+        response = client.post(
+            reverse("project-create"),
+            {
+                "name": f"Invalid Project {suffix}",
+                "annotators": [annotator.id],
+                # no experts: the form is invalid
+                "label_name": ["Offensive", "Irony", ""],
+                "label_color": ["#d64545", "#457b9d", ""],
+                "label_hotkey": ["o", "", ""],
+            },
+        )
+
+        assert response.status_code == 200
+        assert not Project.objects.filter(name=f"Invalid Project {suffix}").exists()
+        assert response.context["label_rows"] == [
+            {"name": "Offensive", "color": "#d64545", "hotkey": "o"},
+            {"name": "Irony", "color": "#457b9d", "hotkey": ""},
+        ]
+        assert response.context["annotators_selected_users"] == (
+            f'[{{"id": {annotator.id}, "username": "{annotator.username}"}}]'
+        )
+        content = html.unescape(response.content.decode())
+        assert 'value="Offensive"' in content
+        assert 'value="#457b9d"' in content
+        # the user search shows them again (a template filter here used to swallow them)
+        assert f"userPicker('annotators', [{{\"id\": {annotator.id}," in content
+
+    def test_create_project_form_starts_with_one_empty_label_row(self, client):
+        assert client.login(username="expert1", password="123")
+
+        response = client.get(reverse("project-create"))
+
+        assert response.context["label_rows"] == [{}]
+        assert response.context["annotators_selected_users"] == "[]"
+
+    def test_batch_create_invalid_keeps_the_chosen_annotators(self, client, project_annotation):
+        # Regression: after an error all project annotators were preselected again,
+        # including the ones the expert had removed
+        a1, _a2 = project_annotation["annotators"]
+        expert = project_annotation["expert"]
+        assert client.login(username=expert.username, password="123")
+
+        response = client.post(
+            reverse("project-batch-create", args=(project_annotation["project"].id,)),
+            {"annotators": [a1.id], "experts": [expert.id]},  # no file: invalid
+        )
+
+        assert response.status_code == 200
+        assert response.context["annotators_selected_users"] == (
+            f'[{{"id": {a1.id}, "username": "{a1.username}"}}]'
+        )
 
     def test_batch_create_invalid_keeps_selected_users_context(self, client):
         suffix = uuid.uuid4().hex[:8]

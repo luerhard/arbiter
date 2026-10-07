@@ -33,7 +33,12 @@ New project · Arbiter
           label="Annotators"
           help="They label every sample independently and discuss disagreements."
         >
-          <c-user-search name="annotators" search_url="{{ project_user_search_url }}" placeholder="Search users" />
+          <c-user-search
+            name="annotators"
+            search_url="{{ project_user_search_url }}"
+            :selected_users="annotators_selected_users"
+            placeholder="Search users"
+          />
         </c-field>
         <c-field
           :field="form.experts"
@@ -44,7 +49,7 @@ New project · Arbiter
             name="experts"
             search_url="{{ project_user_search_url }}"
             :selected_ids="form.experts.value|default:'[]'"
-            :selected_users="experts_selected_users|default:'[]'"
+            :selected_users="experts_selected_users"
             placeholder="Search users"
           />
         </c-field>
@@ -57,7 +62,9 @@ New project · Arbiter
         <p class="field-help">Each label gets a color and an optional one-key shortcut for annotating.</p>
       </div>
       <div id="label-rows" class="flex flex-col gap-3">
-        {% include "projects/partials/label_row.html" with index=0 %}
+        {% for row in label_rows %}
+        {% include "projects/partials/label_row.html" with index=forloop.counter0 row=row %}
+        {% endfor %}
       </div>
       <div>
         <button

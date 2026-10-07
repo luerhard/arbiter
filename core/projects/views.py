@@ -49,6 +49,12 @@ def _users_json(users) -> str:
     return json.dumps([{"id": user.id, "username": user.username} for user in users])
 
 
+def _posted_users_json(post, field) -> str:
+    """The users picked in a user search of a form that is shown again after an error."""
+    ids = [value for value in post.getlist(field) if value.isdigit()]
+    return _users_json(User.objects.filter(id__in=ids).order_by("username"))
+
+
 class ProjectListView(ListView):
     template_name = "projects/project_list.html"
     model = ProjectUser
@@ -93,6 +99,26 @@ class ProjectCreateView(FormView):
 
     def get_success_url(self):
         return reverse("project-detail", kwargs={"project_id": self.project.id})
+
+    def get_context_data(self, **kwargs):
+        # After an error the form is shown again with everything as entered: the label rows
+        # and the picked users are not Django form fields, so they need their own context.
+        context = super().get_context_data(**kwargs)
+        post = self.request.POST
+        rows = zip(
+            post.getlist("label_name"),
+            post.getlist("label_color"),
+            post.getlist("label_hotkey"),
+            strict=False,
+        )
+        context["label_rows"] = [
+            {"name": name, "color": color, "hotkey": hotkey}
+            for name, color, hotkey in rows
+            if (name + color + hotkey).strip()
+        ] or [{}]
+        context["annotators_selected_users"] = _posted_users_json(post, "annotators")
+        context["experts_selected_users"] = _posted_users_json(post, "experts")
+        return context
 
     def form_valid(self, form):
         self.project = Project.objects.create(
@@ -160,8 +186,13 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["project"] = self.project
-        context["annotators_selected_users"] = _users_json(self.project.annotators)
-        context["experts_selected_users"] = _users_json(self.project.experts)
+        post = self.request.POST
+        if self.request.method == "POST":  # shown again after an error: keep the choice
+            context["annotators_selected_users"] = _posted_users_json(post, "annotators")
+            context["experts_selected_users"] = _posted_users_json(post, "experts")
+        else:
+            context["annotators_selected_users"] = _users_json(self.project.annotators)
+            context["experts_selected_users"] = _users_json(self.project.experts)
         return context
 
     def form_valid(self, form):
