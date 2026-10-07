@@ -9,7 +9,7 @@
     <c-slot name="subtitle">
       {% if project.description %}{{ project.description }}
       ·
-      {% endif %}Your batches that are still in progress.
+      {% endif %}Your batches.
     </c-slot>
   </c-page-header>
 
@@ -67,6 +67,34 @@
       {% empty %}
       <c-empty-state title="No batches in progress">Batches appear here when you are assigned to one.</c-empty-state>
       {% endfor %}
+
+      {% if finished %}
+      <section class="mt-4 flex flex-col gap-2.5" aria-label="Finished batches">
+        <h2 class="eyebrow">Finished</h2>
+        {% for row in finished %}
+        {% with b=row.batch %}
+        <article class="card flex items-center justify-between gap-6 px-6 py-3.5" data-phase="{{ b.current_phase }}">
+          <div class="flex items-center gap-3">
+            <h3 class="font-semibold">
+              Batch
+              {{ b.batch_number }}
+            </h3>
+            <span class="phase-badge">{{ b.get_current_phase_display }}</span>
+            <span class="text-[13px] text-ink-3"
+              >{{ row.length }}
+              sample{{ row.length|pluralize }}</span
+            >
+          </div>
+          <a
+            href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
+            class="btn btn-ghost btn-sm"
+            >Codebook changes</a
+          >
+        </article>
+        {% endwith %}
+        {% endfor %}
+      </section>
+      {% endif %}
     </section>
 
     {% include "projects/partials/detail-sidebar.html" %}

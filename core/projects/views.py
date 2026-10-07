@@ -387,6 +387,14 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
             }
             for batch in batches
         ]
+        # finished batches stay listed, without actions
+        context["finished"] = [
+            {"batch": batch, "length": batch.examples.count()}
+            for batch in self.object.batches.filter(
+                id__in=self.batch_roles,
+                current_phase=BatchPhase.FINAL,
+            ).order_by("-batch_number")
+        ]
         return context
 
 

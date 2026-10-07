@@ -84,6 +84,39 @@ class TestProjectListIndicators:
         assert annotate_link not in content
         assert done_link in content
 
+    def test_finished_batches_stay_listed_for_annotators(self, client, project_annotation):
+        annotator = project_annotation["annotators"][0]
+        batch = project_annotation["batch"]
+        url = reverse("project-detail-annotator", args=(project_annotation["project"].id,))
+        client.login(username=annotator.username, password="123")
+        batch.set_phase(BatchPhase.FINAL)
+
+        response = client.get(url)
+
+        assert response.context["batches"] == []
+        assert [row["batch"] for row in response.context["finished"]] == [batch]
+        content = response.content.decode()
+        assert 'aria-label="Finished batches"' in content
+        assert f'href="{reverse("annotate-batch", args=(batch.id,))}"' not in content
+
+    def test_finished_batches_of_others_are_not_listed(
+        self, client, django_user_model, project_annotation
+    ):
+        outsider = django_user_model.objects.create_user(username="not_in_batch", password="123")
+        ProjectUser.objects.create(
+            project=project_annotation["project"],
+            user=outsider,
+            default_role=ProjectRole.ANNOTATOR,
+        )
+        project_annotation["batch"].set_phase(BatchPhase.FINAL)
+        client.login(username=outsider.username, password="123")
+
+        response = client.get(
+            reverse("project-detail-annotator", args=(project_annotation["project"].id,))
+        )
+
+        assert response.context["finished"] == []
+
     def test_expert_page_counts_the_examples_to_discuss(self, client, project_discussion):
         # once the discussion started, its examples are fixed (DISCUSSION assignments);
         # a label changing afterwards must not change the counts on the batch card
