@@ -384,6 +384,98 @@ class TestAnnotationLock:
 
 
 @pytest.mark.django_db
+class TestUndoFinalize:
+    """An annotator can take back their finalize while others are still annotating. The last
+    one to finalize moves the batch on, and from then on the labels stay as they are."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, project_annotation):
+        self.a1, self.a2 = project_annotation["annotators"]
+        self.batch = project_annotation["batch"]
+        self.label1, self.label2 = project_annotation["labels"]
+        self.mine, self.theirs = (
+            ExampleAssignment.objects.get(
+                user=user,
+                example=project_annotation["example"],
+                phase=BatchPhase.ANNOTATION,
+            )
+            for user in (self.a1, self.a2)
+        )
+        self.mine.set_user_annotations([self.label1.id])
+        self.theirs.set_user_annotations([self.label2.id])  # a disagreement
+        self.done_url = reverse("annotate-done", args=(self.batch.id,))
+        self.undo_url = reverse("annotate-undo-finalize", args=(self.batch.id,))
+
+    def _finalize(self, client, user):
+        client.force_login(user)
+        client.post(self.done_url)
+
+    def _finalized(self, user):
+        return BatchUser.objects.get(batch=self.batch, user=user).finalized_at is not None
+
+    def test_undo_unlocks_the_labels(self, client):
+        self._finalize(client, self.a1)
+        assert 'action="' + self.undo_url in client.get(self.done_url).content.decode()
+
+        resp = client.post(self.undo_url)
+
+        assert resp.url == self.done_url
+        assert not self._finalized(self.a1)
+        url = reverse("annotate-assignment", args=(self.batch.id, self.mine.id))
+        client.post(url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+        labels = set(self.mine.annotations.values_list("label_id", flat=True))
+        assert labels == {self.label2.id}
+        assert "Finalize my annotations" in client.get(self.done_url).content.decode()
+
+    def test_undo_leaves_the_others_finalized(self, client):
+        self._finalize(client, self.a1)
+
+        client.force_login(self.a2)
+        client.post(self.undo_url)
+
+        assert self._finalized(self.a1)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.ANNOTATION
+
+    def test_finalizing_again_moves_the_batch_on(self, client):
+        self._finalize(client, self.a1)
+        client.post(self.undo_url)
+        self._finalize(client, self.a2)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.ANNOTATION
+
+        self._finalize(client, self.a1)
+
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+    def test_no_undo_once_the_batch_moved_on(self, client):
+        self._finalize(client, self.a1)
+        self._finalize(client, self.a2)  # the last one: the discussion starts
+        assert self.undo_url not in client.get(self.done_url).content.decode()
+
+        client.force_login(self.a1)
+        assert self.undo_url not in client.get(self.done_url).content.decode()
+        resp = client.post(self.undo_url, follow=True)
+
+        assert "Too late" in resp.content.decode()
+        assert self._finalized(self.a1)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+    @pytest.mark.parametrize("who", ["expert", "outsider"])
+    def test_only_annotators_of_the_batch(self, client, project_annotation, who):
+        BatchUser.objects.filter(batch=self.batch).update(finalized_at=timezone.now())
+        if who == "expert":
+            client.force_login(project_annotation["expert"])
+        else:
+            client.force_login(User.objects.create_user("undo_outsider", password="123"))
+
+        assert client.post(self.undo_url).status_code == 403
+        assert self._finalized(self.a1)
+
+
+@pytest.mark.django_db
 class TestEditAssignmentView:
     @pytest.fixture(autouse=True)
     def _setup(self, client):
