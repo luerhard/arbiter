@@ -327,6 +327,16 @@
   .badge-warning {
     @apply bg-warning-soft text-warning;
   }
+  /* Message box: <p class="alert">, <div class="alert alert-danger text-meta" role="alert"> for form errors */
+  .alert {
+    @apply rounded-lg bg-subtle px-4 py-3 text-ink-2;
+  }
+  .alert-danger {
+    @apply bg-danger-soft text-danger;
+  }
+  .alert-success {
+    @apply bg-success-soft text-success;
+  }
 
   /* Tables: <div class="card overflow-x-auto"><table class="data-table">. Headers don't wrap, so a table that
      doesn't fit scrolls sideways inside its card; relative keeps sr-only labels in there too, otherwise they
@@ -531,7 +541,7 @@
     @apply border-2 border-line-strong;
   }
 
-  /* Read-only label: <span class="label-tag" style="--label-color: #155596"> */
+  /* Read-only label: <span class="label-tag" style="--label-color: #155596">, rendered by cotton/label_tag.html */
   .label-tag {
     @apply inline-flex h-7 items-center gap-2 rounded-lg px-2.5 text-meta font-medium whitespace-nowrap;
     background: color-mix(in srgb, var(--label-color) 13%, var(--c-surface));

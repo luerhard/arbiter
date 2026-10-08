@@ -27,9 +27,7 @@ Sign in · Arbiter
         <p class="page-subtitle">Use the account your project lead created for you.</p>
       </div>
       {% if form.non_field_errors %}
-      <div class="rounded-lg bg-danger-soft px-3.5 py-2.5 text-meta text-danger" role="alert">
-        Wrong username or password. Please try again.
-      </div>
+      <div class="alert alert-danger text-meta" role="alert">Wrong username or password. Please try again.</div>
       {% endif %}
       <div>
         <label for="username" class="field-label">Username</label>

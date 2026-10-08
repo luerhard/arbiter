@@ -2,6 +2,7 @@
 Actions dropdown of a batch card on the expert project page, with the confirmation dialogs it opens.
 <c-batch.menu :batch="batch" :codebook="codebook" />, batch being a row of ProjectExpertDetailView._batch_card.
 {% endcomment %}
+{% load custom_tags %}
 {% with b=batch.batch %}
 {% url "project-export-batch" batch_id=b.id as project_export_batch_url %}
 <el-dropdown class="inline-block">
@@ -11,15 +12,9 @@ Actions dropdown of a batch card on the expert project page, with the confirmati
   <el-menu anchor="bottom end" popover class="menu">
     <div class="menu-section">
       <a href="{% url 'project-batch-detail' b.id %}" class="menu-item">View samples</a>
-      <a
-        href="{{ project_export_batch_url }}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
-        class="menu-item"
-        >Export batch</a
-      >
+      <a href="{{ project_export_batch_url }}?{{ b|batch_range }}" class="menu-item">Export batch</a>
       {% if b.current_phase != "S" %}{# the codebook version is kept when annotation starts #}
-      <a
-        href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
-        class="menu-item"
+      <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="menu-item"
         >Codebook changes</a
       >
       {% endif %}
@@ -91,9 +86,7 @@ Actions dropdown of a batch card on the expert project page, with the confirmati
   </p>
   <p>
     To keep the data,
-    <a
-      href="{{ project_export_batch_url }}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
-      class="font-medium text-ink underline"
+    <a href="{{ project_export_batch_url }}?{{ b|batch_range }}" class="font-medium text-ink underline"
       >export the batch</a
     >
     first.

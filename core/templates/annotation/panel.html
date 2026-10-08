@@ -1,7 +1,7 @@
 {% load custom_tags %}
 <div id="annotation-panel" class="flex flex-col gap-7">
   {% if progress.done >= progress.total %}
-  <p id="all-labeled" class="flex items-center justify-between gap-4 rounded-lg bg-success-soft px-4 py-3 text-success">
+  <p id="all-labeled" class="alert alert-success flex items-center justify-between gap-4">
     All samples labeled.
     <a href="{% url 'annotate-done' batch.id %}" class="font-semibold underline">Finalize →</a>
   </p>

@@ -47,7 +47,7 @@
   <h2 class="card-title">Labels</h2>
   <div class="flex flex-wrap gap-2">
     {% for label in labels %}
-    <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+    <c-label-tag :label="label" />
     {% endfor %}
   </div>
 </section>

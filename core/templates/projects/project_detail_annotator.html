@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load custom_tags %}
 {% block title %}
 {{ project.name }}
 · Arbiter
@@ -42,9 +43,7 @@
           {% endif %}
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <a
-            href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
-            class="btn btn-ghost btn-sm"
+          <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="btn btn-ghost btn-sm"
             >Codebook changes</a
           >
           {% if batch.role == "A" and b.current_phase == "A" and batch.finalized %}
@@ -85,9 +84,7 @@
               sample{{ row.length|pluralize }}</span
             >
           </div>
-          <a
-            href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
-            class="btn btn-ghost btn-sm"
+          <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="btn btn-ghost btn-sm"
             >Codebook changes</a
           >
         </article>

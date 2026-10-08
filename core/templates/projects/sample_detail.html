@@ -45,17 +45,7 @@ Sample
       <section id="sample-state" class="card flex flex-col gap-3 p-5" aria-label="Status">
         <h2 class="card-title">Status</h2>
         <p class="text-sm text-ink">{{ state.status }}</p>
-        <div class="flex flex-wrap gap-1">
-          {% if state.labels is None %}
-          <span class="text-meta text-ink-3">No label yet</span>
-          {% elif not state.labels %}
-          <span class="text-meta text-ink-3 italic">No label</span>
-          {% else %}
-          {% for label in state.labels %}
-          <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
-          {% endfor %}
-          {% endif %}
-        </div>
+        <c-label-tags :labels="state.labels" />
       </section>
 
       <section class="card flex flex-col gap-3 p-5" aria-label="Metadata">

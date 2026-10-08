@@ -59,17 +59,7 @@ example ids in their new order and swaps in these rows again.
     </td>
     <td class="px-4 py-3 text-meta whitespace-nowrap text-ink-2">{{ row.status }}</td>
     <td class="px-4 py-3">
-      {% if row.labels is None %}
-      <span class="text-ink-3" title="Not decided yet">–</span>
-      {% elif not row.labels %}
-      <span class="text-meta text-ink-3 italic">No label</span>
-      {% else %}
-      <div class="flex gap-1">
-        {% for label in row.labels %}
-        <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
-        {% endfor %}
-      </div>
-      {% endif %}
+      <c-label-tags :labels="row.labels" pending="–" pending_title="Not decided yet" class="flex gap-1" />
     </td>
     {% for value in row.values %}
     <td class="max-w-56 truncate px-4 py-3 font-mono text-meta text-ink-2" title="{{ value|default_if_none:'' }}">
