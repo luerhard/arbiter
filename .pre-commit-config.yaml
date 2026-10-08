@@ -10,7 +10,7 @@ repos:
 
   # Keep args and version in sync with .github/workflows/formatter.yml
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.12
+    rev: v0.16.10
     hooks:
       - id: ruff-check
         args: [--fix, --extend-select, F401, --no-unsafe-fixes, --exit-zero]
