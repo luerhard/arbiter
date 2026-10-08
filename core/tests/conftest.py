@@ -87,8 +87,9 @@ def redis_client(monkeypatch, settings):
     client.close()
 
 
-@pytest.fixture
-def project_annotation():
+def make_project():
+    """A project with two annotators and an expert, and one batch with one example in
+    the annotation phase."""
     suffix = uuid.uuid4().hex[:8]
     annotator1 = User.objects.create_user(username=f"user_{suffix}", password="123")
     annotator2 = User.objects.create_user(username=f"user2_{suffix}", password="123")
@@ -124,6 +125,19 @@ def project_annotation():
         "batch": batch,
         "example": example,
     }
+
+
+@pytest.fixture
+def project_annotation():
+    return make_project()
+
+
+@pytest.fixture
+def intruder():
+    """The expert of another project, and the id of an assignment in that project."""
+    other = make_project()
+    assignment = ExampleAssignment.objects.filter(batch=other["batch"]).first()
+    return other["expert"], assignment.id
 
 
 @pytest.fixture

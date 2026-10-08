@@ -10,46 +10,27 @@ class RoleRequiredMixin:
 
     Use for project pages and for managing a project or its batches
     (create, export, change phase, delete).
+
+    The project comes from the URL alone, never from what the request sends along:
+    an id in the query string or form would let a member of one project into another.
     """
 
     def dispatch(self, request, *args, **kwargs):
-        project_id = kwargs.get("project_id")
-        assignment_id = (
-            kwargs.get("assignment_id")
-            or request.GET.get("assignment_id")
-            or request.POST.get("assignment_id")
-        )
-        batch_id = kwargs.get("batch_id")
-        codebook_id = kwargs.get("codebook_id")
-
-        if project_id:
-            membership = ProjectUser.objects.filter(
-                project_id=project_id,
-                user=request.user,
-                default_role__in=self.roles,
-            ).first()
-        elif assignment_id:
-            membership = ProjectUser.objects.filter(
-                project__batches__examples__assignments__id=assignment_id,
-                user=request.user,
-                default_role__in=self.roles,
-            ).first()
-        elif batch_id:
-            membership = ProjectUser.objects.filter(
-                project__batches__id=batch_id,
-                user=request.user,
-                default_role__in=self.roles,
-            ).first()
-        elif codebook_id:
-            membership = ProjectUser.objects.filter(
-                project__codebook__id=codebook_id,
-                user=request.user,
-                default_role__in=self.roles,
-            ).first()
+        if "project_id" in kwargs:
+            project = {"project_id": kwargs["project_id"]}
+        elif "batch_id" in kwargs:
+            project = {"project__batches__id": kwargs["batch_id"]}
+        elif "codebook_id" in kwargs:
+            project = {"project__codebook__id": kwargs["codebook_id"]}
         else:
             msg = "This page belongs to no project."
             raise PermissionDenied(msg)
 
+        membership = ProjectUser.objects.filter(
+            user=request.user,
+            default_role__in=self.roles,
+            **project,
+        ).exists()
         if not membership:
             msg = "You don't have the role this page needs in this project."
             raise PermissionDenied(msg)

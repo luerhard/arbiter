@@ -61,6 +61,31 @@ def test_access(get_as, project_annotation, page, who, status):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("method", "page"),
+    [("get", "view"), ("get", "diff"), ("get", "edit"), ("get", "export"), ("post", "edit")],
+)
+def test_an_assignment_of_another_project_opens_nothing(
+    client, project_annotation, intruder, method, page
+):
+    # Regression: the access check took an assignment_id sent along with the request
+    # before the codebook in the URL, so an expert of any project got in with one of theirs.
+    codebook = project_annotation["project"].codebook.get()
+    content_before = codebook.content
+    expert, assignment_id = intruder
+    client.force_login(expert)
+
+    response = getattr(client, method)(
+        reverse(f"codebook-{page}", args=(codebook.pk,)),
+        {"assignment_id": assignment_id, "content": "Overwritten", "rationale": "x"},
+    )
+
+    assert response.status_code == 403
+    codebook.refresh_from_db()
+    assert codebook.content == content_before
+
+
+@pytest.mark.django_db
 class TestViews:
     def test_codebook_update_view_saves_content(self, client, project_setup):
         login = client.login(username="expert1", password="123")

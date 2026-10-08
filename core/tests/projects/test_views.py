@@ -83,6 +83,47 @@ def test_access(get_as, project_annotation, page, who, status):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("method", "page"),
+    [
+        ("get", "expert page"),
+        ("get", "batch samples"),
+        ("get", "batch export"),
+        ("get", "project export"),
+        ("post", "move batch"),
+        ("post", "reorder batch"),
+        ("post", "delete batch"),
+    ],
+)
+def test_an_assignment_of_another_project_opens_nothing(
+    client, project_annotation, intruder, method, page
+):
+    # Regression: the access check took an assignment_id sent along with the request
+    # before the batch in the URL, so an expert of any project got in with one of theirs.
+    project, batch = project_annotation["project"], project_annotation["batch"]
+    expert, assignment_id = intruder
+    urls = {
+        "expert page": reverse("project-detail-expert", args=(project.id,)),
+        "batch samples": reverse("project-batch-detail", args=(batch.id,)),
+        "batch export": reverse("project-export-batch", args=(batch.id,)),
+        "project export": reverse("project-export-project", args=(project.id,)),
+        "move batch": reverse("change-batch-phase", args=(batch.id,)),
+        "reorder batch": reverse("project-batch-order", args=(batch.id,)),
+        "delete batch": reverse("delete-batch", args=(batch.id,)),
+    }
+    client.force_login(expert)
+
+    response = getattr(client, method)(
+        urls[page],
+        {"assignment_id": assignment_id, "current_phase": BatchPhase.FINAL},
+    )
+
+    assert response.status_code == 403
+    batch.refresh_from_db()
+    assert batch.current_phase == BatchPhase.ANNOTATION
+
+
+@pytest.mark.django_db
 class TestProjectListIndicators:
     def _project_row(self, content, project_name):
         # only look at the table; the sidebar lists the project names too
