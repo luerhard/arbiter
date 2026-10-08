@@ -1,107 +1,60 @@
-{# Main navigation. Data comes from core.context_processors.navigation. #}
+{% comment %}
+Main navigation (layouts/nav.html). From lg up a sticky column on the left; below that a menu bar on top whose button
+opens the same navigation as a drawer (Tailwind Plus el-dialog).
+{% endcomment %}
 <nav
   aria-label="Main"
-  class="sticky top-0 flex h-screen w-62 shrink-0 dark:border-r dark:border-night-line flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line"
+  class="sticky top-0 hidden h-screen w-62 shrink-0 dark:border-r dark:border-night-line flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line lg:flex"
 >
-  <a href="{% url 'home' %}" class="flex items-center gap-2.5 px-2 py-1 text-white">
-    <c-logo.mark size="size-[26px]" tone="night" />
-    <span class="text-xl font-semibold tracking-[-0.02em]">arbiter</span>
-  </a>
-
-  <div class="flex flex-col gap-0.5">
-    <a
-      href="{% url 'home' %}"
-      class="nav-item {% if nav_url_name == 'home' %}nav-item-active{% endif %}"
-      {% if nav_url_name == 'home' %}aria-current="page"
-      {% endif %}
-    >
-      {% heroicon_outline "home" class="size-5" %}
-      Home
-    </a>
-    <a
-      href="{% url 'project-list' %}"
-      class="nav-item {% if nav_url_name == 'project-list' %}nav-item-active{% endif %}"
-      {% if nav_url_name == 'project-list' %}aria-current="page"
-      {% endif %}
-    >
-      {% heroicon_outline "rectangle-stack" class="size-5" %}
-      All projects
-    </a>
-  </div>
-
-  <div class="flex flex-col gap-0.5">
-    <div
-      class="flex items-center justify-between px-2.5 pb-1.5 text-[11px] font-semibold tracking-[0.08em] text-night-ink-2 uppercase"
-    >
-      Projects
-      <a
-        href="{% url 'project-create' %}"
-        aria-label="New project"
-        title="New project"
-        class="rounded p-0.5 text-night-ink-2 hover:bg-night-2 hover:text-white"
-      >
-        {% heroicon_micro "plus" class="size-4" %}
-      </a>
-    </div>
-    {% for membership in nav_projects %}
-    {% with project=membership.project %}
-    {% if project.id == nav_project_id %}
-    <a
-      href="{% url 'project-detail' project.id %}"
-      class="nav-item nav-item-active"
-      data-phase="{{ membership.latest_phase|default:'' }}"
-    >
-      <span class="phase-dot"></span>
-      <span class="truncate">{{ project.name }}</span>
-    </a>
-    <div class="flex flex-col gap-0.5 pl-7">
-      <a
-        href="{% url 'project-detail' project.id %}"
-        class="nav-subitem {% if nav_url_name == 'project-detail-expert' or nav_url_name == 'project-detail-annotator' or nav_url_name == 'project-batch-create' or nav_url_name == 'project-batch-detail' or nav_url_name == 'project-sample-detail' %}nav-subitem-active{% endif %}"
-        >Batches</a
-      >
-      {% if nav_codebook_id %}
-      <a
-        href="{% url 'codebook-view' nav_codebook_id %}"
-        class="nav-subitem {% if nav_url_name == 'codebook-view' or nav_url_name == 'codebook-edit' or nav_url_name == 'codebook-diff' or nav_url_name == 'codebook-change' %}nav-subitem-active{% endif %}"
-        >Codebook</a
-      >
-      {% endif %}
-    </div>
-    {% else %}
-    <a
-      href="{% url 'project-detail' project.id %}"
-      class="nav-item"
-      data-phase="{{ membership.latest_phase|default:'' }}"
-    >
-      <span class="phase-dot"></span>
-      <span class="truncate">{{ project.name }}</span>
-    </a>
-    {% endif %}
-    {% endwith %}
-    {% empty %}
-    <p class="px-2.5 text-meta text-night-ink-2">No projects yet.</p>
-    {% endfor %}
-  </div>
-
-  <div class="mt-auto flex items-center gap-2.5 border-t border-night-line px-1.5 pt-3">
-    <c-avatar :name="user.username" />
-    <div class="flex min-w-0 flex-1 flex-col">
-      <a href="{% url 'user-profile' %}" class="truncate font-medium text-white hover:underline">{{ user.username }}</a>
-      <a href="{% url 'logout' %}" class="text-xs text-night-ink-2 hover:text-white">Log out</a>
-    </div>
-    <button
-      type="button"
-      aria-label="Toggle dark mode"
-      title="Toggle dark mode"
-      onclick="
-        const isDark = document.documentElement.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      "
-      class="inline-flex size-8 cursor-pointer items-center justify-center rounded-lg text-night-ink-2 hover:bg-night-2 hover:text-white"
-    >
-      {% heroicon_mini "moon" class="size-5 dark:hidden" %}
-      {% heroicon_mini "sun" class="size-5 not-dark:hidden" %}
-    </button>
-  </div>
+  {% include "layouts/nav.html" %}
 </nav>
+
+<div class="sticky top-0 z-30 flex h-14 items-center gap-3 bg-night px-4 text-night-ink sm:px-8 lg:hidden">
+  <button
+    type="button"
+    command="show-modal"
+    commandfor="nav-drawer"
+    aria-label="Open menu"
+    class="-ml-1.5 inline-flex size-9 cursor-pointer items-center justify-center rounded-lg hover:bg-night-2 hover:text-white"
+  >
+    {% heroicon_outline "bars-3" class="size-6" %}
+  </button>
+  <a href="{% url 'home' %}" class="flex items-center gap-2 text-white">
+    <c-logo.mark size="size-[22px]" tone="night" />
+    <span class="text-lg font-semibold tracking-[-0.02em]">arbiter</span>
+  </a>
+  <a href="{% url 'user-profile' %}" title="{{ user.username }}" class="ml-auto"><c-avatar :name="user.username" /></a>
+</div>
+
+<el-dialog>
+  <dialog id="nav-drawer" class="backdrop:bg-transparent lg:hidden">
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-night/80 transition-opacity duration-300 ease-linear data-closed:opacity-0"
+    ></el-dialog-backdrop>
+    <div tabindex="0" class="fixed inset-0 flex focus:outline-none">
+      <el-dialog-panel
+        class="group/dialog-panel relative mr-16 flex w-full max-w-62 flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
+      >
+        <div
+          class="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out group-data-closed/dialog-panel:opacity-0"
+        >
+          <button
+            type="button"
+            command="close"
+            commandfor="nav-drawer"
+            aria-label="Close menu"
+            class="-m-2.5 cursor-pointer p-2.5 text-white"
+          >
+            {% heroicon_outline "x-mark" class="size-6" %}
+          </button>
+        </div>
+        <nav
+          aria-label="Main"
+          class="flex grow flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line"
+        >
+          {% include "layouts/nav.html" %}
+        </nav>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>

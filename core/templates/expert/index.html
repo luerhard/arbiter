@@ -14,6 +14,9 @@ Expert decision · Batch
   suffix="decided"
 />
 {% endblock focus_progress %}
+{% block focus_actions %}
+<c-side-panel.toggle name="expert-codebook" label="Codebook" icon="book-open" class="xl:hidden" />
+{% endblock focus_actions %}
 {% block content %}
 {% include "expert/partials/assignment.html" %}
 {% endblock content %}

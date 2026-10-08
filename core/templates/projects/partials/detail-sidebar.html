@@ -1,57 +1,55 @@
 {% load markdownify %}
-{# Right-hand column of the project pages: codebook, team and labels. #}
-<aside class="flex w-80 shrink-0 flex-col gap-4">
-  <section class="card flex flex-col gap-3.5 p-5">
-    <div class="flex items-center justify-between">
-      <h2 class="card-title">Codebook</h2>
-      <a href="{% url 'codebook-view' codebook_id=codebook.pk %}" class="link text-meta">Open</a>
-    </div>
-    <p class="reading text-md text-ink-2">{{ codebook.content|markdownify|striptags|truncatewords:32 }}</p>
-    {% if is_expert_view %}
-    <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary btn-sm">
-      {% heroicon_micro "arrow-down-tray" class="size-4" %}
-      Download with history (.zip)
-    </a>
-    {% endif %}
-  </section>
-
-  <section class="card flex flex-col gap-3 p-5">
-    <h2 class="card-title">Team</h2>
-    {% for member in annotators %}
-    <div class="flex items-center gap-2.5">
-      <c-avatar :name="member.username" size="size-7.5" />
-      <span class="flex-1 truncate"
-        >{{ member.username }}{% if member == user %}
-        <span class="text-ink-3">(you)</span>{% endif %}</span
-      >
-      <span class="text-xs text-ink-3">Annotator</span>
-    </div>
-    {% endfor %}
-    {% for member in experts %}
-    <div class="flex items-center gap-2.5">
-      <c-avatar :name="member.username" size="size-7.5" role="E" />
-      <span class="flex-1 truncate"
-        >{{ member.username }}{% if member == user %}
-        <span class="text-ink-3">(you)</span>{% endif %}</span
-      >
-      <span class="text-xs text-ink-3">Expert</span>
-    </div>
-    {% endfor %}
-    {% if not annotators and not experts %}
-    <p class="text-ink-3">Nobody assigned yet.</p>
-    {% endif %}
-  </section>
-
-  {% with labels=project.labels.all %}
-  {% if labels %}
-  <section class="card flex flex-col gap-3 p-5">
-    <h2 class="card-title">Labels</h2>
-    <div class="flex flex-wrap gap-2">
-      {% for label in labels %}
-      <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
-      {% endfor %}
-    </div>
-  </section>
+{# Side cards of the project pages (the aside slot of c-columns): codebook, team and labels. #}
+<section class="card flex flex-col gap-3.5 p-5">
+  <div class="flex items-center justify-between">
+    <h2 class="card-title">Codebook</h2>
+    <a href="{% url 'codebook-view' codebook_id=codebook.pk %}" class="link text-meta">Open</a>
+  </div>
+  <p class="reading text-md text-ink-2">{{ codebook.content|markdownify|striptags|truncatewords:32 }}</p>
+  {% if is_expert_view %}
+  <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary btn-sm">
+    {% heroicon_micro "arrow-down-tray" class="size-4" %}
+    Download with history (.zip)
+  </a>
   {% endif %}
-  {% endwith %}
-</aside>
+</section>
+
+<section class="card flex flex-col gap-3 p-5">
+  <h2 class="card-title">Team</h2>
+  {% for member in annotators %}
+  <div class="flex items-center gap-2.5">
+    <c-avatar :name="member.username" size="size-7.5" />
+    <span class="flex-1 truncate"
+      >{{ member.username }}{% if member == user %}
+      <span class="text-ink-3">(you)</span>{% endif %}</span
+    >
+    <span class="text-xs text-ink-3">Annotator</span>
+  </div>
+  {% endfor %}
+  {% for member in experts %}
+  <div class="flex items-center gap-2.5">
+    <c-avatar :name="member.username" size="size-7.5" role="E" />
+    <span class="flex-1 truncate"
+      >{{ member.username }}{% if member == user %}
+      <span class="text-ink-3">(you)</span>{% endif %}</span
+    >
+    <span class="text-xs text-ink-3">Expert</span>
+  </div>
+  {% endfor %}
+  {% if not annotators and not experts %}
+  <p class="text-ink-3">Nobody assigned yet.</p>
+  {% endif %}
+</section>
+
+{% with labels=project.labels.all %}
+{% if labels %}
+<section class="card flex flex-col gap-3 p-5">
+  <h2 class="card-title">Labels</h2>
+  <div class="flex flex-wrap gap-2">
+    {% for label in labels %}
+    <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endwith %}

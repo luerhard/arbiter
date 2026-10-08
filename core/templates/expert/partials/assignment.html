@@ -1,8 +1,8 @@
 {% load custom_tags %}
 <div id="expert-assignment" class="flex min-w-0 flex-1">
   {% if not assignment %}
-  <main class="flex flex-1 items-start justify-center px-14 py-16">
-    <section class="card flex w-full max-w-xl flex-col gap-5 p-9">
+  <main class="flex flex-1 items-start justify-center px-4 py-8 sm:px-8 lg:px-14 lg:py-16">
+    <section class="card flex w-full max-w-xl flex-col gap-5 p-6 sm:p-9">
       <div class="flex items-start gap-4">
         <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
           {% heroicon_outline "check" class="size-6" stroke_width=2 %}
@@ -18,7 +18,7 @@
     </section>
   </main>
   {% else %}
-  <main class="flex min-w-0 flex-1 flex-col gap-5.5 px-11 py-9">
+  <main class="flex min-w-0 flex-1 flex-col gap-5.5 px-4 py-6 sm:px-8 lg:px-11 lg:py-9">
     <div class="flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
         <span class="eyebrow">Case</span>
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <article class="card px-8 py-7">
+    <article class="card px-5 py-5 sm:px-8 sm:py-7">
       <p id="current-example" class="reading text-[22px] leading-normal whitespace-pre-line">{{ sentence }}</p>
     </article>
 

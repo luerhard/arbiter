@@ -14,26 +14,26 @@ Profile · Arbiter
 
   <section class="card">
     <dl class="divide-y divide-line">
-      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
         <dt class="text-ink-3">Username</dt>
-        <dd class="col-span-2">{{ username }}</dd>
+        <dd class="@md:col-span-2">{{ username }}</dd>
       </div>
-      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
         <dt class="text-ink-3">Full name</dt>
-        <dd class="col-span-2">
+        <dd class="@md:col-span-2">
           {% if first_name or last_name %}{{ first_name }}
           {{ last_name }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
         </dd>
       </div>
-      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
         <dt class="text-ink-3">Email address</dt>
-        <dd class="col-span-2">
+        <dd class="@md:col-span-2">
           {% if email %}{{ email }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
         </dd>
       </div>
-      <div class="grid grid-cols-3 gap-4 px-6 py-4">
+      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
         <dt class="text-ink-3">User ID</dt>
-        <dd class="col-span-2 font-mono">{{ user_id }}</dd>
+        <dd class="@md:col-span-2 font-mono">{{ user_id }}</dd>
       </div>
     </dl>
   </section>

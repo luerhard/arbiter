@@ -22,11 +22,15 @@
   </head>
   <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full {% block body_class %}{% endblock body_class %}">
     {% block layout %}
-    {# App shell: sidebar on the left, page content on the right. #}
-    <div class="flex min-h-full">
+    {% comment %}
+    App shell: sidebar on the left (from lg up; a menu bar on top below that), page content on the right. The content is
+    an @container: components inside a page adapt to the room they get with @-variants (@xl:, @4xl:), whether the
+    sidebar is shown or not.
+    {% endcomment %}
+    <div class="flex min-h-full flex-col lg:flex-row">
       {% include "layouts/sidebar.html" %}
       <main class="min-w-0 flex-1">
-        <div class="mx-auto max-w-6xl px-12 py-9">
+        <div class="@container mx-auto max-w-6xl px-4 py-6 sm:px-8 lg:px-12 lg:py-9">
           {% block content %}
           {% endblock content %}
         </div>

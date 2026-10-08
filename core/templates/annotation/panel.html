@@ -22,8 +22,12 @@
   </div>
 
   {# long texts scroll inside the card, so the labels and buttons stay in view #}
-  <article class="card max-h-[55vh] overflow-y-auto px-11 py-10 scrollbar-thin scrollbar-thumb-line-strong">
-    <p class="reading text-[28px] leading-normal tracking-[-0.005em] whitespace-pre-line">{{ example.content }}</p>
+  <article
+    class="card max-h-[55vh] overflow-y-auto px-5 py-5 scrollbar-thin scrollbar-thumb-line-strong sm:px-11 sm:py-10"
+  >
+    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">
+      {{ example.content }}
+    </p>
   </article>
 
   <form
@@ -35,7 +39,7 @@
     class="flex flex-col gap-3.5"
   >
     {% csrf_token %}
-    <div class="flex items-baseline gap-3">
+    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
       <h2 class="text-md font-semibold">Which labels apply?</h2>
       <span class="text-meta text-ink-3">Select all that apply. No label is a valid answer.</span>
     </div>

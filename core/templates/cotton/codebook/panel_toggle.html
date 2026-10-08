@@ -1,11 +1,2 @@
-{# Header button that shows/hides the codebook side panel (store defined in layouts/focus.html). #}
-<button
-  type="button"
-  x-data
-  @click="$store.codebookPanel.toggle()"
-  :aria-pressed="$store.codebookPanel.open ? 'true' : 'false'"
-  class="btn btn-sm btn-toggle"
->
-  {% heroicon_micro "book-open" class="size-4" %}
-  Codebook
-</button>
+{# Top bar button that shows/hides the codebook side panel (cotton/codebook/panel.html). #}
+<c-side-panel.toggle name="codebook" label="Codebook" icon="book-open" />

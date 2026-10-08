@@ -16,8 +16,12 @@ Discuss · Batch
 <c-codebook.panel_toggle />
 {% endblock focus_actions %}
 {% block content %}
-<div class="flex min-w-0 flex-1" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
-  <main class="flex min-w-0 flex-1 justify-center px-12 py-10">
+{% comment %}
+The chat is the heart of the discussion and always in view: a column on the right from md up (unlike the side panels it
+never slides away), below md a block under the disagreement.
+{% endcomment %}
+<div class="flex min-w-0 flex-1 flex-col md:flex-row" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+  <main class="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-8 lg:px-12 lg:py-10">
     <div class="flex w-full max-w-3xl flex-col gap-6" x-data>
       {# the batch left the discussion phase: replaces sentence, labels and Save, the chat stays #}
       <div
@@ -32,10 +36,10 @@ Discuss · Batch
       <div class="contents" x-show="!$store.room_closed">
         <span class="eyebrow" x-text="$store.progress.heading">Disagreement</span>
 
-        <article class="card px-9 py-8">
+        <article class="card px-5 py-5 sm:px-9 sm:py-8">
           <p
             id="current-example"
-            class="reading text-2xl leading-normal whitespace-pre-line"
+            class="reading text-xl leading-normal sm:text-2xl whitespace-pre-line"
             x-text="$store.example"
           ></p>
         </article>
@@ -93,7 +97,7 @@ Discuss · Batch
 
   <aside
     aria-label="Chat"
-    class="sticky top-topbar flex h-[calc(100dvh-var(--spacing-topbar))] w-[400px] shrink-0 flex-col border-l border-line bg-surface"
+    class="flex flex-col border-line bg-surface max-md:h-[70dvh] max-md:border-t md:sticky md:top-topbar md:h-[calc(100dvh-var(--spacing-topbar))] md:w-[340px] md:shrink-0 md:border-l lg:w-[400px]"
   >
     <div class="border-b border-line px-5 py-3.5">
       <h2 class="card-title">Chat</h2>
@@ -140,7 +144,9 @@ Discuss · Batch
     </form>
   </aside>
 </div>
+{# below xl the codebook slides in left of the chat, so it never covers it #}
 <c-codebook.panel
+  class="md:max-xl:right-[340px] lg:max-xl:right-[400px]"
   :codebook="codebook"
   :content_diff="content_diff"
   :changes="codebook_changes"

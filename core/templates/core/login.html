@@ -4,7 +4,7 @@ Sign in · Arbiter
 {% endblock title %}
 {% block layout %}
 <div class="flex min-h-full">
-  <div class="flex w-[44%] flex-col justify-between bg-night p-12 text-night-ink">
+  <div class="hidden w-[44%] flex-col justify-between bg-night p-12 text-night-ink lg:flex">
     <div class="flex items-center gap-3 text-white">
       <c-logo.mark size="size-8" tone="night" />
       <span class="text-2xl font-semibold tracking-[-0.02em]">arbiter</span>
@@ -14,9 +14,14 @@ Sign in · Arbiter
     </p>
     <p class="text-meta text-night-ink-2">Open-source annotation tool for research teams.</p>
   </div>
-  <main class="flex flex-1 items-center justify-center p-10">
+  <main class="flex flex-1 items-center justify-center p-6 sm:p-10">
     <form method="post" class="flex w-full max-w-sm flex-col gap-5">
       {% csrf_token %}
+      {# the dark panel with the logo is hidden below lg #}
+      <div class="flex items-center gap-2.5 lg:hidden">
+        <c-logo.mark size="size-7" />
+        <span class="text-xl font-semibold tracking-[-0.02em]">arbiter</span>
+      </div>
       <div class="flex flex-col gap-1.5">
         <h1 class="page-title">Sign in</h1>
         <p class="page-subtitle">Use the account your project lead created for you.</p>

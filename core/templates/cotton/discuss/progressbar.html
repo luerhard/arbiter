@@ -1,5 +1,5 @@
 <div x-data id="progressbar" class="flex flex-1 items-center gap-3" data-phase="D">
-  <div class="progress flex-1">
+  <div class="progress flex-1 max-sm:hidden">
     <div class="progress-bar" :style="{ width: $store.progress.ratio + '%' }"></div>
   </div>
   <span

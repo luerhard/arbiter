@@ -36,7 +36,7 @@ New batch ·
         <h2 class="card-title">Team for this batch</h2>
         <p class="field-help">Anyone in the project can take either role. Roles can differ from batch to batch.</p>
       </div>
-      <div class="grid grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 @xl:grid-cols-2">
         <c-field :field="form.annotators" label="Annotators" help="Label every sample, then discuss disagreements.">
           <c-user-search
             name="annotators"

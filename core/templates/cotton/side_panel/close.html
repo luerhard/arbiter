@@ -1,0 +1,15 @@
+{% comment %}
+Close button in the header of a side panel (cotton/side_panel), e.g.
+<c-side-panel.close name="expert-codebook" label="codebook" class="xl:hidden" />
+class="xl:hidden" for panels that cannot be closed from xl up.
+{% endcomment %}
+<c-vars name="" label="" class="" />
+<button
+  type="button"
+  class="btn btn-ghost btn-sm btn-icon {{ class }}"
+  @click="$store.panels.toggle('{{ name }}')"
+  aria-label="Close {{ label }}"
+  title="Close"
+>
+  {% heroicon_micro "x-mark" class="size-4" %}
+</button>

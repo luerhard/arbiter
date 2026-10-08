@@ -5,9 +5,10 @@ with a button that has command="show-modal" and commandfor set to the dialog id,
   What will be lost.
 </c-confirm-dialog>
 Hidden inputs for the form go into the optional "fields" slot: <c-slot name="fields">...</c-slot>
+While closed it takes no room, so it can sit next to its button in a row of buttons.
 {% endcomment %}
 <c-vars id="" title="" action="" confirm="Delete" fields="" />
-<el-dialog>
+<el-dialog class="contents">
   <dialog
     id="{{ id }}"
     aria-labelledby="{{ id }}-title"

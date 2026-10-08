@@ -247,17 +247,17 @@
     @apply h-7 cursor-pointer rounded-[7px] px-3 text-meta text-ink-2 aria-selected:bg-surface aria-selected:font-semibold aria-selected:text-ink aria-selected:shadow-xs;
   }
 
-  /* Sidebar navigation */
+  /* Sidebar navigation (layouts/nav.html); the current page and the open project carry aria-current */
   .nav-item {
     @apply flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-night-ink hover:bg-night-2 hover:text-white;
   }
-  .nav-item-active {
+  .nav-item[aria-current] {
     @apply bg-night-2 font-medium text-white;
   }
   .nav-subitem {
     @apply flex h-[30px] items-center rounded-md px-2.5 text-meta text-night-ink-2 hover:text-white;
   }
-  .nav-subitem-active {
+  .nav-subitem[aria-current] {
     @apply bg-white/5 text-white shadow-[inset_2px_0_0_var(--c-accent)];
   }
 
@@ -265,14 +265,16 @@
   .card {
     @apply rounded-card border border-line bg-surface;
   }
-  .card-header {
-    @apply flex items-center justify-between gap-4 border-b border-line px-5 py-4;
-  }
   .card-title {
     @apply text-md font-semibold text-ink;
   }
-  .card-body {
-    @apply p-5;
+  /* <article class="card card-document"> around a long text (codebook, diff): less padding when the page is narrow */
+  .card-document {
+    @apply px-6 py-6 @2xl:px-12 @2xl:py-10;
+  }
+  /* Title on the left, actions on the right; the actions move to the next line when they don't fit */
+  .title-row {
+    @apply flex flex-wrap items-center justify-between gap-x-4 gap-y-3;
   }
 
   /* Text helpers */
@@ -428,9 +430,9 @@
   /* Toasts and notifications (cotton/toasts, notifications/partials/unread.html).
      data-variant="success|error|warning|info" picks the color of the stripe and icon. */
   .toast-stack {
-    @apply pointer-events-none fixed top-5 right-5 z-50 flex w-[380px] flex-col gap-2.5;
+    @apply pointer-events-none fixed top-5 right-5 z-50 flex w-[min(380px,calc(100vw-2.5rem))] flex-col gap-2.5 max-lg:top-19;
   }
-  /* below the top bar of the work screens */
+  /* below the top bar: max-lg:top-19 above for the menu bar of layouts/sidebar.html, this one for the work screens */
   .has-topbar .toast-stack {
     top: calc(var(--spacing-topbar) + 1rem);
   }
@@ -486,9 +488,22 @@
     @apply flex w-full cursor-pointer items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-ink hover:bg-subtle focus:bg-subtle focus:outline-hidden disabled:cursor-default disabled:hover:bg-transparent;
   }
 
-  /* Phase stepper: <span class="step step-done|step-current|step-todo"> inside a [data-phase] */
+  /* Side panel of the work screens (cotton/side_panel): a column beside the content from xl up, sliding over the
+     content from the right below that. The column width comes from the page: class="side-panel xl:w-[440px]" */
+  .side-panel {
+    @apply flex flex-col border-l border-line bg-surface;
+    @apply max-xl:fixed max-xl:top-topbar max-xl:right-0 max-xl:bottom-0 max-xl:z-30 max-xl:w-full max-xl:max-w-md max-xl:shadow-popover;
+    @apply xl:sticky xl:top-topbar xl:h-[calc(100dvh-var(--spacing-topbar))] xl:shrink-0;
+  }
+
+  /* Phase stepper: <span class="step step-done|step-current|step-todo"><span class="step-icon"></span>
+     <span class="step-label">…</span></span> inside a [data-phase]. In a narrow @container only the current step
+     keeps its label. */
   .step {
     @apply inline-flex items-center gap-2 text-meta whitespace-nowrap text-ink-2;
+  }
+  .step:not(.step-current) .step-label {
+    @apply sr-only @lg:not-sr-only;
   }
   .step-icon {
     @apply flex size-5 shrink-0 items-center justify-center rounded-full;

@@ -10,7 +10,7 @@ Home · Arbiter
   />
 
   {% if tasks %}
-  <section class="grid grid-cols-3 gap-5">
+  <section class="grid grid-cols-1 gap-5 @xl:grid-cols-2 @4xl:grid-cols-3">
     {% for task in tasks %}
     <article class="card flex flex-col gap-4 p-5.5" data-phase="{{ task.batch.current_phase }}">
       <div class="flex items-center justify-between">

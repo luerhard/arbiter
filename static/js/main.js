@@ -61,6 +61,7 @@ import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import * as ui from "./ui.js";
 import * as discuss from "./discuss.js";
 import { initToasts } from "./toasts.js";
+import { panelsStore, watchWidth } from "./panels.js";
 
 window.lib = window.lib || {};
 window.lib.ui = ui;
@@ -69,6 +70,8 @@ window.lib.discuss = discuss;
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 Alpine.data("skipAnnotatedToggle", skipAnnotatedToggle);
+Alpine.store("panels", panelsStore());
+watchWidth(Alpine.store("panels"));
 Alpine.start();
 
 // Debugging

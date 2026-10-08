@@ -5,6 +5,19 @@ from django.db.models import Subquery
 from projects.models import Batch
 from projects.models import ProjectUser
 
+# Which link under the open project in the sidebar the page belongs to
+NAV_SECTIONS = {
+    "project-detail-expert": "batches",
+    "project-detail-annotator": "batches",
+    "project-batch-create": "batches",
+    "project-batch-detail": "batches",
+    "project-sample-detail": "batches",
+    "codebook-view": "codebook",
+    "codebook-edit": "codebook",
+    "codebook-diff": "codebook",
+    "codebook-change": "codebook",
+}
+
 
 def navigation(request):
     """Data for the sidebar: the user's projects and which one is open."""
@@ -25,6 +38,7 @@ def navigation(request):
     )
 
     match = request.resolver_match
+    url_name = match.url_name if match else ""
     url_kwargs = match.kwargs if match else {}
     project_id = url_kwargs.get("project_id")
     if project_id is None and "batch_id" in url_kwargs:
@@ -50,5 +64,6 @@ def navigation(request):
         "nav_projects": memberships,
         "nav_project_id": project_id,
         "nav_codebook_id": codebook_id,
-        "nav_url_name": match.url_name if match else "",
+        "nav_url_name": url_name,
+        "nav_section": NAV_SECTIONS.get(url_name),
     }

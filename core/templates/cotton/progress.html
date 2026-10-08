@@ -13,7 +13,9 @@ oob="true" re-sends it out-of-band with an htmx response (keeps the top bar up t
   {% endif %}
 >
   {% if total %}
-  <div class="progress flex-1"><div class="progress-bar" style="width: {% widthratio done total 100 %}%"></div></div>
+  <div class="progress flex-1 max-sm:hidden">
+    <div class="progress-bar" style="width: {% widthratio done total 100 %}%"></div>
+  </div>
   <span class="font-mono text-meta whitespace-nowrap text-ink-2"
     >{{ done }}
     /

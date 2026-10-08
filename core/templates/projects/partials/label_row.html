@@ -1,5 +1,6 @@
-<div class="label-row grid grid-cols-[1fr_200px_110px] gap-3">
-  <div>
+<div class="label-row grid grid-cols-[1fr_110px] gap-3 @xl:grid-cols-[1fr_200px_110px]">
+  {# narrow: the name on its own line, color and key below #}
+  <div class="col-span-2 @xl:col-span-1">
     <label class="field-label" for="label-name-{{ index }}">Label</label>
     <input
       id="label-name-{{ index }}"

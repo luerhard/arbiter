@@ -27,8 +27,8 @@ Sample
     </c-slot>
   </c-page-header>
 
-  <div class="flex items-start gap-6">
-    <div class="flex min-w-0 flex-1 flex-col gap-6">
+  <c-columns aside_label="Sample">
+    <div class="flex flex-col gap-6">
       <article class="card px-8 py-7">
         <p class="reading text-[22px] leading-normal whitespace-pre-line">{{ example.content }}</p>
       </article>
@@ -41,7 +41,7 @@ Sample
       {% endif %}
     </div>
 
-    <div class="flex w-80 shrink-0 flex-col gap-4">
+    <c-slot name="aside">
       <section id="sample-state" class="card flex flex-col gap-3 p-5" aria-label="Status">
         <h2 class="card-title">Status</h2>
         <p class="text-sm text-ink">{{ state.status }}</p>
@@ -58,7 +58,7 @@ Sample
         </div>
       </section>
 
-      <aside class="card flex flex-col gap-3 p-5">
+      <section class="card flex flex-col gap-3 p-5" aria-label="Metadata">
         <h2 class="card-title">Metadata</h2>
         {% if example.metadata %}
         <dl class="flex flex-col gap-3">
@@ -72,8 +72,8 @@ Sample
         {% else %}
         <p class="text-meta text-ink-3">The uploaded file had no other columns.</p>
         {% endif %}
-      </aside>
-    </div>
-  </div>
+      </section>
+    </c-slot>
+  </c-columns>
 </div>
 {% endblock content %}

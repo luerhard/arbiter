@@ -13,14 +13,14 @@
     </c-slot>
   </c-page-header>
 
-  <div class="flex items-start gap-6">
-    <section class="flex min-w-0 flex-1 flex-col gap-3.5" aria-label="My batches">
+  <c-columns aside_label="Project">
+    <section class="flex flex-col gap-3.5" aria-label="My batches">
       {% for batch in batches %}
       {% with b=batch.batch %}
-      <article class="card flex items-center justify-between gap-6 px-6 py-5" data-phase="{{ b.current_phase }}">
+      <article class="card title-row gap-x-6 px-6 py-5" data-phase="{{ b.current_phase }}">
         <div class="flex min-w-0 flex-col gap-3">
-          <div class="flex items-center gap-3">
-            <h2 class="text-lg font-semibold">
+          <div class="flex flex-wrap items-center gap-3">
+            <h2 class="text-lg font-semibold whitespace-nowrap">
               Batch
               {{ b.batch_number }}
             </h2>
@@ -41,7 +41,7 @@
           </div>
           {% endif %}
         </div>
-        <div class="flex shrink-0 items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
           <a
             href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ b.batch_number|add:-1 }}&batch_new={{ b.batch_number }}"
             class="btn btn-ghost btn-sm"
@@ -73,9 +73,9 @@
         <h2 class="eyebrow">Finished</h2>
         {% for row in finished %}
         {% with b=row.batch %}
-        <article class="card flex items-center justify-between gap-6 px-6 py-3.5" data-phase="{{ b.current_phase }}">
-          <div class="flex items-center gap-3">
-            <h3 class="font-semibold">
+        <article class="card title-row gap-x-6 px-6 py-3.5" data-phase="{{ b.current_phase }}">
+          <div class="flex flex-wrap items-center gap-3">
+            <h3 class="font-semibold whitespace-nowrap">
               Batch
               {{ b.batch_number }}
             </h3>
@@ -96,8 +96,7 @@
       </section>
       {% endif %}
     </section>
-
-    {% include "projects/partials/detail-sidebar.html" %}
-  </div>
+    <c-slot name="aside">{% include "projects/partials/detail-sidebar.html" %}</c-slot>
+  </c-columns>
 </div>
 {% endblock content %}

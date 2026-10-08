@@ -1,8 +1,5 @@
-<aside
-  id="codebook-panel"
-  aria-label="Codebook"
-  class="sticky top-topbar flex h-[calc(100dvh-var(--spacing-topbar))] w-[500px] shrink-0 flex-col border-l border-line bg-surface"
->
+{# Swapped as a whole (hx-target="#codebook-panel"); the id lands on the aside of c-side-panel. #}
+<c-side-panel id="codebook-panel" name="expert-codebook" label="Codebook" width="xl:w-[500px]">
   <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
     <div class="flex items-center gap-3">
       <h2 class="card-title">Codebook</h2>
@@ -13,8 +10,8 @@
       </span>
       {% endif %}
     </div>
-    {% if panel_mode != "edit" %}
     <div class="flex items-center gap-1.5">
+      {% if panel_mode != "edit" %}
       {% if draft %}
       <button
         type="button"
@@ -39,8 +36,9 @@
         {% heroicon_micro "pencil" class="size-4" %}
         {% if draft %}Continue editing{% else %}Edit{% endif %}
       </button>
+      {% endif %}
+      <c-side-panel.close name="expert-codebook" label="codebook" class="xl:hidden" />
     </div>
-    {% endif %}
   </div>
 
   {% if panel_mode == "edit" %}
@@ -103,4 +101,4 @@
     <c-codebook.view content="{{ panel_content }}" />
   </div>
   {% endif %}
-</aside>
+</c-side-panel>

@@ -32,21 +32,23 @@ Codebook ·
     </c-slot>
   </c-page-header>
 
-  <div class="flex flex-col items-start gap-6 lg:flex-row">
-    <article class="card w-full min-w-0 flex-1 px-12 py-10">
+  <c-columns>
+    <article class="card card-document">
       <div class="max-w-3xl">
         <c-codebook.view content="{{ codebook.content }}" />
       </div>
     </article>
 
-    <aside id="codebook-history" class="card flex w-full shrink-0 flex-col gap-4 px-5.5 py-5 lg:w-80">
-      <h2 class="card-title">History</h2>
-      {% if changes %}
-      {% include "codebook/partials/change-list.html" with links=True %}
-      {% else %}
-      <p class="text-sm text-ink-2">No changes yet.</p>
-      {% endif %}
-    </aside>
-  </div>
+    <c-slot name="aside">
+      <section id="codebook-history" class="card flex flex-col gap-4 px-5.5 py-5" aria-label="History">
+        <h2 class="card-title">History</h2>
+        {% if changes %}
+        {% include "codebook/partials/change-list.html" with links=True %}
+        {% else %}
+        <p class="text-sm text-ink-2">No changes yet.</p>
+        {% endif %}
+      </section>
+    </c-slot>
+  </c-columns>
 </div>
 {% endblock content %}
