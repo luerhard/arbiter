@@ -58,8 +58,7 @@ done ·
         {% csrf_token %}
         <button type="submit" class="btn btn-primary">Finalize my annotations</button>
       </form>
-      {% if review_url %}<a href="{{ review_url }}" class="btn btn-secondary">Review my labels</a
-      >{% endif %}
+      {% if review_url %}<a href="{{ review_url }}" class="btn btn-secondary">Review my labels</a>{% endif %}
       {% elif not phase_advanced %}
       <form method="post" action="{% url 'annotate-undo-finalize' batch.id %}">
         {% csrf_token %}
