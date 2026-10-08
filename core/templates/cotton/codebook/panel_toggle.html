@@ -4,8 +4,7 @@
   x-data
   @click="$store.codebookPanel.toggle()"
   :aria-pressed="$store.codebookPanel.open ? 'true' : 'false'"
-  :class="$store.codebookPanel.open ? 'border-accent bg-accent-soft text-accent-ink' : 'border-line-strong bg-surface text-ink'"
-  class="btn btn-sm border"
+  class="btn btn-sm btn-toggle"
 >
   {% heroicon_micro "book-open" class="size-4" %}
   Codebook

@@ -24,6 +24,18 @@
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Source Serif 4 Variable", Georgia, serif;
   --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Sizes between Tailwind's steps: text-meta (13px) for secondary lines,
+     text-md (15px) for small headings and panel text. */
+  --text-meta: 13px;
+  --text-md: 15px;
+
+  --radius-card: 14px;
+  --shadow-popover: 0 12px 32px rgb(11 13 16 / 0.14);
+
+  /* Height of the top bar on the work screens (layouts/focus.html):
+     h-topbar, top-topbar, var(--spacing-topbar) */
+  --spacing-topbar: 3.75rem;
 }
 
 /* Palette: graphite neutrals with one amber accent (direction "Instrument",
@@ -211,16 +223,28 @@
     @apply bg-danger font-semibold text-white hover:bg-danger/90 dark:text-night;
   }
   .btn-sm {
-    @apply h-8 gap-1.5 rounded-md px-3 text-[13px];
+    @apply h-8 gap-1.5 rounded-md px-3 text-meta;
   }
   .btn-lg {
-    @apply h-12 rounded-[10px] px-5 text-[15px];
+    @apply h-12 rounded-[10px] px-5 text-md;
   }
   .btn-icon {
     @apply w-10 px-0;
   }
   .btn-icon.btn-sm {
     @apply w-8;
+  }
+  /* On/off button: <button class="btn btn-sm btn-toggle" :aria-pressed="on ? 'true' : 'false'"> */
+  .btn-toggle {
+    @apply border border-line-strong bg-surface text-ink aria-pressed:border-accent aria-pressed:bg-accent-soft aria-pressed:text-accent-ink;
+  }
+
+  /* Segmented tabs: <div role="tablist" class="segmented"><button role="tab" class="segment" :aria-selected="…"> */
+  .segmented {
+    @apply inline-flex rounded-[9px] bg-subtle p-[3px];
+  }
+  .segment {
+    @apply h-7 cursor-pointer rounded-[7px] px-3 text-meta text-ink-2 aria-selected:bg-surface aria-selected:font-semibold aria-selected:text-ink aria-selected:shadow-xs;
   }
 
   /* Sidebar navigation */
@@ -231,7 +255,7 @@
     @apply bg-night-2 font-medium text-white;
   }
   .nav-subitem {
-    @apply flex h-[30px] items-center rounded-md px-2.5 text-[13px] text-night-ink-2 hover:text-white;
+    @apply flex h-[30px] items-center rounded-md px-2.5 text-meta text-night-ink-2 hover:text-white;
   }
   .nav-subitem-active {
     @apply bg-white/5 text-white shadow-[inset_2px_0_0_var(--c-accent)];
@@ -239,13 +263,13 @@
 
   /* Cards */
   .card {
-    @apply rounded-[14px] border border-line bg-surface;
+    @apply rounded-card border border-line bg-surface;
   }
   .card-header {
     @apply flex items-center justify-between gap-4 border-b border-line px-5 py-4;
   }
   .card-title {
-    @apply text-[15px] font-semibold text-ink;
+    @apply text-md font-semibold text-ink;
   }
   .card-body {
     @apply p-5;
@@ -279,7 +303,7 @@
     @apply block w-full cursor-pointer rounded-lg border border-line-strong bg-surface text-sm text-ink-2 file:mr-4 file:h-10 file:cursor-pointer file:border-0 file:border-r file:border-line-strong file:bg-subtle file:px-4 file:font-medium file:text-ink hover:file:bg-line;
   }
   .field-label {
-    @apply mb-1.5 block text-[13px] font-medium text-ink;
+    @apply mb-1.5 block text-meta font-medium text-ink;
   }
   .field-help {
     @apply mt-1 text-xs text-ink-3;
@@ -295,8 +319,25 @@
   .badge {
     @apply inline-flex items-center gap-1.5 rounded-full bg-subtle px-2.5 py-0.5 text-xs font-medium text-ink-2;
   }
+  .badge-success {
+    @apply bg-success-soft text-success;
+  }
+  .badge-warning {
+    @apply bg-warning-soft text-warning;
+  }
+
+  /* Tables: <table class="data-table">; cells add their own padding where it differs */
+  .data-table {
+    @apply w-full;
+  }
+  .data-table th {
+    @apply border-b border-line px-4 py-3.5 text-left text-xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+  }
+  .data-table > tbody {
+    @apply divide-y divide-line;
+  }
   .breadcrumb {
-    @apply text-[13px] text-ink-3 [&_a]:hover:text-ink [&_a]:hover:underline;
+    @apply text-meta text-ink-3 [&_a]:hover:text-ink [&_a]:hover:underline;
   }
   .avatar[data-role="E"] {
     background: #f1eafe;
@@ -345,7 +386,7 @@
     @apply mt-6 text-[17px];
   }
   .prose-codebook :is(h4, h5, h6) {
-    @apply mt-5 text-[15px];
+    @apply mt-5 text-md;
   }
   .prose-codebook ul {
     @apply list-disc pl-6;
@@ -389,14 +430,14 @@
   }
   /* below the top bar of the work screens */
   .has-topbar .toast-stack {
-    @apply top-[76px];
+    top: calc(var(--spacing-topbar) + 1rem);
   }
   .toast {
     @apply pointer-events-auto flex items-start gap-3 rounded-xl border border-line bg-surface py-3 pr-3 pl-3.5 text-ink;
     --toast-color: var(--c-accent-ink);
     box-shadow:
       inset 3px 0 0 var(--toast-color),
-      0 12px 32px rgb(11 13 16 / 0.14);
+      var(--shadow-popover);
   }
   .toast[data-variant="success"] {
     --toast-color: var(--c-success);
@@ -431,7 +472,7 @@
 
   /* Dropdown menu (Tailwind Plus <el-dropdown>/<el-menu>) */
   .menu {
-    @apply w-60 rounded-[10px] border border-line bg-surface p-1.5 text-sm shadow-[0_12px_32px_rgb(11_13_16/0.14)] transition transition-discrete [--anchor-gap:--spacing(1.5)] data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in;
+    @apply w-60 rounded-[10px] border border-line bg-surface p-1.5 text-sm shadow-popover transition transition-discrete [--anchor-gap:--spacing(1.5)] data-closed:scale-95 data-closed:opacity-0 data-enter:duration-100 data-enter:ease-out data-leave:duration-75 data-leave:ease-in;
   }
   .menu-section {
     @apply flex flex-col border-line py-1 not-first:border-t;
@@ -445,7 +486,7 @@
 
   /* Phase stepper: <span class="step step-done|step-current|step-todo"> inside a [data-phase] */
   .step {
-    @apply inline-flex items-center gap-2 text-[13px] whitespace-nowrap text-ink-2;
+    @apply inline-flex items-center gap-2 text-meta whitespace-nowrap text-ink-2;
   }
   .step-icon {
     @apply flex size-5 shrink-0 items-center justify-center rounded-full;
@@ -475,7 +516,7 @@
 
   /* Read-only label: <span class="label-tag" style="--label-color: #155596"> */
   .label-tag {
-    @apply inline-flex h-7 items-center gap-2 rounded-lg px-2.5 text-[13px] font-medium whitespace-nowrap;
+    @apply inline-flex h-7 items-center gap-2 rounded-lg px-2.5 text-meta font-medium whitespace-nowrap;
     background: color-mix(in srgb, var(--label-color) 13%, var(--c-surface));
     color: color-mix(in srgb, var(--label-color) 65%, var(--c-ink));
   }
@@ -556,7 +597,7 @@
 
 /* read-only (someone else's labels, saved decisions) */
 .label-input:disabled + .label {
-  @apply h-8 cursor-default rounded-lg pr-2.5 text-[13px] hover:border-line-strong;
+  @apply h-8 cursor-default rounded-lg pr-2.5 text-meta hover:border-line-strong;
 }
 .label-input:disabled + .label .label-hotkey {
   @apply hidden;

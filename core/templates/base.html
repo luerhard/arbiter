@@ -34,7 +34,7 @@
     </div>
     {% endblock layout %}
     <c-toasts>
-      {% for message in messages %}<c-toasts.toast :tags="message.tags" , :message="message.message" />{% endfor %}
+      {% for message in messages %}<c-toasts.toast :tags="message.tags" :message="message.message" />{% endfor %}
       {% if user.is_authenticated %}
       <div
         id="notification-stack"

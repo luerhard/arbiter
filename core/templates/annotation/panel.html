@@ -14,7 +14,7 @@
       {{ progress.total }}</span
     >
     {% if assignment.done %}
-    <span class="inline-flex items-center gap-1.5 text-[13px] text-success">
+    <span class="inline-flex items-center gap-1.5 text-meta text-success">
       {% heroicon_micro "check" class="size-4" %}
       Labeled. Change the labels and save again to correct.
     </span>
@@ -36,8 +36,8 @@
   >
     {% csrf_token %}
     <div class="flex items-baseline gap-3">
-      <h2 class="text-[15px] font-semibold">Which labels apply?</h2>
-      <span class="text-[13px] text-ink-3">Select all that apply. No label is a valid answer.</span>
+      <h2 class="text-md font-semibold">Which labels apply?</h2>
+      <span class="text-meta text-ink-3">Select all that apply. No label is a valid answer.</span>
     </div>
     <div class="flex flex-wrap items-start gap-3" role="group" aria-label="Labels">
       {% for checkbox, detail in label_form.labels|zip_lists:label_form.label_details %}

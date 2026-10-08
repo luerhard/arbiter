@@ -9,7 +9,7 @@ Discuss · Batch
 <c-discuss.progressbar />
 {% endblock focus_progress %}
 {% block focus_actions %}
-<span class="inline-flex items-center gap-2 text-[13px] text-ink-2" title="People in this discussion right now">
+<span class="inline-flex items-center gap-2 text-meta text-ink-2" title="People in this discussion right now">
   <span class="size-2 rounded-full bg-success"></span>
   <span id="n-online-status">0</span> online
 </span>
@@ -26,7 +26,7 @@ Discuss · Batch
         x-show="$store.room_closed"
         x-cloak
       >
-        <p class="max-w-md text-[15px] font-semibold" x-text="$store.room_closed?.message"></p>
+        <p class="max-w-md text-md font-semibold" x-text="$store.room_closed?.message"></p>
         <a class="btn btn-primary" :href="$store.room_closed?.project_url">Back to project</a>
       </div>
       <div class="contents" x-show="!$store.room_closed">
@@ -51,12 +51,12 @@ Discuss · Batch
         </section>
 
         <section class="flex flex-col gap-3">
-          <h2 class="text-[15px] font-semibold">Your label after discussing</h2>
+          <h2 class="text-md font-semibold">Your label after discussing</h2>
           <c-discuss.labels user="self" id="current-labels" enabled />
         </section>
 
         <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
-          <span class="inline-flex items-center gap-2 text-[13px] text-ink-2">
+          <span class="inline-flex items-center gap-2 text-meta text-ink-2">
             {% heroicon_micro "information-circle" class="size-4" %}
             <span id="save-status" x-text="$store.save_status"></span>
           </span>
@@ -93,7 +93,7 @@ Discuss · Batch
 
   <aside
     aria-label="Chat"
-    class="sticky top-15 flex h-[calc(100vh-3.75rem)] w-[400px] shrink-0 flex-col border-l border-line bg-surface"
+    class="sticky top-topbar flex h-[calc(100dvh-var(--spacing-topbar))] w-[400px] shrink-0 flex-col border-l border-line bg-surface"
   >
     <div class="border-b border-line px-5 py-3.5">
       <h2 class="card-title">Chat</h2>

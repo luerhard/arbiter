@@ -39,18 +39,18 @@ Batch
     hx-swap="outerHTML"
     hx-on::response-error="window.location.reload()"
   >
-    <table class="w-full">
+    <table class="data-table">
       <thead>
-        <tr class="eyebrow text-left">
+        <tr>
           {% if batch.can_reorder %}
-          <th class="w-10 border-b border-line"><span class="sr-only">Move</span></th>
+          <th class="w-10 p-0"><span class="sr-only">Move</span></th>
           {% endif %}
-          <th class="w-12 border-b border-line px-4 py-3.5 text-right font-semibold">#</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Text</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Status</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Label</th>
+          <th class="w-12 text-right">#</th>
+          <th>Text</th>
+          <th>Status</th>
+          <th>Label</th>
           {% for column in metadata_columns %}
-          <th class="border-b border-line px-4 py-3.5 font-semibold whitespace-nowrap normal-case tracking-normal">
+          <th class="whitespace-nowrap normal-case tracking-normal">
             {{ column }}
           </th>
           {% endfor %}

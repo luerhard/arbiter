@@ -3,7 +3,7 @@
     <div class="progress-bar" :style="{ width: $store.progress.ratio + '%' }"></div>
   </div>
   <span
-    class="font-mono text-[13px] whitespace-nowrap text-ink-2"
+    class="font-mono text-meta whitespace-nowrap text-ink-2"
     x-text="$store.progress.total ? `${$store.progress.done} / ${$store.progress.total} discussed` : ''"
   ></span>
 </div>

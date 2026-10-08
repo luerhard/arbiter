@@ -29,12 +29,12 @@
       id="{{ name }}-results"
       x-show="open"
       x-cloak
-      class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-[10px] border border-line bg-surface p-1 shadow-[0_12px_32px_rgb(11_13_16/0.14)]"
+      class="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-[10px] border border-line bg-surface p-1 shadow-popover"
     ></div>
   </div>
   <div class="flex flex-wrap gap-1.5">
     <template x-for="u in selectedUsers" :key="u.id">
-      <span class="inline-flex h-7 items-center gap-1.5 rounded-full bg-subtle pr-1 pl-3 text-[13px] text-ink">
+      <span class="inline-flex h-7 items-center gap-1.5 rounded-full bg-subtle pr-1 pl-3 text-meta text-ink">
         <span x-text="u.username"></span>
         <button
           type="button"

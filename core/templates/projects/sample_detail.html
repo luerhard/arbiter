@@ -44,12 +44,12 @@ Sample
     <div class="flex w-80 shrink-0 flex-col gap-4">
       <section id="sample-state" class="card flex flex-col gap-3 p-5" aria-label="Status">
         <h2 class="card-title">Status</h2>
-        <p class="text-[14px] text-ink">{{ state.status }}</p>
+        <p class="text-sm text-ink">{{ state.status }}</p>
         <div class="flex flex-wrap gap-1">
           {% if state.labels is None %}
-          <span class="text-[13px] text-ink-3">No label yet</span>
+          <span class="text-meta text-ink-3">No label yet</span>
           {% elif not state.labels %}
-          <span class="text-[13px] text-ink-3 italic">No label</span>
+          <span class="text-meta text-ink-3 italic">No label</span>
           {% else %}
           {% for label in state.labels %}
           <span class="label-tag" style="--label-color: {{ label.color }}">{{ label.name }}</span>
@@ -65,12 +65,12 @@ Sample
           {% for key, value in example.metadata.items %}
           <div class="flex flex-col gap-0.5">
             <dt class="text-xs text-ink-3">{{ key }}</dt>
-            <dd class="font-mono text-[13px] break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+            <dd class="font-mono text-meta break-all text-ink">{{ value|default_if_none:"–" }}</dd>
           </div>
           {% endfor %}
         </dl>
         {% else %}
-        <p class="text-[13px] text-ink-3">The uploaded file had no other columns.</p>
+        <p class="text-meta text-ink-3">The uploaded file had no other columns.</p>
         {% endif %}
       </aside>
     </div>

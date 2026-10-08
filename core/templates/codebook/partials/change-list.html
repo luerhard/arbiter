@@ -10,9 +10,9 @@ Codebook changes with their rationales, newest first. Needs changes and codebook
       {{ change.when }}</span
     >
     {% if change.rationale %}
-    <p class="text-[14px] whitespace-pre-line text-ink">{{ change.rationale }}</p>
+    <p class="text-sm whitespace-pre-line text-ink">{{ change.rationale }}</p>
     {% else %}
-    <p class="text-[14px] text-ink-3 italic">No rationale given.</p>
+    <p class="text-sm text-ink-3 italic">No rationale given.</p>
     {% endif %}
     {% if change.decision_text %}
     <p class="text-xs text-ink-2">Saved with the decision on “{{ change.decision_text|truncatechars:80 }}”</p>
@@ -20,7 +20,7 @@ Codebook changes with their rationales, newest first. Needs changes and codebook
     {% if links %}
     <a
       href="{% url 'codebook-change' codebook.pk change.sha %}"
-      class="text-[13px] font-medium text-accent-ink hover:underline"
+      class="text-meta font-medium text-accent-ink hover:underline"
       >Show changes →</a
     >
     {% endif %}

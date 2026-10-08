@@ -17,14 +17,14 @@ Home · Arbiter
         <span class="phase-badge">{{ task.batch.get_current_phase_display }}</span>
       </div>
       <div class="flex flex-col gap-0.5">
-        <span class="text-[13px] text-ink-3">{{ task.batch.project.name }}</span>
+        <span class="text-meta text-ink-3">{{ task.batch.project.name }}</span>
         <span class="text-lg font-semibold"
           >Batch
           {{ task.batch.batch_number }}</span
         >
       </div>
       <div class="flex flex-col gap-2">
-        <div class="flex justify-between text-[13px] text-ink-2">
+        <div class="flex justify-between text-meta text-ink-2">
           <span>
             {% if task.kind == "annotate" %}Annotated{% elif task.kind == "discuss" %}Disagreements discussed{% else %}Cases
             decided{% endif %}
@@ -65,15 +65,15 @@ Home · Arbiter
       </a>
     </div>
     <div class="card overflow-hidden">
-      <table class="w-full">
+      <table class="data-table">
         <thead>
-          <tr class="eyebrow text-left">
-            <th class="border-b border-line px-5.5 py-3.5 font-semibold">Project</th>
-            <th class="border-b border-line px-4 py-3.5 font-semibold">Your role</th>
-            <th class="border-b border-line px-4 py-3.5 font-semibold">Batches by phase</th>
+          <tr>
+            <th class="px-5.5">Project</th>
+            <th>Your role</th>
+            <th>Batches by phase</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-line">
+        <tbody>
           {% for membership in memberships %}
           <tr class="hover:bg-subtle">
             <td class="px-5.5 py-4">
@@ -81,7 +81,7 @@ Home · Arbiter
                 >{{ membership.project.name }}</a
               >
               {% if membership.project.description %}
-              <div class="max-w-md truncate text-[13px] text-ink-3">{{ membership.project.description }}</div>
+              <div class="max-w-md truncate text-meta text-ink-3">{{ membership.project.description }}</div>
               {% endif %}
             </td>
             <td class="px-4 py-4 text-ink-2">{{ membership.get_default_role_display }}</td>
@@ -95,7 +95,7 @@ Home · Arbiter
                   title="Batch {{ batch.batch_number }} · {{ batch.get_current_phase_display }}"
                 ></span>
                 {% empty %}
-                <span class="text-[13px] text-ink-3">No batches yet</span>
+                <span class="text-meta text-ink-3">No batches yet</span>
                 {% endfor %}
               </div>
             </td>

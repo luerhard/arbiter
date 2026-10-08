@@ -28,7 +28,7 @@
             <span class="badge">{% if batch.role == "E" %}Expert{% else %}Annotator{% endif %}</span>
           </div>
           {% if batch.role == "A" %}
-          <div class="flex items-center gap-3 text-[13px] text-ink-2">
+          <div class="flex items-center gap-3 text-meta text-ink-2">
             Annotated
             <span class="font-mono text-ink"
               >{{ batch.done }}
@@ -59,7 +59,7 @@
           {% elif batch.role == "E" and b.current_phase == "E" %}
           <a href="{% url 'expert-batch' b.id %}" class="btn btn-primary btn-sm">Resolve disagreements</a>
           {% else %}
-          <span class="text-[13px] text-ink-3">Nothing to do in this phase</span>
+          <span class="text-meta text-ink-3">Nothing to do in this phase</span>
           {% endif %}
         </div>
       </article>
@@ -80,7 +80,7 @@
               {{ b.batch_number }}
             </h3>
             <span class="phase-badge">{{ b.get_current_phase_display }}</span>
-            <span class="text-[13px] text-ink-3"
+            <span class="text-meta text-ink-3"
               >{{ row.length }}
               sample{{ row.length|pluralize }}</span
             >

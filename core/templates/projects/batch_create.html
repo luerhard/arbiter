@@ -17,7 +17,7 @@ New batch ·
   <form method="post" enctype="multipart/form-data" class="flex flex-col gap-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
-    <div class="rounded-lg bg-danger-soft px-4 py-3 text-[13px] text-danger" role="alert">
+    <div class="rounded-lg bg-danger-soft px-4 py-3 text-meta text-danger" role="alert">
       {{ form.non_field_errors }}
     </div>
     {% endif %}

@@ -14,29 +14,15 @@ content_diff and changes: what changed since batch since started, up to the curr
   x-show="$store.codebookPanel.open"
   x-cloak
   aria-label="Codebook"
-  class="sticky top-15 flex h-[calc(100vh-3.75rem)] w-[440px] shrink-0 flex-col border-l border-line bg-surface"
+  class="sticky top-topbar flex h-[calc(100dvh-var(--spacing-topbar))] w-[440px] shrink-0 flex-col border-l border-line bg-surface"
 >
   <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
-    <div role="tablist" aria-label="Codebook view" class="inline-flex rounded-[9px] bg-subtle p-[3px]">
-      <button
-        type="button"
-        role="tab"
-        @click="tab = 'read'"
-        :aria-selected="tab === 'read'"
-        :class="tab === 'read' ? 'bg-surface text-ink font-semibold shadow-xs' : 'text-ink-2'"
-        class="h-7 cursor-pointer rounded-[7px] px-3 text-[13px]"
-      >
+    <div role="tablist" aria-label="Codebook view" class="segmented">
+      <button type="button" role="tab" @click="tab = 'read'" :aria-selected="tab === 'read'" class="segment">
         Codebook
       </button>
       {% if content_diff %}
-      <button
-        type="button"
-        role="tab"
-        @click="tab = 'changes'"
-        :aria-selected="tab === 'changes'"
-        :class="tab === 'changes' ? 'bg-surface text-ink font-semibold shadow-xs' : 'text-ink-2'"
-        class="h-7 cursor-pointer rounded-[7px] px-3 text-[13px]"
-      >
+      <button type="button" role="tab" @click="tab = 'changes'" :aria-selected="tab === 'changes'" class="segment">
         Changes since batch
         {{ since }}
       </button>
@@ -64,13 +50,13 @@ content_diff and changes: what changed since batch since started, up to the curr
       </button>
     </div>
   </div>
-  <div class="flex-1 overflow-y-auto px-6 py-5 text-[15px] scrollbar-thin scrollbar-thumb-line-strong">
+  <div class="flex-1 overflow-y-auto px-6 py-5 text-md scrollbar-thin scrollbar-thumb-line-strong">
     <div x-show="tab === 'read'"><c-codebook.view content="{{ codebook.content }}" /></div>
     {% if content_diff %}
     <div x-show="tab === 'changes'" x-cloak class="flex flex-col gap-5">
       {% if changes %}
       <section class="flex flex-col gap-3 border-b border-line pb-5" aria-label="Why it changed">
-        <h3 class="text-[13px] font-semibold text-ink-2">Why it changed</h3>
+        <h3 class="text-meta font-semibold text-ink-2">Why it changed</h3>
         {% include "codebook/partials/change-list.html" %}
       </section>
       {% endif %}

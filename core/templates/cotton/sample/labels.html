@@ -9,17 +9,17 @@ not labeled the example yet. <c-sample.labels :by_user="before" empty_text="Nobo
   <span class="truncate text-ink-2">{{ user }}</span>
   <div class="flex flex-wrap gap-1.5">
     {% if annotations is None %}
-    <span class="text-[13px] text-ink-3">Not labeled yet</span>
+    <span class="text-meta text-ink-3">Not labeled yet</span>
     {% else %}
     {% for annotation in annotations %}
     <span class="label-tag" style="--label-color: {{ annotation.label.color }}">{{ annotation.label.name }}</span>
     {% empty %}
-    <span class="text-[13px] text-ink-3 italic">No label</span>
+    <span class="text-meta text-ink-3 italic">No label</span>
     {% endfor %}
     {% endif %}
   </div>
   {% endfor %}
 </div>
 {% else %}
-<p class="text-[13px] text-ink-3">{{ empty_text }}</p>
+<p class="text-meta text-ink-3">{{ empty_text }}</p>
 {% endif %}

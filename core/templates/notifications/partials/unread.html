@@ -4,7 +4,7 @@
   <div class="flex min-w-0 flex-1 flex-col gap-1">
     <p class="font-medium">{{ notification.message }}</p>
     {% if notification.batch %}
-    <a href="{% url 'project-detail' notification.batch.project_id %}" class="link text-[13px]">Open project</a>
+    <a href="{% url 'project-detail' notification.batch.project_id %}" class="link text-meta">Open project</a>
     {% endif %}
   </div>
   <button
@@ -22,17 +22,12 @@
 {% endfor %}
 {% if more %}
 <div id="notifications-more" class="toast items-center" data-variant="info" role="status">
-  <p class="flex-1 text-[13px] text-ink-2">
+  <p class="flex-1 text-meta text-ink-2">
     +
     {{ more }}
     more notification{{ more|pluralize }}
   </p>
-  <button
-    type="button"
-    hx-post="{% url 'notifications-read-all' %}"
-    hx-swap="none"
-    class="link text-[13px] font-medium"
-  >
+  <button type="button" hx-post="{% url 'notifications-read-all' %}" hx-swap="none" class="link text-meta font-medium">
     Mark all as read
   </button>
 </div>

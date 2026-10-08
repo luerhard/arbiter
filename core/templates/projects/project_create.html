@@ -14,7 +14,7 @@ New project · Arbiter
   <form method="post" class="flex flex-col gap-5">
     {% csrf_token %}
     {% if form.non_field_errors %}
-    <div class="rounded-lg bg-danger-soft px-4 py-3 text-[13px] text-danger" role="alert">
+    <div class="rounded-lg bg-danger-soft px-4 py-3 text-meta text-danger" role="alert">
       {{ form.non_field_errors }}
     </div>
     {% endif %}
@@ -48,7 +48,6 @@ New project · Arbiter
           <c-user-search
             name="experts"
             search_url="{{ project_user_search_url }}"
-            :selected_ids="form.experts.value|default:'[]'"
             :selected_users="experts_selected_users"
             placeholder="Search users"
           />

@@ -19,32 +19,32 @@ Projects · Arbiter
   </c-page-header>
 
   <div class="card overflow-hidden">
-    <table class="w-full">
+    <table class="data-table">
       <thead>
-        <tr class="eyebrow text-left">
-          <th class="border-b border-line px-5.5 py-3.5 font-semibold">Project</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Your role</th>
-          <th class="border-b border-line px-4 py-3.5 text-right font-semibold">Active batches</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Annotation</th>
-          <th class="border-b border-line px-4 py-3.5 font-semibold">Discussion</th>
-          <th class="border-b border-line px-5.5 py-3.5"><span class="sr-only">Actions</span></th>
+        <tr>
+          <th class="px-5.5">Project</th>
+          <th>Your role</th>
+          <th class="text-right">Active batches</th>
+          <th>Annotation</th>
+          <th>Discussion</th>
+          <th class="px-5.5"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-line">
+      <tbody>
         {% for project_user in project_users %}
         {% with project=project_user.project %}
         <tr class="hover:bg-subtle">
           <td class="px-5.5 py-4">
             <a href="{% url 'project-detail' project.pk %}" class="group flex items-center gap-3.5">
               <span
-                class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-night text-[13px] font-semibold text-accent"
+                class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-night text-meta font-semibold text-accent"
               >
                 {{ project.name|default:"–"|slice:":2"|upper }}
               </span>
               <span class="flex min-w-0 flex-col">
                 <span class="font-semibold text-ink group-hover:underline">{{ project.name }}</span>
                 {% if project.description %}
-                <span class="max-w-md truncate text-[13px] text-ink-3">{{ project.description }}</span>
+                <span class="max-w-md truncate text-meta text-ink-3">{{ project.description }}</span>
                 {% endif %}
               </span>
             </a>

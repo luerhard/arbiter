@@ -23,14 +23,12 @@
       <div class="flex items-center gap-3">
         <span class="eyebrow">Case</span>
         {% if review %}
-        <span
-          class="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-medium text-success"
-        >
+        <span class="badge badge-success">
           {% heroicon_micro "check" class="size-3.5" %}
           Decision saved
         </span>
         {% else %}
-        <span class="text-[13px] text-ink-2"
+        <span class="text-meta text-ink-2"
           >{{ disagreements_remaining }}
           still open</span
         >
@@ -130,7 +128,7 @@
         </button>
       </div>
       {% if draft_has_changes %}
-      <p class="text-[13px] text-ink-2">Saving also commits your codebook draft together with its rationale.</p>
+      <p class="text-meta text-ink-2">Saving also commits your codebook draft together with its rationale.</p>
       {% endif %}
     </form>
     {% endif %}

@@ -26,7 +26,7 @@
     {% if disabled|yesno:"true,false" == "true" %}disabled{% endif %}
     x-ref="input"
   />
-  <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}; --label-text: #ffffff">
+  <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}">
     {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span>{{ text }}</span>
@@ -48,7 +48,7 @@
     {% endif %}
     x-ref="input"
   />
-  <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }}, '--label-text': '#ffffff' }">
+  <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }} }">
     {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span x-text="{{ text }}"></span>

@@ -4,9 +4,9 @@
   <section class="card flex flex-col gap-3.5 p-5">
     <div class="flex items-center justify-between">
       <h2 class="card-title">Codebook</h2>
-      <a href="{% url 'codebook-view' codebook_id=codebook.pk %}" class="link text-[13px]">Open</a>
+      <a href="{% url 'codebook-view' codebook_id=codebook.pk %}" class="link text-meta">Open</a>
     </div>
-    <p class="reading text-[15px] text-ink-2">{{ codebook.content|markdownify|striptags|truncatewords:32 }}</p>
+    <p class="reading text-md text-ink-2">{{ codebook.content|markdownify|striptags|truncatewords:32 }}</p>
     {% if is_expert_view %}
     <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary btn-sm">
       {% heroicon_micro "arrow-down-tray" class="size-4" %}
