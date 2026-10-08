@@ -186,13 +186,15 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 
 <dl class="py class">
 <dt class="sig sig-object py" id="data.models.Example">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">data.models.</span></span><span class="sig-name descname"><span class="pre">Example</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#data.models.Example" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">data_example</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.1)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
 <li><p><strong>content</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.1)"><em>TextField</em></a>) – Content</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.JSONField" title="(in Django v6.1)"><em>JSONField</em></a>) – Metadata</p></li>
+<li><p><strong>position</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.1)"><em>PositiveIntegerField</em></a>) – Position</p></li>
 </ul>
 </dd>
 </dl>
@@ -285,6 +287,13 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">labels</span></span><a class="headerlink" href="#data.models.Example.labels" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="data.models.Example.labels_by_user">
+<span class="sig-name descname"><span class="pre">labels_by_user</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">phase</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="projects.html#projects.models.BatchPhase" title="projects.models.batch.BatchPhase"><span class="pre">BatchPhase</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="(in Python v3.14)"><span class="pre">dict</span></a></span></span><a class="headerlink" href="#data.models.Example.labels_by_user" title="Link to this definition"></a></dt>
+<dd><p>Who labeled this example how in one phase: username -&gt; list of annotations,
+or None if the person has not labeled it yet.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.Example.messages">
 <span class="sig-name descname"><span class="pre">messages</span></span><a class="headerlink" href="#data.models.Example.messages" title="Link to this definition"></a></dt>
@@ -293,9 +302,23 @@ The data is so heavily interlinked that we run into circular imports and non-sen
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><a class="headerlink" href="#data.models.Example.metadata" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.JSONField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">JSONField</span></code></a></p>
+<p>Metadata</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="data.models.Example.objects">
 <span class="sig-name descname"><span class="pre">objects</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;django.db.models.manager.ManagerFromExampleQuerySet</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#data.models.Example.objects" title="Link to this definition"></a></dt>
 <dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="data.models.Example.position">
+<span class="sig-name descname"><span class="pre">position</span></span><a class="headerlink" href="#data.models.Example.position" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.PositiveIntegerField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositiveIntegerField</span></code></a></p>
+<p>Position</p>
+</dd></dl>
 
 </dd></dl>
 

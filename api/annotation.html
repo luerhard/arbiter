@@ -51,8 +51,11 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Annotation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-annotation.views">Views</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.annotation_locked"><code class="docutils literal notranslate"><span class="pre">annotation_locked()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.locked_batch"><code class="docutils literal notranslate"><span class="pre">locked_batch()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.AnnotateView"><code class="docutils literal notranslate"><span class="pre">AnnotateView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#annotation.views.AnnotationDoneView"><code class="docutils literal notranslate"><span class="pre">AnnotationDoneView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#annotation.views.UndoFinalizeView"><code class="docutils literal notranslate"><span class="pre">UndoFinalizeView</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -105,6 +108,24 @@
 <dd><p>helper function to calculate current progress</p>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="annotation.views.annotation_locked">
+<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">annotation_locked</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#annotation.views.annotation_locked" title="Link to this definition"></a></dt>
+<dd><p>Labels can only change while the batch is in the annotation phase and the
+annotator has not finalized yet (or has undone it). Later phases (discussion, expert
+decision) are built from the annotation labels at the moment of the phase change, so a
+late edit would change the disagreements underneath a running discussion.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="annotation.views.locked_batch">
+<span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">locked_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.locked_batch" title="Link to this definition"></a></dt>
+<dd><p>The batch, its row locked until the block ends. Saving labels, finalizing and undoing
+it take this lock, so per batch they run one after another: otherwise an annotator could
+undo or save while the last one’s finalize moves the batch on, and change labels under
+the discussion that was just built from them.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="annotation.views.AnnotateView">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">AnnotateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.AnnotateView" title="Link to this definition"></a></dt>
@@ -142,6 +163,18 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="annotation.views.AnnotationDoneView.post">
 <span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.AnnotationDoneView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="annotation.views.UndoFinalizeView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">annotation.views.</span></span><span class="sig-name descname"><span class="pre">UndoFinalizeView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.UndoFinalizeView" title="Link to this definition"></a></dt>
+<dd><p>Unlock an annotator’s labels again. Only while the others are still annotating: the
+last one to finalize moves the batch on, and from then on the labels stay as they are.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="annotation.views.UndoFinalizeView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#annotation.views.UndoFinalizeView.post" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

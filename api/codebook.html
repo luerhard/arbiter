@@ -53,11 +53,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-codebook.views">Views</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookView"><code class="docutils literal notranslate"><span class="pre">CodebookView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookDiffView"><code class="docutils literal notranslate"><span class="pre">CodebookDiffView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookChangeView"><code class="docutils literal notranslate"><span class="pre">CodebookChangeView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookUpdateView"><code class="docutils literal notranslate"><span class="pre">CodebookUpdateView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#codebook.views.CodebookExportView"><code class="docutils literal notranslate"><span class="pre">CodebookExportView</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#module-codebook.models">Models</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#codebook.models.CodebookChange"><code class="docutils literal notranslate"><span class="pre">CodebookChange</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#codebook.models.Codebook"><code class="docutils literal notranslate"><span class="pre">Codebook</span></code></a></li>
 </ul>
 </li>
@@ -191,6 +193,39 @@ Differences between versions are rendered with custom markdown extensions.</p>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookChangeView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookChangeView" title="Link to this definition"></a></dt>
+<dd><p>One change of the codebook text with its rationale.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView.pk_url_kwarg">
+<span class="sig-name descname"><span class="pre">pk_url_kwarg</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook_id'</span></em><a class="headerlink" href="#codebook.views.CodebookChangeView.pk_url_kwarg" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#codebook.views.CodebookChangeView.model" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#codebook.models.Codebook" title="codebook.models.Codebook"><code class="xref py py-class docutils literal notranslate"><span class="pre">Codebook</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView.context_object_name">
+<span class="sig-name descname"><span class="pre">context_object_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook'</span></em><a class="headerlink" href="#codebook.views.CodebookChangeView.context_object_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'codebook/change.html'</span></em><a class="headerlink" href="#codebook.views.CodebookChangeView.template_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.views.CodebookChangeView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookChangeView.get_context_data" title="Link to this definition"></a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="codebook.views.CodebookUpdateView">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.views.</span></span><span class="sig-name descname"><span class="pre">CodebookUpdateView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.views.CodebookUpdateView" title="Link to this definition"></a></dt>
 <dd><dl class="py attribute">
@@ -254,6 +289,47 @@ Differences between versions are rendered with custom markdown extensions.</p>
 <section id="module-codebook.models">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-codebook.models" title="Link to this heading"></a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.models.</span></span><span class="sig-name descname"><span class="pre">CodebookChange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rationale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">when</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.CodebookChange" title="Link to this definition"></a></dt>
+<dd><p>One saved change of the codebook text (a commit that changed main.md).</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.sha">
+<span class="sig-name descname"><span class="pre">sha</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.sha" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.date">
+<span class="sig-name descname"><span class="pre">date</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.date" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.rationale">
+<span class="sig-name descname"><span class="pre">rationale</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.rationale" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.decision_text">
+<span class="sig-name descname"><span class="pre">decision_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.decision_text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.example_id">
+<span class="sig-name descname"><span class="pre">example_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.example_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.when">
+<span class="sig-name descname"><span class="pre">when</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></em><a class="headerlink" href="#codebook.models.CodebookChange.when" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.CodebookChange.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.14)"><span class="pre">datetime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rationale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">decision_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">example_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">when</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#codebook.models.CodebookChange.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="codebook.models.Codebook">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">codebook.models.</span></span><span class="sig-name descname"><span class="pre">Codebook</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">git_dir</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">codebook_codebook</span></code></p>
@@ -316,9 +392,52 @@ Differences between versions are rendered with custom markdown extensions.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.tagged_batches">
+<span class="sig-name descname"><span class="pre">tagged_batches</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#set" title="(in Python v3.14)"><span class="pre">set</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#codebook.models.Codebook.tagged_batches" title="Link to this definition"></a></dt>
+<dd><p>The batch numbers with a codebook version: batch_N is tagged when batch N starts
+annotation, batch_0 is the empty codebook. Deleting a batch removes its tag.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="codebook.models.Codebook.diff">
-<span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.diff" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#codebook.models.Codebook.diff" title="Link to this definition"></a></dt>
+<dd><p>What changed between the versions batch old and batch new started with; without
+new, up to the current text.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.changes">
+<span class="sig-name descname"><span class="pre">changes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#codebook.models.CodebookChange" title="codebook.models.CodebookChange"><span class="pre">CodebookChange</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#codebook.models.Codebook.changes" title="Link to this definition"></a></dt>
+<dd><p>Every change of the codebook text, newest first.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.changes_between">
+<span class="sig-name descname"><span class="pre">changes_between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">new</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#codebook.models.CodebookChange" title="codebook.models.CodebookChange"><span class="pre">CodebookChange</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#codebook.models.Codebook.changes_between" title="Link to this definition"></a></dt>
+<dd><p>The changes made after batch old started and before batch new started; without
+new, up to now.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.last_batch_of">
+<span class="sig-name descname"><span class="pre">last_batch_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">before</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#codebook.models.Codebook.last_batch_of" title="Link to this definition"></a></dt>
+<dd><p>The newest batch (before batch before) user annotated in that has a codebook
+version: changes since it are new to them. For an expert who annotates in no batch,
+the newest batch that started.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.changes_for">
+<span class="sig-name descname"><span class="pre">changes_for</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">example</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="(in Python v3.14)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#codebook.models.CodebookChange" title="codebook.models.CodebookChange"><span class="pre">CodebookChange</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#codebook.models.Codebook.changes_for" title="Link to this definition"></a></dt>
+<dd><p>The changes an expert saved together with the decision on example. Decisions
+saved before the log named the example are matched by its text.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="codebook.models.Codebook.change">
+<span class="sig-name descname"><span class="pre">change</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#codebook.models.CodebookChange" title="codebook.models.CodebookChange"><span class="pre">CodebookChange</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></span><a class="headerlink" href="#codebook.models.Codebook.change" title="Link to this definition"></a></dt>
+<dd><p>One change and what it changed, None if sha is not a change of the text.</p>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="codebook.models.Codebook.save">
@@ -341,8 +460,11 @@ empty commit whose message carries the revised metadata.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="codebook.models.Codebook.get_as_context">
-<span class="sig-name descname"><span class="pre">get_as_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch_number</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.get_as_context" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">get_as_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">since</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#codebook.models.Codebook.get_as_context" title="Link to this definition"></a></dt>
+<dd><p>The codebook for a work screen, with what changed since the version batch since
+started with, up to the current text. Nothing to show without an earlier version
+(since is None) or for the first version: everything would be new.</p>
+</dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="codebook.models.Codebook.DoesNotExist">
@@ -393,7 +515,7 @@ empty commit whose message carries the revised metadata.</p>
 </ul>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="codebook.forms.CodebookForm.textarea_class">
-<span class="sig-name descname"><span class="pre">textarea_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'w-full</span> <span class="pre">border</span> <span class="pre">bg-white</span> <span class="pre">dark:bg-gray-900</span> <span class="pre">p-2</span> <span class="pre">text-gray-900</span> <span class="pre">dark:text-gray-100</span> <span class="pre">caret-blue-500</span> <span class="pre">focus:outline-none</span> <span class="pre">focus:ring-1</span> <span class="pre">focus:border-blue-500</span> <span class="pre">focus:ring-blue-500</span> <span class="pre">rounded-2xl</span> <span class="pre">p-2</span> <span class="pre">scrollbar</span> <span class="pre">rounded-2xl'</span></em><a class="headerlink" href="#codebook.forms.CodebookForm.textarea_class" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">textarea_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'input'</span></em><a class="headerlink" href="#codebook.forms.CodebookForm.textarea_class" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -465,6 +587,11 @@ untouched submission as a change.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_NEG">
 <span class="sig-name descname"><span class="pre">FIX_PATTERN_WRAP_NEG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'\\[\\-(\\*\\*\\*\\*|\\*\\*|\\*|\\_\\_\\_\\_|\\_\\_|\\_|\\`\\`\\`|\\`|\\~\\~|\\~)(.*?)\\1\\-\\]'</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.FIX_PATTERN_WRAP_NEG" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.TABLE_ROW">
+<span class="sig-name descname"><span class="pre">TABLE_ROW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">re.compile('^(\\{\\+|\\[-)(\\s*\\|.*\\|\\s*)(\\+\\}|-\\])$')</span></em><a class="headerlink" href="#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.TABLE_ROW" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">

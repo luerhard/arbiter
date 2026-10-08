@@ -248,6 +248,13 @@ deletes it; Undo deletes it directly.</p>
 <p>Updated at</p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="expert.models.CodebookDraft.is_based_on_current">
+<span class="sig-name descname"><span class="pre">is_based_on_current</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">codebook</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#bool" title="(in Python v3.14)"><span class="pre">bool</span></a></span></span><a class="headerlink" href="#expert.models.CodebookDraft.is_based_on_current" title="Link to this definition"></a></dt>
+<dd><p>Whether the codebook text is still the one the draft started from. Compares
+the text, not the commit: corrected decisions are logged as commits too.</p>
+</dd></dl>
+
 <dl class="py exception">
 <dt class="sig sig-object py" id="expert.models.CodebookDraft.DoesNotExist">
 <em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#expert.models.CodebookDraft.DoesNotExist" title="Link to this definition"></a></dt>

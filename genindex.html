@@ -93,6 +93,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -101,6 +102,8 @@
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.__init__">__init__() (codebook.forms.CodebookForm method)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.models.CodebookChange.__init__">(codebook.models.CodebookChange method)</a>
+</li>
         <li><a href="api/data.html#data.forms.MultiLabelForm.__init__">(data.forms.MultiLabelForm method)</a>
 </li>
         <li><a href="api/expert.html#expert.forms.MultiLabelFormExpert.__init__">(expert.forms.MultiLabelFormExpert method)</a>
@@ -147,6 +150,8 @@
         <li><a href="api/annotation.html#module-annotation.views">module</a>
 </li>
       </ul></li>
+      <li><a href="api/annotation.html#annotation.views.annotation_locked">annotation_locked() (in module annotation.views)</a>
+</li>
       <li><a href="api/annotation.html#annotation.views.AnnotationDoneView">AnnotationDoneView (class in annotation.views)</a>
 </li>
   </ul></td>
@@ -225,10 +230,10 @@
       </ul></li>
       <li><a href="api/projects.html#projects.models.Batch.batch_number">batch_number (projects.models.Batch attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.batch_set">batch_set (users.models.User attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/core.html#core.mixins.BatchAnnotatorRequiredMixin">BatchAnnotatorRequiredMixin (class in core.mixins)</a>
 </li>
       <li><a href="api/projects.html#projects.forms.BatchCreateForm">BatchCreateForm (class in projects.forms)</a>
@@ -237,11 +242,15 @@
 </li>
       <li><a href="api/core.html#core.mixins.BatchExpertRequiredMixin">BatchExpertRequiredMixin (class in core.mixins)</a>
 </li>
+      <li><a href="api/projects.html#projects.views.BatchOrderView">BatchOrderView (class in projects.views)</a>
+</li>
       <li><a href="api/projects.html#projects.models.BatchPhase">BatchPhase (class in projects.models)</a>
 </li>
       <li><a href="api/projects.html#projects.forms.BatchPhaseForm">BatchPhaseForm (class in projects.forms)</a>
 </li>
       <li><a href="api/core.html#core.mixins.BatchRoleRequiredMixin">BatchRoleRequiredMixin (class in core.mixins)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.BatchSamplesView">BatchSamplesView (class in projects.views)</a>
 </li>
       <li><a href="api/projects.html#projects.models.BatchUser">BatchUser (class in projects.models)</a>
 </li>
@@ -265,7 +274,17 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/projects.html#projects.models.Batch.can_reorder">can_reorder (projects.models.Batch property)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.change">change() (codebook.models.Codebook method)</a>
+</li>
       <li><a href="api/projects.html#projects.views.ChangeBatchPhase">ChangeBatchPhase (class in projects.views)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.changes">changes() (codebook.models.Codebook method)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.changes_between">changes_between() (codebook.models.Codebook method)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.changes_for">changes_for() (codebook.models.Codebook method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.chat_typing">chat_typing() (discuss.consumers.ChatConsumer method)</a>
 </li>
@@ -286,6 +305,10 @@
       <li><a href="api/projects.html#projects.forms.BatchCreateForm.clean_file">clean_file() (projects.forms.BatchCreateForm method)</a>
 </li>
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.clean_modified">clean_modified() (codebook.forms.CodebookForm method)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.room_state.close_room">close_room() (in module discuss.room_state)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.closing">closing (discuss.consumers.ChatConsumer attribute)</a>
 </li>
       <li><a href="api/codebook.html#codebook.models.Codebook">Codebook (class in codebook.models)</a>
 </li>
@@ -348,10 +371,16 @@
       </ul></li>
       <li><a href="api/data.html#data.models.ExampleAssignment.codebook_draft">codebook_draft (data.models.ExampleAssignment attribute)</a>
 </li>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange">CodebookChange (class in codebook.models)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.views.CodebookChangeView">CodebookChangeView (class in codebook.views)</a>
+</li>
       <li><a href="api/codebook.html#codebook.views.CodebookDiffView">CodebookDiffView (class in codebook.views)</a>
 </li>
       <li><a href="api/expert.html#expert.models.CodebookDraft">CodebookDraft (class in expert.models)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/expert.html#expert.models.CodebookDraft.DoesNotExist">CodebookDraft.DoesNotExist</a>
 </li>
       <li><a href="api/expert.html#expert.models.CodebookDraft.MultipleObjectsReturned">CodebookDraft.MultipleObjectsReturned</a>
@@ -360,8 +389,6 @@
 </li>
       <li><a href="api/expert.html#expert.views.CodebookDraftDeleteView">CodebookDraftDeleteView (class in expert.views)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/expert.html#expert.views.CodebookDraftSaveView">CodebookDraftSaveView (class in expert.views)</a>
 </li>
       <li><a href="api/codebook.html#codebook.views.CodebookExportView">CodebookExportView (class in codebook.views)</a>
@@ -398,9 +425,11 @@
         <li><a href="api/expert.html#expert.models.CodebookDraft.content">(expert.models.CodebookDraft attribute)</a>
 </li>
       </ul></li>
-      <li><a href="api/codebook.html#codebook.views.CodebookDiffView.context_object_name">context_object_name (codebook.views.CodebookDiffView attribute)</a>
+      <li><a href="api/codebook.html#codebook.views.CodebookChangeView.context_object_name">context_object_name (codebook.views.CodebookChangeView attribute)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.views.CodebookDiffView.context_object_name">(codebook.views.CodebookDiffView attribute)</a>
+</li>
         <li><a href="api/codebook.html#codebook.views.CodebookView.context_object_name">(codebook.views.CodebookView attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ProjectListView.context_object_name">(projects.views.ProjectListView attribute)</a>
@@ -483,9 +512,17 @@
         <li><a href="api/data.html#module-data.views">module</a>
 </li>
       </ul></li>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.date">date (codebook.models.CodebookChange attribute)</a>
+</li>
       <li><a href="api/users.html#users.models.User.date_joined">date_joined (users.models.User attribute)</a>
 </li>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.decision_text">decision_text (codebook.models.CodebookChange attribute)</a>
+</li>
       <li><a href="api/projects.html#projects.models.ProjectUser.default_role">default_role (projects.models.ProjectUser attribute)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.room_state.delete_all_states">delete_all_states() (in module discuss.room_state)</a>
+</li>
+      <li><a href="api/discuss.html#discuss.room_state.delete_state">delete_state() (in module discuss.room_state)</a>
 </li>
       <li><a href="api/projects.html#projects.views.DeleteBatch">DeleteBatch (class in projects.views)</a>
 </li>
@@ -495,12 +532,12 @@
 </li>
       <li><a href="api/projects.html#projects.models.Project.description">description (projects.models.Project attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/codebook.html#codebook.models.Codebook.diff">diff() (codebook.models.Codebook method)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Batch.disagreements">disagreements() (projects.models.Batch method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.disconnect">disconnect() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li>
@@ -532,6 +569,8 @@
 </li>
       </ul></li>
       <li><a href="api/projects.html#projects.models.BatchPhase.DISCUSSION">DISCUSSION (projects.models.BatchPhase attribute)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Batch.discussion_examples">discussion_examples() (projects.models.Batch method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.views.DiscussView">DiscussView (class in discuss.views)</a>
 </li>
@@ -565,9 +604,11 @@
 </li>
       <li><a href="api/data.html#data.models.Example.NotUpdated">Example.NotUpdated</a>
 </li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.example_id">example_id (data.models.ExampleAssignment attribute)</a>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.example_id">example_id (codebook.models.CodebookChange attribute)</a>
 
       <ul>
+        <li><a href="api/data.html#data.models.ExampleAssignment.example_id">(data.models.ExampleAssignment attribute)</a>
+</li>
         <li><a href="api/discuss.html#discuss.models.Message.example_id">(discuss.models.Message attribute)</a>
 </li>
       </ul></li>
@@ -583,14 +624,14 @@
 </li>
       <li><a href="api/projects.html#projects.models.Batch.examples">examples (projects.models.Batch attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.BatchPhase.EXPERT">EXPERT (projects.models.BatchPhase attribute)</a>
 
       <ul>
         <li><a href="api/projects.html#projects.models.ProjectRole.EXPERT">(projects.models.ProjectRole attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     expert.forms
 
@@ -703,6 +744,8 @@
 </li>
         <li><a href="api/projects.html#projects.views.ProjectLabelRowView.get">(projects.views.ProjectLabelRowView method)</a>
 </li>
+        <li><a href="api/projects.html#projects.views.SampleDetailView.get">(projects.views.SampleDetailView method)</a>
+</li>
       </ul></li>
       <li><a href="api/codebook.html#codebook.models.Codebook.get_absolute_url">get_absolute_url() (codebook.models.Codebook method)</a>
 </li>
@@ -710,10 +753,14 @@
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_assigned_annotators">get_assigned_annotators() (discuss.consumers.ChatConsumer method)</a>
 </li>
-      <li><a href="api/codebook.html#codebook.views.CodebookDiffView.get_context_data">get_context_data() (codebook.views.CodebookDiffView method)</a>
+      <li><a href="api/codebook.html#codebook.views.CodebookChangeView.get_context_data">get_context_data() (codebook.views.CodebookChangeView method)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.views.CodebookDiffView.get_context_data">(codebook.views.CodebookDiffView method)</a>
+</li>
         <li><a href="api/codebook.html#codebook.views.CodebookView.get_context_data">(codebook.views.CodebookView method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.BatchSamplesView.get_context_data">(projects.views.BatchSamplesView method)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.get_context_data">(projects.views.ProjectAnnotatorDetailView method)</a>
 </li>
@@ -730,6 +777,8 @@
 </li>
       <li><a href="api/projects.html#projects.models.ProjectUser.get_default_role_display">get_default_role_display() (projects.models.ProjectUser method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_example">get_example() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.get_form_kwargs">get_form_kwargs() (codebook.views.CodebookUpdateView method)</a>
@@ -738,8 +787,6 @@
         <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.get_form_kwargs">(projects.views.ProjectBatchCreateView method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.get_initial">get_initial() (codebook.views.CodebookUpdateView method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.models.Message.get_next_by_created_at">get_next_by_created_at() (discuss.models.Message method)</a>
@@ -888,6 +935,8 @@
 </li>
       <li><a href="api/users.html#users.models.User.is_active">is_active (users.models.User attribute)</a>
 </li>
+      <li><a href="api/expert.html#expert.models.CodebookDraft.is_based_on_current">is_based_on_current() (expert.models.CodebookDraft method)</a>
+</li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.is_batch_annotator">is_batch_annotator() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/users.html#users.models.User.is_staff">is_staff (users.models.User attribute)</a>
@@ -914,8 +963,6 @@
 </li>
       <li><a href="api/data.html#data.models.Label.NotUpdated">Label.NotUpdated</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.Annotation.label_id">label_id (data.models.Annotation attribute)</a>
 </li>
       <li><a href="api/data.html#data.models.Example.labels">labels (data.models.Example property)</a>
@@ -926,9 +973,17 @@
         <li><a href="api/projects.html#projects.models.Project.labels">(projects.models.Project attribute)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data.html#data.models.Example.labels_by_user">labels_by_user() (data.models.Example method)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.last_batch_of">last_batch_of() (codebook.models.Codebook method)</a>
+</li>
       <li><a href="api/users.html#users.models.User.last_login">last_login (users.models.User attribute)</a>
 </li>
       <li><a href="api/users.html#users.models.User.last_name">last_name (users.models.User attribute)</a>
+</li>
+      <li><a href="api/annotation.html#annotation.views.locked_batch">locked_batch() (in module annotation.views)</a>
 </li>
       <li><a href="api/users.html#users.models.User.logentry_set">logentry_set (users.models.User attribute)</a>
 </li>
@@ -947,6 +1002,8 @@
 </li>
       </ul></li>
       <li><a href="api/notifications.html#notifications.models.Notification.mark_read">mark_read() (notifications.models.Notification method)</a>
+</li>
+      <li><a href="api/notifications.html#notifications.views.MarkAllNotificationsReadView">MarkAllNotificationsReadView (class in notifications.views)</a>
 </li>
       <li><a href="api/notifications.html#notifications.views.MarkNotificationReadView">MarkNotificationReadView (class in notifications.views)</a>
 </li>
@@ -996,9 +1053,13 @@
         <li><a href="api/discuss.html#discuss.models.Room.messages">(discuss.models.Room attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/data.html#data.models.Example.metadata">metadata (data.models.Example attribute)</a>
+</li>
       <li><a href="api/annotation.html#annotation.views.AnnotateView.model">model (annotation.views.AnnotateView attribute)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.views.CodebookChangeView.model">(codebook.views.CodebookChangeView attribute)</a>
+</li>
         <li><a href="api/codebook.html#codebook.views.CodebookDiffView.model">(codebook.views.CodebookDiffView attribute)</a>
 </li>
         <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.model">(codebook.views.CodebookUpdateView attribute)</a>
@@ -1007,11 +1068,7 @@
 </li>
         <li><a href="api/discuss.html#discuss.views.DiscussView.model">(discuss.views.DiscussView attribute)</a>
 </li>
-        <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.model">(projects.views.ProjectAnnotatorDetailView attribute)</a>
-</li>
-        <li><a href="api/projects.html#projects.views.ProjectDetailView.model">(projects.views.ProjectDetailView attribute)</a>
-</li>
-        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.model">(projects.views.ProjectExpertDetailView attribute)</a>
+        <li><a href="api/projects.html#projects.views.BatchSamplesView.model">(projects.views.BatchSamplesView attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ProjectListView.model">(projects.views.ProjectListView attribute)</a>
 </li>
@@ -1181,6 +1238,10 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/projects.html#projects.models.Batch.open_discussion_examples">open_discussion_examples() (projects.models.Batch method)</a>
+</li>
+      <li><a href="api/core.html#core.views.open_tasks">open_tasks() (in module core.views)</a>
+</li>
       <li><a href="api/data.html#data.models.ExampleAssignment.order">order (data.models.ExampleAssignment attribute)</a>
 </li>
       <li><a href="api/users.html#users.models.User.owned_projects">owned_projects (users.models.User attribute)</a>
@@ -1201,24 +1262,28 @@
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.phase">phase (data.models.ExampleAssignment attribute)</a>
 </li>
-      <li><a href="api/codebook.html#codebook.views.CodebookDiffView.pk_url_kwarg">pk_url_kwarg (codebook.views.CodebookDiffView attribute)</a>
+      <li><a href="api/codebook.html#codebook.views.CodebookChangeView.pk_url_kwarg">pk_url_kwarg (codebook.views.CodebookChangeView attribute)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.views.CodebookDiffView.pk_url_kwarg">(codebook.views.CodebookDiffView attribute)</a>
+</li>
         <li><a href="api/codebook.html#codebook.views.CodebookExportView.pk_url_kwarg">(codebook.views.CodebookExportView attribute)</a>
 </li>
         <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.pk_url_kwarg">(codebook.views.CodebookUpdateView attribute)</a>
 </li>
         <li><a href="api/codebook.html#codebook.views.CodebookView.pk_url_kwarg">(codebook.views.CodebookView attribute)</a>
 </li>
-        <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.pk_url_kwarg">(projects.views.ProjectAnnotatorDetailView attribute)</a>
-</li>
-        <li><a href="api/projects.html#projects.views.ProjectExpertDetailView.pk_url_kwarg">(projects.views.ProjectExpertDetailView attribute)</a>
+        <li><a href="api/projects.html#projects.views.BatchSamplesView.pk_url_kwarg">(projects.views.BatchSamplesView attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/data.html#data.models.Example.position">position (data.models.Example attribute)</a>
+</li>
       <li><a href="api/annotation.html#annotation.views.AnnotateView.post">post() (annotation.views.AnnotateView method)</a>
 
       <ul>
         <li><a href="api/annotation.html#annotation.views.AnnotationDoneView.post">(annotation.views.AnnotationDoneView method)</a>
+</li>
+        <li><a href="api/annotation.html#annotation.views.UndoFinalizeView.post">(annotation.views.UndoFinalizeView method)</a>
 </li>
         <li><a href="api/discuss.html#discuss.views.DiscussView.post">(discuss.views.DiscussView method)</a>
 </li>
@@ -1228,11 +1293,17 @@
 </li>
         <li><a href="api/expert.html#expert.views.ExpertAssignmentView.post">(expert.views.ExpertAssignmentView method)</a>
 </li>
+        <li><a href="api/notifications.html#notifications.views.MarkAllNotificationsReadView.post">(notifications.views.MarkAllNotificationsReadView method)</a>
+</li>
         <li><a href="api/notifications.html#notifications.views.MarkNotificationReadView.post">(notifications.views.MarkNotificationReadView method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.BatchOrderView.post">(projects.views.BatchOrderView method)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ChangeBatchPhase.post">(projects.views.ChangeBatchPhase method)</a>
 </li>
         <li><a href="api/projects.html#projects.views.DeleteBatch.post">(projects.views.DeleteBatch method)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.ProjectDeleteView.post">(projects.views.ProjectDeleteView method)</a>
 </li>
       </ul></li>
       <li><a href="api/codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs">PreprocessDiffs (class in codebook.markdown_extensions.git_diff_preprocess)</a>
@@ -1254,9 +1325,13 @@
 </li>
         <li><a href="api/projects.html#projects.models.ProjectUser.project">(projects.models.ProjectUser attribute)</a>
 </li>
+        <li><a href="api/projects.html#projects.views.ProjectBatchCreateView.project">(projects.views.ProjectBatchCreateView attribute)</a>
+</li>
       </ul></li>
       <li><a href="api/projects.html#projects.models.Project.DoesNotExist">Project.DoesNotExist</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Project.MultipleObjectsReturned">Project.MultipleObjectsReturned</a>
 </li>
       <li><a href="api/projects.html#projects.models.Project.NotUpdated">Project.NotUpdated</a>
@@ -1271,8 +1346,6 @@
         <li><a href="api/projects.html#projects.models.ProjectUser.project_id">(projects.models.ProjectUser attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Project.project_users">project_users (projects.models.Project attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView">ProjectAnnotatorDetailView (class in projects.views)</a>
@@ -1282,6 +1355,8 @@
       <li><a href="api/projects.html#projects.forms.ProjectCreateForm">ProjectCreateForm (class in projects.forms)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectCreateView">ProjectCreateView (class in projects.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.views.ProjectDeleteView">ProjectDeleteView (class in projects.views)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectDetailView">ProjectDetailView (class in projects.views)</a>
 </li>
@@ -1353,8 +1428,12 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/expert.html#expert.models.CodebookDraft.rationale">rationale (expert.models.CodebookDraft attribute)</a>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.rationale">rationale (codebook.models.CodebookChange attribute)</a>
+
+      <ul>
+        <li><a href="api/expert.html#expert.models.CodebookDraft.rationale">(expert.models.CodebookDraft attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/notifications.html#notifications.models.Notification.read_at">read_at (notifications.models.Notification attribute)</a>
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.receive">receive() (discuss.consumers.ChatConsumer method)</a>
@@ -1391,6 +1470,8 @@
 </li>
       <li><a href="api/discuss.html#discuss.models.Room.NotUpdated">Room.NotUpdated</a>
 </li>
+      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.room_closed">room_closed() (discuss.consumers.ChatConsumer method)</a>
+</li>
       <li><a href="api/discuss.html#discuss.models.Message.room_id">room_id (discuss.models.Message attribute)</a>
 </li>
       <li><a href="api/codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.run">run() (codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs method)</a>
@@ -1401,6 +1482,8 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/projects.html#projects.views.SampleDetailView">SampleDetailView (class in projects.views)</a>
+</li>
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.save">save() (codebook.forms.CodebookForm method)</a>
 
       <ul>
@@ -1419,13 +1502,17 @@
       </ul></li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_labels_to_db">save_labels_to_db() (discuss.consumers.ChatConsumer method)</a>
 </li>
+      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_message_to_db">save_message_to_db() (discuss.consumers.ChatConsumer method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_message_to_db">save_message_to_db() (discuss.consumers.ChatConsumer method)</a>
+      <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send">send() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_state">send_state() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/data.html#data.models.Annotation.sentence">sentence (data.models.Annotation property)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Batch.set_example_order">set_example_order() (projects.models.Batch method)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Batch.set_phase">set_phase() (projects.models.Batch method)</a>
 </li>
@@ -1435,6 +1522,8 @@
 </li>
       <li><a href="api/projects.html#projects.models.BatchPhase.SETUP">SETUP (projects.models.BatchPhase attribute)</a>
 </li>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.sha">sha (codebook.models.CodebookChange attribute)</a>
+</li>
       <li><a href="api/projects.html#projects.models.Batch.start_next_setup_batch">start_next_setup_batch() (projects.models.Batch method)</a>
 </li>
   </ul></td>
@@ -1443,11 +1532,17 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/codebook.html#codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs.TABLE_ROW">TABLE_ROW (codebook.markdown_extensions.git_diff_preprocess.PreprocessDiffs attribute)</a>
+</li>
       <li><a href="api/codebook.html#codebook.models.Codebook.tag_version">tag_version() (codebook.models.Codebook method)</a>
+</li>
+      <li><a href="api/codebook.html#codebook.models.Codebook.tagged_batches">tagged_batches() (codebook.models.Codebook method)</a>
 </li>
       <li><a href="api/annotation.html#annotation.views.AnnotateView.template_name">template_name (annotation.views.AnnotateView attribute)</a>
 
       <ul>
+        <li><a href="api/codebook.html#codebook.views.CodebookChangeView.template_name">(codebook.views.CodebookChangeView attribute)</a>
+</li>
         <li><a href="api/codebook.html#codebook.views.CodebookDiffView.template_name">(codebook.views.CodebookDiffView attribute)</a>
 </li>
         <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.template_name">(codebook.views.CodebookUpdateView attribute)</a>
@@ -1457,6 +1552,8 @@
         <li><a href="api/discuss.html#discuss.views.DiscussView.template_name">(discuss.views.DiscussView attribute)</a>
 </li>
         <li><a href="api/expert.html#expert.views.ExpertAssignmentView.template_name">(expert.views.ExpertAssignmentView attribute)</a>
+</li>
+        <li><a href="api/projects.html#projects.views.BatchSamplesView.template_name">(projects.views.BatchSamplesView attribute)</a>
 </li>
         <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView.template_name">(projects.views.ProjectAnnotatorDetailView attribute)</a>
 </li>
@@ -1479,6 +1576,8 @@
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/annotation.html#annotation.views.UndoFinalizeView">UndoFinalizeView (class in annotation.views)</a>
+</li>
       <li><a href="api/projects.html#projects.management.commands.populatedb.uniform_choices">uniform_choices() (in module projects.management.commands.populatedb)</a>
 </li>
       <li><a href="api/notifications.html#notifications.views.UnreadNotificationsView">UnreadNotificationsView (class in notifications.views)</a>
@@ -1521,10 +1620,10 @@
       </ul></li>
       <li><a href="api/users.html#users.views.user_login">user_login() (in module users.views)</a>
 </li>
-      <li><a href="api/users.html#users.views.user_logout">user_logout() (in module users.views)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/users.html#users.views.user_logout">user_logout() (in module users.views)</a>
+</li>
       <li><a href="api/users.html#users.models.User.user_permissions">user_permissions (users.models.User attribute)</a>
 </li>
       <li><a href="api/users.html#users.views.user_profile">user_profile() (in module users.views)</a>
@@ -1582,6 +1681,14 @@
         <li><a href="api/users.html#module-users.views">module</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/codebook.html#codebook.models.CodebookChange.when">when (codebook.models.CodebookChange attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
