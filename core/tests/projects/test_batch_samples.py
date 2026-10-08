@@ -58,13 +58,6 @@ class TestSamplesTable:
         assert [e.content for e in response.context["examples"]] == ["A", "B", "C"]
         assert response.context["metadata_columns"] == ["id"]
 
-    def test_annotator_cannot_open_it(self, client, batch_with_three):
-        _login(client, batch_with_three["annotators"][0])
-
-        response = client.get(reverse("project-batch-detail", args=(batch_with_three["batch"].id,)))
-
-        assert response.status_code == 403
-
     def test_upload_numbers_examples_in_file_order(self, client, project_annotation):
         project = project_annotation["project"]
         _login(client, project_annotation["expert"])
@@ -285,14 +278,6 @@ class TestSampleDetail:
 
         assert (response.context["previous"], response.context["next"]) == (a, c)
         assert response.context["number"] == 2
-
-    def test_annotator_cannot_open_it(self, client, project_annotation):
-        data = project_annotation
-        _login(client, data["annotators"][0])
-
-        response = client.get(self._url(data["batch"], data["example"]))
-
-        assert response.status_code == 403
 
     def test_example_of_another_batch_is_not_found(self, client, batch_with_three):
         # project_annotation's example belongs to the fixture's first batch

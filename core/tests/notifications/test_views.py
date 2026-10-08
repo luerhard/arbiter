@@ -8,6 +8,14 @@ from projects.models import BatchPhase
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(("who", "status"), [("anonymous", 302), ("annotator", 200)])
+def test_access(get_as, project_annotation, who, status):
+    url = reverse("notifications-unread")
+
+    assert get_as(url, who, project_annotation).status_code == status
+
+
+@pytest.mark.django_db
 class TestPhaseChangeCreatesNotifications:
     def test_set_phase_notifies_all_batch_users(self, project_annotation):
         batch = project_annotation["batch"]
@@ -108,11 +116,6 @@ class TestNotificationViews:
             message="Batch moved to phase Discussion.",
         )
         self.unread_url = reverse("notifications-unread")
-
-    def test_unread_requires_login(self, client):
-        client.logout()
-        response = client.get(self.unread_url)
-        assert response.status_code == 302
 
     def test_unread_returns_own_notifications_with_mark_read_button(self):
         Notification.objects.create(

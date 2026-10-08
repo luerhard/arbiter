@@ -24,13 +24,62 @@ from projects.models import ProjectRole
 from projects.models import ProjectUser
 from users.models import User
 
-URLS_ANYROLE = [("project-list", None)]
-URLS_EXPERT = [
-    ("project-detail-expert", (1,)),
-    ("project-export-batch", (1,)),
-    ("project-export-project", (1,)),
-]
-URLS_ANNOTATOR = [("project-detail-annotator", (1,))]
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("projects", "anonymous", 302),
+        ("projects", "outsider", 200),
+        ("projects", "annotator", 200),
+        ("projects", "expert", 200),
+        ("expert page", "anonymous", 302),
+        ("expert page", "outsider", 403),
+        ("expert page", "annotator", 403),
+        ("expert page", "expert", 200),
+        ("annotator page", "anonymous", 302),
+        ("annotator page", "outsider", 403),
+        ("annotator page", "annotator", 200),
+        # roles are set per batch, so experts may annotate too and need the page as well
+        ("annotator page", "expert", 200),
+        ("new batch", "anonymous", 302),
+        ("new batch", "outsider", 403),
+        ("new batch", "annotator", 403),
+        ("new batch", "expert", 200),
+        ("batch samples", "anonymous", 302),
+        ("batch samples", "outsider", 403),
+        ("batch samples", "annotator", 403),
+        ("batch samples", "expert", 200),
+        ("sample", "anonymous", 302),
+        ("sample", "outsider", 403),
+        ("sample", "annotator", 403),
+        ("sample", "expert", 200),
+        ("batch export", "anonymous", 302),
+        ("batch export", "outsider", 403),
+        ("batch export", "annotator", 403),
+        ("batch export", "expert", 200),
+        ("project export", "anonymous", 302),
+        ("project export", "outsider", 403),
+        ("project export", "annotator", 403),
+        ("project export", "expert", 200),
+    ],
+)
+def test_access(get_as, project_annotation, page, who, status):
+    project, batch = project_annotation["project"], project_annotation["batch"]
+    urls = {
+        "projects": reverse("project-list"),
+        "expert page": reverse("project-detail-expert", args=(project.id,)),
+        "annotator page": reverse("project-detail-annotator", args=(project.id,)),
+        "new batch": reverse("project-batch-create", args=(project.id,)),
+        "batch samples": reverse("project-batch-detail", args=(batch.id,)),
+        "sample": reverse(
+            "project-sample-detail", args=(batch.id, project_annotation["example"].id)
+        ),
+        "batch export": reverse("project-export-batch", args=(batch.id,)),
+        "project export": reverse("project-export-project", args=(project.id,)),
+    }
+
+    assert get_as(urls[page], who, project_annotation).status_code == status
 
 
 @pytest.mark.django_db
@@ -373,51 +422,6 @@ class TestProjectAndBatchCreationViews:
 
 @pytest.mark.django_db
 class TestViews:
-    @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR + URLS_ANYROLE))
-    def test_login_required_not_logged_in(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        req = client.get(url)
-        assert req.status_code == 302
-
-    @pytest.mark.parametrize("params", URLS_ANNOTATOR + URLS_ANYROLE)
-    def test_http_200_as_annotator(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="annotator1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
-
-    @pytest.mark.parametrize("params", URLS_EXPERT + URLS_ANYROLE)
-    def test_http_200_as_expert(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="expert1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
-
-    @pytest.mark.parametrize("params", URLS_ANNOTATOR)
-    def test_annotator_page_open_to_expert(self, params, client):
-        # the annotator page lists the user's own batches; roles are set per
-        # batch, so experts may annotate too and need the page as well
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="expert1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
-
-    @pytest.mark.parametrize("params", URLS_EXPERT)
-    def test_http_403_as_annotator(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="annotator1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 403
-
     def test_change_batch_phase_as_annotator(self, client):
         url = reverse("change-batch-phase", args=(1,))
         login = client.login(username="annotator1", password="123")
@@ -426,14 +430,6 @@ class TestViews:
         req = client.post(url, data)
         assert req.status_code == 403
 
-    def test_change_batch_phase_as_expert(self, client):
-        url = reverse("change-batch-phase", args=(1,))
-        login = client.login(username="expert1", password="123")
-        assert login == True
-        data = {"current_phase": "A"}
-        req = client.post(url, data, HTTP_HX_REQUEST="true")  # the phase menu uses htmx
-        assert req.status_code == 204
-
     def test_delete_batch_as_annotator(self, client):
         url = reverse("delete-batch", args=(1,))
         login = client.login(username="annotator1", password="123")
@@ -441,15 +437,6 @@ class TestViews:
         req = client.post(url)
         assert req.status_code == 403
         assert Batch.objects.filter(id=1).exists()
-
-    def test_delete_batch_as_expert(self, client):
-        url = reverse("delete-batch", args=(1,))
-        login = client.login(username="expert1", password="123")
-        assert login == True
-        req = client.post(url)
-        assert req.status_code == 302
-        assert req.url == reverse("project-detail", args=(1,))
-        assert not Batch.objects.filter(id=1).exists()
 
     def test_redirect_project_detail_expert(self, client):
         url = reverse("project-detail", args=(1,))
@@ -482,6 +469,7 @@ def test_delete_batch_cascades_related_objects(client, project_annotation):
     resp = client.post(reverse("delete-batch", args=(batch.id,)))
 
     assert resp.status_code == 302
+    assert resp.url == reverse("project-detail", args=(batch.project_id,))
     assert not Batch.objects.filter(id=batch.id).exists()
     assert not ExampleAssignment.objects.filter(batch_id=batch.id).exists()
     assert tag not in codebook.repo.tags

@@ -22,11 +22,6 @@ def _text(response):
     return " ".join(response.content.decode().split())
 
 
-URLS_EXPERT = [("codebook-view", (1,)), ("codebook-diff", (1,)), ("codebook-edit", (1,))]
-
-URLS_ANNOTATOR = [("codebook-view", (1,)), ("codebook-diff", (1,))]
-
-
 @pytest.fixture
 def project_setup():
     return {
@@ -37,41 +32,36 @@ def project_setup():
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("view", "anonymous", 302),
+        ("view", "outsider", 403),
+        ("view", "annotator", 200),
+        ("view", "expert", 200),
+        ("diff", "anonymous", 302),
+        ("diff", "outsider", 403),
+        ("diff", "annotator", 200),
+        ("diff", "expert", 200),
+        ("edit", "anonymous", 302),
+        ("edit", "outsider", 403),
+        ("edit", "annotator", 403),
+        ("edit", "expert", 200),
+        ("export", "anonymous", 302),
+        ("export", "outsider", 403),
+        ("export", "annotator", 403),
+        ("export", "expert", 200),
+    ],
+)
+def test_access(get_as, project_annotation, page, who, status):
+    codebook = project_annotation["project"].codebook.get()
+    url = reverse(f"codebook-{page}", args=(codebook.pk,))
+
+    assert get_as(url, who, project_annotation).status_code == status
+
+
+@pytest.mark.django_db
 class TestViews:
-    @pytest.mark.parametrize("params", set(URLS_EXPERT + URLS_ANNOTATOR))
-    def test_login_required_not_logged_in(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        req = client.get(url)
-        assert req.status_code == 302
-
-    @pytest.mark.parametrize("params", URLS_ANNOTATOR)
-    def test_http_200_as_annotator(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="annotator1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
-
-    @pytest.mark.parametrize("params", URLS_EXPERT)
-    def test_http_200_as_expert(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="expert1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
-
-    @pytest.mark.parametrize("params", [("codebook-edit", (1,))])
-    def test_codebook_update_view_annotator_access_denied(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="annotator1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 403
-
     def test_codebook_update_view_saves_content(self, client, project_setup):
         login = client.login(username="expert1", password="123")
         assert login is True
@@ -90,18 +80,6 @@ class TestViews:
 
         codebook.refresh_from_db()
         assert codebook.content == new_content + "\n"
-
-    def test_codebook_export_not_logged_in(self, client):
-        url = reverse("codebook-export", args=(1,))
-        req = client.get(url)
-        assert req.status_code == 302
-
-    def test_codebook_export_annotator_access_denied(self, client):
-        url = reverse("codebook-export", args=(1,))
-        login = client.login(username="annotator1", password="123")
-        assert login is True
-        req = client.get(url)
-        assert req.status_code == 403
 
     def test_codebook_export_as_expert(self, client):
         url = reverse("codebook-export", args=(1,))

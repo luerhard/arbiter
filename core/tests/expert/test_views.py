@@ -17,6 +17,36 @@ def _assignment_url(batch_id, assignment_id, **params):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("batch", "anonymous", 302),
+        ("batch", "outsider", 403),
+        ("batch", "annotator", 403),
+        ("batch", "expert", 302),  # continues at the first open case
+        ("case", "anonymous", 302),
+        ("case", "outsider", 403),
+        ("case", "annotator", 403),
+        ("case", "expert", 200),
+        ("codebook panel", "anonymous", 302),
+        ("codebook panel", "outsider", 403),
+        ("codebook panel", "annotator", 403),
+        ("codebook panel", "expert", 200),
+    ],
+)
+def test_access(get_as, project_expert, page, who, status):
+    batch = project_expert["batch"]
+    case = ExampleAssignment.objects.get(batch=batch, phase=BatchPhase.EXPERT)
+    urls = {
+        "batch": reverse("expert-batch", args=[batch.id]),
+        "case": _assignment_url(batch.id, case.id),
+        "codebook panel": reverse("expert-codebook-panel", args=[batch.id, case.id]),
+    }
+
+    assert get_as(urls[page], who, project_expert).status_code == status
+
+
+@pytest.mark.django_db
 class TestExpertNavigation:
     @pytest.fixture(autouse=True)
     def setup(self, client, project_expert):
@@ -64,13 +94,6 @@ class TestExpertNavigation:
         assert response.status_code == 200
         assert "expert/partials/assignment.html" in (t.name for t in response.templates)
         assert b"<html" not in response.content
-
-    def test_foreign_assignment_is_forbidden_not_500(self, client):
-        # Another expert's assignment id under this batch URL -> 403.
-        other_login = client.login(username=self.data["annotators"][0].username, password="123")
-        assert other_login is True
-        response = client.get(_assignment_url(self.batch.id, self.assignment.id))
-        assert response.status_code == 403
 
     def test_assignment_from_other_batch_forbidden(self):
         annotation_assignment = ExampleAssignment.objects.filter(

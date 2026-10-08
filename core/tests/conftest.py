@@ -174,3 +174,28 @@ def project_expert(project_discussion):
     ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
     batch.set_phase(BatchPhase.EXPERT)
     return data
+
+
+@pytest.fixture
+def get_as(client):
+    """GET a page as one of the people of a project fixture: "anonymous", "annotator" (the
+    first one), "other annotator", "expert", or "outsider" (logged in, but in no project).
+    For the access tables in each app's test_views.py."""
+
+    def get(url, who, project):
+        people = {
+            "annotator": project["annotators"][0],
+            "other annotator": project["annotators"][1],
+            "expert": project["expert"],
+        }
+        if who == "outsider":
+            outsider = User.objects.create_user(f"out_{uuid.uuid4().hex[:8]}", password="123")
+            client.force_login(outsider)
+        elif who != "anonymous":
+            client.force_login(people[who])
+        response = client.get(url)
+        if who == "anonymous" and response.status_code == 302:  # sent to log in, nothing else
+            assert response.url.startswith(f"{settings.LOGIN_URL}?next=")
+        return response
+
+    return get

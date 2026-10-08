@@ -18,10 +18,6 @@ def _first_annotator_user():
     return User.objects.filter(username="annotator1").get()
 
 
-def _first_non_annotator_user():
-    return User.objects.filter(username="annotator3").get()
-
-
 def _first_annotation_batch_for_user(user):
     # only batches still in the annotation phase: later phases lock annotating
     batch = (
@@ -95,13 +91,40 @@ def _add_discussion_assignment(assignment):
 
 
 @pytest.mark.django_db
-class TestAnnotateViews:
-    def test_login_required(self, client):
-        batch_id = _first_annotation_batch_for_user(_first_annotator_user())
-        url = reverse("annotate-batch", args=(batch_id,))
-        resp = client.get(url)
-        assert resp.status_code == 302
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("batch", "anonymous", 302),
+        ("batch", "outsider", 403),
+        ("batch", "annotator", 302),  # continues at the first open sample
+        ("batch", "expert", 403),  # experts decide afterwards, they do not annotate
+        ("sample", "anonymous", 302),
+        ("sample", "outsider", 403),
+        ("sample", "annotator", 200),
+        ("sample", "other annotator", 403),  # each annotator labels on their own
+        ("done", "anonymous", 302),
+        ("done", "outsider", 403),
+        ("done", "annotator", 200),
+    ],
+)
+def test_access(get_as, project_annotation, page, who, status):
+    batch = project_annotation["batch"]
+    sample = ExampleAssignment.objects.get(
+        user=project_annotation["annotators"][0],
+        example=project_annotation["example"],
+        phase=BatchPhase.ANNOTATION,
+    )
+    urls = {
+        "batch": reverse("annotate-batch", args=(batch.id,)),
+        "sample": reverse("annotate-assignment", args=(batch.id, sample.id)),
+        "done": reverse("annotate-done", args=(batch.id,)),
+    }
 
+    assert get_as(urls[page], who, project_annotation).status_code == status
+
+
+@pytest.mark.django_db
+class TestAnnotateViews:
     def test_annotator_can_open_annotation_page(self, client):
         user = _first_annotator_user()
         batch_id = _first_annotation_batch_for_user(user)
@@ -124,15 +147,6 @@ class TestAnnotateViews:
         page = client.get(resp.url)
         assert page.status_code == 200
         assert b'id="annotation-panel"' in page.content
-
-    def test_non_annotator_forbidden(self, client):
-        user = _first_non_annotator_user()
-        batch_id = _first_annotation_batch_for_user(_first_annotator_user())
-        login = client.login(username=user.username, password="123")
-        assert login is True
-
-        resp = client.get(reverse("annotate-batch", args=(batch_id,)))
-        assert resp.status_code == 403
 
     def test_assignment_in_url_loads_panel_and_labels(self, client):
         user = _first_annotator_user()
