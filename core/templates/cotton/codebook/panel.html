@@ -1,0 +1,56 @@
+{% comment %}
+Codebook side panel for the work screens. Shows the codebook and, when given, what changed for this batch. Usage:
+<c-codebook.panel
+  :codebook="codebook"
+  :content_diff="content_diff"
+  :changes="codebook_changes"
+  :since="codebook_since"
+/>
+content_diff and changes: what changed since batch since started, up to the current text. class: extra classes for the
+panel, e.g. to place it beside another column.
+{% endcomment %}
+<c-vars codebook="" content_diff="" changes="" since="" class="" />
+<c-side-panel name="codebook" label="Codebook" width="xl:w-[440px] {{ class }}">
+  <div x-data="{ tab: 'read' }" class="contents">
+    <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+      <div role="tablist" aria-label="Codebook view" class="segmented">
+        <button type="button" role="tab" @click="tab = 'read'" :aria-selected="tab === 'read'" class="segment">
+          Codebook
+        </button>
+        {% if content_diff %}
+        <button type="button" role="tab" @click="tab = 'changes'" :aria-selected="tab === 'changes'" class="segment">
+          Changes since batch
+          {{ since }}
+        </button>
+        {% endif %}
+      </div>
+      <div class="flex items-center gap-1">
+        <a
+          href="{% url 'codebook-view' codebook.pk %}"
+          target="_blank"
+          rel="noopener"
+          class="btn btn-ghost btn-sm btn-icon"
+          aria-label="Open codebook in a new tab"
+          title="Open in a new tab"
+        >
+          {% heroicon_micro "arrow-top-right-on-square" class="size-4" %}
+        </a>
+        <c-side-panel.close name="codebook" label="codebook" />
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto px-6 py-5 text-md scrollbar-thin scrollbar-thumb-line-strong">
+      <div x-show="tab === 'read'"><c-codebook.view content="{{ codebook.content }}" /></div>
+      {% if content_diff %}
+      <div x-show="tab === 'changes'" x-cloak class="flex flex-col gap-5">
+        {% if changes %}
+        <section class="flex flex-col gap-3 border-b border-line pb-5" aria-label="Why it changed">
+          <h3 class="text-meta font-semibold text-ink-2">Why it changed</h3>
+          {% include "codebook/partials/change-list.html" %}
+        </section>
+        {% endif %}
+        {% include "codebook/partials/view-diff-codebook.html" %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</c-side-panel>

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}
+Sample
+{{ number }}
+· Batch
+{{ batch.batch_number }}
+·
+{{ batch.project.name }}
+· Arbiter
+{% endblock title %}
+{% block content %}
+<div class="flex flex-col gap-7">
+  <c-page-header title="Sample {{ number }}" :project="batch.project" :batch="batch" crumb="Sample {{ number }}">
+    <c-slot name="actions">
+      {% if previous %}
+      <a href="{% url 'project-sample-detail' batch.id previous.id %}" class="btn btn-secondary">
+        {% heroicon_micro "chevron-left" class="size-4" %}
+        Previous
+      </a>
+      {% endif %}
+      {% if next %}
+      <a href="{% url 'project-sample-detail' batch.id next.id %}" class="btn btn-secondary">
+        Next
+        {% heroicon_micro "chevron-right" class="size-4" %}
+      </a>
+      {% endif %}
+    </c-slot>
+  </c-page-header>
+
+  <c-columns aside_label="Sample">
+    <div class="flex flex-col gap-6">
+      <article class="card px-8 py-7">
+        <p class="reading text-[22px] leading-normal whitespace-pre-line">{{ example.content }}</p>
+      </article>
+      <c-sample.trace :before="before" :chat="chat" :after="after" :decision="decision" />
+      {% if changes %}
+      <section class="card flex flex-col gap-4 px-6 py-5" aria-label="Codebook changes">
+        <h2 class="card-title">Codebook changed with this decision</h2>
+        {% include "codebook/partials/change-list.html" with links=True %}
+      </section>
+      {% endif %}
+    </div>
+
+    <c-slot name="aside">
+      <section id="sample-state" class="card flex flex-col gap-3 p-5" aria-label="Status">
+        <h2 class="card-title">Status</h2>
+        <p class="text-sm text-ink">{{ state.status }}</p>
+        <c-label-tags :labels="state.labels" />
+      </section>
+
+      <section class="card flex flex-col gap-3 p-5" aria-label="Metadata">
+        <h2 class="card-title">Metadata</h2>
+        {% if example.metadata %}
+        <dl class="flex flex-col gap-3">
+          {% for key, value in example.metadata.items %}
+          <div class="flex flex-col gap-0.5">
+            <dt class="text-xs text-ink-3">{{ key }}</dt>
+            <dd class="font-mono text-meta break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+          </div>
+          {% endfor %}
+        </dl>
+        {% else %}
+        <p class="text-meta text-ink-3">The uploaded file had no other columns.</p>
+        {% endif %}
+      </section>
+    </c-slot>
+  </c-columns>
+</div>
+{% endblock content %}

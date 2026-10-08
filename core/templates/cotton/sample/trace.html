@@ -1,0 +1,41 @@
+{% comment %}
+How the team got to the labels of one example: independent annotation, discussion (chat), labels after the discussion
+and, if given, the expert decision. Label arguments come from Example.labels_by_user(phase).
+<c-sample.trace :before="before" :chat="chat" :after="after" :decision="decision" />
+{% endcomment %}
+<c-vars before="" chat="" after="" decision="" highlight="" />
+<section aria-label="How the team got here" class="flex flex-col">
+  <c-sample.step number="1" phase="A" title="Independent annotation">
+    <c-sample.labels :by_user="before" empty_text="Nobody was assigned to this sample." />
+  </c-sample.step>
+  <c-sample.step number="2" phase="D" title="Discussion">
+    {% if chat %}
+    <div
+      class="card flex max-h-64 flex-col gap-2.5 overflow-y-auto px-4 py-3.5 leading-normal scrollbar-thin scrollbar-thumb-line-strong"
+    >
+      {% for message in chat %}
+      <p>
+        <span class="font-semibold {% if message.user == highlight %}text-ink{% else %}text-accent-ink{% endif %}"
+          >{{ message.user }}</span
+        >
+        <span class="text-ink-2">{{ message.message }}</span>
+      </p>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-meta text-ink-3">No messages.</p>
+    {% endif %}
+  </c-sample.step>
+  {% if decision %}
+  <c-sample.step number="3" phase="D" title="After discussion">
+    <c-sample.labels :by_user="after" />
+  </c-sample.step>
+  <c-sample.step number="4" phase="E" title="Expert decision" :last="True">
+    <c-sample.labels :by_user="decision" />
+  </c-sample.step>
+  {% else %}
+  <c-sample.step number="3" phase="D" title="After discussion" :last="True">
+    <c-sample.labels :by_user="after" empty_text="Not discussed: no disagreement, or the discussion has not started." />
+  </c-sample.step>
+  {% endif %}
+</section>

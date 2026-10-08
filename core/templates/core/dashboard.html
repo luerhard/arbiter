@@ -1,20 +1,113 @@
 {% extends "base.html" %}
 {% block title %}
-Dashboard
+Home · Arbiter
 {% endblock title %}
 {% block content %}
-<h1>Dashboard</h1>
-{% for project_name, project_id, batch_numbers in assignments %}
-<h2>{{ project_name }}</h2>
-<ul>
-  {% for batch_number in batch_numbers %}
-  <li>
-    <a href="{% url 'annotate-batch' project_id batch_number %}"
-      >Annotate Batch
-      {{ batch_number }}</a
-    >
-  </li>
-  {% endfor %}
-</ul>
-{% endfor %}
+<div class="flex flex-col gap-9">
+  <c-page-header
+    title="Waiting for you"
+    subtitle="Open work across your projects. Discussions first, because they need your partner online."
+  />
+
+  {% if tasks %}
+  <section class="grid grid-cols-1 gap-5 @xl:grid-cols-2 @4xl:grid-cols-3">
+    {% for task in tasks %}
+    <article class="card flex flex-col gap-4 p-5.5" data-phase="{{ task.batch.current_phase }}">
+      <div class="flex items-center justify-between">
+        <span class="phase-badge">{{ task.batch.get_current_phase_display }}</span>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <span class="text-meta text-ink-3">{{ task.batch.project.name }}</span>
+        <span class="text-lg font-semibold"
+          >Batch
+          {{ task.batch.batch_number }}</span
+        >
+      </div>
+      <div class="flex flex-col gap-2">
+        <div class="flex justify-between text-meta text-ink-2">
+          <span>
+            {% if task.kind == "annotate" %}Annotated{% elif task.kind == "discuss" %}Disagreements discussed{% else %}Cases
+            decided{% endif %}
+          </span>
+          <span class="font-mono text-ink"
+            >{{ task.done }}
+            /
+            {{ task.total }}</span
+          >
+        </div>
+        <div class="progress"><div class="progress-bar" style="width: {{ task.percent }}%"></div></div>
+      </div>
+      <a href="{{ task.url }}" class="btn {% if forloop.first %}btn-primary{% else %}btn-secondary{% endif %}">
+        {% if task.kind == "annotate" %}
+        {% if task.done >= task.total %}Finalize{% elif task.done %}Continue annotating{% else %}Start annotating{% endif %}
+        {% elif task.kind == "discuss" %}
+        Join discussion
+        {% else %}
+        Resolve disagreements
+        {% endif %}
+      </a>
+    </article>
+    {% endfor %}
+  </section>
+  {% else %}
+  <c-empty-state title="Nothing to do right now">
+    <c-slot name="icon">{% heroicon_outline "check-circle" class="size-8 text-success" %}</c-slot>
+    New work shows up here when a batch reaches a phase you are part of.
+  </c-empty-state>
+  {% endif %}
+
+  <section class="flex flex-col gap-3.5">
+    <div class="flex items-end justify-between">
+      <h2 class="text-lg font-semibold">Your projects</h2>
+      <a href="{% url 'project-create' %}" class="btn btn-secondary btn-sm">
+        {% heroicon_micro "plus" class="size-4" %}
+        New project
+      </a>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th class="px-5.5">Project</th>
+            <th>Your role</th>
+            <th>Batches by phase</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for membership in memberships %}
+          <tr class="hover:bg-subtle">
+            <td class="px-5.5 py-4">
+              <a href="{% url 'project-detail' membership.project.id %}" class="font-semibold text-ink hover:underline"
+                >{{ membership.project.name }}</a
+              >
+              {% if membership.project.description %}
+              <div class="max-w-md truncate text-meta text-ink-3">{{ membership.project.description }}</div>
+              {% endif %}
+            </td>
+            <td class="px-4 py-4 text-ink-2">{{ membership.get_default_role_display }}</td>
+            <td class="px-4 py-4">
+              <div class="flex flex-wrap items-center gap-1">
+                {% for batch in membership.project.batches.all %}
+                <span
+                  class="h-2 w-7 rounded-[3px]"
+                  style="background: var(--phase)"
+                  data-phase="{{ batch.current_phase }}"
+                  title="Batch {{ batch.batch_number }} · {{ batch.get_current_phase_display }}"
+                ></span>
+                {% empty %}
+                <span class="text-meta text-ink-3">No batches yet</span>
+                {% endfor %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="3" class="px-5.5 py-10 text-center text-ink-2">You are not part of any project yet.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 {% endblock content %}

@@ -18,9 +18,24 @@ class PreprocessDiffs(Preprocessor):
     FIX_PATTERN_WRAP_POS = r"\{\+(\*\*\*\*|\*\*|\*|\_\_\_\_|\_\_|\_|\`\`\`|\`|\~\~|\~)(.*?)\1\+\}"
     FIX_PATTERN_WRAP_NEG = r"\[\-(\*\*\*\*|\*\*|\*|\_\_\_\_|\_\_|\_|\`\`\`|\`|\~\~|\~)(.*?)\1\-\]"
 
+    # a whole table row added or removed: {+| a | b |+}
+    TABLE_ROW = re.compile(r"^(\{\+|\[-)(\s*\|.*\|\s*)(\+\}|-\])$")
+
+    @staticmethod
+    def _mark_cells(match: re.Match) -> str:
+        """{+| a | b |+} -> | {+a+} | {+b+} |, so the row stays a table row. The row
+        below the header (|---|) stays as it is."""
+        start, row, end = match.groups()
+        cells = row.strip().strip("|").split("|")
+        if all(re.fullmatch(r"\s*:?-+:?\s*", cell) for cell in cells):
+            return row
+        marked = [f" {start}{cell.strip()}{end} " if cell.strip() else cell for cell in cells]
+        return "|" + "|".join(marked) + "|"
+
     def run(self, lines: list[str]) -> list[str]:
         new_lines = []
         for line in lines:
+            line = self.TABLE_ROW.sub(self._mark_cells, line)  # noqa: PLW2901
             # Takes the MD start syntax (#, -, >, 1.) and puts it outside of Diff syntax
             # Example: {+## Examples+} -> ## {+Examples+}
             modified_line = re.sub(self.FIX_PATTERN_START_POS, r"\1{+\2+}", line)

@@ -1,0 +1,23 @@
+{% comment %}
+Card with a check mark that closes a piece of work (end of the annotation, all disagreements resolved):
+<c-done-card title="All samples labeled">
+  <c-slot name="summary">You labeled 20 / 20 samples.</c-slot>
+  optional further content
+  <c-slot name="actions"><a class="btn btn-primary" href="…">Back to project</a></c-slot>
+</c-done-card>
+title and summary can be attributes or named slots.
+{% endcomment %}
+<c-vars title="" summary="" actions="" />
+<section class="card flex w-full max-w-xl flex-col gap-6 p-6 sm:p-9">
+  <div class="flex items-start gap-4">
+    <span class="flex size-11 shrink-0 items-center justify-center rounded-full bg-success-soft text-success">
+      {% heroicon_outline "check" class="size-6" stroke_width=2 %}
+    </span>
+    <div class="flex flex-col gap-1.5">
+      <h1 class="text-2xl font-semibold tracking-[-0.01em]">{{ title }}</h1>
+      <p class="text-ink-2">{{ summary }}</p>
+    </div>
+  </div>
+  {{ slot }}
+  <div class="flex flex-wrap items-center gap-2.5 border-t border-line pt-5">{{ actions }}</div>
+</section>

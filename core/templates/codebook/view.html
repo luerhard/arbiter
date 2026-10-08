@@ -1,26 +1,54 @@
 {% extends "base.html" %}
+{% block title %}
+Codebook ·
+{{ codebook.project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mt-4">
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold">
-        Project:
-        {{ object.project }}
-      </h2>
-    </div>
-    <div class="p-4">
-      <c-codebook.view content="{{ codebook.content }}" />
-    </div>
-  </div>
-</div>
-{% if role == "E" %}
-<div class="flex mt-2">
-  <a
-    href="{% url 'codebook-edit' codebook_id=codebook.pk %}"
-    role="button"
-    class="cursor-pointer inline-flex items-center rounded-md border border-transparent bg-indigo-600 hover:bg-indigo-500 dark:hover:bg-indigo-700 px-4 py-2 text-sm font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-    >Edit</a
+<div class="flex flex-col gap-7">
+  <c-page-header
+    title="Codebook"
+    :project="codebook.project"
+    crumb="Codebook"
+    subtitle="The shared instructions for {{ codebook.project.name }}. Every change is kept with its rationale."
   >
+    <c-slot name="actions">
+      {% if since %}
+      <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}" class="btn btn-secondary"
+        >Changes since batch
+        {{ since }}</a
+      >
+      {% endif %}
+      {% if role == "E" %}
+      <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary">
+        {% heroicon_micro "arrow-down-tray" class="size-4" %}
+        Download (.zip)
+      </a>
+      <a href="{% url 'codebook-edit' codebook_id=codebook.pk %}" class="btn btn-primary">
+        {% heroicon_micro "pencil" class="size-4" %}
+        Edit
+      </a>
+      {% endif %}
+    </c-slot>
+  </c-page-header>
+
+  <c-columns>
+    <article class="card card-document">
+      <div class="max-w-3xl">
+        <c-codebook.view content="{{ codebook.content }}" />
+      </div>
+    </article>
+
+    <c-slot name="aside">
+      <section id="codebook-history" class="card flex flex-col gap-4 px-5.5 py-5" aria-label="History">
+        <h2 class="card-title">History</h2>
+        {% if changes %}
+        {% include "codebook/partials/change-list.html" with links=True %}
+        {% else %}
+        <p class="text-sm text-ink-2">No changes yet.</p>
+        {% endif %}
+      </section>
+    </c-slot>
+  </c-columns>
 </div>
-{% endif %}
 {% endblock content %}

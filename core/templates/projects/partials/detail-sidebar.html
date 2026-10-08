@@ -1,86 +1,55 @@
-<aside class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-  <!-- Header -->
-  <div class="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
-    <h2 class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ project.name }}</h2>
+{% load markdownify %}
+{# Side cards of the project pages (the aside slot of c-columns): codebook, team and labels. #}
+<section class="card flex flex-col gap-3.5 p-5">
+  <div class="flex items-center justify-between">
+    <h2 class="card-title">Codebook</h2>
+    <a href="{% url 'codebook-view' codebook_id=codebook.pk %}" class="link text-meta">Open</a>
   </div>
-  <!-- Body -->
-  <div class="space-y-6 px-5 py-5">
-    <!-- Annotators -->
-    <section>
-      <div class="mb-2 flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">Annotators</span>
-        <span
-          class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-200 dark:ring-white/10"
-        >
-          {{ annotators|length }}
-        </span>
-      </div>
-      {% if annotators %}
-      <ul
-        role="list"
-        class="divide-y divide-gray-200 rounded-xl border border-gray-200 dark:divide-gray-800 dark:border-gray-800"
-      >
-        {% for user in annotators %}
-        <li class="flex items-center gap-3 px-3 py-2">
-          <div
-            class="flex size-8 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 via-sky-500 to-emerald-500 text-xs font-semibold text-white"
-          >
-            {{ user.username|first|upper }}
-          </div>
-          <span class="truncate text-sm text-gray-700 dark:text-gray-300">{{ user.username }}</span>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p class="text-sm text-gray-500 dark:text-gray-400">No annotators assigned.</p>
-      {% endif %}
-    </section>
-    <!-- Experts -->
-    <section>
-      <div class="mb-2 flex items-center justify-between">
-        <span class="text-xs font-semibold uppercase tracking-wide text-gray-600 dark:text-gray-300">Experts</span>
-        <span
-          class="rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-200 dark:ring-white/10"
-        >
-          {{ experts|length }}
-        </span>
-      </div>
-      {% if experts %}
-      <ul
-        role="list"
-        class="divide-y divide-gray-200 rounded-xl border border-gray-200 dark:divide-gray-800 dark:border-gray-800"
-      >
-        {% for user in experts %}
-        <li class="flex items-center gap-3 px-3 py-2">
-          <div
-            class="flex size-8 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 via-rose-500 to-fuchsia-500 text-xs font-semibold text-white"
-          >
-            {{ user.username|first|upper }}
-          </div>
-          <span class="truncate text-sm text-gray-700 dark:text-gray-300">{{ user.username }}</span>
-        </li>
-        {% endfor %}
-      </ul>
-      {% else %}
-      <p class="text-sm text-gray-500 dark:text-gray-400">No experts assigned.</p>
-      {% endif %}
-    </section>
-  </div>
-  <!-- Footer -->
-  <div class="border-t border-gray-200 px-5 py-4 dark:border-gray-800">
-    <a
-      href="{% url 'codebook-view' codebook_id=codebook.pk %}"
-      class="inline-flex w-full items-center justify-center rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900"
+  <p class="reading text-md text-ink-2">{{ codebook.content|markdownify|striptags|truncatewords:32 }}</p>
+  {% if is_expert_view %}
+  <a href="{% url 'codebook-export' codebook_id=codebook.pk %}" class="btn btn-secondary btn-sm">
+    {% heroicon_micro "arrow-down-tray" class="size-4" %}
+    Download with history (.zip)
+  </a>
+  {% endif %}
+</section>
+
+<section class="card flex flex-col gap-3 p-5">
+  <h2 class="card-title">Team</h2>
+  {% for member in annotators %}
+  <div class="flex items-center gap-2.5">
+    <c-avatar :name="member.username" size="size-7.5" />
+    <span class="flex-1 truncate"
+      >{{ member.username }}{% if member == user %}
+      <span class="text-ink-3">(you)</span>{% endif %}</span
     >
-      View Codebook
-    </a>
-    {% if is_expert_view %}
-    <a
-      href="{% url 'codebook-export' codebook_id=codebook.pk %}"
-      class="mt-2 inline-flex w-full items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 dark:focus:ring-offset-gray-900"
-    >
-      Download Codebook (.zip)
-    </a>
-    {% endif %}
+    <span class="text-xs text-ink-3">Annotator</span>
   </div>
-</aside>
+  {% endfor %}
+  {% for member in experts %}
+  <div class="flex items-center gap-2.5">
+    <c-avatar :name="member.username" size="size-7.5" role="E" />
+    <span class="flex-1 truncate"
+      >{{ member.username }}{% if member == user %}
+      <span class="text-ink-3">(you)</span>{% endif %}</span
+    >
+    <span class="text-xs text-ink-3">Expert</span>
+  </div>
+  {% endfor %}
+  {% if not annotators and not experts %}
+  <p class="text-ink-3">Nobody assigned yet.</p>
+  {% endif %}
+</section>
+
+{% with labels=project.labels.all %}
+{% if labels %}
+<section class="card flex flex-col gap-3 p-5">
+  <h2 class="card-title">Labels</h2>
+  <div class="flex flex-wrap gap-2">
+    {% for label in labels %}
+    <c-label-tag :label="label" />
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endwith %}

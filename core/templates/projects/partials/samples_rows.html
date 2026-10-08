@@ -1,0 +1,71 @@
+{% comment %}
+Rows of the samples table. Dragging a row (Alpine x-sort) fires "reordered"; the form around the table then posts the
+example ids in their new order and swaps in these rows again.
+{% endcomment %}
+<tbody
+  id="samples"
+  {% if batch.can_reorder %}x-data
+  x-sort="$dispatch('reordered')"
+  x-sort:config="{ forceFallback: true }"
+  {% endif %}
+>
+  {% for row in rows %}
+  {% url 'project-sample-detail' batch.id row.example.id as sample_url %}
+  {% comment %}
+  The whole row opens the sample (the link in the text cell is the keyboard way there), but not a press that started on
+  the drag handle or a link, and not selecting text.
+  {% endcomment %}
+  <tr
+    class="cursor-pointer bg-surface hover:bg-subtle"
+    x-data="{ onControl: false }"
+    @pointerdown="onControl = !!$event.target.closest('a, button')"
+    @click="if (!onControl && !$event.target.closest('a, button') && !window.getSelection().toString()) window.location = '{{ sample_url }}'"
+    {% if batch.can_reorder %}x-sort:item{% endif %}
+  >
+    {% if batch.can_reorder %}
+    <td class="py-2 pl-3">
+      <button
+        type="button"
+        x-sort:handle
+        class="btn btn-ghost btn-sm btn-icon cursor-grab"
+        aria-label="Move sample {{ forloop.counter }}"
+        title="Drag to move"
+      >
+        {% heroicon_mini "bars-3" class="size-5" %}
+      </button>
+      <input type="hidden" name="example" value="{{ row.example.id }}" />
+    </td>
+    {% endif %}
+    <td class="px-4 py-3 font-mono text-meta text-ink-3">
+      {# fixed slots, so the dot stays in place when the number gets more digits #}
+      <span class="flex items-center justify-end gap-2">
+        <span
+          class="size-2 shrink-0 rounded-full {% if row.disagreement %}bg-warning{% endif %}"
+          {% if row.disagreement %}title="The annotators disagree"
+          role="img"
+          aria-label="The annotators disagree"
+          {% endif %}
+        ></span>
+        <span class="w-8 text-right tabular-nums">{{ forloop.counter }}</span>
+      </span>
+    </td>
+    <td class="px-4 py-3">
+      <a
+        href="{{ sample_url }}"
+        class="reading block max-w-md min-w-64 truncate text-md hover:underline"
+        title="{{ row.example.content }}"
+        >{{ row.example.content }}</a
+      >
+    </td>
+    <td class="px-4 py-3 text-meta whitespace-nowrap text-ink-2">{{ row.status }}</td>
+    <td class="px-4 py-3">
+      <c-label-tags :labels="row.labels" pending="–" pending_title="Not decided yet" class="flex gap-1" />
+    </td>
+    {% for value in row.values %}
+    <td class="max-w-56 truncate px-4 py-3 font-mono text-meta text-ink-2" title="{{ value|default_if_none:'' }}">
+      {{ value|default_if_none:"–" }}
+    </td>
+    {% endfor %}
+  </tr>
+  {% endfor %}
+</tbody>

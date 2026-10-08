@@ -22,6 +22,8 @@ dependencies = [
   "whitenoise>=6.11.0",
   "crispy-tailwind>=1.0.3",
   "daphne>=4.1.2",
+  "heroicons[django]>=2.14.0",
+  "openpyxl>=3.1.5",
 ]
 description = "The Annotation Tool."
 license = "MIT"

@@ -1,0 +1,17 @@
+{% comment %}
+The labels a sample got so far: <c-label-tags :labels="row.labels" pending="–" pending_title="Not decided yet" />
+labels: None while still open (shows pending, with pending_title as tooltip), [] for "No label", otherwise the labels.
+class: of the box around the tags.
+{% endcomment %}
+<c-vars pending="No label yet" pending_title="" class="flex flex-wrap gap-1" />
+{% if labels is None %}
+<span class="text-meta text-ink-3" {% if pending_title %}title="{{ pending_title }}" {% endif %}>{{ pending }}</span>
+{% elif not labels %}
+<span class="text-meta text-ink-3 italic">No label</span>
+{% else %}
+<div class="{{ class }}">
+  {% for label in labels %}
+  <c-label-tag :label="label" />
+  {% endfor %}
+</div>
+{% endif %}

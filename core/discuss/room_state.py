@@ -6,7 +6,11 @@ import logging
 import os
 from typing import Any
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
+from redis import Redis as SyncRedis
 from redis.asyncio import Redis
+from redis.exceptions import RedisError
 from redis.exceptions import WatchError
 
 log = logging.getLogger(__name__)
@@ -30,7 +34,8 @@ def _key(batch_id: int | str) -> str:
 def _defaults() -> dict[str, Any]:
     return {
         "version": 0,
-        "online_users": [],
+        "online_users": [],  # users with at least one open connection
+        "connections": {},  # {username: [channel names]}
         "required_users": [],
         "page": 0,
         "discussion_ended": False,
@@ -38,7 +43,8 @@ def _defaults() -> dict[str, Any]:
         "cur_example": "",
         "annotation_labels": {},
         "discussion_labels": {},
-        "clicked_done": {},  # {username: 0|1}
+        "clicked_done": {},  # {username: 0|1}, a saved decision for the current example
+        "saving_example": None,  # example whose decisions are being written to the database
         "messages": [],  # dict-keys: username, msg
         "total_pages": 0,
     }
@@ -79,3 +85,31 @@ async def update_state(
         except WatchError:
             # state changed between WATCH and EXEC, retry
             continue
+
+
+def close_room(batch_id: int | str, phase: str) -> None:
+    """Tell the clients in a room that the batch left the discussion phase. A failing
+    channel layer must not block the phase change."""
+    try:
+        async_to_sync(get_channel_layer().group_send)(
+            f"chat_{batch_id}",
+            {"type": "room_closed", "phase": phase},
+        )
+    except Exception:
+        log.warning("Could not close the chat room of batch %s", batch_id, exc_info=True)
+
+
+def delete_state(batch_id: int | str) -> None:
+    """Forget the chat state of a deleted batch. A Redis outage must not block the deletion."""
+    try:
+        with SyncRedis.from_url(REDIS_URL) as r:
+            r.delete(_key(batch_id))
+    except RedisError:
+        log.warning("Could not delete the chat state of batch %s", batch_id, exc_info=True)
+
+
+def delete_all_states() -> int:
+    """Forget the chat state of every batch, e.g. after the database was reset."""
+    with SyncRedis.from_url(REDIS_URL) as r:
+        keys = list(r.scan_iter(_key("*")))
+        return r.delete(*keys) if keys else 0

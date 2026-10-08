@@ -1,21 +1,18 @@
 <!doctype html>
 {% load django_vite static %}
-<html
-  class="h-full scrollbar scrollbar-thumb-gray-700 scrollbar-track-transparent text-gray-900 dark:text-gray-100"
-  lang="en"
->
+<html class="h-full scrollbar scrollbar-thumb-line-strong scrollbar-track-transparent" lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Arbiter</title>
+    <title>{% block title %}Arbiter{% endblock title %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="keywords" content="annotation label labeling text collaborative arbiter" />
     <meta name="description" content="Text Annotation Tool: Arbiter" />
     <meta name="author" content="Lukas Erhard" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}" />
     <script>
       (function () {
         var stored = localStorage.getItem('theme');
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (stored === 'dark' || (!stored && prefersDark)) {
+        if (stored === 'dark') {
           document.documentElement.classList.add('dark');
         }
       })();
@@ -23,33 +20,31 @@
     {% vite_hmr_client %}
     {% vite_asset 'static/js/main.js' %}
   </head>
-  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full bg-white dark:bg-gray-900">
-    <div class="min-h-full">
-      {% include "navbar.html" %}
-      <div class="py-10">
-        <header>
-          <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {% comment %}
-            <h1 class="text-3xl font-bold tracking-tight">Dashboard</h1>
-            {% endcomment %}
-          </div>
-        </header>
-        <main>
-          <div class="mx-auto max-w-7xl px-4 pb-8 sm:px-6 lg:px-8">
-            {% block content %}
-            {% endblock content %}
-          </div>
-        </main>
-      </div>
+  <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="h-full {% block body_class %}{% endblock body_class %}">
+    {% block layout %}
+    {% comment %}
+    App shell: sidebar on the left (from lg up; a menu bar on top below that), page content on the right. The content is
+    an @container: components inside a page adapt to the room they get with @-variants (@xl:, @4xl:), whether the
+    sidebar is shown or not.
+    {% endcomment %}
+    <div class="flex min-h-full flex-col lg:flex-row">
+      {% include "layouts/sidebar.html" %}
+      <main class="min-w-0 flex-1">
+        <div class="@container mx-auto max-w-6xl px-4 py-6 sm:px-8 lg:px-12 lg:py-9">
+          {% block content %}
+          {% endblock content %}
+        </div>
+      </main>
     </div>
+    {% endblock layout %}
     <c-toasts>
-      {% for message in messages %}<c-toasts.toast :tags="message.tags" , :message="message.message" />{% endfor %}
+      {% for message in messages %}<c-toasts.toast :tags="message.tags" :message="message.message" />{% endfor %}
       {% if user.is_authenticated %}
       <div
         id="notification-stack"
         class="contents"
         hx-get="{% url 'notifications-unread' %}"
-        hx-trigger="load, every 15s"
+        hx-trigger="load, every 15s, notifications-changed from:body"
         hx-swap="innerHTML"
       ></div>
       {% endif %}

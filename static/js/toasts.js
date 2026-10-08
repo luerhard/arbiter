@@ -13,95 +13,17 @@ function resolveToastVariant(tags) {
   return "info";
 }
 
-function iconSvg(icon, className) {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "1.5");
-  svg.setAttribute("aria-hidden", "true");
-  svg.setAttribute("class", className);
-
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("stroke-linecap", "round");
-  path.setAttribute("stroke-linejoin", "round");
-
-  if (icon === "check-circle") {
-    path.setAttribute("d", "M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  } else if (icon === "x-circle") {
-    path.setAttribute("d", "m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  } else {
-    path.setAttribute("d", "m15 11.25-3-3m0 0-3 3m3-3v7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z");
-  }
-
-  svg.appendChild(path);
-  return svg;
-}
-
 function applyToastVariant(element, tags) {
-  if (!element) return;
-
-  const variant = resolveToastVariant(tags);
-  element.classList.remove("bg-white", "dark:bg-gray-800", "outline-black/5", "dark:outline-white/10");
-
-  const body = element.querySelector("[data-toast-body]");
-  if (body) {
-    body.classList.remove("text-gray-900", "dark:text-white");
-  }
-
-  const iconHost = element.querySelector("[data-toast-icon]");
-  if (iconHost) {
-    iconHost.replaceChildren();
-  }
-
-  if (variant === "success") {
-    element.classList.add(
-      "bg-green-50",
-      "text-green-900",
-      "outline-green-900/10",
-      "dark:bg-green-900/30",
-      "dark:text-green-100",
-      "dark:outline-green-500/20",
-    );
-    if (body) body.classList.add("text-green-900", "dark:text-green-100");
-    iconHost?.appendChild(iconSvg("check-circle", "size-6 text-green-400"));
-  } else if (variant === "error") {
-    element.classList.add(
-      "bg-red-50",
-      "text-red-900",
-      "outline-red-900/10",
-      "dark:bg-red-900/30",
-      "dark:text-red-100",
-      "dark:outline-red-500/20",
-    );
-    if (body) body.classList.add("text-red-900", "dark:text-red-100");
-    iconHost?.appendChild(iconSvg("x-circle", "size-6 text-red-400"));
-  } else if (variant === "warning") {
-    element.classList.add(
-      "bg-amber-50",
-      "text-amber-900",
-      "outline-amber-900/10",
-      "dark:bg-amber-900/25",
-      "dark:text-amber-100",
-      "dark:outline-amber-500/20",
-    );
-    if (body) body.classList.add("text-amber-900", "dark:text-amber-100");
-    iconHost?.appendChild(iconSvg("arrow-up-circle", "size-6 text-amber-400"));
-  } else {
-    element.classList.add(
-      "bg-indigo-50",
-      "text-indigo-900",
-      "outline-indigo-900/10",
-      "dark:bg-indigo-900/30",
-      "dark:text-indigo-100",
-      "dark:outline-indigo-500/20",
-    );
-    if (body) body.classList.add("text-indigo-900", "dark:text-indigo-100");
-    iconHost?.appendChild(iconSvg("arrow-up-circle", "size-6 text-indigo-400"));
-  }
+  // colors and the matching icon come from .toast[data-variant=...] in main.css
+  if (element) element.dataset.variant = resolveToastVariant(tags);
 }
 
-function showToastElement(element, { delay = 2000 } = {}) {
+// errors stay longer: they usually mean the user has to do something
+function toastDelay(element) {
+  return element?.dataset.variant === "error" ? 8000 : 2000;
+}
+
+function showToastElement(element, { delay = toastDelay(element) } = {}) {
   if (!element) return;
 
   const closeButton = element.querySelector("[data-toast-close]");
@@ -137,6 +59,11 @@ function createToast(htmx, message) {
   showToastElement(element);
 }
 
+function showErrorOnce(htmx, message) {
+  const shown = [...document.querySelectorAll("[data-toast-body]")].some((body) => body.innerText === message);
+  if (!shown) createToast(htmx, { message, tags: "error" });
+}
+
 export function initToasts(htmx) {
   document.querySelectorAll("[data-toast]").forEach((element) => {
     applyToastVariant(element, element.dataset.toastTags);
@@ -145,5 +72,25 @@ export function initToasts(htmx) {
 
   htmx.on("messages", (e) => {
     (e?.detail?.value ?? []).forEach((message) => createToast(htmx, message));
+  });
+
+  // A request that never reaches the server, or fails on it, swaps nothing: without a
+  // message the page just stays as it is, and the user believes the change was saved.
+  // The notification polling stays quiet, it tries again on its own.
+  const polling = (e) => e.detail.elt?.id === "notification-stack";
+  htmx.on("htmx:sendError", (e) => {
+    if (polling(e)) return;
+    const saving = e.detail.requestConfig?.verb !== "get";
+    showErrorOnce(
+      htmx,
+      saving
+        ? "Not saved: the server could not be reached. Check your connection and try again."
+        : "The server could not be reached. Check your connection and try again.",
+    );
+  });
+  htmx.on("htmx:responseError", (e) => {
+    // 4xx answers bring their own message (e.g. "This decision is already saved")
+    if (polling(e) || e.detail.xhr.status < 500) return;
+    showErrorOnce(htmx, "Something went wrong on the server. Please try again.");
   });
 }

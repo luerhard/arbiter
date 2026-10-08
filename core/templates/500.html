@@ -1,0 +1,26 @@
+<!doctype html>
+{% comment %}
+Rendered without a request when the server fails, so it does not use base.html (sidebar, user, messages): a plain page
+with the app's styles.
+{% endcomment %}
+{% load django_vite static %}
+<html class="h-full" lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Server error · Arbiter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}" />
+    {% vite_asset 'static/js/main.js' %}
+  </head>
+  <body class="h-full">
+    <main class="mx-auto max-w-xl px-6 py-24">
+      <div class="card flex flex-col items-center gap-2 px-6 py-14 text-center">
+        <h1 class="text-md font-semibold">Something went wrong on the server</h1>
+        <p class="max-w-sm text-ink-2">
+          The error has been logged. Please go back and try again; if it happens again, tell the project's expert.
+        </p>
+        <div class="mt-2"><a href="/" class="btn btn-primary">Back to the start page</a></div>
+      </div>
+    </main>
+  </body>
+</html>

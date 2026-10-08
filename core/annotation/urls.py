@@ -14,6 +14,11 @@ urlpatterns = [
         views.AnnotationDoneView.as_view(),
         name="annotate-done",
     ),
+    path(
+        "batch/<int:batch_id>/done/undo",
+        views.UndoFinalizeView.as_view(),
+        name="annotate-undo-finalize",
+    ),
 ]
 
 htmx_patterns = [

@@ -3,10 +3,12 @@ import json
 import logging
 
 from asgiref.sync import async_to_sync
+from autobahn.exception import Disconnected
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth import get_user_model
-from django.core.paginator import Paginator
+from django.db import transaction
+from django.urls import reverse
 
 from .models import Message
 from .models import Room
@@ -28,12 +30,25 @@ User = get_user_model()
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
+    closing = False  # this side closed the connection: nothing more to send
+
+    async def send(self, text_data=None, bytes_data=None, close=False):
+        # A group message can still arrive after the connection was closed, before
+        # disconnect() runs. Sending then raises, and the exception would end the consumer
+        # without disconnect(): the user would stay online in the room state for good.
+        if self.closing:
+            return
+        try:
+            await super().send(text_data=text_data, bytes_data=bytes_data, close=close)
+        except Disconnected:
+            log.debug(f"Batch {self.batch_id}: {self.username} is gone, dropped a message")
+
     async def connect(self):
         self.joined = False
         self.route = self.scope["url_route"]
         self.batch_id = self.scope["url_route"]["kwargs"]["batch_id"]
         self.user = self.scope["user"]
-        if not await self.is_batch_annotator():
+        if not await self.is_batch_annotator() or not await self._in_discussion():
             await self.close()
             return
 
@@ -44,30 +59,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)  # type: ignore
         await self.accept()
 
-        # Initialize / update room state in Redis
+        # Initialize / update room state in Redis. A user can be connected more than once
+        # (two tabs, or a reconnect while the server has not yet noticed the old socket
+        # died), so the room tracks connections and a user is online while one is open.
+        first_connection = False
+
         async def _init(state):
+            nonlocal first_connection
             # required users (usernames) once
             if not state["required_users"]:
                 annotators = await self.get_assigned_annotators()
                 state["required_users"] = sorted({u.username for u in annotators})
-            # join online users
-            if self.username not in state["online_users"]:
-                state["online_users"].append(self.username)
+            connections = state.setdefault("connections", {})
+            first_connection = not connections.get(self.username)
+            connections.setdefault(self.username, []).append(self.channel_name)
+            state["online_users"] = list(connections)
             # init clicked_done entry
             state["clicked_done"].setdefault(self.username, 0)
             return state
 
-        await self._append_chat_message(
-            username="system",
-            message=f"{self.username} is now connected.",
-        )
         state = await update_state(self.batch_id, _init)
         log.debug(f"Current {state=} ")
+        if first_connection:
+            await self._append_chat_message(
+                username="system",
+                message=f"{self.username} is now connected.",
+            )
 
         if (set(state["online_users"]) == set(state["required_users"])) and not state[
             "discussion_ended"
         ]:
-            if state["page"] == 0:
+            # start, or resync a room state whose example was decided in the meantime
+            if state["page"] == 0 or not await self._is_open(state["cur_example_id"]):
                 await self._set_next_and_reset()
         await self.group_send_state()
 
@@ -75,35 +98,81 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not self.joined:
             return
 
-        async def _leave(state):
-            if self.username in state["online_users"]:
-                state["online_users"].remove(self.username)
-            state["clicked_done"].pop(self.username, None)
+        last_connection = False
 
+        async def _leave(state):
+            nonlocal last_connection
+            connections = state.setdefault("connections", {})
+            mine = [c for c in connections.get(self.username, []) if c != self.channel_name]
+            last_connection = not mine
+            if mine:
+                connections[self.username] = mine
+            else:
+                connections.pop(self.username, None)
+            state["online_users"] = list(connections)
             return state
 
-        state = await update_state(self.batch_id, _leave)
+        await update_state(self.batch_id, _leave)
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
+        if not last_connection:
+            return  # another connection of this user is still in the room
         await self._append_chat_message(
             username="system",
             message=f"{self.username} has disconnected.",
         )
         await self.group_send_state()
 
-        if len(state["online_users"]) == 0:
-            log.debug("No users, closing websocket.")
-            await self.close(code=1000)
-
     async def receive(self, text_data):
-        data = json.loads(text_data)
+        # An exception escaping here would end the consumer: the socket closes, disconnect()
+        # never runs, and a half-done save leaves both Done flags set with locked buttons,
+        # so the room can never continue. Recover instead and let the users retry.
+        saving = False
+        try:
+            data = json.loads(text_data)
+            saving = isinstance(data, dict) and "clicked-done" in data
+            await self._handle(data)
+        except Exception:
+            log.exception(f"Batch {self.batch_id}: handling a message of {self.username} failed")
+            await self._recover(saving)
+
+    async def _recover(self, saving: bool):
+        """Put the room back into a state the users can retry from, and tell them."""
+        try:
+            if saving:
+
+                async def mut(state):
+                    state["clicked_done"] = dict.fromkeys(state["clicked_done"], 0)
+                    state["saving_example"] = None
+                    return state
+
+                await update_state(self.batch_id, mut)
+                msg = "Saving failed. Please save your labels again."
+            else:
+                msg = f"Something went wrong with the last action of {self.username}."
+            await self._append_chat_message(username="system", message=msg)
+            await self.group_send_state()
+        except Exception:
+            # e.g. Redis is down: nothing more to do here, the users can reload
+            log.exception(f"Batch {self.batch_id}: recovering from the error failed")
+
+    async def _handle(self, data):
         log.debug(f"Received: {data}")
 
         if "message" in data.keys():
             message = data["message"]
             username = self.user.username
+            if not isinstance(message, str):
+                msg = f"message must be a string, got {message!r}"
+                raise TypeError(msg)
 
             # return instantly if message is empty
             if not message.strip():
+                return
+            state = await self._get_state()
+            if not state["cur_example_id"] or state["discussion_ended"]:
+                # the page only lets users chat while an example is open: a message without
+                # one would be missing from the export and from the expert's view
+                log.info(f"Batch {self.batch_id}: ignored a message of {username}, no open example")
                 return
             await self._append_chat_message(username=username, message=message)
 
@@ -120,87 +189,136 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 },
             )
 
+        elif ("clicked-done" in data or "undo-done" in data) and not await self._in_discussion():
+            # the phase was changed while the room was open
+            await self._append_chat_message(
+                username="system",
+                message="This batch is no longer in the discussion phase. Nothing was saved.",
+            )
+            await self.group_send_state()
+
         elif "clicked-done" in data.keys():
-            labels = list(data["labels"])
+            example_id = self._validated_example_id(data.get("example_id"))
+            labels = await self._validated_labels(data.get("labels"))
+            if await self._save_decision(example_id, labels):
+                await self.save_labels_to_db()
+                await self._set_next_and_reset()
+            # also after an ignored save: the client waits for a state to unlock its button
+            await self.group_send_state()
 
-            await self._store_discussion_labels(self.username, labels)
-            log.debug(f"{self.username} clicked done.")
-            await self._clicked_done(self.username)
-
-            log.debug("Await self._all_done().")
-            if await self._all_done():
-                state = await self._get_state()
-                # log.debug(f"{not state["discussion_ended"] = }")
-                if not state["discussion_ended"]:
-                    await self.save_labels_to_db()
-                    await self._set_next_and_reset()
+        elif "undo-done" in data.keys():
+            example_id = self._validated_example_id(data.get("example_id"))
+            await self._undo_decision(example_id)
             await self.group_send_state()
 
     # ---------- LABEL HELPERS -----------------
+    @staticmethod
+    def _validated_example_id(example_id) -> int:
+        if not isinstance(example_id, int) or isinstance(example_id, bool):
+            msg = f"example_id must be an example id, got {example_id!r}"
+            raise ValueError(msg)
+        return example_id
+
+    @database_sync_to_async
+    def _validated_labels(self, labels) -> list[int]:
+        """The label ids a client sent, if they all are labels of this project."""
+        if not isinstance(labels, list) or not all(
+            isinstance(i, int) and not isinstance(i, bool) for i in labels
+        ):
+            msg = f"labels must be a list of label ids, got {labels!r}"
+            raise ValueError(msg)
+        unknown = set(labels) - set(self.batch.labels.values_list("id", flat=True))
+        if unknown:
+            msg = f"labels {sorted(unknown)} are not labels of this project"
+            raise ValueError(msg)
+        return labels
+
     @database_sync_to_async
     def save_labels_to_db(self):
-        """Write cached labels to DB for all users for the given example."""
+        """Write cached labels to DB for all users for the given example: for all of them
+        or, if anything fails, for none."""
         state = async_to_sync(self._get_state)()
 
         example = Example.objects.get(pk=state["cur_example_id"])
 
-        # save per user
-        for username, label_ids in (state["discussion_labels"] or {}).items():
-            try:
-                user = User.objects.get(username=username)
-            except User.DoesNotExist:
-                continue
-            assignment = ExampleAssignment.objects.filter(
-                user=user,
-                example=example,
-                batch=self.batch,
-                phase=BatchPhase.DISCUSSION,
-            ).get()
-            assignment.set_user_annotations(label_ids=label_ids)
+        with transaction.atomic():
+            for username, label_ids in (state["discussion_labels"] or {}).items():
+                try:
+                    user = User.objects.get(username=username)
+                except User.DoesNotExist:
+                    continue
+                assignment = ExampleAssignment.objects.filter(
+                    user=user,
+                    example=example,
+                    batch=self.batch,
+                    phase=BatchPhase.DISCUSSION,
+                ).get()
+                assignment.set_user_annotations(label_ids=label_ids)
 
-    async def _store_discussion_labels(self, username, labels):
+    @staticmethod
+    def _decides_example(state, example_id) -> bool:
+        """Whether a save or undo for example_id still applies: it is the example on
+        screen, and its decisions are not being written already. A late or repeated
+        message (double click, sent before a reconnect) must not touch the next one."""
+        return (
+            not state["discussion_ended"]
+            and state["cur_example_id"] != 0  # the room has not started yet
+            and state["cur_example_id"] == example_id
+            and not state.get("saving_example")
+        )
+
+    async def _save_decision(self, example_id, labels) -> bool:
+        """Mark the user's decision as saved. Returns True if this save completes the
+        example: then everyone has saved, and this consumer, only this one, writes the
+        decisions to the database."""
+        outcome = set()
+
         async def mut(state):
-            state["discussion_labels"][username] = labels
+            outcome.clear()  # update_state retries mut when the state changed meanwhile
+            if not self._decides_example(state, example_id) or state["clicked_done"].get(
+                self.username,
+            ):
+                return state
+            state["discussion_labels"][self.username] = labels
+            state["clicked_done"][self.username] = 1
+            outcome.add("saved")
+            if all(state["clicked_done"].get(u) for u in state["required_users"]):
+                state["saving_example"] = example_id
+                outcome.add("complete")
             return state
 
-        return await update_state(self.batch_id, mut)
+        await update_state(self.batch_id, mut)
+        if "saved" not in outcome:
+            log.info(f"Batch {self.batch_id}: ignored a save of {self.username} for {example_id}")
+            return False
 
-    async def _clicked_done(self, username):
-        log.debug(f"{username =} clicked done.")
-
-        async def mut(state):
-            log.debug(f"clicked done state: {state['clicked_done']}")
-            if state["clicked_done"][username]:
-                # TODO: Looks like on reload the user can press Save & Done
-                # even after having pressed it previously.
-                # After pressing it again the boolean rotates.
-                state["clicked_done"][username] = 0
-                # This means the button should change the un/lock dynamically on the frontend.
-            else:
-                state["clicked_done"][username] = 1
-
-            return state
-
-        state = await update_state(self.batch_id, mut)
-
-        # get labels
-        labels = state["discussion_labels"][username]
         label_dict = await database_sync_to_async(Label.objects.in_bulk)(labels)
-        label_names = [label_dict[i].name for i in labels]
-
-        # print finalized message
-        msg = f"{username} finalized their decision: {label_names}"
+        label_names = ", ".join(label_dict[i].name for i in labels) or "no labels"
+        msg = f"{self.username} saved: {label_names}"
         await self._append_chat_message(username="system", message=msg)
+        return "complete" in outcome
 
-        return
+    async def _undo_decision(self, example_id):
+        """Withdraw the user's saved decision while the others have not all saved."""
+        undone = False
 
-    async def _all_done(self):
-        state = await self._get_state()
-        log.debug(f"{state =}")
-        required = set(state.get("required_users", []))
-        clicked = {u for u, v in (state.get("clicked_done", {}) or {}).items() if v == 1}
-        log.debug(f"{required <= clicked =}")
-        return required <= clicked
+        async def mut(state):
+            nonlocal undone
+            undone = self._decides_example(state, example_id) and bool(
+                state["clicked_done"].get(self.username),
+            )
+            if undone:
+                state["clicked_done"][self.username] = 0
+            return state
+
+        await update_state(self.batch_id, mut)
+        if not undone:
+            log.info(f"Batch {self.batch_id}: ignored an undo of {self.username} for {example_id}")
+            return
+        await self._append_chat_message(
+            username="system",
+            message=f"{self.username} undid their save.",
+        )
 
     # ---------- CHAT HELPERS -----------------
     def get_or_create_room(self):
@@ -234,53 +352,48 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug("Discussion ended.")
             return
 
-        next_page = int(state.get("page", 0)) + 1
-        state["page"] = next_page
-        example, annotations, total_pages = await database_sync_to_async(self.get_example)(
-            state=state,
-        )
+        example, annotations, page, total_pages = await database_sync_to_async(
+            self.get_example,
+        )(state=state)
 
         end_reason = None
         msg = None
         if example is None:
-            had_any = await database_sync_to_async(
-                lambda: any(
-                    e.has_disagreement for e in Example.objects.filter(batch=self.batch_id)
-                ),
-            )()
-
-            if not had_any:
+            if total_pages == 0:
                 end_reason = "NO_EXAMPLES"
-                msg = "No disagreements exist."
+                msg = "There are no disagreements to discuss."
 
             else:
                 end_reason = "DISCUSSION_END"
-                msg = "All Examples discussed."
+                msg = "All disagreements discussed."
 
-        else:
-            if state["page"] != 1:
-                msg = "All done. Next Sentence."
+        elif state["page"] != 0:
+            everyone = "Both" if len(state["required_users"]) == 2 else "Everyone"
+            msg = f"{everyone} saved. Next disagreement."
 
         async def mut(state):
             if end_reason:
                 state["discussion_ended"] = end_reason
             else:
-                state["page"] = next_page
+                state["page"] = page
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
                 state["annotation_labels"] = annotations
                 state["total_pages"] = total_pages
 
-                state["clicked_done"] = dict.fromkeys(state.get("online_users", []), 0)
+                state["clicked_done"] = dict.fromkeys(state["required_users"], 0)
+                state["discussion_labels"] = {}
+            state["saving_example"] = None
             return state
 
         await update_state(self.batch_id, mut)
 
-        if end_reason:
-            await database_sync_to_async(self._advance_batch_after_discussion)()
-
         if msg:
             await self._append_chat_message(username="system", message=msg)
+
+        if end_reason:
+            # closes the room (Batch.set_phase), so the message above goes first
+            await database_sync_to_async(self._advance_batch_after_discussion)()
 
     def _advance_batch_after_discussion(self):
         # Re-fetch: self.batch was loaded at connect time and may be stale.
@@ -297,6 +410,42 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 ensure_ascii=False,
             ),
         )
+
+    async def room_closed(self, event):
+        """The batch left the discussion phase: show the end, then close the connection
+        (code 1000, so the client does not reconnect)."""
+        state = await self._get_state()
+        phase = event["phase"]
+        if state["discussion_ended"] == "NO_EXAMPLES":
+            message = "There was nothing to discuss."
+        elif state["discussion_ended"]:
+            message = "All disagreements discussed."
+        else:
+            message = f"This batch was moved to the {BatchPhase(phase).label} phase."
+        if state["discussion_ended"]:
+            message += {
+                BatchPhase.EXPERT: " The batch moves on to expert decisions.",
+                BatchPhase.FINAL: " The batch is finalized.",
+            }.get(phase, "")
+        else:
+            message += " The discussion is closed."
+        await self.send(
+            text_data=json.dumps({"state": state, "user": self.username}, ensure_ascii=False),
+        )
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "room_closed": {
+                        "message": message,
+                        "project_url": reverse("project-detail", args=(self.batch.project_id,)),
+                    },
+                },
+            ),
+        )
+        # no more group messages for this connection; send() drops those already on the way
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)  # type: ignore
+        self.closing = True
+        await self.close(code=1000)
 
     async def chat_typing(self, event):
         if event["user"] == self.username:
@@ -322,17 +471,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
     # ---------- EXAMPLE HELPERS -----------------
 
     def get_example(self, state):
+        """The next example to discuss: the first one (in batch order) that not every
+        annotator has decided yet. The DISCUSSION assignments in the database are the
+        source of truth, so a lost or stale room state resumes at the right example.
+
+        Returns (example, annotation labels by user, page, total pages); example is
+        None when nothing is left to discuss."""
         log.debug("Getting example")
-        examples = self.batch.disagreements(BatchPhase.ANNOTATION)
-        log.debug(f"{examples =}")
-        paginator = Paginator(examples, 1)
-        page_obj = paginator.get_page(state["page"])
-        total_pages = paginator.count
-
-        if page_obj.number < state["page"] or not examples:
-            return None, None, total_pages + 1
-
-        example = page_obj.object_list[0]
+        total_pages = self.batch.discussion_examples().count()
+        open_examples = self.batch.open_discussion_examples()
+        example = open_examples.first()
+        if example is None:
+            return None, None, total_pages, total_pages
+        page = total_pages - open_examples.count() + 1
 
         log.debug("Getting annotations")
         all_labels = example.labels.all()
@@ -357,7 +508,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 by_user[user].append(label)
 
-        return example, by_user, total_pages
+        return example, by_user, page, total_pages
+
+    @database_sync_to_async
+    def _is_open(self, example_id):
+        return self.batch.open_discussion_examples().filter(id=example_id).exists()
+
+    @database_sync_to_async
+    def _in_discussion(self):
+        return Batch.objects.filter(pk=self.batch_id, current_phase=BatchPhase.DISCUSSION).exists()
 
     @database_sync_to_async
     def is_batch_annotator(self):

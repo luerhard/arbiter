@@ -1,8 +1,18 @@
+import re
+
 from django.urls import reverse
 from notifications.models import Notification
 import pytest
 
 from projects.models import BatchPhase
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(("who", "status"), [("anonymous", 302), ("annotator", 200)])
+def test_access(get_as, project_annotation, who, status):
+    url = reverse("notifications-unread")
+
+    assert get_as(url, who, project_annotation).status_code == status
 
 
 @pytest.mark.django_db
@@ -43,6 +53,7 @@ class TestPhaseChangeCreatesNotifications:
         response = client.post(
             reverse("change-batch-phase", args=[batch.id]),
             data={"current_phase": BatchPhase.DISCUSSION},
+            HTTP_HX_REQUEST="true",
         )
 
         assert response.status_code == 204
@@ -106,11 +117,6 @@ class TestNotificationViews:
         )
         self.unread_url = reverse("notifications-unread")
 
-    def test_unread_requires_login(self, client):
-        client.logout()
-        response = client.get(self.unread_url)
-        assert response.status_code == 302
-
     def test_unread_returns_own_notifications_with_mark_read_button(self):
         Notification.objects.create(
             user=self.other_user,
@@ -155,7 +161,7 @@ class TestNotificationViews:
     def test_poller_rendered_on_full_pages_when_logged_in(self):
         response = self.client.get(reverse("home"))
         content = response.content.decode()
-        assert 'hx-trigger="load, every 15s"' in content
+        assert 'hx-trigger="load, every 15s, notifications-changed from:body"' in content
         assert self.unread_url in content
 
     def test_poller_absent_when_logged_out(self, client):
@@ -175,3 +181,55 @@ class TestNotificationViews:
         assert response.status_code == 404
         other.refresh_from_db()
         assert other.read_at is None
+
+
+@pytest.mark.django_db
+class TestNotificationPile:
+    """Many unread notifications must not cover the page: three toasts, the rest counted."""
+
+    @pytest.fixture(autouse=True)
+    def setup(self, client, project_annotation):
+        self.client = client
+        self.user, self.other_user = project_annotation["annotators"]
+        self.batch = project_annotation["batch"]
+        Notification.objects.all().delete()
+        self.notifications = [
+            Notification.objects.create(user=self.user, batch=self.batch, message=f"Message {i}")
+            for i in range(5)
+        ]
+        client.login(username=self.user.username, password="123")
+
+    def test_only_the_newest_three_are_shown_with_a_count_of_the_rest(self):
+        content = self.client.get(reverse("notifications-unread")).content.decode()
+
+        shown = re.findall(r"Message (\d)", content)
+        assert shown == ["4", "3", "2"]
+        assert "+ 2 more notifications" in " ".join(content.split())
+        assert reverse("notifications-read-all") in content
+
+    def test_no_count_when_all_are_shown(self):
+        for notification in self.notifications[:2]:
+            notification.mark_read()
+
+        content = self.client.get(reverse("notifications-unread")).content.decode()
+
+        assert len(re.findall(r"Message \d", content)) == 3
+        assert 'id="notifications-more"' not in content
+
+    def test_mark_all_read_marks_only_own_notifications(self):
+        others = Notification.objects.create(user=self.other_user, batch=self.batch, message="x")
+
+        response = self.client.post(reverse("notifications-read-all"))
+
+        assert response.status_code == 200
+        assert response["HX-Trigger"] == "notifications-changed"
+        assert not Notification.objects.filter(user=self.user, read_at__isnull=True).exists()
+        others.refresh_from_db()
+        assert others.read_at is None
+
+    def test_reading_one_reloads_the_toasts(self):
+        response = self.client.post(
+            reverse("notification-read", args=[self.notifications[0].id]),
+        )
+
+        assert response["HX-Trigger"] == "notifications-changed"

@@ -1,19 +1,29 @@
+import os
+from pathlib import Path
+import shutil
+import tempfile
 import uuid
 
 from django.conf import settings
 from django.core.management import call_command
 from django.db import connection
 import pytest
+import redis
 
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
+from discuss import room_state
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
 from projects.models import ProjectRole
 from projects.models import ProjectUser
 from users.models import User
+
+# The default hasher is deliberately slow (0.15 s per password); tests create and log in
+# hundreds of users. Set before populatedb creates its users, so their logins are fast too.
+settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 
 def run_sql(sql):
@@ -23,6 +33,15 @@ def run_sql(sql):
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_blocker):  # noqa: PT004
+    # Codebooks are git repositories on disk, stored by codebook id. Keep the
+    # test ones in a temporary folder: the test database reuses the ids of the
+    # dev database, and creating a codebook wipes an existing folder.
+    import core.settings as project_settings
+
+    dev_codebooks_root = project_settings.CODEBOOKS_ROOT
+    test_codebooks_root = Path(tempfile.mkdtemp(prefix="arbiter-test-codebooks-"))
+    project_settings.CODEBOOKS_ROOT = test_codebooks_root
+
     settings.DATABASES["default"]["NAME"] = "postgres"
     connection.close()
 
@@ -45,9 +64,32 @@ def django_db_setup(django_db_blocker):  # noqa: PT004
     with django_db_blocker.unblock():
         run_sql("DROP DATABASE test_annotationtool")
 
+    project_settings.CODEBOOKS_ROOT = dev_codebooks_root
+    shutil.rmtree(test_codebooks_root, ignore_errors=True)
+
 
 @pytest.fixture
-def project_annotation():
+def redis_client(monkeypatch, settings):
+    """An empty Redis database for the chat state and the channel layer. In docker compose
+    (and CI) Redis runs in its own container, which REDIS_HOST names."""
+    url = f"redis://{os.environ.get('REDIS_HOST', 'localhost')}:6379/15"
+    monkeypatch.setattr(room_state, "REDIS_URL", url)
+    settings.CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {"hosts": [url]},
+        },
+    }
+    client = redis.Redis.from_url(url, decode_responses=True)
+    client.flushdb()
+    yield client
+    client.flushdb()
+    client.close()
+
+
+def make_project():
+    """A project with two annotators and an expert, and one batch with one example in
+    the annotation phase."""
     suffix = uuid.uuid4().hex[:8]
     annotator1 = User.objects.create_user(username=f"user_{suffix}", password="123")
     annotator2 = User.objects.create_user(username=f"user2_{suffix}", password="123")
@@ -83,6 +125,19 @@ def project_annotation():
         "batch": batch,
         "example": example,
     }
+
+
+@pytest.fixture
+def project_annotation():
+    return make_project()
+
+
+@pytest.fixture
+def intruder():
+    """The expert of another project, and the id of an assignment in that project."""
+    other = make_project()
+    assignment = ExampleAssignment.objects.filter(batch=other["batch"]).first()
+    return other["expert"], assignment.id
 
 
 @pytest.fixture
@@ -133,3 +188,28 @@ def project_expert(project_discussion):
     ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
     batch.set_phase(BatchPhase.EXPERT)
     return data
+
+
+@pytest.fixture
+def get_as(client):
+    """GET a page as one of the people of a project fixture: "anonymous", "annotator" (the
+    first one), "other annotator", "expert", or "outsider" (logged in, but in no project).
+    For the access tables in each app's test_views.py."""
+
+    def get(url, who, project):
+        people = {
+            "annotator": project["annotators"][0],
+            "other annotator": project["annotators"][1],
+            "expert": project["expert"],
+        }
+        if who == "outsider":
+            outsider = User.objects.create_user(f"out_{uuid.uuid4().hex[:8]}", password="123")
+            client.force_login(outsider)
+        elif who != "anonymous":
+            client.force_login(people[who])
+        response = client.get(url)
+        if who == "anonymous" and response.status_code == 302:  # sent to log in, nothing else
+            assert response.url.startswith(f"{settings.LOGIN_URL}?next=")
+        return response
+
+    return get

@@ -99,9 +99,12 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.navigation",
             ],
             "builtins": [
                 "django_cotton.templatetags.cotton",
+                # {% heroicon_micro "plus" class="size-4" %} etc. in every template
+                "heroicons.templatetags.heroicons",
             ],
         },
     },
@@ -114,7 +117,17 @@ ASGI_APPLICATION = "core.asgi.application"
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": ["redis://redis:6379/0"]},
+        "CONFIG": {
+            "hosts": [
+                {
+                    "address": "redis://redis:6379/0",
+                    # channels_redis waits up to 5 s (brpop_timeout) for new
+                    # messages; redis-py >= 8 defaults to a 5 s socket timeout,
+                    # which races with that wait and kills the websocket.
+                    "socket_timeout": 15,
+                },
+            ],
+        },
     },
 }
 
@@ -192,6 +205,12 @@ MARKDOWNIFY = {
             "ul",
             "del",
             "text",
+            "table",
+            "thead",
+            "tbody",
+            "tr",
+            "th",
+            "td",
         ],
         "WHITELIST_ATTRS": [
             "href",
@@ -202,6 +221,9 @@ MARKDOWNIFY = {
             "codebook.markdown_extensions.git_diff_preprocess",
             "codebook.markdown_extensions.git_diff_del",
             "codebook.markdown_extensions.git_diff_insertion",
+            "codebook.markdown_extensions.block_spacing",
+            "tables",
+            "sane_lists",
         ],
     },
 }

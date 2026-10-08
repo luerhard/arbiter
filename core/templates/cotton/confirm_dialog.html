@@ -1,0 +1,42 @@
+{% comment %}
+Confirmation for destructive actions (Tailwind Plus "Simple alert" modal). Confirming posts a form to "action". Open it
+with a button that has command="show-modal" and commandfor set to the dialog id, e.g.
+<c-confirm-dialog id="delete-project-1" title="Delete project?" action="/projects/1/delete" confirm="Delete project">
+  What will be lost.
+</c-confirm-dialog>
+Hidden inputs for the form go into the optional "fields" slot: <c-slot name="fields">...</c-slot>
+While closed it takes no room, so it can sit next to its button in a row of buttons.
+{% endcomment %}
+<c-vars id="" title="" action="" confirm="Delete" fields="" />
+<el-dialog class="contents">
+  <dialog
+    id="{{ id }}"
+    aria-labelledby="{{ id }}-title"
+    class="fixed inset-0 size-auto max-h-none max-w-none overflow-y-auto bg-transparent backdrop:bg-transparent"
+  >
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-night/50 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+    ></el-dialog-backdrop>
+    <div tabindex="0" class="flex min-h-full items-center justify-center p-4 focus:outline-none">
+      <el-dialog-panel
+        class="card relative block w-full max-w-lg p-6 text-left whitespace-normal shadow-[0_24px_64px_rgb(11_13_16/0.24)] transition-all data-closed:scale-95 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+      >
+        <div class="flex items-start gap-4">
+          <span class="flex size-10 shrink-0 items-center justify-center rounded-full bg-danger-soft text-danger">
+            {% heroicon_outline "exclamation-triangle" class="size-6" %}
+          </span>
+          <div class="flex flex-col gap-2 pt-1.5">
+            <h2 id="{{ id }}-title" class="text-base font-semibold text-ink">{{ title }}</h2>
+            <div class="flex flex-col gap-2 leading-relaxed text-ink-2">{{ slot }}</div>
+          </div>
+        </div>
+        <form method="post" action="{{ action }}" class="mt-6 flex flex-row-reverse gap-2.5">
+          {% csrf_token %}
+          {{ fields }}
+          <button type="submit" class="btn btn-danger-solid">{{ confirm }}</button>
+          <button type="button" command="close" commandfor="{{ id }}" class="btn btn-secondary">Cancel</button>
+        </form>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>

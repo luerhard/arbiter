@@ -4,9 +4,11 @@ import "../css/main.css";
 import Alpine from "alpinejs";
 import focus from "@alpinejs/focus";
 import morph from "@alpinejs/morph";
+import sort from "@alpinejs/sort";
 window.Alpine = Alpine;
 Alpine.plugin(focus);
 Alpine.plugin(morph);
+Alpine.plugin(sort);
 
 import "@tailwindplus/elements";
 import htmx from "htmx.org";
@@ -14,7 +16,6 @@ window.htmx = htmx;
 import "htmx-ext-ws";
 import "htmx-ext-alpine-morph";
 
-import Mousetrap from "mousetrap";
 import "./vendor/coloris.min.js";
 
 window.Coloris({
@@ -58,18 +59,19 @@ window.Coloris({
 
 import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import * as ui from "./ui.js";
-import * as funcs from "./functions.js";
 import * as discuss from "./discuss.js";
 import { initToasts } from "./toasts.js";
+import { panelsStore, watchWidth } from "./panels.js";
 
 window.lib = window.lib || {};
 window.lib.ui = ui;
-window.lib.funcs = funcs;
 window.lib.discuss = discuss;
 
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 Alpine.data("skipAnnotatedToggle", skipAnnotatedToggle);
+Alpine.store("panels", panelsStore());
+watchWidth(Alpine.store("panels"));
 Alpine.start();
 
 // Debugging

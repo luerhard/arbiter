@@ -1,38 +1,38 @@
-<div class="label-row grid grid-cols-1 gap-3 sm:grid-cols-3">
-  <div>
-    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300" for="label-name-{{ index }}">Label</label>
+<div class="label-row grid grid-cols-[1fr_110px] gap-3 @xl:grid-cols-[1fr_200px_110px]">
+  {# narrow: the name on its own line, color and key below #}
+  <div class="col-span-2 @xl:col-span-1">
+    <label class="field-label" for="label-name-{{ index }}">Label</label>
     <input
       id="label-name-{{ index }}"
       name="label_name"
       type="text"
-      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-gray-900 dark:text-white"
-      placeholder="e.g. Positive"
+      class="input"
+      placeholder="e.g. Offensive"
+      value="{{ row.name|default:'' }}"
     />
   </div>
   <div>
-    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300" for="label-color-{{ index }}"
-      >Color</label
-    >
+    <label class="field-label" for="label-color-{{ index }}">Color</label>
     <input
       id="label-color-{{ index }}"
       name="label_color"
+      value="{{ row.color|default:'' }}"
       type="text"
-      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-gray-900 dark:text-white"
-      placeholder="#2c3e50"
+      class="input"
+      placeholder="#155596"
       data-coloris
     />
   </div>
   <div>
-    <label class="block text-xs font-medium text-gray-700 dark:text-gray-300" for="label-hotkey-{{ index }}"
-      >Hotkey</label
-    >
+    <label class="field-label" for="label-hotkey-{{ index }}">Key</label>
     <input
       id="label-hotkey-{{ index }}"
       name="label_hotkey"
+      value="{{ row.hotkey|default:'' }}"
       type="text"
       maxlength="1"
-      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:border-white/10 dark:bg-gray-900 dark:text-white"
-      placeholder="A"
+      class="input font-mono"
+      placeholder="1"
     />
   </div>
 </div>

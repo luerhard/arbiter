@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% comment %}
+Layout for the work screens (annotate, discuss, expert decision): no sidebar, a slim top bar with context, and the full
+width for the task. Expects `batch` in the context. Blocks: focus_progress, focus_actions, content.
+{% endcomment %}
+{% block body_class %}has-topbar{% endblock body_class %}
+{% block layout %}
+<div class="flex min-h-full flex-col">
+  <header
+    class="sticky top-0 z-20 flex h-topbar shrink-0 items-center gap-2 border-b border-line bg-surface px-3 sm:gap-4 sm:px-5"
+  >
+    <a
+      href="{% url 'project-detail' batch.project_id %}"
+      aria-label="Back to project"
+      title="Back to project"
+      class="flex items-center gap-1.5 rounded-lg py-1 pr-1.5 pl-1 text-ink-2 hover:bg-subtle hover:text-ink"
+    >
+      {% heroicon_mini "chevron-left" class="size-5" %}
+      <c-logo.mark />
+    </a>
+    <div class="flex items-center gap-2 whitespace-nowrap">
+      <span class="text-ink-3 max-md:hidden">{{ batch.project.name }}</span>
+      <span class="text-line-strong max-md:hidden">/</span>
+      <span class="font-semibold"
+        >Batch
+        {{ batch.batch_number }}</span
+      >
+    </div>
+    <span class="phase-badge max-sm:hidden" data-phase="{{ batch.current_phase }}"
+      >{{ batch.get_current_phase_display }}</span
+    >
+    <div class="mx-auto flex max-w-md min-w-0 flex-1 items-center gap-3">
+      {% block focus_progress %}{% endblock focus_progress %}
+    </div>
+    <div class="flex items-center gap-2">{% block focus_actions %}{% endblock focus_actions %}</div>
+    <a href="{% url 'user-profile' %}" title="{{ user.username }}" class="max-sm:hidden"
+      ><c-avatar :name="user.username"
+    /></a>
+  </header>
+  <div class="flex min-h-0 flex-1">
+    {% block content %}
+    {% endblock content %}
+  </div>
+</div>
+{% endblock layout %}

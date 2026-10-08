@@ -4,7 +4,7 @@ from typing import Any
 
 from codebook.utils import normalize_content
 from django.contrib import messages
-from django.http import HttpResponseForbidden
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -21,6 +21,8 @@ from discuss.models import Message
 from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
+
+NOT_YOURS = "This case is not assigned to you."
 
 
 def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dict[str, Any]:
@@ -61,6 +63,7 @@ def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dic
     )
 
     return {
+        "example_id": example.id,
         "text": example.content,
         "labels_before_discussion": labels_by_user(BatchPhase.ANNOTATION),
         "labels_after_discussion": labels_by_user(BatchPhase.DISCUSSION),
@@ -74,27 +77,19 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
     batch = assignment.batch
     example = assignment.example
 
-    def annotations_by_user(phase: BatchPhase):
-        assignments = (
-            ExampleAssignment.objects.filter(batch=batch, example=example, phase=phase)
-            .select_related("user")
-            .prefetch_related("annotations__label")
-            .order_by("user__username")
-        )
-        return {a.user.username: list(a.annotations.all()) for a in assignments}
-
-    before_by_user = annotations_by_user(BatchPhase.ANNOTATION)
+    before_by_user = example.labels_by_user(BatchPhase.ANNOTATION)
 
     chat_messages = (
         Message.objects.filter(example=example).exclude(user="system").order_by("created_at")
     )
 
-    open_count = ExampleAssignment.objects.filter(
+    expert_assignments = ExampleAssignment.objects.filter(
         batch=batch,
         user=assignment.user,
         phase=BatchPhase.EXPERT,
-        done__isnull=True,
-    ).count()
+    )
+    open_count = expert_assignments.filter(done__isnull=True).count()
+    total_count = expert_assignments.count()
 
     return {
         "batch": batch,
@@ -103,12 +98,14 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         "example": example,
         "sentence": example,
         "prev_annotations": before_by_user,
-        "post_annotations": annotations_by_user(BatchPhase.DISCUSSION),
+        "post_annotations": example.labels_by_user(BatchPhase.DISCUSSION),
         # Presentational only (right-aligns this user's chat messages); an
         # example without annotation-phase assignments must not crash.
         "annotator": next(iter(before_by_user), None),
         "chat_messages": chat_messages,
         "disagreements_remaining": open_count,
+        "disagreements_total": total_count,
+        "disagreements_decided": total_count - open_count,
         "prev_assignment": assignment.previous(),
         "next_assignment": assignment.next(),
     }
@@ -124,6 +121,7 @@ def _codebook_panel_context(assignment: ExampleAssignment, mode: str = "view") -
         "draft": draft,
         "panel_mode": mode,
         "panel_content": draft.content if draft else codebook.content,
+        "panel_rationale": draft.rationale if draft else "",
         "draft_has_changes": bool(draft)
         and normalize_content(draft.content) != normalize_content(codebook.content),
     }
@@ -195,7 +193,7 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
     def get(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         editing = request.GET.get("edit") == "1" and assignment.done is not None
         review = assignment.done is not None and not editing
@@ -205,7 +203,7 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         editing = request.POST.get("edit") == "1" and assignment.done is not None
 
@@ -253,11 +251,11 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
                     labels_form=labels_form,
                 )
                 return self._render(request, context)
-            if draft.base_revision != codebook.repo.head.commit.hexsha:
+            if not draft.is_based_on_current(codebook):
                 messages.error(
                     request,
-                    "The codebook changed since this draft was started. "
-                    "Review your draft against the current version.",
+                    "The codebook was changed since you started this draft. Discard the "
+                    "draft and make your change again on the current version.",
                 )
                 context = self._build_context(
                     assignment,
@@ -359,7 +357,7 @@ class CodebookPanelView(_AssignmentAccessMixin, View):
     def get(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
         mode = "edit" if request.GET.get("mode") == "edit" else "view"
         context = _codebook_panel_context(assignment, mode=mode)
         return render(request, "expert/partials/codebook_panel.html", context)
@@ -369,7 +367,7 @@ class CodebookDraftSaveView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
 
         content = request.POST.get("content", "")
         rationale = request.POST.get("rationale", "")
@@ -383,6 +381,16 @@ class CodebookDraftSaveView(_AssignmentAccessMixin, View):
         if normalize_content(content) == normalize_content(codebook.content):
             # Saving an unchanged codebook equals discarding the draft.
             CodebookDraft.objects.filter(assignment=assignment).delete()
+        elif not rationale.strip():
+            # refused here, not only when the decision is saved: keep what was typed
+            context = _codebook_panel_context(assignment, mode="edit")
+            context.update(
+                panel_content=content,
+                panel_rationale=rationale,
+                rationale_error="Add a rationale: it is saved with the change and shown "
+                "to the annotators.",
+            )
+            return render(request, "expert/partials/codebook_panel.html", context)
         else:
             CodebookDraft.objects.update_or_create(
                 assignment=assignment,
@@ -402,7 +410,7 @@ class CodebookDraftDeleteView(_AssignmentAccessMixin, View):
     def post(self, request, batch_id, assignment_id):
         assignment = self.get_assignment(request, batch_id, assignment_id)
         if assignment is None:
-            return HttpResponseForbidden()
+            raise PermissionDenied(NOT_YOURS)
         CodebookDraft.objects.filter(assignment=assignment).delete()
         context = _codebook_panel_context(assignment, mode="view")
         return render(request, "expert/partials/codebook_panel.html", context)

@@ -1,75 +1,17 @@
-<div
-  id="codebook-panel"
-  class="border bg-white dark:bg-gray-900 rounded-2xl overflow-hidden {% if draft_has_changes %}border-orange-300/70 shadow-orange-300/70 dark:border-orange-300/50 dark:shadow-orange-300/50 shadow-lg{% else %}border-gray-200 dark:border-gray-800 shadow-sm{% endif %}"
->
-  <div class="px-4 py-2 font-semibold flex items-center justify-between">
-    <span>Codebook</span>
-    {% if draft_has_changes %}
-    <span
-      class="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-orange-600/20 ring-inset dark:bg-orange-900/30 dark:text-orange-300 dark:ring-orange-500/50"
-      >Uncommitted draft</span
-    >
-    {% endif %}
-  </div>
-  <div class="p-4">
-    {% if panel_mode == "edit" %}
-    <textarea
-      id="codebook-content"
-      name="content"
-      rows="20"
-      style="white-space: pre-wrap"
-      class="w-full border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500 rounded-2xl p-2 scrollbar"
-    >
-{{ panel_content }}</textarea>
-    <div class="my-3">
-      <label for="rationale" class="block font-medium mb-1">Rationale</label>
-      <textarea
-        id="rationale"
-        name="rationale"
-        rows="3"
-        placeholder="Describe why the codebook needs to be updated..."
-        class="w-full border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 rounded-2xl p-2 caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 focus:ring-blue-500"
-      >
-{{ draft.rationale|default:"" }}</textarea>
+{# Swapped as a whole (hx-target="#codebook-panel"); the id lands on the aside of c-side-panel. #}
+<c-side-panel id="codebook-panel" name="expert-codebook" label="Codebook" width="xl:w-[500px]">
+  <div class="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
+    <div class="flex items-center gap-3">
+      <h2 class="card-title">Codebook</h2>
+      {% if draft_has_changes %}
+      <span class="badge badge-warning">
+        <span class="size-1.5 rounded-full bg-current"></span>
+        Uncommitted draft
+      </span>
+      {% endif %}
     </div>
-    <div class="flex flex-row gap-2">
-      <button
-        type="button"
-        id="draft-save-button"
-        hx-post="{% url 'expert-draft-save' batch_id assignment.id %}"
-        hx-include="#codebook-panel"
-        hx-target="#codebook-panel"
-        hx-swap="outerHTML"
-        class="basis-1/2 cursor-pointer rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm"
-      >
-        Save Draft
-      </button>
-      <button
-        type="button"
-        id="draft-cancel-button"
-        hx-get="{% url 'expert-codebook-panel' batch_id assignment.id %}"
-        hx-target="#codebook-panel"
-        hx-swap="outerHTML"
-        class="basis-1/2 cursor-pointer rounded-md border border-transparent bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm"
-      >
-        Cancel
-      </button>
-    </div>
-    {% else %}
-    <div id="codebook-rendered" class="overflow-auto scrollbar max-h-[645px]">
-      <c-codebook.view content="{{ panel_content }}" />
-    </div>
-    <div class="flex flex-col mt-4 gap-2">
-      <button
-        type="button"
-        id="edit-button"
-        hx-get="{% url 'expert-codebook-panel' batch_id assignment.id %}?mode=edit"
-        hx-target="#codebook-panel"
-        hx-swap="outerHTML"
-        class="cursor-pointer rounded-md border border-transparent bg-blue-600 hover:bg-blue-500 dark:hover:bg-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm"
-      >
-        Edit
-      </button>
+    <div class="flex items-center gap-1.5">
+      {% if panel_mode != "edit" %}
       {% if draft %}
       <button
         type="button"
@@ -78,12 +20,85 @@
         hx-confirm="Discard your codebook draft and restore the committed version?"
         hx-target="#codebook-panel"
         hx-swap="outerHTML"
-        class="cursor-pointer rounded-md border border-transparent bg-gray-600 hover:bg-gray-500 dark:hover:bg-gray-700 px-4 py-2 text-sm font-medium text-white shadow-sm"
+        class="btn btn-ghost btn-sm text-danger hover:text-danger"
       >
-        Undo All Changes
+        Discard draft
       </button>
       {% endif %}
+      <button
+        type="button"
+        id="edit-button"
+        hx-get="{% url 'expert-codebook-panel' batch_id assignment.id %}?mode=edit"
+        hx-target="#codebook-panel"
+        hx-swap="outerHTML"
+        class="btn btn-secondary btn-sm"
+      >
+        {% heroicon_micro "pencil" class="size-4" %}
+        {% if draft %}Continue editing{% else %}Edit{% endif %}
+      </button>
+      {% endif %}
+      <c-side-panel.close name="expert-codebook" label="codebook" class="xl:hidden" />
     </div>
-    {% endif %}
   </div>
-</div>
+
+  {% if panel_mode == "edit" %}
+  <div class="flex min-h-0 flex-1 flex-col gap-4 p-5">
+    <textarea
+      id="codebook-content"
+      name="content"
+      aria-label="Codebook (Markdown)"
+      class="input min-h-0 flex-1 resize-none font-mono text-meta leading-relaxed scrollbar-thin scrollbar-thumb-line-strong"
+    >
+{{ panel_content }}</textarea>
+    <div>
+      <label for="rationale" class="field-label"
+        >Rationale <span class="font-normal text-ink-3">· saved with the change and shown to annotators</span></label
+      >
+      <textarea
+        id="rationale"
+        name="rationale"
+        rows="3"
+        placeholder="Why does the codebook need this change?"
+        class="input"
+        {% if rationale_error %}aria-invalid="true"
+        aria-describedby="rationale-error"
+        autofocus{% endif %}
+      >
+{{ panel_rationale }}</textarea>
+      {% if rationale_error %}
+      <p id="rationale-error" class="field-error">{{ rationale_error }}</p>
+      {% endif %}
+    </div>
+    <div class="flex justify-end gap-2.5">
+      <button
+        type="button"
+        id="draft-cancel-button"
+        hx-get="{% url 'expert-codebook-panel' batch_id assignment.id %}"
+        hx-target="#codebook-panel"
+        hx-swap="outerHTML"
+        class="btn btn-ghost"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        id="draft-save-button"
+        hx-post="{% url 'expert-draft-save' batch_id assignment.id %}"
+        hx-include="#codebook-panel"
+        hx-target="#codebook-panel"
+        hx-swap="outerHTML"
+        class="btn btn-primary"
+      >
+        Save draft
+      </button>
+    </div>
+  </div>
+  {% else %}
+  <div
+    id="codebook-rendered"
+    class="flex-1 overflow-y-auto px-6 py-5 text-md scrollbar-thin scrollbar-thumb-line-strong"
+  >
+    <c-codebook.view content="{{ panel_content }}" />
+  </div>
+  {% endif %}
+</c-side-panel>

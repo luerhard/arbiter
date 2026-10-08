@@ -1,8 +1,10 @@
+from contextlib import contextmanager
 import logging
 
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.http import HttpResponse
-from django.http import HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.shortcuts import redirect
 from django.shortcuts import render
@@ -21,6 +23,8 @@ from projects.models.batch import BatchUser
 
 log = logging.getLogger(__name__)
 
+NOT_YOURS = "This sample is not assigned to you."
+
 
 def get_progress(user, batch):
     """helper function to calculate current progress"""
@@ -33,6 +37,40 @@ def get_progress(user, batch):
         current = 100
 
     return {"done": done, "total": total, "current": current}
+
+
+def annotation_locked(user, batch) -> bool:
+    """Labels can only change while the batch is in the annotation phase and the
+    annotator has not finalized yet (or has undone it). Later phases (discussion, expert
+    decision) are built from the annotation labels at the moment of the phase change, so a
+    late edit would change the disagreements underneath a running discussion."""
+    if batch.current_phase != BatchPhase.ANNOTATION:
+        return True
+    return BatchUser.objects.filter(
+        batch=batch,
+        user=user,
+        finalized_at__isnull=False,
+    ).exists()
+
+
+@contextmanager
+def locked_batch(batch_id):
+    """The batch, its row locked until the block ends. Saving labels, finalizing and undoing
+    it take this lock, so per batch they run one after another: otherwise an annotator could
+    undo or save while the last one's finalize moves the batch on, and change labels under
+    the discussion that was just built from them."""
+    with transaction.atomic():
+        yield Batch.objects.select_for_update().get(id=batch_id)
+
+
+def _redirect_to_done(request, batch):
+    url = reverse("annotate-done", kwargs={"batch_id": batch.id})
+    if request.htmx:
+        # a plain redirect would be followed by htmx and swapped into the panel
+        response = HttpResponse(status=204)
+        response["HX-Redirect"] = url
+        return response
+    return redirect(url)
 
 
 def _next_unfinished_with_wraparound(assignment):
@@ -59,6 +97,7 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
 
     context = {
         "batch": batch,
+        "assignment": assignment,
         "assignment_id": assignment.id,
         "example": assignment.example,
         "label_form": MultiLabelForm(assignment=assignment),
@@ -119,14 +158,15 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         context = _annotation_panel_context(batch, assignment, skip_annotated=skip_annotated)
         context["progress"] = get_progress(request.user, batch)
 
-        if context["has_next"] and context["progress"]["done"] >= context["progress"]["total"]:
-            redirect("annotate-done", batch_id=batch.id)
-
         if request.htmx:
             return render(request, "annotation/panel.html", context)
 
         codebook = batch.project.codebook.get()
-        context.update(codebook.get_as_context(batch.batch_number))
+        # what changed since the annotator's previous batch started; in their first batch,
+        # since this one started
+        since = codebook.last_batch_of(request.user, before=batch.batch_number)
+        since = batch.batch_number if since is None else since
+        context.update(codebook.get_as_context(since))
         return render(request, "annotation/index.html", context)
 
     def get(
@@ -137,20 +177,23 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
     ):
         try:
             batch = self._get_batch(request, batch_id)
-        except PermissionError:
-            return HttpResponseForbidden()
+        except PermissionError as exc:
+            raise PermissionDenied(NOT_YOURS) from exc
+
+        if annotation_locked(request.user, batch):
+            return _redirect_to_done(request, batch)
 
         if assignment_id:
             try:
                 assignment = self._get_assignment(request, batch, assignment_id)
-            except PermissionError:
-                return HttpResponseForbidden()
+            except PermissionError as exc:
+                raise PermissionDenied(NOT_YOURS) from exc
 
             skip_annotated = request.GET.get("skip_annotated") == "1"
             if skip_annotated and assignment.done is not None:
                 target = _next_unfinished_with_wraparound(assignment)
                 if target is None:
-                    return redirect("annotate-done", batch_id=batch.id)
+                    return _redirect_to_done(request, batch)
                 return redirect(
                     reverse(
                         "annotate-assignment",
@@ -159,11 +202,14 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
                     + "?skip_annotated=1",
                 )
         else:
+            # continue where the annotator left off; with everything labeled, what is left
+            # is finalizing
             assignment = (
                 ExampleAssignment.objects.filter(
                     user=request.user,
                     example__batch=batch,
                     phase=BatchPhase.ANNOTATION,
+                    done__isnull=True,
                 )
                 .order_by("order")
                 .first()
@@ -185,15 +231,20 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         try:
             batch = self._get_batch(request, batch_id)
             assignment = self._get_assignment(request, batch, assignment_id)
-        except PermissionError:
-            return HttpResponseForbidden()
+        except PermissionError as exc:
+            raise PermissionDenied(NOT_YOURS) from exc
 
-        form = MultiLabelForm(request.POST, assignment=assignment)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Saved.")
-        else:
-            messages.error(request, f"Something was invalid: {form}")
+        with locked_batch(batch.id) as locked:
+            if annotation_locked(request.user, locked):
+                messages.warning(request, "Not saved: your annotations for this batch are locked.")
+                return _redirect_to_done(request, batch)
+
+            form = MultiLabelForm(request.POST, assignment=assignment)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Saved.")
+            else:
+                messages.error(request, f"Something was invalid: {form}")
 
         skip_annotated = request.GET.get("skip_annotated") == "1"
         progress = get_progress(request.user, batch)
@@ -201,8 +252,12 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
             next_assignment = _next_unfinished_with_wraparound(assignment)
         else:
             next_assignment = assignment.next()
-        if not next_assignment and progress["done"] >= progress["total"]:
-            return redirect("annotate-done", batch_id=batch.id)
+        if next_assignment is None and progress["done"] < progress["total"]:
+            # the last sample was saved while earlier ones are still open:
+            # go back to the first open one
+            next_assignment = _next_unfinished_with_wraparound(assignment)
+        if next_assignment is None:
+            return _redirect_to_done(request, batch)
 
         context = _annotation_panel_context(batch, next_assignment, skip_annotated=skip_annotated)
         context["progress"] = progress
@@ -224,9 +279,21 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
 class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
     def _context(self, request, batch):
         batch_user = BatchUser.objects.filter(batch=batch, user=request.user).first()
+        first = (
+            ExampleAssignment.objects.filter(
+                batch=batch,
+                user=request.user,
+                phase=BatchPhase.ANNOTATION,
+            )
+            .order_by("order")
+            .first()
+        )
         return {
             "batch": batch,
             "project": batch.project,
+            "review_url": (
+                reverse("annotate-assignment", args=(batch.id, first.id)) if first else ""
+            ),
             "progress": get_progress(request.user, batch),
             "finalized": batch_user is not None and batch_user.finalized_at is not None,
             "finalized_count": BatchUser.objects.filter(
@@ -243,14 +310,28 @@ class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
         return render(request, "annotation/done.html", self._context(request, batch))
 
     def post(self, request, batch_id):
-        batch = Batch.objects.get(id=batch_id)
-        progress = get_progress(request.user, batch)
-        done = progress["done"] >= progress["total"]
-        if done and batch.current_phase == BatchPhase.ANNOTATION:
-            BatchUser.objects.filter(
-                batch=batch,
-                user=request.user,
-                finalized_at__isnull=True,
-            ).update(finalized_at=timezone.now())
-            batch.advance_from_annotation_if_finalized()
-        return redirect("annotate-done", batch_id=batch.id)
+        with locked_batch(batch_id) as batch:
+            progress = get_progress(request.user, batch)
+            done = progress["done"] >= progress["total"]
+            if done and batch.current_phase == BatchPhase.ANNOTATION:
+                BatchUser.objects.filter(
+                    batch=batch,
+                    user=request.user,
+                    finalized_at__isnull=True,
+                ).update(finalized_at=timezone.now())
+                batch.advance_from_annotation_if_finalized()
+        return redirect("annotate-done", batch_id=batch_id)
+
+
+class UndoFinalizeView(BatchAnnotatorRequiredMixin, View):
+    """Unlock an annotator's labels again. Only while the others are still annotating: the
+    last one to finalize moves the batch on, and from then on the labels stay as they are."""
+
+    def post(self, request, batch_id):
+        with locked_batch(batch_id) as batch:
+            if batch.current_phase == BatchPhase.ANNOTATION:
+                BatchUser.objects.filter(batch=batch, user=request.user).update(finalized_at=None)
+                messages.success(request, "Your labels can be changed again.")
+            else:
+                messages.warning(request, "Too late: the batch has already moved on.")
+        return redirect("annotate-done", batch_id=batch_id)

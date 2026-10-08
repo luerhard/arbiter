@@ -1,0 +1,106 @@
+{% comment %}
+Batch card on the expert project page: phase stepper and progress, with the actions menu.
+<c-batch.card :batch="batch" :codebook="codebook" />, batch being a row of ProjectExpertDetailView._batch_card. The card
+is its own @container: when it gets narrow, the stepper shows only the current label and the numbers stack.
+{% endcomment %}
+{% with b=batch.batch %}
+<article class="@container card flex flex-col gap-5 px-6 py-5.5" data-phase="{{ b.current_phase }}">
+  <div class="title-row">
+    <div class="flex flex-wrap items-center gap-x-3.5 gap-y-1">
+      <h2 class="text-lg font-semibold whitespace-nowrap">
+        <a href="{% url 'project-batch-detail' b.id %}" class="hover:underline"
+          >Batch
+          {{ b.batch_number }}</a
+        >
+      </h2>
+      <span class="text-meta whitespace-nowrap text-ink-3"
+        >{{ batch.length }}
+        sample{{ batch.length|pluralize }}</span
+      >
+      {% if b.current_phase == "S" %}<span class="phase-badge">Setup</span>{% endif %}
+    </div>
+    <div class="flex items-center gap-2">
+      {% if b.current_phase == "E" and batch.is_batch_expert and batch.expert_open > 0 %}
+      <a href="{% url 'expert-batch' b.id %}" class="btn btn-primary btn-sm">
+        Resolve
+        {{ batch.expert_open }}
+        disagreement{{ batch.expert_open|pluralize }}
+      </a>
+      {% elif b.current_phase == "E" and batch.is_batch_expert %}
+      <a href="{% url 'expert-batch' b.id %}" class="btn btn-secondary btn-sm">Review decisions</a>
+      {% endif %}
+      <c-batch.menu :batch="batch" :codebook="codebook" />
+    </div>
+  </div>
+
+  <ol class="flex items-center" aria-label="Phase">
+    {% for step in batch.steps %}
+    <li class="flex items-center {% if not forloop.last %}flex-1{% endif %}" data-phase="{{ step.phase }}">
+      <span class="step step-{{ step.state }}" {% if step.state == "current" %}aria-current="step" {% endif %}>
+        <span class="step-icon">
+          {% if step.state == "done" %}
+          {% heroicon_micro "check" class="size-3" %}
+          {% endif %}
+        </span>
+        <span class="step-label">{{ step.label }}</span>
+      </span>
+      {% if not forloop.last %}<span
+        class="mx-3 h-0.5 flex-1 {% if step.state == 'done' %}bg-line-strong{% else %}bg-line{% endif %}"
+      ></span
+      >{% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+
+  <dl class="grid grid-cols-1 gap-4 border-t border-line pt-4 @md:grid-cols-3">
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs text-ink-3">Annotated</dt>
+      <dd class="font-mono text-md">
+        {{ batch.annotated_total }}
+        /
+        {{ batch.annotated_max }}
+      </dd>
+      <dd class="text-xs text-ink-2">
+        {% for row in batch.users %}{{ row.user.username }}
+        {{ row.annotated }}{% if not forloop.last %}
+        ·
+        {% endif %}{% empty %}No annotators{% endfor %}
+      </dd>
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs text-ink-3">Discussed</dt>
+      {% if b.current_phase == "A" or b.current_phase == "S" %}
+      <dd class="text-ink-3">–</dd>
+      {% elif batch.disagreement %}
+      <dd class="font-mono text-md">
+        {{ batch.discussed }}
+        /
+        {{ batch.disagreement }}
+      </dd>
+      <dd class="text-xs text-ink-2">disagreements after annotation</dd>
+      {% else %}
+      <dd class="text-ink-2">No disagreements</dd>
+      {% endif %}
+    </div>
+    <div class="flex flex-col gap-1">
+      <dt class="text-xs text-ink-3">Expert decisions</dt>
+      {% if b.current_phase == "E" or b.current_phase == "F" %}
+      {% if batch.disc_disagreement %}
+      <dd class="font-mono text-md">
+        {{ batch.expert_dec }}
+        /
+        {{ batch.disc_disagreement }}
+      </dd>
+      <dd data-phase="E" class="progress mt-1">
+        <div class="progress-bar" style="width: {% widthratio batch.expert_dec batch.disc_disagreement 100 %}%"></div>
+      </dd>
+      {% else %}
+      <dd class="text-ink-2">None needed</dd>
+      {% endif %}
+      {% else %}
+      <dd class="text-ink-3">–</dd>
+      {% endif %}
+    </div>
+  </dl>
+</article>
+{% endwith %}

@@ -29,10 +29,7 @@ def user_login(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            if user.is_staff:
-                return redirect("project-list")
-            else:
-                return redirect("project-list")
+            return redirect("home")
     else:
         form = AuthenticationForm()
     return render(request, "core/login.html", {"form": form})

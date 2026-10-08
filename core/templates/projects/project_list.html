@@ -1,107 +1,120 @@
 {% extends "base.html" %}
+{% block title %}
+Projects · Arbiter
+{% endblock title %}
 {% block content %}
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-base font-semibold">Projects</h1>
-      <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
-        Your assigned projects including role, active batches, and current states.
-      </p>
-    </div>
-    {% if create_url %}
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <a
-        href="{{ create_url }}"
-        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 dark:bg-indigo-500 dark:hover:bg-indigo-400 dark:focus-visible:outline-indigo-500"
+<div class="flex flex-col gap-7">
+  <c-page-header
+    title="All projects"
+    subtitle="Every project you are part of, with your role and where its batches stand."
+  >
+    <c-slot name="actions">
+      {% if create_url %}
+      <a href="{{ create_url }}" class="btn btn-primary"
+        >{% heroicon_micro "plus" class="size-4" %}
+        New project</a
       >
-        Create project
-      </a>
-    </div>
-    {% endif %}
-  </div>
-  <div class="mt-8 flow-root">
-    <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-      <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-        <table class="relative min-w-full divide-y divide-gray-300 dark:divide-white/15">
-          <thead>
-            <tr>
-              <th
-                scope="col"
-                class="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0 dark:text-white"
+      {% endif %}
+    </c-slot>
+  </c-page-header>
+
+  <div class="card overflow-x-auto">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th class="px-5.5">Project</th>
+          <th>Your role</th>
+          <th class="text-right">Active batches</th>
+          <th>Annotation</th>
+          <th>Discussion</th>
+          <th class="px-5.5"><span class="sr-only">Actions</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for project_user in project_users %}
+        {% with project=project_user.project %}
+        <tr class="hover:bg-subtle">
+          <td class="px-5.5 py-4">
+            <a href="{% url 'project-detail' project.pk %}" class="group flex items-center gap-3.5">
+              <span
+                class="flex size-9 shrink-0 items-center justify-center rounded-lg bg-night text-meta font-semibold text-accent"
               >
-                Project
-              </th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Active batches</th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Annotation</th>
-              <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold">Discussion</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200 bg-white dark:divide-white/10 dark:bg-gray-900">
-            {% if project_users %}
-            {% for project_user in project_users %}
-            <tr class="transition hover:bg-gray-50/70 dark:hover:bg-white/5">
-              <td class="py-5 pr-3 pl-4 text-sm whitespace-nowrap sm:pl-0">
-                <a href="{% url 'project-detail' project_user.project.pk %}" class="group flex items-center">
-                  <div
-                    class="hidden sm:flex sm:size-10 sm:shrink-0 sm:items-center sm:justify-center rounded-xl bg-gradient-to-tr from-indigo-500 via-sky-500 to-emerald-500 text-white font-semibold"
-                  >
-                    {{ project_user.project.name|default:"–"|slice:":2"|upper }}
-                  </div>
-                  <div class="sm:ml-4">
-                    <div
-                      class="font-medium text-gray-900 group-hover:text-indigo-600 dark:text-white dark:group-hover:text-indigo-300"
-                    >
-                      {{ project_user.project.name }}
-                    </div>
-                  </div>
-                </a>
-              </td>
-              <td class="px-3 py-5 text-sm whitespace-nowrap">
-                <span class="font-semibold">{{ project_user.project.annotator_n_active_batches }}</span>
-              </td>
-              <td class="px-3 py-5 text-sm whitespace-nowrap">
-                {% if project_user.project.annotator_any_annotation_batches %}
-                <span
-                  class="inline-flex items-center rounded-md bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20 ring-inset dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-500/50"
-                >
-                  Open
-                </span>
-                {% else %}
-                <span
-                  class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-300 dark:ring-white/10"
-                >
-                  Closed
-                </span>
+                {{ project.name|default:"–"|slice:":2"|upper }}
+              </span>
+              <span class="flex min-w-0 flex-col">
+                <span class="font-semibold text-ink group-hover:underline">{{ project.name }}</span>
+                {% if project.description %}
+                <span class="max-w-md truncate text-meta text-ink-3">{{ project.description }}</span>
                 {% endif %}
-              </td>
-              <td class="px-3 py-5 text-sm whitespace-nowrap">
-                {% if project_user.project.annotator_any_discussion_batches %}
-                <span
-                  class="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-amber-600/20 ring-inset dark:bg-amber-900/30 dark:text-amber-300 dark:ring-amber-500/50"
-                >
-                  Open
-                </span>
-                {% else %}
-                <span
-                  class="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-300 ring-inset dark:bg-gray-800/60 dark:text-gray-300 dark:ring-white/10"
-                >
-                  Closed
-                </span>
-                {% endif %}
-              </td>
-            </tr>
-            {% endfor %}
+              </span>
+            </a>
+          </td>
+          <td class="px-4 py-4 text-ink-2">{{ project_user.get_default_role_display }}</td>
+          <td class="px-4 py-4 text-right">
+            <span class="font-mono">{{ project.annotator_n_active_batches }}</span>
+          </td>
+          <td class="px-4 py-4">
+            {% if project.annotator_any_annotation_batches %}
+            <span class="phase-badge" data-phase="A">Open</span>
             {% else %}
-            <tr>
-              <td colspan="4" class="py-12 text-center text-sm text-gray-600 dark:text-gray-300">
-                No projects to display.
-              </td>
-            </tr>
+            <span class="badge">Closed</span>
             {% endif %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </td>
+          <td class="px-4 py-4">
+            {% if project.annotator_any_discussion_batches %}
+            <span class="phase-badge" data-phase="D">Open</span>
+            {% else %}
+            <span class="badge">Closed</span>
+            {% endif %}
+          </td>
+          <td class="px-5.5 py-4 text-right">
+            {% if project.owner_id == user.id %}
+            <button
+              type="button"
+              command="show-modal"
+              commandfor="delete-project-{{ project.pk }}"
+              class="btn btn-ghost btn-sm btn-icon hover:text-danger"
+              aria-label="Delete {{ project.name }}"
+              title="Delete project"
+            >
+              {% heroicon_mini "trash" class="size-4" %}
+            </button>
+            {% with n_batches=project.batches.count %}
+            {% url "project-delete" project.pk as delete_url %}
+            <c-confirm-dialog
+              id="delete-project-{{ project.pk }}"
+              title="Delete {{ project.name }}?"
+              :action="delete_url"
+              confirm="Delete project"
+            >
+              <p>
+                This permanently deletes the project with its
+                {{ n_batches }}
+                batch{{ n_batches|pluralize:"es" }}: all samples, annotations, discussions, expert decisions and the
+                codebook with its history. This cannot be undone.
+              </p>
+              {% if n_batches and project_user.default_role == "E" %}
+              <p>
+                To keep the data,
+                <a href="{% url 'project-export-project' project.pk %}" class="font-medium text-ink underline"
+                  >export the project</a
+                >
+                first.
+              </p>
+              {% endif %}
+            </c-confirm-dialog>
+            {% endwith %}
+            {% endif %}
+          </td>
+        </tr>
+        {% endwith %}
+        {% empty %}
+        <tr>
+          <td colspan="6" class="px-5.5 py-12 text-center text-ink-2">You are not part of any project yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 {% endblock content %}

@@ -1,0 +1,20 @@
+{% comment %}
+Side panel of the work screens (codebook), e.g.
+<c-side-panel name="codebook" label="Codebook" width="xl:w-[440px]">header and body</c-side-panel>
+From xl up a column beside the content; below that it slides over the content from the right, one panel at a time
+(.side-panel in main.css). Whether it is open: the Alpine store "panels" (static/js/panels.js), switched by
+<c-side-panel.toggle name="codebook" /> in the top bar and <c-side-panel.close name="codebook" /> in the panel. Escape
+closes it below xl.
+{% endcomment %}
+<c-vars name="" label="" width="" />
+<aside
+  aria-label="{{ label }}"
+  x-data
+  x-show="$store.panels.isOpen('{{ name }}')"
+  x-cloak
+  @keydown.escape.window="$store.panels.closeOverlay()"
+  class="side-panel {{ width }}"
+  {{ attrs }}
+>
+  {{ slot }}
+</aside>

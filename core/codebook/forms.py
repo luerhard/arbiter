@@ -9,12 +9,12 @@ log = logging.getLogger(__name__)
 
 
 class CodebookForm(forms.Form):
-    textarea_class = (
-        "w-full border bg-white dark:bg-gray-900 p-2 text-gray-900 dark:text-gray-100 "
-        "caret-blue-500 focus:outline-none focus:ring-1 focus:border-blue-500 "
-        "focus:ring-blue-500 rounded-2xl p-2 scrollbar rounded-2xl"
+    textarea_class = "input"
+    content = forms.CharField(
+        widget=forms.Textarea(
+            attrs={"rows": 28, "class": f"{textarea_class} font-mono text-[13px]"}
+        ),
     )
-    content = forms.CharField(widget=forms.Textarea(attrs={"rows": 32, "class": textarea_class}))
     rationale = forms.CharField(widget=forms.Textarea(attrs={"rows": 8, "class": textarea_class}))
     modified = forms.BooleanField(initial=True, required=False)
 

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}
+Batch
+{{ batch.batch_number }}
+·
+{{ batch.project.name }}
+· Arbiter
+{% endblock title %}
+{% block content %}
+<div class="flex flex-col gap-7">
+  <c-page-header title="Batch {{ batch.batch_number }}" :project="batch.project" crumb="Batch {{ batch.batch_number }}">
+    <c-slot name="subtitle">
+      {{ examples|length }}
+      sample{{ examples|length|pluralize }}
+      ·
+      {% if batch.can_reorder %}
+      Drag the rows to change the order in which annotators get the samples.
+      {% else %}
+      The order is fixed since the discussion started.
+      {% endif %}
+    </c-slot>
+    <c-slot name="actions">
+      <span class="phase-badge self-center" data-phase="{{ batch.current_phase }}">
+        {{ batch.get_current_phase_display }}
+      </span>
+      <a href="{% url 'project-export-batch' batch_id=batch.id %}" class="btn btn-secondary">
+        {% heroicon_micro "arrow-down-tray" class="size-4" %}
+        Export batch
+      </a>
+    </c-slot>
+  </c-page-header>
+
+  {% if examples %}
+  <form
+    class="card overflow-x-auto"
+    hx-post="{% url 'project-batch-order' batch.id %}"
+    hx-trigger="reordered"
+    hx-target="#samples"
+    hx-swap="outerHTML"
+    hx-on::response-error="window.location.reload()"
+  >
+    <table class="data-table">
+      <thead>
+        <tr>
+          {% if batch.can_reorder %}
+          <th class="w-10 p-0"><span class="sr-only">Move</span></th>
+          {% endif %}
+          <th class="w-12 text-right">#</th>
+          <th>Text</th>
+          <th>Status</th>
+          <th>Label</th>
+          {% for column in metadata_columns %}
+          <th class="normal-case tracking-normal">
+            {{ column }}
+          </th>
+          {% endfor %}
+        </tr>
+      </thead>
+      {% include "projects/partials/samples_rows.html" %}
+    </table>
+  </form>
+  {% else %}
+  <c-empty-state title="No samples">This batch has no samples.</c-empty-state>
+  {% endif %}
+</div>
+{% endblock content %}

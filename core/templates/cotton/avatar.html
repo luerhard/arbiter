@@ -1,0 +1,6 @@
+{% comment %}
+Initials of a user: <c-avatar :name="user.username" /> (experts: role="E", bigger: size="size-14 text-lg").
+{% endcomment %}
+{% load custom_tags %}
+<c-vars name="" role="" size="" />
+<span class="avatar {{ size }}" {% if role %}data-role="{{ role }}" {% endif %}>{{ name|initials }}</span>

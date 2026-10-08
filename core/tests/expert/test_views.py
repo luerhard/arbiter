@@ -17,6 +17,36 @@ def _assignment_url(batch_id, assignment_id, **params):
 
 
 @pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("batch", "anonymous", 302),
+        ("batch", "outsider", 403),
+        ("batch", "annotator", 403),
+        ("batch", "expert", 302),  # continues at the first open case
+        ("case", "anonymous", 302),
+        ("case", "outsider", 403),
+        ("case", "annotator", 403),
+        ("case", "expert", 200),
+        ("codebook panel", "anonymous", 302),
+        ("codebook panel", "outsider", 403),
+        ("codebook panel", "annotator", 403),
+        ("codebook panel", "expert", 200),
+    ],
+)
+def test_access(get_as, project_expert, page, who, status):
+    batch = project_expert["batch"]
+    case = ExampleAssignment.objects.get(batch=batch, phase=BatchPhase.EXPERT)
+    urls = {
+        "batch": reverse("expert-batch", args=[batch.id]),
+        "case": _assignment_url(batch.id, case.id),
+        "codebook panel": reverse("expert-codebook-panel", args=[batch.id, case.id]),
+    }
+
+    assert get_as(urls[page], who, project_expert).status_code == status
+
+
+@pytest.mark.django_db
 class TestExpertNavigation:
     @pytest.fixture(autouse=True)
     def setup(self, client, project_expert):
@@ -65,13 +95,6 @@ class TestExpertNavigation:
         assert "expert/partials/assignment.html" in (t.name for t in response.templates)
         assert b"<html" not in response.content
 
-    def test_foreign_assignment_is_forbidden_not_500(self, client):
-        # Another expert's assignment id under this batch URL -> 403.
-        other_login = client.login(username=self.data["annotators"][0].username, password="123")
-        assert other_login is True
-        response = client.get(_assignment_url(self.batch.id, self.assignment.id))
-        assert response.status_code == 403
-
     def test_assignment_from_other_batch_forbidden(self):
         annotation_assignment = ExampleAssignment.objects.filter(
             batch=self.batch,
@@ -100,9 +123,10 @@ class TestExpertNavigation:
         content = response.content.decode()
         html_name = response.context["labels_form"]["labels"].html_name
         assert content.count(f'name="{html_name}"') >= len(self.data["labels"])
-        # Discussion-union pre-selection comes from the form's initial data.
+        # Pre-selected are the labels both annotators kept after the discussion
+        # (label 1), not the contested one (label 2, only the second annotator).
         initial = response.context["labels_form"].fields["labels"].initial
-        assert initial == sorted(label.id for label in self.data["labels"])
+        assert initial == [self.data["labels"][0].id]
         assert "checked" in content
 
 
@@ -339,15 +363,41 @@ class TestCodebookDraft:
             label.name for label in self.data["labels"]
         )
         assert commit["text"] == self.data["example"].content
+        assert commit["example_id"] == self.data["example"].id
         assert "labels_before_discussion" in commit
         assert "labels_after_discussion" in commit
         assert "chat_history" in commit
 
+    def test_draft_without_rationale_is_refused_and_kept_in_the_editor(self):
+        typed = self.codebook.content + "\n# needs rationale"
+
+        response = self._save_draft(typed, rationale="  ")
+
+        assert response.status_code == 200
+        assert not CodebookDraft.objects.filter(assignment=self.assignment).exists()
+        content = response.content.decode()
+        assert 'id="rationale-error"' in content
+        assert "# needs rationale" in content  # still in the editor
+        assert 'name="rationale"' in content
+
+    def test_draft_rationale_stays_when_editing_again(self):
+        self._save_draft(self.codebook.content + "\n# edit", rationale="my reason")
+
+        response = self.client.get(self.panel_url + "?mode=edit")
+
+        assert "my reason" in response.content.decode()
+
     def test_decision_without_rationale_is_rejected_not_dropped(self):
         # A codebook change without rationale must fail loudly and save
         # nothing -- never silently discard the edit (the bug users hit).
+        # Saving such a draft is refused; this guards drafts from before that.
         original = self.codebook.content
-        self._save_draft(original + "\n# needs rationale")
+        CodebookDraft.objects.create(
+            assignment=self.assignment,
+            content=original + "\n# needs rationale",
+            rationale="",
+            base_revision=self.codebook.repo.head.commit.hexsha,
+        )
 
         response = self.client.post(
             self.decision_url,
@@ -387,6 +437,18 @@ class TestCodebookDraft:
         assert self.assignment.done is None
         assert "# based on old revision" not in self.codebook.content
         assert CodebookDraft.objects.filter(assignment=self.assignment).exists()
+
+    def test_corrected_decision_does_not_block_a_draft(self):
+        # correcting another decision logs a commit, but the codebook text is the same
+        self._save_draft(self.codebook.content + "\n# my edit", rationale="why")
+        self.codebook.commit_decision_revision(json.dumps({"rationale": "", "revises": True}))
+
+        response = self.client.post(self.decision_url, data={"labels": [self.data["labels"][0].id]})
+
+        assert response.status_code == 302
+        self.codebook.refresh_from_db()
+        assert "# my edit" in self.codebook.content
+        assert not CodebookDraft.objects.filter(assignment=self.assignment).exists()
 
     def test_decision_without_draft_commits_nothing(self):
         commits_before = len(list(self.codebook.repo.iter_commits()))

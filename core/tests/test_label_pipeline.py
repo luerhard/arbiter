@@ -64,8 +64,9 @@ def _annotate_via_http(user, batch, example, label_ids):
     assignment = _assignment(batch, user, example, BatchPhase.ANNOTATION)
     url = reverse("annotate-assignment", args=(batch.id, assignment.id))
     response = client.post(url, data={"labels": label_ids}, HTTP_HX_REQUEST="true")
-    # Single-example batch: saving the last assignment redirects to done.
-    assert response.status_code in (200, 302)
+    # Single-example batch: saving the last assignment tells htmx to load the done page.
+    assert response.status_code == 204
+    assert response["HX-Redirect"] == reverse("annotate-done", args=(batch.id,))
     return assignment
 
 
@@ -85,14 +86,18 @@ def _discuss_via_websocket(user1, user2, batch, labels_user1, labels_user2):
         assert connected is True
 
         # Both users receive a state after the second user joins.
+        example_id = (await comm1.receive_json_from())["state"]["cur_example_id"]
+        await comm2.receive_json_from()
+
+        await comm1.send_json_to(
+            {"clicked-done": True, "labels": labels_user1, "example_id": example_id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 
-        await comm1.send_json_to({"clicked-done": True, "labels": labels_user1})
-        await comm1.receive_json_from()
-        await comm2.receive_json_from()
-
-        await comm2.send_json_to({"clicked-done": True, "labels": labels_user2})
+        await comm2.send_json_to(
+            {"clicked-done": True, "labels": labels_user2, "example_id": example_id},
+        )
         await comm1.receive_json_from()
         await comm2.receive_json_from()
 

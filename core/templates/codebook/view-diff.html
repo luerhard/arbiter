@@ -1,14 +1,51 @@
 {% extends "base.html" %}
+{% block title %}
+Codebook changes ·
+{{ codebook.project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mt-4">
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold">
-        Project:
-        {{ object.project }}
-      </h2>
-    </div>
-    <div class="p-4">{% include "codebook/partials/view-diff-codebook.html" %}</div>
-  </div>
+<div class="flex flex-col gap-7">
+  <c-page-header title="Codebook changes" :project="codebook.project" :codebook="codebook" crumb="Changes">
+    <c-slot name="subtitle">
+      {% if batch_new is None and batch_old %}What changed since batch
+      {{ batch_old }}
+      started, up to now.
+      {% elif batch_new is None %}Everything written so far.
+      {% elif batch_old %}What changed between the start of batch
+      {{ batch_old }}
+      and the start of batch
+      {{ batch_new }}.
+      {% else %}What changed up to batch
+      {{ batch_new }}.{% endif %}
+    </c-slot>
+    <c-slot name="actions">{% include "codebook/partials/diff-legend.html" %}</c-slot>
+  </c-page-header>
+
+  {% if content_diff %}
+  <section class="card flex flex-col gap-4 px-6 py-5" aria-label="Rationales">
+    <h2 class="card-title">Why it changed</h2>
+    {% include "codebook/partials/change-list.html" with links=True %}
+  </section>
+
+  <article class="card card-document">
+    <div class="max-w-3xl">{% include "codebook/partials/view-diff-codebook.html" %}</div>
+  </article>
+  {% else %}
+  <c-empty-state title="No changes">
+    {% if batch_new is None and batch_old %}Nothing changed since batch
+    {{ batch_old }}
+    started.
+    {% elif batch_new is None %}The codebook is still empty.
+    {% elif batch_old %}The codebook was the same when batch
+    {{ batch_new }}
+    started as when batch
+    {{ batch_old }}
+    started.
+    {% else %}The codebook was empty when batch
+    {{ batch_new }}
+    started.{% endif %}
+  </c-empty-state>
+  {% endif %}
 </div>
 {% endblock content %}

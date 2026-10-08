@@ -1,25 +1,18 @@
 from django.urls import reverse
 import pytest
 
-URLS_LOGIN_REQUIRED = [
-    ("discuss-batch", (1,)),
-]
-
 
 @pytest.mark.django_db
-class TestViews:
-    @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
-    def test_login_required_not_logged_in(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        req = client.get(url)
-        assert req.status_code == 302
+@pytest.mark.parametrize(
+    ("who", "status"),
+    [
+        ("anonymous", 302),
+        ("annotator", 200),
+        ("expert", 403),  # experts decide afterwards, they do not discuss
+        ("outsider", 403),
+    ],
+)
+def test_access(get_as, project_discussion, who, status):
+    url = reverse("discuss-batch", args=(project_discussion["batch"].id,))
 
-    @pytest.mark.parametrize("params", URLS_LOGIN_REQUIRED)
-    def test_http_200_as_annotator(self, params, client):
-        slug, args = params
-        url = reverse(slug, args=args)
-        login = client.login(username="annotator1", password="123")
-        assert login == True
-        req = client.get(url)
-        assert req.status_code == 200
+    assert get_as(url, who, project_discussion).status_code == status

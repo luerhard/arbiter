@@ -1,90 +1,99 @@
 {% extends "base.html" %}
+{% load custom_tags %}
+{% block title %}
+{{ project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-  <div class="grid gap-6 lg:grid-cols-3">
-    <!-- Sidebar -->
-    <aside class="lg:col-span-1">
-      {% include "projects/partials/detail-sidebar.html" %}
-    </aside>
-    <!-- Main content -->
-    <section class="lg:col-span-2">
-      <div class="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <div class="border-b border-gray-200 px-6 py-4 text-center dark:border-gray-800">
-          <h2 class="text-xl font-bold">My Batches</h2>
-        </div>
-        <div class="p-6">
-          {% if batches %}
-          <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-800">
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-                {% for batch in batches %}
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
-                  <!-- Batch details -->
-                  <td class="p-4 align-top">
-                    <h3 class="text-lg font-semibold">
-                      Batch
-                      {{ batch.batch.batch_number }}
-                    </h3>
-                    <dl class="mt-3 space-y-2 text-sm text-gray-700 dark:text-gray-300">
-                      <div class="flex justify-between">
-                        <dt class="font-medium">Batch Phase</dt>
-                        <dd>
-                          {{ batch.batch.get_current_phase_display }}
-                        </dd>
-                      </div>
-                      <div class="flex justify-between">
-                        <dt class="font-medium">My role</dt>
-                        <dd>{% if batch.role == "E" %}Expert{% else %}Annotator{% endif %}</dd>
-                      </div>
-                      {% if batch.role == "A" %}
-                      <div class="flex justify-between">
-                        <dt class="font-medium">Already annotated</dt>
-                        <dd>
-                          {{ batch.done }}
-                          /
-                          {{ batch.length }}
-                        </dd>
-                      </div>
-                      {% endif %}
-                    </dl>
-                  </td>
-                  <!-- Actions -->
-                  <td class="flex flex-col items-end p-4 align-top text-right space-y-2 whitespace-nowrap">
-                    {% if batch.role == "A" and batch.batch.current_phase == "A" %}
-                    <c-button.primary type="link" href="{% url 'annotate-batch' batch_id=batch.batch.id %}"
-                      >Start Annotation</c-button.primary
-                    >
-                    {% elif batch.role == "A" and batch.batch.current_phase == "D" %}
-                    <c-button.primary type="link" href="{% url 'discuss-batch' batch_id=batch.batch.pk %}"
-                      >Start Discussion</c-button.primary
-                    >
-                    {% elif batch.role == "E" and batch.batch.current_phase == "E" %}
-                    <c-button.primary type="link" href="{% url 'expert-batch' batch.batch.id %}"
-                      >Resolve Disagreements</c-button.primary
-                    >
-                    {% endif %}
-                    <c-button.secondary
-                      type="link"
-                      href="{% url 'codebook-diff' codebook_id=codebook.pk %}?batch_old={{ batch.batch.batch_number|add:-1 }}&batch_new={{ batch.batch.batch_number }}"
-                      >Open Codebook Changes</c-button.secondary
-                    >
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+<div class="flex flex-col gap-7">
+  <c-page-header :title="project.name" :project="project">
+    <c-slot name="subtitle">
+      {% if project.description %}{{ project.description }}
+      ·
+      {% endif %}Your batches.
+    </c-slot>
+  </c-page-header>
+
+  <c-columns aside_label="Project">
+    <section class="flex flex-col gap-3.5" aria-label="My batches">
+      {% for batch in batches %}
+      {% with b=batch.batch %}
+      <article class="card title-row gap-x-6 px-6 py-5" data-phase="{{ b.current_phase }}">
+        <div class="flex min-w-0 flex-col gap-3">
+          <div class="flex flex-wrap items-center gap-3">
+            <h2 class="text-lg font-semibold whitespace-nowrap">
+              Batch
+              {{ b.batch_number }}
+            </h2>
+            <span class="phase-badge">{{ b.get_current_phase_display }}</span>
+            <span class="badge">{% if batch.role == "E" %}Expert{% else %}Annotator{% endif %}</span>
           </div>
-          {% else %}
-          <div class="rounded-xl border border-dashed border-gray-300 p-12 text-center dark:border-gray-700">
-            <h3 class="text-sm font-medium">No batches available</h3>
-            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Batches will appear here when you are assigned to one.
-            </p>
+          {% if batch.role == "A" %}
+          <div class="flex items-center gap-3 text-meta text-ink-2">
+            Annotated
+            <span class="font-mono text-ink"
+              >{{ batch.done }}
+              /
+              {{ batch.length }}</span
+            >
+            <div class="progress w-40" data-phase="A">
+              <div class="progress-bar" style="width: {% widthratio batch.done batch.length 100 %}%"></div>
+            </div>
           </div>
           {% endif %}
         </div>
-      </div>
+        <div class="flex flex-wrap items-center gap-2">
+          <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="btn btn-ghost btn-sm"
+            >Codebook changes</a
+          >
+          {% if batch.role == "A" and b.current_phase == "A" and batch.finalized %}
+          <a href="{% url 'annotate-done' batch_id=b.id %}" class="btn btn-secondary btn-sm">Finalized</a>
+          {% elif batch.role == "A" and b.current_phase == "A" %}
+          <a href="{% url 'annotate-batch' batch_id=b.id %}" class="btn btn-primary btn-sm">
+            {% if batch.done >= batch.length %}Finalize{% elif batch.done %}Continue annotating{% else %}Start
+            annotating{% endif %}
+          </a>
+          {% elif batch.role == "A" and b.current_phase == "D" %}
+          <a href="{% url 'discuss-batch' batch_id=b.pk %}" class="btn btn-primary btn-sm">Join discussion</a>
+          {% elif batch.role == "E" and b.current_phase == "E" %}
+          <a href="{% url 'expert-batch' b.id %}" class="btn btn-primary btn-sm">Resolve disagreements</a>
+          {% else %}
+          <span class="text-meta text-ink-3">Nothing to do in this phase</span>
+          {% endif %}
+        </div>
+      </article>
+      {% endwith %}
+      {% empty %}
+      <c-empty-state title="No batches in progress">Batches appear here when you are assigned to one.</c-empty-state>
+      {% endfor %}
+
+      {% if finished %}
+      <section class="mt-4 flex flex-col gap-2.5" aria-label="Finished batches">
+        <h2 class="eyebrow">Finished</h2>
+        {% for row in finished %}
+        {% with b=row.batch %}
+        <article class="card title-row gap-x-6 px-6 py-3.5" data-phase="{{ b.current_phase }}">
+          <div class="flex flex-wrap items-center gap-3">
+            <h3 class="font-semibold whitespace-nowrap">
+              Batch
+              {{ b.batch_number }}
+            </h3>
+            <span class="phase-badge">{{ b.get_current_phase_display }}</span>
+            <span class="text-meta text-ink-3"
+              >{{ row.length }}
+              sample{{ row.length|pluralize }}</span
+            >
+          </div>
+          <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="btn btn-ghost btn-sm"
+            >Codebook changes</a
+          >
+        </article>
+        {% endwith %}
+        {% endfor %}
+      </section>
+      {% endif %}
     </section>
-  </div>
+    <c-slot name="aside">{% include "projects/partials/detail-sidebar.html" %}</c-slot>
+  </c-columns>
 </div>
 {% endblock content %}

@@ -1,3 +1,5 @@
+import re
+
 from django.db.models import Max
 from django.urls import reverse
 from django.utils import timezone
@@ -6,6 +8,7 @@ import pytest
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
+from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models.batch import BatchUser
 from users.models import User
@@ -15,13 +18,14 @@ def _first_annotator_user():
     return User.objects.filter(username="annotator1").get()
 
 
-def _first_non_annotator_user():
-    return User.objects.filter(username="annotator3").get()
-
-
 def _first_annotation_batch_for_user(user):
+    # only batches still in the annotation phase: later phases lock annotating
     batch = (
-        ExampleAssignment.objects.filter(user=user, phase=BatchPhase.ANNOTATION)
+        ExampleAssignment.objects.filter(
+            user=user,
+            phase=BatchPhase.ANNOTATION,
+            batch__current_phase=BatchPhase.ANNOTATION,
+        )
         .order_by("example__batch_id")
         .values_list("example__batch_id", flat=True)
         .first()
@@ -74,14 +78,53 @@ def _ensure_next_assignment_exists(assignment):
     )
 
 
+def _add_discussion_assignment(assignment):
+    """A DISCUSSION-phase twin of an annotation assignment (same example and order)."""
+    discussion_assignment, _ = ExampleAssignment.objects.get_or_create(
+        batch=assignment.batch,
+        user=assignment.user,
+        example=assignment.example,
+        phase=BatchPhase.DISCUSSION,
+        defaults={"order": assignment.order},
+    )
+    return discussion_assignment
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("page", "who", "status"),
+    [
+        ("batch", "anonymous", 302),
+        ("batch", "outsider", 403),
+        ("batch", "annotator", 302),  # continues at the first open sample
+        ("batch", "expert", 403),  # experts decide afterwards, they do not annotate
+        ("sample", "anonymous", 302),
+        ("sample", "outsider", 403),
+        ("sample", "annotator", 200),
+        ("sample", "other annotator", 403),  # each annotator labels on their own
+        ("done", "anonymous", 302),
+        ("done", "outsider", 403),
+        ("done", "annotator", 200),
+    ],
+)
+def test_access(get_as, project_annotation, page, who, status):
+    batch = project_annotation["batch"]
+    sample = ExampleAssignment.objects.get(
+        user=project_annotation["annotators"][0],
+        example=project_annotation["example"],
+        phase=BatchPhase.ANNOTATION,
+    )
+    urls = {
+        "batch": reverse("annotate-batch", args=(batch.id,)),
+        "sample": reverse("annotate-assignment", args=(batch.id, sample.id)),
+        "done": reverse("annotate-done", args=(batch.id,)),
+    }
+
+    assert get_as(urls[page], who, project_annotation).status_code == status
+
+
 @pytest.mark.django_db
 class TestAnnotateViews:
-    def test_login_required(self, client):
-        batch_id = _first_annotation_batch_for_user(_first_annotator_user())
-        url = reverse("annotate-batch", args=(batch_id,))
-        resp = client.get(url)
-        assert resp.status_code == 302
-
     def test_annotator_can_open_annotation_page(self, client):
         user = _first_annotator_user()
         batch_id = _first_annotation_batch_for_user(user)
@@ -104,15 +147,6 @@ class TestAnnotateViews:
         page = client.get(resp.url)
         assert page.status_code == 200
         assert b'id="annotation-panel"' in page.content
-
-    def test_non_annotator_forbidden(self, client):
-        user = _first_non_annotator_user()
-        batch_id = _first_annotation_batch_for_user(_first_annotator_user())
-        login = client.login(username=user.username, password="123")
-        assert login is True
-
-        resp = client.get(reverse("annotate-batch", args=(batch_id,)))
-        assert resp.status_code == 403
 
     def test_assignment_in_url_loads_panel_and_labels(self, client):
         user = _first_annotator_user()
@@ -236,6 +270,212 @@ class TestAnnotationDoneFinalize:
 
 
 @pytest.mark.django_db
+class TestAnnotationLock:
+    """Annotating is locked once the annotator finalized or the batch left the
+    annotation phase: later phases are built from the labels at the phase change."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, client, project_annotation):
+        self.data = project_annotation
+        self.a1, self.a2 = project_annotation["annotators"]
+        self.batch = project_annotation["batch"]
+        self.example = project_annotation["example"]
+        self.label1, self.label2 = project_annotation["labels"]
+        self.assignment = ExampleAssignment.objects.get(
+            user=self.a1,
+            example=self.example,
+            phase=BatchPhase.ANNOTATION,
+        )
+        self.assignment.set_user_annotations([self.label1.id])
+        self.url = reverse("annotate-assignment", args=(self.batch.id, self.assignment.id))
+        self.done_url = reverse("annotate-done", args=(self.batch.id,))
+        client.login(username=self.a1.username, password="123")
+
+    def _labels(self):
+        return set(self.assignment.annotations.values_list("label_id", flat=True))
+
+    def _finalize(self, user):
+        BatchUser.objects.filter(batch=self.batch, user=user).update(finalized_at=timezone.now())
+
+    def _finalize_a1(self):
+        self._finalize(self.a1)
+
+    def _leave_annotation_phase(self):
+        Batch.objects.filter(pk=self.batch.pk).update(current_phase=BatchPhase.DISCUSSION)
+
+    def test_open_while_annotating(self, client):
+        assert client.get(self.url).status_code == 200
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+        assert self._labels() == {self.label2.id}
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_post_is_not_saved(self, client, lock):
+        getattr(self, lock)()
+
+        resp = client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == self.done_url
+        assert self._labels() == {self.label1.id}
+        # htmx drops HX-Trigger events on a redirect: the warning must wait for the done page
+        assert "HX-Trigger" not in resp
+        assert "Not saved" in client.get(self.done_url).content.decode()
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_post_without_htmx_redirects_to_done(self, client, lock):
+        getattr(self, lock)()
+
+        resp = client.post(self.url, data={"labels": [self.label2.id]})
+
+        assert resp.status_code == 302
+        assert resp.url == self.done_url
+        assert self._labels() == {self.label1.id}
+
+    @pytest.mark.parametrize("lock", ["_finalize_a1", "_leave_annotation_phase"])
+    def test_get_redirects_to_done(self, client, lock):
+        getattr(self, lock)()
+
+        for url in (self.url, reverse("annotate-batch", args=(self.batch.id,))):
+            resp = client.get(url)
+            assert resp.status_code == 302
+            assert resp.url == self.done_url
+
+        resp = client.get(self.url, HTTP_HX_REQUEST="true")
+        assert resp["HX-Redirect"] == self.done_url
+
+    def test_other_annotator_finalizing_does_not_lock(self, client):
+        self._finalize(self.a2)
+
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert self._labels() == {self.label2.id}
+
+    def test_late_edit_cannot_change_the_discussion(self, client):
+        # Regression (production, 7 Oct 2026): an annotator finalized, kept
+        # editing, and changed labels after the batch had moved to the
+        # discussion. That created a disagreement without discussion
+        # assignments and the discussion room crashed on it.
+        ExampleAssignment.objects.get(
+            user=self.a2,
+            example=self.example,
+            phase=BatchPhase.ANNOTATION,
+        ).set_user_annotations([self.label2.id])
+        for annotator in (self.a1, self.a2):
+            client.login(username=annotator.username, password="123")
+            client.post(self.done_url)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+        # a1 now agrees with a2: must not be saved
+        client.login(username=self.a1.username, password="123")
+        client.post(self.url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+
+        assert self._labels() == {self.label1.id}
+        disagreements = set(
+            self.batch.disagreements(BatchPhase.ANNOTATION).values_list("id", flat=True),
+        )
+        discussed = set(
+            ExampleAssignment.objects.filter(
+                batch=self.batch,
+                phase=BatchPhase.DISCUSSION,
+            ).values_list("example_id", flat=True),
+        )
+        assert disagreements == discussed == {self.example.id}
+
+
+@pytest.mark.django_db
+class TestUndoFinalize:
+    """An annotator can take back their finalize while others are still annotating. The last
+    one to finalize moves the batch on, and from then on the labels stay as they are."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, project_annotation):
+        self.a1, self.a2 = project_annotation["annotators"]
+        self.batch = project_annotation["batch"]
+        self.label1, self.label2 = project_annotation["labels"]
+        self.mine, self.theirs = (
+            ExampleAssignment.objects.get(
+                user=user,
+                example=project_annotation["example"],
+                phase=BatchPhase.ANNOTATION,
+            )
+            for user in (self.a1, self.a2)
+        )
+        self.mine.set_user_annotations([self.label1.id])
+        self.theirs.set_user_annotations([self.label2.id])  # a disagreement
+        self.done_url = reverse("annotate-done", args=(self.batch.id,))
+        self.undo_url = reverse("annotate-undo-finalize", args=(self.batch.id,))
+
+    def _finalize(self, client, user):
+        client.force_login(user)
+        client.post(self.done_url)
+
+    def _finalized(self, user):
+        return BatchUser.objects.get(batch=self.batch, user=user).finalized_at is not None
+
+    def test_undo_unlocks_the_labels(self, client):
+        self._finalize(client, self.a1)
+        assert 'action="' + self.undo_url in client.get(self.done_url).content.decode()
+
+        resp = client.post(self.undo_url)
+
+        assert resp.url == self.done_url
+        assert not self._finalized(self.a1)
+        url = reverse("annotate-assignment", args=(self.batch.id, self.mine.id))
+        client.post(url, data={"labels": [self.label2.id]}, HTTP_HX_REQUEST="true")
+        labels = set(self.mine.annotations.values_list("label_id", flat=True))
+        assert labels == {self.label2.id}
+        assert "Finalize my annotations" in client.get(self.done_url).content.decode()
+
+    def test_undo_leaves_the_others_finalized(self, client):
+        self._finalize(client, self.a1)
+
+        client.force_login(self.a2)
+        client.post(self.undo_url)
+
+        assert self._finalized(self.a1)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.ANNOTATION
+
+    def test_finalizing_again_moves_the_batch_on(self, client):
+        self._finalize(client, self.a1)
+        client.post(self.undo_url)
+        self._finalize(client, self.a2)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.ANNOTATION
+
+        self._finalize(client, self.a1)
+
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+    def test_no_undo_once_the_batch_moved_on(self, client):
+        self._finalize(client, self.a1)
+        self._finalize(client, self.a2)  # the last one: the discussion starts
+        assert self.undo_url not in client.get(self.done_url).content.decode()
+
+        client.force_login(self.a1)
+        assert self.undo_url not in client.get(self.done_url).content.decode()
+        resp = client.post(self.undo_url, follow=True)
+
+        assert "Too late" in resp.content.decode()
+        assert self._finalized(self.a1)
+        self.batch.refresh_from_db()
+        assert self.batch.current_phase == BatchPhase.DISCUSSION
+
+    @pytest.mark.parametrize("who", ["expert", "outsider"])
+    def test_only_annotators_of_the_batch(self, client, project_annotation, who):
+        BatchUser.objects.filter(batch=self.batch).update(finalized_at=timezone.now())
+        if who == "expert":
+            client.force_login(project_annotation["expert"])
+        else:
+            client.force_login(User.objects.create_user("undo_outsider", password="123"))
+
+        assert client.post(self.undo_url).status_code == 403
+        assert self._finalized(self.a1)
+
+
+@pytest.mark.django_db
 class TestEditAssignmentView:
     @pytest.fixture(autouse=True)
     def _setup(self, client):
@@ -298,7 +538,9 @@ class TestEditAssignmentView:
         assert self.assignment.done is not None
         assert list(self.assignment.annotations.values_list("label_id", flat=True)) == [label.id]
 
-    def test_post_no_labels_clears(self, client):
+    def test_post_without_labels_clears(self, client):
+        # With every checkbox unticked the form sends no "labels" field at all
+        # (the test client drops an empty list the same way).
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
         self.assignment.set_user_annotations(label_ids=label_ids)
@@ -307,21 +549,6 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id},
-            HTTP_HX_REQUEST="true",
-        )
-        assert resp.status_code == 200
-        self.assignment.refresh_from_db()
-        assert self.assignment.annotations.count() == 0
-
-    def test_post_empty_labels_list_clears(self, client):
-        labels = Label.objects.filter(project=self.assignment.example.batch.project)
-        label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids)
-        assert self.assignment.annotations.count() == 1
-
-        resp = client.post(
-            self.url,
-            data={"assignment_id": self.assignment.id, "labels": []},
             HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
@@ -364,19 +591,10 @@ class TestEditAssignmentView:
         assert self.assignment.annotations.count() == 0
 
     def test_post_to_non_annotation_phase_assignment_forbidden(self, client):
-        # Regression: batch 1 of the populated DB also has DISCUSSION-phase
-        # assignments for this user. The annotation view must never save into
-        # them, otherwise annotation-phase input overwrites discussion labels.
-        discussion_assignment = (
-            ExampleAssignment.objects.filter(
-                user=self.user,
-                example__batch_id=self.batch_id,
-                phase=BatchPhase.DISCUSSION,
-            )
-            .order_by("order")
-            .first()
-        )
-        assert discussion_assignment is not None
+        # Regression: a batch can hold DISCUSSION-phase assignments for this
+        # user. The annotation view must never save into them, otherwise
+        # annotation-phase input overwrites discussion labels.
+        discussion_assignment = _add_discussion_assignment(self.assignment)
         labels_before = sorted(
             discussion_assignment.annotations.values_list("label_id", flat=True),
         )
@@ -403,27 +621,13 @@ class TestEditAssignmentView:
         # Regression: the entry redirect must pick the ANNOTATION-phase
         # assignment even though a DISCUSSION-phase assignment with the same
         # order exists in this batch.
+        _add_discussion_assignment(self.assignment)
         resp = client.get(reverse("annotate-batch", args=(self.batch_id,)))
         assert resp.status_code == 302
         assignment_id = int(resp.url.rstrip("/").split("/")[-1])
         assignment = ExampleAssignment.objects.get(id=assignment_id)
         assert assignment.phase == BatchPhase.ANNOTATION
         assert assignment.user == self.user
-
-    def test_post_wrong_parameter_name_clears(self, client):
-        labels = Label.objects.filter(project=self.assignment.example.batch.project)
-        label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids)
-        assert self.assignment.annotations.count() == 1
-
-        resp = client.post(
-            self.url,
-            data={"assignment_id": self.assignment.id, "wrong_labels": [1, 2]},
-            HTTP_HX_REQUEST="true",
-        )
-        assert resp.status_code == 200
-        self.assignment.refresh_from_db()
-        assert self.assignment.annotations.count() == 0
 
 
 @pytest.mark.django_db
@@ -464,7 +668,7 @@ class TestSkipAnnotatedToggle:
         assert resp.context["skip_annotated"] is False
         assert b'id="skip-annotated-toggle"' in resp.content
         assert b'x-data="skipAnnotatedToggle()"' in resp.content
-        assert b"Hide finished" in resp.content
+        assert b"Skip labeled" in resp.content
 
     def test_toggle_button_present_when_on(self, client):
         first = self.assignments[0]
@@ -472,7 +676,7 @@ class TestSkipAnnotatedToggle:
         assert resp.status_code == 200
         assert resp.context["skip_annotated"] is True
         assert b'id="skip-annotated-toggle"' in resp.content
-        assert b"Hide finished" in resp.content
+        assert b"Skip labeled" in resp.content
 
     def test_get_redirects_to_next_unfinished_when_landing_on_done_with_skip(self, client):
         # Simulates the bug: user finished item 0, navigated back to it, then
@@ -508,6 +712,32 @@ class TestSkipAnnotatedToggle:
         resp = client.get(self._url(first, "?skip_annotated=1"))
         assert resp.status_code == 302
         assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_get_with_skip_from_the_panel_loads_the_done_page(self, client):
+        # Previous/Next are htmx requests: a plain redirect would put the whole done page
+        # inside the annotation panel
+        first = self.assignments[0]
+        for a in self.assignments:
+            a.done = timezone.now()
+            a.save()
+
+        resp = client.get(self._url(first, "?skip_annotated=1"), HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_saving_the_last_open_sample_without_htmx_redirects_to_done(self, client):
+        last = self.assignments[-1]
+        for a in self.assignments[:-1]:
+            a.done = timezone.now()
+            a.save()
+
+        resp = client.post(self._url(last), data={"labels": []})
+
+        assert resp.status_code == 302
+        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+        last.refresh_from_db()
+        assert last.done is not None
 
     def test_get_without_skip_renders_done_assignment(self, client):
         # Without skip on, viewing a done assignment is a valid review action and
@@ -619,5 +849,119 @@ class TestSkipAnnotatedToggle:
             data={"labels": label_ids},
             HTTP_HX_REQUEST="true",
         )
+        # not a plain redirect: htmx would show the done page inside the annotation panel
+        assert resp.status_code == 204
+        assert resp["HX-Redirect"] == reverse("annotate-done", args=(self.batch_id,))
+
+    def test_post_last_without_skip_jumps_to_first_unfinished(self, client):
+        # Regression: saving the last sample while earlier ones were still open
+        # crashed (there is no "next" sample). It should go back to the first open one.
+        first_open = self.assignments[0]
+        current = self.assignments[-1]
+        for a in self.assignments:
+            a.done = None if a.id in {first_open.id, current.id} else timezone.now()
+            a.save()
+
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(self._url(current), data={"labels": label_ids}, HTTP_HX_REQUEST="true")
+
+        assert resp.status_code == 200
+        assert resp.headers["HX-Push-Url"] == self._url(first_open)
+        current.refresh_from_db()
+        assert current.done is not None
+
+    def test_post_last_without_htmx_redirects_to_first_unfinished(self, client):
+        first_open = self.assignments[0]
+        current = self.assignments[-1]
+        for a in self.assignments:
+            a.done = None if a.id in {first_open.id, current.id} else timezone.now()
+            a.save()
+
+        labels = Label.objects.filter(project=current.example.batch.project)
+        label_ids = list(labels.values_list("id", flat=True)[:1])
+
+        resp = client.post(self._url(current), data={"labels": label_ids})
+
         assert resp.status_code == 302
-        assert resp.url == reverse("annotate-done", args=(self.batch_id,))
+        assert resp.url == self._url(first_open)
+
+
+@pytest.mark.django_db
+class TestFindingFinalize:
+    """Annotators continue where they left off, and find Finalize once everything is labeled."""
+
+    @pytest.fixture(autouse=True)
+    def _setup(self, client):
+        self.user = _first_annotator_user()
+        self.batch_id = _first_annotation_batch_for_user(self.user)
+        _ensure_batch_unfinished_for_user(self.batch_id, self.user)
+        mine = ExampleAssignment.objects.filter(
+            user=self.user,
+            example__batch_id=self.batch_id,
+            phase=BatchPhase.ANNOTATION,
+        ).order_by("order")
+        while mine.count() < 3:
+            _ensure_next_assignment_exists(mine.last())
+        self.assignments = list(mine)
+        self.entry_url = reverse("annotate-batch", args=(self.batch_id,))
+        self.done_url = reverse("annotate-done", args=(self.batch_id,))
+        assert client.login(username=self.user.username, password="123")
+
+    def _label(self, assignments):
+        for assignment in assignments:
+            assignment.done = timezone.now()
+            assignment.save()
+
+    def _url(self, assignment):
+        return reverse("annotate-assignment", args=(self.batch_id, assignment.id))
+
+    def _button_text(self, content, href):
+        match = re.search(rf'href="{re.escape(href)}"[^>]*>(.*?)</a\s*>', content, re.DOTALL)
+        return " ".join(match[1].split())
+
+    def test_entry_continues_at_the_first_open_sample(self, client):
+        self._label(self.assignments[:2])
+
+        resp = client.get(self.entry_url)
+
+        assert resp.url == self._url(self.assignments[2])
+
+    def test_entry_with_everything_labeled_opens_the_done_page(self, client):
+        self._label(self.assignments)
+
+        resp = client.get(self.entry_url)
+
+        assert resp.url == self.done_url
+
+    def test_annotation_page_points_to_finalize_once_everything_is_labeled(self, client):
+        first = self.assignments[0]
+        self._label(self.assignments[1:])
+        assert b'id="all-labeled"' not in client.get(self._url(first)).content
+
+        self._label([first])
+
+        content = client.get(self._url(first)).content.decode()
+        assert 'id="all-labeled"' in content
+        assert f'href="{self.done_url}"' in content
+
+    def test_review_on_the_done_page_starts_at_the_first_sample(self, client):
+        self._label(self.assignments)
+
+        content = client.get(self.done_url).content.decode()
+
+        assert self._button_text(content, self._url(self.assignments[0])) == "Review my labels"
+
+    @pytest.mark.parametrize("page", ["home", "project-detail-annotator"])
+    def test_button_says_finalize_once_everything_is_labeled(self, client, page):
+        batch = Batch.objects.get(id=self.batch_id)
+        url = reverse(page, args=(batch.project_id,)) if page != "home" else reverse(page)
+        assert self._button_text(client.get(url).content.decode(), self.entry_url) in (
+            "Start annotating",
+            "Continue annotating",
+        )
+
+        self._label(self.assignments)
+
+        assert self._button_text(client.get(url).content.decode(), self.entry_url) == "Finalize"

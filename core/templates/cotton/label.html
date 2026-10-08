@@ -1,4 +1,15 @@
-<c-vars id value text color hotkey model :checked="false" :disabled="false" name="labels" variant="django" />
+<c-vars
+  id=""
+  value=""
+  text=""
+  color=""
+  hotkey=""
+  model=""
+  :checked="false"
+  :disabled="false"
+  name="labels"
+  variant="django"
+/>
 <div
   class="inline-block"
   x-data='labelButton({ id: "{{ id|default:""|escapejs }}", hotkey: "{{ hotkey|default:""|escapejs }}", disabled: {% if variant == "alpine" %}{{ disabled|default:"false" }}{% else %}{{ disabled|yesno:"true,false" }}{% endif %} })'
@@ -15,11 +26,11 @@
     {% if disabled|yesno:"true,false" == "true" %}disabled{% endif %}
     x-ref="input"
   />
-  <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}; --label-text: #ffffff">
-    <i class="bi bi-check check-icon"></i>
+  <label for="{{ id }}" class="label" style="--label-color: {{ color|default:'#3b82f6' }}">
+    {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span>{{ text }}</span>
-      {% if hotkey %}<span class="label-hotkey">({{ hotkey }})</span>{% endif %}
+      {% if hotkey %}<span class="label-hotkey">{{ hotkey }}</span>{% endif %}
     </span>
   </label>
   {% elif variant == "alpine" %}
@@ -37,12 +48,12 @@
     {% endif %}
     x-ref="input"
   />
-  <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }}, '--label-text': '#ffffff' }">
-    <i class="bi bi-check check-icon"></i>
+  <label :for="{{ id }}" class="label" :style="{ '--label-color': {{ color }} }">
+    {% heroicon_micro "check" class="check-icon" %}
     <span class="label-content">
       <span x-text="{{ text }}"></span>
       <template x-if="typeof hotkey !== 'undefined' && hotkey">
-        <span class="label-hotkey" x-text="`(${hotkey})`"></span>
+        <span class="label-hotkey" x-text="hotkey"></span>
       </template>
     </span>
   </label>

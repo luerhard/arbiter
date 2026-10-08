@@ -19,7 +19,6 @@ class Project(models.Model):
 
     @property
     def annotators(self):
-        ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
             projectuser__default_role=ProjectRole.ANNOTATOR,
@@ -27,7 +26,6 @@ class Project(models.Model):
 
     @property
     def experts(self):
-        ProjectUser = apps.get_model("projects", "ProjectUser")
         return User.objects.filter(
             projectuser__project=self,
             projectuser__default_role=ProjectRole.EXPERT,

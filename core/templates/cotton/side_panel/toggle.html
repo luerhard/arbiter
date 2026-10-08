@@ -1,0 +1,16 @@
+{% comment %}
+Top bar button that opens and closes a side panel (cotton/side_panel), e.g.
+<c-side-panel.toggle name="expert-codebook" label="Codebook" icon="book-open" class="xl:hidden" />
+class="xl:hidden" for panels that cannot be closed from xl up.
+{% endcomment %}
+<c-vars name="" label="" icon="" class="" />
+<button
+  type="button"
+  x-data
+  @click="$store.panels.toggle('{{ name }}')"
+  :aria-pressed="$store.panels.isOpen('{{ name }}') ? 'true' : 'false'"
+  class="btn btn-sm btn-toggle {{ class }}"
+>
+  {% heroicon_micro icon class="size-4" %}
+  <span class="max-sm:sr-only">{{ label }}</span>
+</button>

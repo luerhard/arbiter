@@ -78,6 +78,11 @@ class ExampleAssignment(models.Model):
         # Atomic so a failure between delete and create can never wipe the
         # previously stored labels.
         with transaction.atomic():
+            # Two saves at once (double click, two tabs) would both delete the old
+            # labels and both insert theirs: the second fails on the unique constraint,
+            # or the labels of both stay. Lock the assignment so the second one waits.
+            ExampleAssignment.objects.select_for_update().filter(pk=self.pk).first()
+
             # delete previous annotations if any
             self.annotations.all().delete()
 

@@ -3,6 +3,7 @@ from collections import defaultdict
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db import transaction
 
 from .project_user import ProjectRole
 
@@ -13,7 +14,7 @@ class BatchPhase(models.TextChoices):
     SETUP = "S", "Setup"
     ANNOTATION = "A", "Annotation"
     DISCUSSION = "D", "Discussion"
-    EXPERT = "E", "ExpertDecision"
+    EXPERT = "E", "Expert decision"
     FINAL = "F", "Finalized"
 
 
@@ -78,6 +79,10 @@ class Batch(models.Model):
         return self.users.filter(batchuser__role=role).distinct()
 
     def disagreements(self, phase):
+        """The examples the annotators have not agreed on in this phase: different labels, or
+        someone has not saved theirs yet. Normally everyone has saved before the batch moves
+        on; when an expert moves it on by hand earlier, a missing label must not count as
+        "no labels", which would turn it into an agreement nobody made."""
         Example = apps.get_model("data", "Example")
         ExampleAssignment = apps.get_model("data", "ExampleAssignment")
 
@@ -92,9 +97,12 @@ class Batch(models.Model):
         ).prefetch_related("annotations")
 
         by_example = defaultdict(dict)
+        unsaved = set()
         for assignment in assignments:
             label_ids = [annotation.label_id for annotation in assignment.annotations.all()]
             by_example[assignment.example_id][assignment.user_id] = label_ids
+            if assignment.done is None:
+                unsaved.add(assignment.example_id)
 
         disagreements = []
         required_user_count = len(annotators)
@@ -102,10 +110,56 @@ class Batch(models.Model):
             if len(user_labels) != required_user_count:
                 continue
             unique_label_sets = {frozenset(labels) for labels in user_labels.values()}
-            if len(unique_label_sets) > 1:
+            if len(unique_label_sets) > 1 or example_id in unsaved:
                 disagreements.append(example_id)
 
         return Example.objects.filter(id__in=disagreements)
+
+    def discussion_examples(self):
+        """The examples to discuss, in batch order: the disagreements as they were when
+        the batch entered the discussion, i.e. the examples with DISCUSSION assignments.
+        Unlike disagreements(), this does not change when labels change afterwards."""
+        Example = apps.get_model("data", "Example")  # noqa: N806
+        return Example.objects.filter(
+            assignments__batch=self,
+            assignments__phase=BatchPhase.DISCUSSION,
+        ).distinct()
+
+    def open_discussion_examples(self):
+        """Discussion examples where not every annotator has saved a decision yet."""
+        return self.discussion_examples().filter(
+            assignments__batch=self,
+            assignments__phase=BatchPhase.DISCUSSION,
+            assignments__done__isnull=True,
+        )
+
+    @property
+    def can_reorder(self) -> bool:
+        """The order can change until the discussion starts; afterwards it is part of the record."""
+        return self.current_phase in (BatchPhase.SETUP, BatchPhase.ANNOTATION)
+
+    def set_example_order(self, example_ids: list[int]) -> None:
+        """Put the examples in this order. Annotators get them in it right away, and every
+        later phase follows it (see _create_example_assignments)."""
+        Example = apps.get_model("data", "Example")  # noqa: N806
+        ExampleAssignment = apps.get_model("data", "ExampleAssignment")  # noqa: N806
+
+        examples = {example.id: example for example in self.examples.all()}
+        if sorted(example_ids) != sorted(examples):
+            msg = "The new order must contain every example of the batch exactly once."
+            raise ValueError(msg)
+
+        with transaction.atomic():
+            for position, example_id in enumerate(example_ids, start=1):
+                examples[example_id].position = position
+            Example.objects.bulk_update(examples.values(), ["position"])
+
+            assignments = list(
+                ExampleAssignment.objects.filter(batch=self, phase=BatchPhase.ANNOTATION),
+            )
+            for assignment in assignments:
+                assignment.order = examples[assignment.example_id].position
+            ExampleAssignment.objects.bulk_update(assignments, ["order"])
 
     def all_annotators_finalized(self) -> bool:
         """True if every annotator has confirmed they are done annotating."""
@@ -191,7 +245,48 @@ class Batch(models.Model):
         self.save()
 
         if old_phase != phase:
+            self._reset_phase(phase)
+            if old_phase == BatchPhase.DISCUSSION:
+                from discuss import room_state  # noqa: PLC0415
+
+                # open discussion pages show that the room is closed
+                batch_id = self.pk
+                transaction.on_commit(lambda: room_state.close_room(batch_id, phase))
             self._notify_phase_change(phase, actor=actor)
+
+    def _reset_phase(self, phase: BatchPhase):
+        """Entering a phase, also again after it was moved back by hand, starts it from a
+        clean state. Nothing anyone entered is deleted: labels, decisions, drafts stay."""
+        ExampleAssignment = apps.get_model("data", "ExampleAssignment")  # noqa: N806
+
+        if phase == BatchPhase.ANNOTATION:
+            # Finalized annotators can not change their labels, and only finalizing
+            # advances the batch: everyone finalizes again, their labels are kept.
+            BatchUser.objects.filter(batch=self, role=ProjectRole.ANNOTATOR).update(
+                finalized_at=None,
+            )
+            return
+
+        if phase == BatchPhase.DISCUSSION:
+            from discuss import room_state  # noqa: PLC0415
+
+            # a fresh room: one whose discussion had ended would never start again
+            batch_id = self.pk
+            transaction.on_commit(lambda: room_state.delete_state(batch_id))
+            disagreements = self.disagreements(BatchPhase.ANNOTATION)
+        elif phase == BatchPhase.EXPERT:
+            disagreements = self.disagreements(BatchPhase.DISCUSSION)
+        else:
+            return
+
+        # undecided assignments of examples that are no longer disagreements
+        ExampleAssignment.objects.filter(
+            batch=self,
+            phase=phase,
+            done__isnull=True,
+            annotations__isnull=True,
+            codebook_draft__isnull=True,
+        ).exclude(example__in=disagreements).delete()
 
     def _notify_phase_change(self, phase: BatchPhase, actor=None):
         """Create an unread notification for every batch user; the polling UI

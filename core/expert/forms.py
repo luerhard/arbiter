@@ -33,16 +33,20 @@ class MultiLabelFormExpert(forms.Form):
 
     def _initial_label_ids(self):
         # Editing a saved decision pre-selects that decision; an open
-        # assignment pre-selects the union of all discussion-phase labels.
+        # assignment pre-selects the labels every annotator kept after the
+        # discussion. Contested labels stay open: pre-selecting them too would
+        # let a quick save decide for both sides (Positive and Negative).
         if self.assignment.done is not None:
             return sorted(self.assignment.annotations.values_list("label_id", flat=True))
-        from data.models import Annotation
+        from data.models import ExampleAssignment
 
-        discussion_label_ids = Annotation.objects.filter(
-            assignment__example=self.example,
-            assignment__phase=BatchPhase.DISCUSSION,
-        ).values_list("label_id", flat=True)
-        return sorted(set(discussion_label_ids))
+        discussion = ExampleAssignment.objects.filter(
+            example=self.example,
+            batch=self.assignment.batch,
+            phase=BatchPhase.DISCUSSION,
+        ).prefetch_related("annotations")
+        label_sets = [{a.label_id for a in d.annotations.all()} for d in discussion]
+        return sorted(set.intersection(*label_sets)) if label_sets else []
 
     def save(self):
         data = self.cleaned_data

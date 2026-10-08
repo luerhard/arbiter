@@ -1,7 +1,22 @@
-{% extends "base.html" %}
+{% extends "layouts/focus.html" %}
 {% block title %}
-Expert Decision
+Expert decision · Batch
+{{ batch.batch_number }}
+·
+{{ batch.project.name }}
 {% endblock title %}
+{% block focus_progress %}
+<c-progress
+  id="expert-progress"
+  :done="disagreements_decided"
+  :total="disagreements_total"
+  phase="E"
+  suffix="decided"
+/>
+{% endblock focus_progress %}
+{% block focus_actions %}
+<c-side-panel.toggle name="expert-codebook" label="Codebook" icon="book-open" class="xl:hidden" />
+{% endblock focus_actions %}
 {% block content %}
 {% include "expert/partials/assignment.html" %}
 {% endblock content %}

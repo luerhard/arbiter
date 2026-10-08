@@ -1,0 +1,38 @@
+{% comment %}
+Page heading with breadcrumb, e.g.
+<c-page-header title="Codebook" :project="project" crumb="Codebook" subtitle="Shown below the title">
+  <c-slot name="actions">buttons</c-slot>
+</c-page-header>
+The breadcrumb is built from what you pass: project adds "Projects / project name", codebook adds "Codebook", batch adds
+"Batch N", crumb is the current page. A subtitle with markup can be passed as a named slot "subtitle" instead.
+{% endcomment %}
+<c-vars title="" subtitle="" project="" codebook="" batch="" crumb="" actions="" />
+<header class="flex flex-wrap items-end justify-between gap-4">
+  <div class="flex flex-col gap-1.5">
+    {% if project or crumb %}
+    <nav aria-label="Breadcrumb" class="breadcrumb">
+      <a href="{% url 'project-list' %}">Projects</a>
+      {% if project %}
+      /
+      {% if codebook or batch or crumb %}<a href="{% url 'project-detail' project.id %}">{{ project.name }}</a
+      >{% else %}{{ project.name }}{% endif %}
+      {% endif %}
+      {% if codebook %}/ <a href="{% url 'codebook-view' codebook.pk %}">Codebook</a>{% endif %}
+      {% if batch %}/
+      <a href="{% url 'project-batch-detail' batch.id %}"
+        >Batch
+        {{ batch.batch_number }}</a
+      >{% endif %}
+      {% if crumb %}/
+      {{ crumb }}{% endif %}
+    </nav>
+    {% endif %}
+    <h1 class="page-title">{{ title }}</h1>
+    {% if subtitle %}
+    <p class="page-subtitle">{{ subtitle }}</p>
+    {% endif %}
+  </div>
+  {% if actions %}
+  <div class="flex flex-wrap gap-2.5">{{ actions }}</div>
+  {% endif %}
+</header>

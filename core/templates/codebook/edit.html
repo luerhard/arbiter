@@ -1,15 +1,37 @@
 {% extends "base.html" %}
-{% load crispy_forms_tags %}
+{% block title %}
+Edit codebook ·
+{{ object.project.name }}
+· Arbiter
+{% endblock title %}
 {% block content %}
-<div class="mt-4">
-  <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md">
-    <div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
-        Project:
-        {{ object.project }}
-      </h2>
-    </div>
-    <div class="p-4">{% crispy form %}</div>
+<form method="post" class="flex flex-col gap-7">
+  {% csrf_token %}
+  <c-page-header
+    title="Edit codebook"
+    :project="object.project"
+    :codebook="object"
+    crumb="Edit"
+    subtitle="Written in Markdown. Your rationale is saved with the change and shown to annotators."
+  >
+    <c-slot name="actions">
+      <a href="{% url 'codebook-view' object.pk %}" class="btn btn-ghost">Cancel</a>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </c-slot>
+  </c-page-header>
+
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger text-meta" role="alert">
+    {{ form.non_field_errors }}
   </div>
-</div>
+  {% endif %}
+
+  <section class="card flex flex-col gap-5 p-6">
+    <c-field :field="form.content" label="Codebook" />
+    <c-field
+      :field="form.rationale"
+      help="Why does the codebook need this change? For example, which disagreement it settles."
+    />
+  </section>
+</form>
 {% endblock content %}

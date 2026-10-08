@@ -1,0 +1,96 @@
+{% comment %}
+Actions dropdown of a batch card on the expert project page, with the confirmation dialogs it opens.
+<c-batch.menu :batch="batch" :codebook="codebook" />, batch being a row of ProjectExpertDetailView._batch_card.
+{% endcomment %}
+{% load custom_tags %}
+{% with b=batch.batch %}
+{% url "project-export-batch" batch_id=b.id as project_export_batch_url %}
+<el-dropdown class="inline-block">
+  <button type="button" class="btn btn-secondary btn-sm btn-icon" aria-label="Actions for batch {{ b.batch_number }}">
+    {% heroicon_mini "ellipsis-horizontal" class="size-5" %}
+  </button>
+  <el-menu anchor="bottom end" popover class="menu">
+    <div class="menu-section">
+      <a href="{% url 'project-batch-detail' b.id %}" class="menu-item">View samples</a>
+      <a href="{{ project_export_batch_url }}?{{ b|batch_range }}" class="menu-item">Export batch</a>
+      {% if b.current_phase != "S" %}{# the codebook version is kept when annotation starts #}
+      <a href="{% url 'codebook-diff' codebook_id=codebook.pk %}?{{ b|batch_range }}" class="menu-item"
+        >Codebook changes</a
+      >
+      {% endif %}
+    </div>
+    {# moving on while the phase is unfinished opens a confirmation dialog (below) #}
+    <div class="menu-section">
+      <div class="menu-heading">Move to phase</div>
+      {% for item in batch.phase_menu %}
+      <button
+        type="button"
+        {% if item.confirm %}command="show-modal"
+        commandfor="move-batch-{{ b.id }}-{{ item.phase.value }}"
+        {% else %}hx-post="{% url 'change-batch-phase' batch_id=b.id %}"
+        hx-vals='{"current_phase": "{{ item.phase.value }}"}'
+        hx-swap="none"
+        {% endif %}
+        class="menu-item"
+        data-phase="{{ item.phase.value }}"
+        {% if item.current %}aria-current="true"
+        disabled{% endif %}
+      >
+        <span class="phase-dot"></span>
+        {{ item.label }}
+        {% if item.current %}<span class="ml-auto text-xs text-ink-3">current</span>{% endif %}
+      </button>
+      {% endfor %}
+    </div>
+    <div class="menu-section">
+      <button type="button" command="show-modal" commandfor="delete-batch-{{ b.id }}" class="menu-item text-danger">
+        Delete batch
+      </button>
+    </div>
+  </el-menu>
+</el-dropdown>
+{% url "change-batch-phase" batch_id=b.id as change_phase_url %}
+{% for item in batch.phase_menu %}
+{% if item.confirm %}
+<c-confirm-dialog
+  id="move-batch-{{ b.id }}-{{ item.phase.value }}"
+  title="Batch {{ b.batch_number }} is not finished"
+  :action="change_phase_url"
+  confirm="Move to {{ item.label }}"
+>
+  <p>{{ batch.open_work }}</p>
+  <p>
+    Move it to
+    {{ item.label }}
+    anyway?
+  </p>
+  <c-slot name="fields">
+    <input type="hidden" name="current_phase" value="{{ item.phase.value }}" />
+  </c-slot>
+</c-confirm-dialog>
+{% endif %}
+{% endfor %}
+{% with n_samples=b.examples.count %}
+{% url "delete-batch" batch_id=b.id as delete_url %}
+<c-confirm-dialog
+  id="delete-batch-{{ b.id }}"
+  title="Delete Batch {{ b.batch_number }}?"
+  :action="delete_url"
+  confirm="Delete batch"
+>
+  <p>
+    This permanently deletes the batch with its
+    {{ n_samples }}
+    sample{{ n_samples|pluralize }}: all annotations, discussions and expert decisions. Codebook changes stay. This
+    cannot be undone.
+  </p>
+  <p>
+    To keep the data,
+    <a href="{{ project_export_batch_url }}?{{ b|batch_range }}" class="font-medium text-ink underline"
+      >export the batch</a
+    >
+    first.
+  </p>
+</c-confirm-dialog>
+{% endwith %}
+{% endwith %}

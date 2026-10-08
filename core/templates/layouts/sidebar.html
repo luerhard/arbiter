@@ -1,0 +1,60 @@
+{% comment %}
+Main navigation (layouts/nav.html). From lg up a sticky column on the left; below that a menu bar on top whose button
+opens the same navigation as a drawer (Tailwind Plus el-dialog).
+{% endcomment %}
+<nav
+  aria-label="Main"
+  class="sticky top-0 hidden h-screen w-62 shrink-0 dark:border-r dark:border-night-line flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line lg:flex"
+>
+  {% include "layouts/nav.html" %}
+</nav>
+
+<div class="sticky top-0 z-30 flex h-14 items-center gap-3 bg-night px-4 text-night-ink sm:px-8 lg:hidden">
+  <button
+    type="button"
+    command="show-modal"
+    commandfor="nav-drawer"
+    aria-label="Open menu"
+    class="-ml-1.5 inline-flex size-9 cursor-pointer items-center justify-center rounded-lg hover:bg-night-2 hover:text-white"
+  >
+    {% heroicon_outline "bars-3" class="size-6" %}
+  </button>
+  <a href="{% url 'home' %}" class="flex items-center gap-2 text-white">
+    <c-logo.mark size="size-[22px]" tone="night" />
+    <span class="text-lg font-semibold tracking-[-0.02em]">arbiter</span>
+  </a>
+  <a href="{% url 'user-profile' %}" title="{{ user.username }}" class="ml-auto"><c-avatar :name="user.username" /></a>
+</div>
+
+<el-dialog>
+  <dialog id="nav-drawer" class="backdrop:bg-transparent lg:hidden">
+    <el-dialog-backdrop
+      class="fixed inset-0 bg-night/80 transition-opacity duration-300 ease-linear data-closed:opacity-0"
+    ></el-dialog-backdrop>
+    <div tabindex="0" class="fixed inset-0 flex focus:outline-none">
+      <el-dialog-panel
+        class="group/dialog-panel relative mr-16 flex w-full max-w-62 flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
+      >
+        <div
+          class="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out group-data-closed/dialog-panel:opacity-0"
+        >
+          <button
+            type="button"
+            command="close"
+            commandfor="nav-drawer"
+            aria-label="Close menu"
+            class="-m-2.5 cursor-pointer p-2.5 text-white"
+          >
+            {% heroicon_outline "x-mark" class="size-6" %}
+          </button>
+        </div>
+        <nav
+          aria-label="Main"
+          class="flex grow flex-col gap-6 overflow-y-auto bg-night px-3.5 py-5 text-night-ink scrollbar-thin scrollbar-thumb-night-line"
+        >
+          {% include "layouts/nav.html" %}
+        </nav>
+      </el-dialog-panel>
+    </div>
+  </dialog>
+</el-dialog>
