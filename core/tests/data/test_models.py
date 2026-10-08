@@ -137,23 +137,6 @@ def test_concurrent_saves_of_an_assignment_keep_the_last_one(monkeypatch, second
 
 
 @pytest.mark.django_db
-def test_example_set_user_annotations_uses_user_assignment():
-    data = _setup_example_assignment()
-    example = data["example"]
-    user = data["user"]
-    label1, _label2 = data["labels"]
-    assignment = data["assignment"]
-
-    assignment.set_user_annotations(label_ids=[label1.id])
-
-    annotations = Annotation.objects.filter(assignment=assignment)
-    assert annotations.count() == 1
-    assert annotations.first().label_id == label1.id
-    assignment.refresh_from_db()
-    assert assignment.done is not None
-
-
-@pytest.mark.django_db
 def test_example_assignment_previous_next_respects_order_and_bounds():
     data = _setup_example_assignment()
     user = data["user"]

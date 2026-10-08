@@ -432,7 +432,9 @@ class TestEditAssignmentView:
         assert self.assignment.done is not None
         assert list(self.assignment.annotations.values_list("label_id", flat=True)) == [label.id]
 
-    def test_post_no_labels_clears(self, client):
+    def test_post_without_labels_clears(self, client):
+        # With every checkbox unticked the form sends no "labels" field at all
+        # (the test client drops an empty list the same way).
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
         self.assignment.set_user_annotations(label_ids=label_ids)
@@ -441,21 +443,6 @@ class TestEditAssignmentView:
         resp = client.post(
             self.url,
             data={"assignment_id": self.assignment.id},
-            HTTP_HX_REQUEST="true",
-        )
-        assert resp.status_code == 200
-        self.assignment.refresh_from_db()
-        assert self.assignment.annotations.count() == 0
-
-    def test_post_empty_labels_list_clears(self, client):
-        labels = Label.objects.filter(project=self.assignment.example.batch.project)
-        label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids)
-        assert self.assignment.annotations.count() == 1
-
-        resp = client.post(
-            self.url,
-            data={"assignment_id": self.assignment.id, "labels": []},
             HTTP_HX_REQUEST="true",
         )
         assert resp.status_code == 200
@@ -535,21 +522,6 @@ class TestEditAssignmentView:
         assignment = ExampleAssignment.objects.get(id=assignment_id)
         assert assignment.phase == BatchPhase.ANNOTATION
         assert assignment.user == self.user
-
-    def test_post_wrong_parameter_name_clears(self, client):
-        labels = Label.objects.filter(project=self.assignment.example.batch.project)
-        label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids)
-        assert self.assignment.annotations.count() == 1
-
-        resp = client.post(
-            self.url,
-            data={"assignment_id": self.assignment.id, "wrong_labels": [1, 2]},
-            HTTP_HX_REQUEST="true",
-        )
-        assert resp.status_code == 200
-        self.assignment.refresh_from_db()
-        assert self.assignment.annotations.count() == 0
 
 
 @pytest.mark.django_db

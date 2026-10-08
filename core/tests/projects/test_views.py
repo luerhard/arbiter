@@ -350,7 +350,7 @@ class TestProjectAndBatchCreationViews:
         assert response.context["label_rows"] == [{}]
         assert response.context["annotators_selected_users"] == "[]"
 
-    def test_batch_create_invalid_keeps_the_chosen_annotators(self, client, project_annotation):
+    def test_batch_create_invalid_keeps_the_chosen_users(self, client, project_annotation):
         # Regression: after an error all project annotators were preselected again,
         # including the ones the expert had removed
         a1, _a2 = project_annotation["annotators"]
@@ -365,45 +365,6 @@ class TestProjectAndBatchCreationViews:
         assert response.status_code == 200
         assert response.context["annotators_selected_users"] == (
             f'[{{"id": {a1.id}, "username": "{a1.username}"}}]'
-        )
-
-    def test_batch_create_invalid_keeps_selected_users_context(self, client):
-        suffix = uuid.uuid4().hex[:8]
-        annotator = User.objects.create_user(username=f"batch_ann_ctx_{suffix}", password="123")
-        expert = User.objects.create_user(username=f"batch_exp_ctx_{suffix}", password="123")
-
-        project = Project.objects.create(
-            name=f"Batch Project Context {suffix}",
-            description="For batch context test",
-            owner=expert,
-        )
-        ProjectUser.objects.create(
-            project=project,
-            user=annotator,
-            default_role=ProjectRole.ANNOTATOR,
-        )
-        ProjectUser.objects.create(
-            project=project,
-            user=expert,
-            default_role=ProjectRole.EXPERT,
-        )
-
-        login = client.login(username=expert.username, password="123")
-        assert login == True
-
-        url = reverse("project-batch-create", args=(project.id,))
-        response = client.post(
-            url,
-            {
-                # Deliberately omit file to keep the form invalid.
-                "annotators": [annotator.id],
-                "experts": [expert.id],
-            },
-        )
-
-        assert response.status_code == 200
-        assert response.context["annotators_selected_users"] == (
-            f'[{{"id": {annotator.id}, "username": "{annotator.username}"}}]'
         )
         assert response.context["experts_selected_users"] == (
             f'[{{"id": {expert.id}, "username": "{expert.username}"}}]'

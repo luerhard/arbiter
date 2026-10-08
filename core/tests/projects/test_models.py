@@ -223,6 +223,8 @@ def test_advance_to_final_when_no_disagreements():
 
     assert result == BatchPhase.FINAL
     assert batch.current_phase == BatchPhase.FINAL
+    # the project has no batch waiting in SETUP: there is nothing to start
+    assert batch.start_next_setup_batch() is None
 
 
 @pytest.mark.django_db
@@ -279,19 +281,6 @@ def test_finalize_without_disagreements_starts_next_setup_batch():
         batch=next_batch,
         phase=BatchPhase.ANNOTATION,
     ).exists()
-
-
-@pytest.mark.django_db
-def test_finalize_without_next_setup_batch_is_harmless():
-    data = _create_project_with_batch()
-    batch = data["batch"]
-
-    _resolve_all_disagreements(data)
-    _finalize(batch, *data["annotators"])
-    result = batch.advance_from_annotation_if_finalized()
-
-    assert result == BatchPhase.FINAL
-    assert batch.start_next_setup_batch() is None
 
 
 @pytest.mark.django_db

@@ -72,14 +72,13 @@ class TestViews:
         req = client.get(url)
         assert req.status_code == 403
 
-    @pytest.mark.parametrize("params", URLS_EXPERT)
-    def test_codebook_update_view_post_all_data(self, params, client, project_setup):
+    def test_codebook_update_view_saves_content(self, client, project_setup):
         login = client.login(username="expert1", password="123")
         assert login is True
 
         codebook = project_setup["codebook"]
 
-        new_content = "Updated codebook content test 1."
+        new_content = "Updated codebook content."
         post_data = {
             "content": new_content,
             "rationale": "Test rationale",
@@ -120,26 +119,6 @@ class TestViews:
             names = zf.namelist()
             assert "main.md" in names
             assert any(name.startswith(".git/") for name in names)
-
-    @pytest.mark.parametrize("params", URLS_EXPERT)
-    def test_codebook_update_view_post_some_data(self, params, client, project_setup):
-        login = client.login(username="expert1", password="123")
-        assert login is True
-
-        codebook = project_setup["codebook"]
-
-        new_content = "Updated codebook content test 2."
-        post_data = {
-            "content": new_content,
-            "rationale": "Test rationale",
-        }
-        response = client.post(reverse("codebook-edit", args=[codebook.id]), post_data)
-
-        assert response.status_code == 302
-        assert response.url == codebook.get_absolute_url()
-
-        codebook.refresh_from_db()
-        assert codebook.content == new_content + "\n"
 
 
 @pytest.mark.django_db
