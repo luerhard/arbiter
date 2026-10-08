@@ -21,6 +21,10 @@ from projects.models import ProjectRole
 from projects.models import ProjectUser
 from users.models import User
 
+# The default hasher is deliberately slow (0.15 s per password); tests create and log in
+# hundreds of users. Set before populatedb creates its users, so their logins are fast too.
+settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
 
 def run_sql(sql):
     with connection.cursor() as conn:
