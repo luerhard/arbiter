@@ -326,12 +326,14 @@
     @apply bg-warning-soft text-warning;
   }
 
-  /* Tables: <table class="data-table">; cells add their own padding where it differs */
+  /* Tables: <div class="card overflow-x-auto"><table class="data-table">. Headers don't wrap, so a table that
+     doesn't fit scrolls sideways inside its card; relative keeps sr-only labels in there too, otherwise they
+     widen the page. Cells add their own padding where it differs. */
   .data-table {
-    @apply w-full;
+    @apply relative w-full;
   }
   .data-table th {
-    @apply border-b border-line px-4 py-3.5 text-left text-xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply border-b border-line px-4 py-3.5 text-left text-xs font-semibold tracking-[0.08em] whitespace-nowrap text-ink-3 uppercase;
   }
   .data-table > tbody {
     @apply divide-y divide-line;
