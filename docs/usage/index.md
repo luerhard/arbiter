@@ -18,6 +18,7 @@ In subjective or complex data annotation tasks, low inter-annotator agreement of
 Unlike traditional post-hoc statistical methods that attempt to model disagreement after data collection is complete, Arbiter addresses disagreement **during** the active annotation process.
 
 ### Key Features
+
 - **Project Creation and Data Batches Upload**: create your annotation project describing its purpose, choose the user accounts that will participate, define the labels, write initial annotation guidelines (i.e., **codebook**) and upload your dataset batch by batch.
 - **Batch-Based Annotation and Real-Time Chat**: data is annotated in batches. When label disagreements occur, annotators discuss them synchronously in an integrated real-time chat interface.
 - **Expert Adjudication and Guideline Revision**: disagreements that cannot be resolved between annotators are passed to an expert, who adjudicates the final label and updates the annotation guidelines.
@@ -138,7 +139,9 @@ Once a batch is uploaded, it's possible to reorder the samples within that batch
 ---
 
 ### 3. First Codebook
+
 After creating a batch, the Expert writes the initial annotation guidelines (Codebook):
+
 1. Click **Open** in the Codebook card on the project dashboard, or on **Codebook** on the menu on the left side of the page.
 2. Click **Edit**, enter the initial guideline instructions, write an explanatory rationale, and click on **Save changes**.
 
@@ -161,8 +164,6 @@ When annotators complete peer discussion without reaching consensus on a sample,
 3. Select the final adjudicated label for the sample and click on **Save and next case**.
 4. Edit the Codebook instructions in the right-hand panel to address the underlying underspecification (e.g., adding an edge case rule).
 5. Enter a detailed rationale explaining your decision and click **Save draft**.
-
-
 
 :::{figure} screenshots/expert_resolve.png
 :width: 650px
@@ -245,7 +246,7 @@ In the Annotation phase, annotators label each sample independently:
 3. Navigate through samples using arrow buttons or keyboard shortcuts.
 4. When all samples for the current batch are annotated, you can either check and change your labels by clicking on **Review my labels** or lock in your annotations for the current batch by clicking on **Finalize annotation**. When all annotators have finalized, the batch moves to the _Discussion_ phase in case of disagreements.
 
-You can click on the **Codebook** button anytime to display the annotation guidelines next to the sample you're annotating. 
+You can click on the **Codebook** button anytime to display the annotation guidelines next to the sample you're annotating.
 
 :::{figure} screenshots/annotator_annotation_interface.png
 :width: 550px
