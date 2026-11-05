@@ -44,9 +44,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="#general-info-overview">General Info &amp; Overview</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-arbiter">What is Arbiter?</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#general-info-overview">General Info &amp; Overview</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-is-arbiter">What is Arbiter?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#key-features">Key Features</a></li>
 </ul>
 </li>
@@ -56,15 +56,16 @@
 <li class="toctree-l3"><a class="reference internal" href="#workflow">Workflow</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#expert-user-guide">2. Expert User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#expert-user-guide">Expert User Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#create-a-project">1. Create a Project</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#upload-batches">2. Upload Batches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reorder-samples-within-a-batch">2.1 Reorder samples within a batch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#first-codebook">3. First Codebook</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#resolve-disagreements-and-edit-the-codebook">4. Resolve Disagreements and Edit the Codebook</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#export-batch-data-after-annotation-and-discussion">5. Export Batch Data After Annotation and Discussion</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#annotator-user-guide">3. Annotator User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#annotator-user-guide">Annotator User Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#project-dashboard-view">Project Dashboard View</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#first-batch-overview-codebook-view">1. First Batch Overview &amp; Codebook View</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#annotation-phase">2. Annotation Phase</a><ul>
@@ -75,7 +76,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#view-codebook-after-update">4. View Codebook After Update</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#admin-user-guide">4. Admin User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#admin-user-guide">Admin User Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#admin-homepage">1. Admin Homepage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#add-users">2. Add Users</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#manage-user-groups">3. Manage User Groups</a></li>
@@ -114,11 +115,12 @@
              
   <section id="usage">
 <h1>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h1>
-</section>
 <section id="general-info-overview">
-<h1>General Info &amp; Overview<a class="headerlink" href="#general-info-overview" title="Link to this heading"></a></h1>
+<h2>General Info &amp; Overview<a class="headerlink" href="#general-info-overview" title="Link to this heading"></a></h2>
+<p>You can access Arbiter at this link: <a class="reference external" href="http://193.196.55.39/">http://193.196.55.39/</a></p>
+<p>You must be connected to University of Stuttgart’s network (either by being on site or via VPN).</p>
 <section id="what-is-arbiter">
-<h2>What is Arbiter?<a class="headerlink" href="#what-is-arbiter" title="Link to this heading"></a></h2>
+<h3>What is Arbiter?<a class="headerlink" href="#what-is-arbiter" title="Link to this heading"></a></h3>
 <p><strong>Arbiter</strong> is an open-source collaborative software tool and web application designed to build and document a shared understanding during data annotation tasks.</p>
 <p>In subjective or complex data annotation tasks, low inter-annotator agreement often derives from two primary sources:</p>
 <ol class="arabic simple">
@@ -126,23 +128,25 @@
 <li><p><strong>Misapplication</strong>: Annotators misunderstanding or incorrectly applying guidelines.</p></li>
 </ol>
 <p>Unlike traditional post-hoc statistical methods that attempt to model disagreement after data collection is complete, Arbiter addresses disagreement <strong>during</strong> the active annotation process.</p>
+</section>
 <section id="key-features">
 <h3>Key Features<a class="headerlink" href="#key-features" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>Batch-Based Annotation and Real-Time Chat</strong>: Data is annotated in structured batches. When label disagreements occur, annotators discuss them synchronously in an integrated real-time chat interface.</p></li>
-<li><p><strong>Expert Adjudication and Guideline Revision</strong>: Disagreements that cannot be resolved between annotators are passed to an expert, who adjudicates the final label and updates the annotation guidelines (i.e., <strong>codebook</strong>).</p></li>
-<li><p><strong>Traceable Dataset Documentation</strong>: Every label assignment, discussion, expert decision rationale, and guideline revision is logged. This creates a complete audit trail that documents how the team’s interpretation evolved over time, serving as a reproducibility artifact for downstream dataset users.</p></li>
+<li><p><strong>Project Creation and Data Batches Upload</strong>: create your annotation project describing its purpose, choose the user accounts that will participate, define the labels, write initial annotation guidelines (i.e., <strong>codebook</strong>) and upload your dataset batch by batch.</p></li>
+<li><p><strong>Batch-Based Annotation and Real-Time Chat</strong>: data is annotated in batches. When label disagreements occur, annotators discuss them synchronously in an integrated real-time chat interface.</p></li>
+<li><p><strong>Expert Adjudication and Guideline Revision</strong>: disagreements that cannot be resolved between annotators are passed to an expert, who adjudicates the final label and updates the annotation guidelines.</p></li>
+<li><p><strong>Traceable Dataset Documentation</strong>: every label assignment, discussion, expert decision rationale, and guideline revision is logged. This creates a complete audit trail that documents how the team’s interpretation evolved over time, serving as a reproducibility artifact for downstream dataset users.</p></li>
 </ul>
 </section>
 </section>
 <section id="user-login">
 <h2>User Login<a class="headerlink" href="#user-login" title="Link to this heading"></a></h2>
-<p>To log into Arbiter, enter the credentials provided by your system administrator. The login interface is identical for annotators and experts</p>
+<p>To log into Arbiter, enter the credentials provided by your system administrator. The login interface is identical for annotators and experts.</p>
 <figure class="align-center" id="id1">
 <a class="reference internal image-reference" href="../_images/login.png"><img alt="Arbiter Login Interface" src="../_images/login.png" style="width: 500px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 1: Arbiter Login Screen</strong>. Authentication page for Annotators and Experts</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 1: Arbiter Login</strong>. Authentication page for Annotators and Experts.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -152,37 +156,37 @@
 <section id="users">
 <h3>Users<a class="headerlink" href="#users" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><strong>Annotator</strong>: Independently label data batches, deliberate with peers in real-time chat regarding disagreed samples to resolve misapplications, and review codebook updates prior to starting subsequent batches.</p></li>
-<li><p><strong>Expert</strong>: Create projects, upload data batches, review annotators’ unresolved disagreements, assign final adjudicated labels, provide explanatory rationales, and edit the codebook.</p></li>
-<li><p><strong>Administrator</strong>: Manage groups and users.</p></li>
+<li><p><strong>Annotator</strong>: Independently label data batches, deliberate with peers in real-time chat regarding disagreed samples to resolve misapplications, and review codebook updates before starting subsequent batches annotation.</p></li>
+<li><p><strong>Expert</strong>: Create projects, upload data batches, review annotators’ unresolved disagreements, assign final adjudicated labels, provide explanatory rationales, edit the codebook and export projects.</p></li>
+<li><p><strong>Administrator</strong>: Manage user accounts and groups.</p></li>
 </ul>
 </section>
 <section id="workflow">
 <h3>Workflow<a class="headerlink" href="#workflow" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>First batch and codebook upload</strong>: Expert user uploads batches and writes the first version of the annotation guidelines.</p></li>
+<li><p><strong>Annotation</strong>: Annotators independently assign labels according to current codebook guidelines.</p></li>
+<li><p><strong>Discussion (Resolving Misapplication)</strong>: Once independent labeling for a batch is complete, samples with divergent labels automatically enter the discussion stage. Annotators use the real-time chat interface to discuss their reasoning. If they reach consensus, updated labels are saved. If they don’t, the sample is passed to the Expert.</p></li>
+<li><p><strong>Expert adjudication and codebook update (Resolving Underspecification)</strong>: The expert selects the final decision for the samples with divergent label and, where needed, updates the codebook to clarify the rule or edge case, writing the rationale on which is based the final decision.</p></li>
+<li><p><strong>Codebook synchronization and maturation</strong>: Before beginning the next batch, annotators read the updated codebook with changes highlighted. Over time, as guidelines mature, discussion counts and annotation guidelines edits decrease, signaling that the team has converged on a relatively stable, shared understanding.</p></li>
+</ol>
 <figure class="align-center" id="id2">
-<a class="reference internal image-reference" href="../_images/workflow_diagram.png"><img alt="Arbiter Login Interface" src="../_images/workflow_diagram.png" style="width: 500px;" />
+<a class="reference internal image-reference" href="../_images/workflow_diagram.png"><img alt="Arbiter Workflow Diagram" src="../_images/workflow_diagram.png" style="width: 500px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><strong>Figure 2: Arbiter Workflow</strong></span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<ol class="arabic simple">
-<li><p><strong>First batch and codebook upload</strong>: Expert user uploads batches and the first version of the annotation guidelines.</p></li>
-<li><p><strong>Annotation</strong>: Annotators independently assign labels according to current codebook guidelines.</p></li>
-<li><p><strong>Discussion (Resolving Misapplication)</strong>: Once independent labeling for a batch is complete, samples with divergent labels automatically enter the discussion stage. Annotators use the real-time chat interface to discuss their reasoning. If they reach consensus, updated labels are saved. If they don’t, the sample is passed to the Expert.</p></li>
-<li><p><strong>Expert adjudication and codebook update (Resolving Underspecification)</strong>: The expert selects the final decision for the samples with divergent label and updates the codebook to clarify the rule or edge case, writing the rationale on which is based the final decision.</p></li>
-<li><p><strong>Codebook synchronization and maturation</strong>: Before beginning the next batch, annotators read the updated codebook with changes highlighted. Over time, as guidelines mature, discussion counts and instruction edits decrease, signaling that the team has converged on a relatively stable, shared understanding.</p></li>
-</ol>
 </section>
 </section>
 <hr class="docutils" />
 <section id="expert-user-guide">
-<h2>2. Expert User Guide<a class="headerlink" href="#expert-user-guide" title="Link to this heading"></a></h2>
+<h2>Expert User Guide<a class="headerlink" href="#expert-user-guide" title="Link to this heading"></a></h2>
 <section id="create-a-project">
 <h3>1. Create a Project<a class="headerlink" href="#create-a-project" title="Link to this heading"></a></h3>
 <p>To set up a new annotation project:</p>
 <ol class="arabic simple">
-<li><p>Log in with an Expert account and click <strong>Create Project</strong> in the navigation menu.</p></li>
+<li><p>Log in with an Expert account and click <strong>+</strong> in the navigation menu or <strong>New Project</strong> on the right side of the page, at the top of <strong>Your Projects</strong> section.</p></li>
 <li><p>Fill out the project configuration form:</p>
 <ul class="simple">
 <li><p><strong>Project title</strong>: A name for your project.</p></li>
@@ -191,13 +195,13 @@
 <li><p><strong>Labels</strong>: Define labels along with custom display colors and hotkeys.</p></li>
 </ul>
 </li>
-<li><p>Click <strong>Create Project</strong> at the bottom of the page to finalize setup.</p></li>
+<li><p>Click <strong>Create Project</strong> at the bottom of the page to save and create the project.</p></li>
 </ol>
 <figure class="align-center" id="id3">
 <a class="reference internal image-reference" href="../_images/expert_create_project_filled.png"><img alt="Create Project Form" src="../_images/expert_create_project_filled.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 3: Project Creation Form</strong>. Filling in project title, description, user assignments, labels, display colors, and hotkeys.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 3: Project Creation Form</strong>. Fill in project info and save.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -206,32 +210,43 @@
 <h3>2. Upload Batches<a class="headerlink" href="#upload-batches" title="Link to this heading"></a></h3>
 <p>Once a project is created, data samples must be grouped and uploaded in batches:</p>
 <ol class="arabic simple">
-<li><p>Navigate to the project dashboard and click <strong>Create Batch</strong>.</p></li>
-<li><p>In the modal dialog, select a dataset file (<code class="docutils literal notranslate"><span class="pre">CSV</span></code> or <code class="docutils literal notranslate"><span class="pre">XLSX</span></code> containing a <code class="docutils literal notranslate"><span class="pre">text</span></code> column) and select the designated annotators and experts for that batch.
+<li><p>Navigate to the project dashboard and click <strong>New Batch</strong> at the top of the page.</p></li>
+<li><p>In the batch upload page, select a dataset file (<code class="docutils literal notranslate"><span class="pre">CSV</span></code> or <code class="docutils literal notranslate"><span class="pre">XLSX</span></code> containing a <code class="docutils literal notranslate"><span class="pre">text</span></code> column) and select the designated annotators and experts for that batch.
 Every other column (for example an <code class="docutils literal notranslate"><span class="pre">id</span></code>, the source or a date) is kept as metadata of the sample and included in the exports, so you can join the labels back to your data.
 Every row needs a text; the upload is rejected and names the rows that are empty.
 Put each piece of metadata in its own column, and save files from pandas with <code class="docutils literal notranslate"><span class="pre">df.to_csv(...,</span> <span class="pre">index=False)</span></code>; otherwise the row index is stored as an extra column called <code class="docutils literal notranslate"><span class="pre">Unnamed:</span> <span class="pre">0</span></code>.</p></li>
-<li><p>Upon upload, the new batch appears in the project’s <strong>Batches</strong> list in <code class="docutils literal notranslate"><span class="pre">Annotation</span></code> mode.</p></li>
+<li><p>Upon upload, the new batch appears in the project’s <strong>Batches</strong> list in <strong>Annotation</strong> mode.</p></li>
 </ol>
 <figure class="align-center" id="id4">
 <a class="reference internal image-reference" href="../_images/expert_upload_first_batch.png"><img alt="Empty Project Dashboard" src="../_images/expert_upload_first_batch.png" style="width: 550px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 4: Initial Project Dashboard</strong>. Dashboard view prior to uploading dataset batches.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 4: Initial Project Dashboard</strong>. Dashboard view before uploading dataset batches.</span><a class="headerlink" href="#id4" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id5">
-<a class="reference internal image-reference" href="../_images/expert_create_first_batch.png"><img alt="Create Batch Modal" src="../_images/expert_create_first_batch.png" style="width: 550px;" />
+<a class="reference internal image-reference" href="../_images/expert_create_first_batch.png"><img alt="Create Batch Page" src="../_images/expert_create_first_batch.png" style="width: 550px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 5: Batch Creation Modal</strong>. Uploading a dataset file and assigning specific annotators and experts to the batch.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 5: Batch Creation Page</strong>. Uploading a dataset file and assigning specific annotators and experts to the batch.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id6">
 <a class="reference internal image-reference" href="../_images/expert_batch_uploaded.png"><img alt="Active Batch Overview" src="../_images/expert_batch_uploaded.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 6: Active Batch Dashboard</strong>. Overview card displaying Batch 1 in the Annotation phase, showing real-time annotation progress per user.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 6: Active Batch Dashboard</strong>. Overview card displaying Batch 1 in the <em>Annotation</em> phase, showing real-time annotation progress per user.</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+<section id="reorder-samples-within-a-batch">
+<h3>2.1 Reorder samples within a batch<a class="headerlink" href="#reorder-samples-within-a-batch" title="Link to this heading"></a></h3>
+<p>Once a batch is uploaded, it’s possible to reorder the samples within that batch by clicking on “Batch #” (e.g., <strong>Batch 1</strong>) in the batch overview card. Once the samples view is open, click on the button at the left side of each sample row and drag it to change order.</p>
+<figure class="align-center" id="id7">
+<a class="reference internal image-reference" href="../_images/expert_reorder_samples.png"><img alt="Reorder batch samples" src="../_images/expert_reorder_samples.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><strong>Figure 5: Reorder batch samples</strong>. Click and drag on the samples to change order.</span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -240,43 +255,40 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <h3>3. First Codebook<a class="headerlink" href="#first-codebook" title="Link to this heading"></a></h3>
 <p>After creating a batch, the Expert writes the initial annotation guidelines (Codebook):</p>
 <ol class="arabic simple">
-<li><p>Click <strong>View Codebook</strong> on the project dashboard.</p></li>
-<li><p>Click <strong>Edit</strong>, enter the initial guideline instructions, write a rationale for the initial setup, and save.</p></li>
+<li><p>Click <strong>Open</strong> in the Codebook card on the project dashboard, or on <strong>Codebook</strong> on the menu on the left side of the page.</p></li>
+<li><p>Click <strong>Edit</strong>, enter the initial guideline instructions, write an explanatory rationale, and click on <strong>Save changes</strong>.</p></li>
 </ol>
-<figure class="align-center" id="id7">
+<figure class="align-center" id="id8">
 <a class="reference internal image-reference" href="../_images/expert_first_codebook.png"><img alt="Initial Codebook Editor" src="../_images/expert_first_codebook.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 7: Initial Codebook Setup</strong>. Editor interface where Experts input first instructions and save the initial Codebook commit.</span><a class="headerlink" href="#id7" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 7: Initial Codebook Setup</strong>. Editor interface where Experts input first instructions and save the first version of the Codebook.</span><a class="headerlink" href="#id8" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <hr class="docutils" />
 <section id="resolve-disagreements-and-edit-the-codebook">
 <h3>4. Resolve Disagreements and Edit the Codebook<a class="headerlink" href="#resolve-disagreements-and-edit-the-codebook" title="Link to this heading"></a></h3>
-<p>When annotators complete peer discussion without reaching consensus on a sample, the batch transitions to the <em>Expert decision</em> phase.</p>
+<p>When annotators complete peer discussion without reaching consensus on a sample, the batch moves to the <em>Expert decision</em> phase.</p>
 <ol class="arabic simple">
-<li><p>Click <strong>Resolve</strong> on the batch card to open the adjudication panel.</p></li>
+<li><p>Click <strong>Resolve disagreements</strong> on the batch card to open the adjudication panel.</p></li>
 <li><p>Review the sample text, individual annotator labels, and the Annotators chat transcript.</p></li>
-<li><p>Select the final adjudicated label for the sample.</p></li>
+<li><p>Select the final adjudicated label for the sample and click on <strong>Save and next case</strong>.</p></li>
 <li><p>Edit the Codebook instructions in the right-hand panel to address the underlying underspecification (e.g., adding an edge case rule).</p></li>
-<li><p>Enter a detailed rationale explaining your decision and click <strong>Save</strong>.</p></li>
+<li><p>Enter a detailed rationale explaining your decision and click <strong>Save draft</strong>.</p></li>
 </ol>
-<blockquote>
-<div><p><strong>Important Note</strong>: In order for annotators to see highlighted Codebook changes when starting a new batch, the subsequent batch must already be created and in <code class="docutils literal notranslate"><span class="pre">Setup</span></code> mode when the Codebook edit takes place.</p>
-</div></blockquote>
-<figure class="align-center" id="id8">
+<figure class="align-center" id="id9">
 <a class="reference internal image-reference" href="../_images/expert_resolve.png"><img alt="Unresolved Disagreements Alert" src="../_images/expert_resolve.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 8: Unresolved Disagreement Alert</strong>. Batch dashboard card indicating cases needing expert adjudication via the “Resolve” button.</span><a class="headerlink" href="#id8" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 8: Unresolved Disagreement Alert</strong>. Batch dashboard card indicating cases needing expert adjudication via the “Resolve disagreements” button.</span><a class="headerlink" href="#id9" title="Link to this image"></a></p>
 </figcaption>
 </figure>
-<figure class="align-center" id="id9">
+<figure class="align-center" id="id10">
 <a class="reference internal image-reference" href="../_images/expert_codebook_editing.png"><img alt="Expert Adjudication Interface" src="../_images/expert_codebook_editing.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 9: Expert Adjudication &amp; Codebook Revision Interface</strong>. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook rule editing, and rationale logging.</span><a class="headerlink" href="#id9" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 9: Expert Adjudication &amp; Codebook Revision Interface</strong>. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook editing, and rationale logging.</span><a class="headerlink" href="#id10" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -285,55 +297,48 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <h3>5. Export Batch Data After Annotation and Discussion<a class="headerlink" href="#export-batch-data-after-annotation-and-discussion" title="Link to this heading"></a></h3>
 <p>When all annotations, discussions, and expert adjudications for a batch are complete:</p>
 <ul class="simple">
-<li><p>Click <strong>Export</strong> on an individual batch card to download its final labels, discussion transcripts, and revision history.</p></li>
-<li><p>Click <strong>Export Project</strong> to download the complete dataset and full Git-backed audit trail for the entire project.</p></li>
+<li><p>Click <strong>…</strong> and <strong>Export batch</strong> on an individual batch card to download its final labels, discussion transcripts, and revision history.</p></li>
+<li><p>Click <strong>Export Project</strong> at the top right of the project page to download the complete dataset and full Git-backed audit trail for the entire project.</p></li>
 <li><p>Both exports are JSON Lines files with one sample per line. The extra columns of the uploaded file appear under <code class="docutils literal notranslate"><span class="pre">metadata</span></code>, e.g. <code class="docutils literal notranslate"><span class="pre">&quot;metadata&quot;:</span> <span class="pre">{&quot;id&quot;:</span> <span class="pre">4711,</span> <span class="pre">&quot;source&quot;:</span> <span class="pre">&quot;twitter&quot;}</span></code>.</p></li>
 </ul>
-<figure class="align-center" id="id10">
+<figure class="align-center" id="id11">
 <a class="reference internal image-reference" href="../_images/expert_export_project.png"><img alt="Export Project Dashboard" src="../_images/expert_export_project.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 10: Data Export Dashboard</strong>. Finalized batch view offering individual batch or full project data export options.</span><a class="headerlink" href="#id10" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 10: Data Export</strong>. Project dashboard view offering individual batch or full project data export options.</span><a class="headerlink" href="#id11" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 </section>
 <hr class="docutils" />
 <section id="annotator-user-guide">
-<h2>3. Annotator User Guide<a class="headerlink" href="#annotator-user-guide" title="Link to this heading"></a></h2>
+<h2>Annotator User Guide<a class="headerlink" href="#annotator-user-guide" title="Link to this heading"></a></h2>
 <p>The Annotator role focuses on independent labeling, peer discussion of conflicting samples, and staying synchronized with evolving Codebook guidelines.</p>
 <section id="project-dashboard-view">
 <h3>Project Dashboard View<a class="headerlink" href="#project-dashboard-view" title="Link to this heading"></a></h3>
-<p>When logging in, Annotators see a summary of all assigned projects, active batches, and current phase statuses.</p>
-<figure class="align-center" id="id11">
+<p>When logging in, Annotators see a summary of all assigned projects, active batches, and current phase statuses. Batches in <em>Discussion</em> phase are highlited and displayed first.</p>
+<figure class="align-center" id="id12">
 <a class="reference internal image-reference" href="../_images/annotator_start.png"><img alt="Annotator Home Dashboard" src="../_images/annotator_start.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 11: Annotator Home Dashboard</strong>. Overview of assigned projects, count of active batches, and current phase indicator.</span><a class="headerlink" href="#id11" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 11: Annotator Home Dashboard</strong>. Overview of assigned projects, active batches, and current phase indicator.</span><a class="headerlink" href="#id12" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <hr class="docutils" />
 <section id="first-batch-overview-codebook-view">
 <h3>1. First Batch Overview &amp; Codebook View<a class="headerlink" href="#first-batch-overview-codebook-view" title="Link to this heading"></a></h3>
-<p>Clicking on a project opens the batch management view:</p>
+<p>Clicking on a project opens the project view:</p>
 <ul class="simple">
-<li><p><strong>Start Annotation</strong>: Opens the labeling interface for the assigned batch.</p></li>
-<li><p><strong>View Codebook</strong>: Opens the current annotation guidelines.</p></li>
-<li><p><strong>Open Codebook Changes</strong>: Displays the codebook view showing newly added rules since the previous batch.</p></li>
+<li><p><strong>Start Annotating</strong> (Batch section): Opens the labeling interface for the assigned batch.</p></li>
+<li><p><strong>Open</strong> (Codebook section): Opens the current annotation guidelines.</p></li>
+<li><p><strong>Codebook Changes</strong> (Batch section): Displays the codebook view showing newly added rules since the previous batch.</p></li>
 </ul>
-<figure class="align-center" id="id12">
+<figure class="align-center" id="id13">
 <a class="reference internal image-reference" href="../_images/annotator_first_batch_overview.png"><img alt="Annotator Batch Overview" src="../_images/annotator_first_batch_overview.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 12: Annotator Batch Overview Card</strong>. Displaying assigned samples (0/11 annotated) and action buttons.</span><a class="headerlink" href="#id12" title="Link to this image"></a></p>
-</figcaption>
-</figure>
-<figure class="align-center" id="id13">
-<a class="reference internal image-reference" href="../_images/annotator_first_codebook_view.png"><img alt="Initial Codebook View Modal" src="../_images/annotator_first_codebook_view.png" style="width: 650px;" />
-</a>
-<figcaption>
-<p><span class="caption-text"><strong>Figure 13: Codebook</strong>. Displaying instructions before any batch edits occur.</span><a class="headerlink" href="#id13" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 12: Annotator Batch Overview Card</strong>. Displaying assigned samples for the current project, codebook and action buttons.</span><a class="headerlink" href="#id13" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -343,10 +348,11 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <p>In the Annotation phase, annotators label each sample independently:</p>
 <ol class="arabic simple">
 <li><p>Read the presented text sample.</p></li>
-<li><p>Click the appropriate candidate label button (or use custom keyboard shortcuts).</p></li>
+<li><p>Click the appropriate candidate label button and save to move to the next sample (or use custom keyboard shortcuts).</p></li>
 <li><p>Navigate through samples using arrow buttons or keyboard shortcuts.</p></li>
-<li><p>When finished, click <strong>Finalize annotation</strong>.</p></li>
+<li><p>When all samples for the current batch are annotated, you can either check and change your labels by clicking on <strong>Review my labels</strong> or lock in your annotations for the current batch by clicking on <strong>Finalize annotation</strong>. When all annotators have finalized, the batch moves to the <em>Discussion</em> phase in case of disagreements.</p></li>
 </ol>
+<p>You can click on the <strong>Codebook</strong> button anytime to display the annotation guidelines next to the sample you’re annotating.</p>
 <figure class="align-center" id="id14">
 <a class="reference internal image-reference" href="../_images/annotator_annotation_interface.png"><img alt="Independent Annotation Screen" src="../_images/annotator_annotation_interface.png" style="width: 550px;" />
 </a>
@@ -355,7 +361,7 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 </figcaption>
 </figure>
 <figure class="align-center" id="id15">
-<a class="reference internal image-reference" href="../_images/finalize_annotation.png"><img alt="Finalize Batch Screen" src="../_images/finalize_annotation.png" style="width: 550px;" />
+<a class="reference internal image-reference" href="../_images/annotator_finalize_annotation.png"><img alt="Finalize Batch Screen" src="../_images/annotator_finalize_annotation.png" style="width: 550px;" />
 </a>
 <figcaption>
 <p><span class="caption-text"><strong>Figure 15: Finalize Batch</strong>. Completion prompt displayed when all samples in a batch have been labeled.</span><a class="headerlink" href="#id15" title="Link to this image"></a></p>
@@ -365,33 +371,33 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <h4>Keyboard Shortcuts<a class="headerlink" href="#keyboard-shortcuts" title="Link to this heading"></a></h4>
 <p>The annotation interface supports hotkeys for rapid labeling and navigation:</p>
 <ul class="simple">
-<li><p><strong>Left Arrow Key ($\leftarrow$)</strong>: Move to the previous sample.</p></li>
-<li><p><strong>Right Arrow Key ($\rightarrow$)</strong>: Move to the next sample.</p></li>
-<li><p><strong>Enter Key ($\hookleftarrow$)</strong>: Save annotation (transmits current label selections to the server).</p></li>
-<li><p><strong>Custom Hotkeys</strong>: Custom key bindings defined during project setup (e.g., key <code class="docutils literal notranslate"><span class="pre">A</span></code> for Positive, key <code class="docutils literal notranslate"><span class="pre">B</span></code> for Negative).</p></li>
+<li><p><strong>Left Arrow Key (←)</strong>: Move to the previous sample.</p></li>
+<li><p><strong>Right Arrow Key (→)</strong>: Move to the next sample.</p></li>
+<li><p><strong>Enter Key (↵)</strong>: Save annotation.</p></li>
+<li><p><strong>Custom Hotkeys</strong>: Custom key bindings defined during project setup.</p></li>
 </ul>
 </section>
 </section>
 <hr class="docutils" />
 <section id="peer-discussion-phase">
 <h3>3. Peer Discussion Phase<a class="headerlink" href="#peer-discussion-phase" title="Link to this heading"></a></h3>
-<p>When independent annotation is complete and label mismatches exist between annotators, the batch transitions to the <code class="docutils literal notranslate"><span class="pre">Discussion</span></code> phase.</p>
+<p>When independent annotation is complete and label mismatches exist between annotators, the batch moves to the <em>Discussion</em> phase.</p>
 <ol class="arabic simple">
-<li><p>Click <strong>Start Discussion</strong> on the batch card.</p></li>
+<li><p>Click <strong>Join Discussion</strong> on the batch card.</p></li>
 <li><p>The split-screen discussion interface displays:</p>
 <ul class="simple">
-<li><p><strong>Left Panel</strong>: The sample text, your label, and your peer’s label.</p></li>
-<li><p><strong>Right Panel</strong>: A real-time chat window.</p></li>
+<li><p>Left Panel: The sample text, labels before discussion, label choice after discussion.</p></li>
+<li><p>Right Panel: A real-time chat window.</p></li>
 </ul>
 </li>
-<li><p>Discuss the sample with your peer.</p></li>
-<li><p>If you reach consensus, update your label selections. If you remain in disagreement, leave the conflicting labels as-is to escalate the sample to the Expert. Click <strong>Save &amp; Done</strong>.</p></li>
+<li><p>Discuss the sample with your peer, writing messages in the designated box at the bottom-right corner of the page.</p></li>
+<li><p>If you reach consensus, update your label selections. If you remain in disagreement, leave the conflicting labels as-is to escalate the sample to the Expert. Click <strong>Save my label</strong>.</p></li>
 </ol>
 <figure class="align-center" id="id16">
 <a class="reference internal image-reference" href="../_images/annotator_start_discussion.png"><img alt="Start Discussion Alert" src="../_images/annotator_start_discussion.png" style="width: 550px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 16: Peer Discussion Alert</strong>. Batch card notifying annotators that independent labeling is complete and peer discussion is open.</span><a class="headerlink" href="#id16" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 16: Peer Discussion Open</strong>. Batch card notifying annotators that independent labeling is complete and peer discussion is open.</span><a class="headerlink" href="#id16" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id17">
@@ -407,28 +413,28 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <h3>4. View Codebook After Update<a class="headerlink" href="#view-codebook-after-update" title="Link to this heading"></a></h3>
 <p>When the Expert adjudicates an escalated sample and updates the guidelines:</p>
 <ol class="arabic simple">
-<li><p>Upon entering the next batch, click <strong>Open Codebook Changes</strong>.</p></li>
+<li><p>In the project page, click <strong>Codebook changes</strong> in the new batch section.</p></li>
 <li><p>The Codebook view highlights all newly added or modified rules in highlighted format.</p></li>
 </ol>
 <figure class="align-center" id="id18">
-<a class="reference internal image-reference" href="../_images/annotator_open_codebook_changes.png"><img alt="Codebook Update Notification" src="../_images/annotator_open_codebook_changes.png" style="width: 550px;" />
+<a class="reference internal image-reference" href="../_images/annotator_open_codebook_changes.png"><img alt="Codebook Update" src="../_images/annotator_open_codebook_changes.png" style="width: 550px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 18: Codebook Update</strong>. Button on new batch card indicating updated guidelines are available.</span><a class="headerlink" href="#id18" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 18: Codebook Update</strong>. Click on codebook changes button on new batch card to see updates in the codebook.</span><a class="headerlink" href="#id18" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id19">
 <a class="reference internal image-reference" href="../_images/annotator_codebook_view_edited.png"><img alt="Diff-Highlighted Codebook View" src="../_images/annotator_codebook_view_edited.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 19: Highlighted Codebook Edits View</strong>. Updated guideline screen with newly added rules highlighted in green.</span><a class="headerlink" href="#id19" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 19: Highlighted Codebook Edits View</strong>. Updated guideline screen with edits highlighted.</span><a class="headerlink" href="#id19" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 </section>
 <hr class="docutils" />
 <section id="admin-user-guide">
-<h2>4. Admin User Guide<a class="headerlink" href="#admin-user-guide" title="Link to this heading"></a></h2>
+<h2>Admin User Guide<a class="headerlink" href="#admin-user-guide" title="Link to this heading"></a></h2>
 <p>Administrators manage system deployment, user account creation, user group assignments, and Django permissions. Access the admin interface at <code class="docutils literal notranslate"><span class="pre">/admin</span></code> using administrator credentials.</p>
 <section id="admin-homepage">
 <h3>1. Admin Homepage<a class="headerlink" href="#admin-homepage" title="Link to this heading"></a></h3>
@@ -437,7 +443,7 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <a class="reference internal image-reference" href="../_images/admin.png"><img alt="Django Admin Homepage" src="../_images/admin.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 20: Django Administration Homepage</strong> — Central management portal for site administration, user accounts, and system logs.</span><a class="headerlink" href="#id20" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 20: Django Administration Homepage</strong>. Central management portal for site administration, user accounts, and system logs.</span><a class="headerlink" href="#id20" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -454,7 +460,7 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <a class="reference internal image-reference" href="../_images/admin_add_user.png"><img alt="Add User Form" src="../_images/admin_add_user.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 21: User Registration Form</strong> — Admin form for creating new user credentials.</span><a class="headerlink" href="#id21" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 21: User Registration Form</strong>. Admin form for creating new user credentials.</span><a class="headerlink" href="#id21" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -470,7 +476,7 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <a class="reference internal image-reference" href="../_images/admin_user_groups.png"><img alt="User Group Assignment" src="../_images/admin_user_groups.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 22: User Group Management</strong> — Interface for assigning users to designated functional groups.</span><a class="headerlink" href="#id22" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 22: User Group Management</strong>. Interface for assigning users to designated functional groups.</span><a class="headerlink" href="#id22" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
@@ -487,7 +493,7 @@ Put each piece of metadata in its own column, and save files from pandas with <c
 <a class="reference internal image-reference" href="../_images/admin_user_permissions.png"><img alt="User Permissions Selector" src="../_images/admin_user_permissions.png" style="width: 650px;" />
 </a>
 <figcaption>
-<p><span class="caption-text"><strong>Figure 23: Fine-Grained User Permissions</strong> — Selector panel for assigning specific system and model permissions to user profiles.</span><a class="headerlink" href="#id23" title="Link to this image"></a></p>
+<p><span class="caption-text"><strong>Figure 23: Fine-Grained User Permissions</strong>. Selector panel for assigning specific system and model permissions to user profiles.</span><a class="headerlink" href="#id23" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
