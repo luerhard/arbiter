@@ -1,8 +1,12 @@
 # Usage
 
-# General Info & Overview
+## General Info & Overview
 
-## What is Arbiter?
+You can access Arbiter at this link: [http://193.196.55.39/](http://193.196.55.39/)
+
+You must be connected to University of Stuttgart's network (either by being on site or via VPN).
+
+### What is Arbiter?
 
 **Arbiter** is an open-source collaborative software tool and web application designed to build and document a shared understanding during data annotation tasks.
 
@@ -15,20 +19,21 @@ Unlike traditional post-hoc statistical methods that attempt to model disagreeme
 
 ### Key Features
 
-- **Batch-Based Annotation and Real-Time Chat**: Data is annotated in structured batches. When label disagreements occur, annotators discuss them synchronously in an integrated real-time chat interface.
-- **Expert Adjudication and Guideline Revision**: Disagreements that cannot be resolved between annotators are passed to an expert, who adjudicates the final label and updates the annotation guidelines (i.e., **codebook**).
-- **Traceable Dataset Documentation**: Every label assignment, discussion, expert decision rationale, and guideline revision is logged. This creates a complete audit trail that documents how the team's interpretation evolved over time, serving as a reproducibility artifact for downstream dataset users.
+- **Project Creation and Data Batches Upload**: create your annotation project describing its purpose, choose the user accounts that will participate, define the labels, write initial annotation guidelines (i.e., **codebook**) and upload your dataset batch by batch.
+- **Batch-Based Annotation and Real-Time Chat**: data is annotated in batches. When label disagreements occur, annotators discuss them synchronously in an integrated real-time chat interface.
+- **Expert Adjudication and Guideline Revision**: disagreements that cannot be resolved between annotators are passed to an expert, who adjudicates the final label and updates the annotation guidelines.
+- **Traceable Dataset Documentation**: every label assignment, discussion, expert decision rationale, and guideline revision is logged. This creates a complete audit trail that documents how the team's interpretation evolved over time, serving as a reproducibility artifact for downstream dataset users.
 
 ## User Login
 
-To log into Arbiter, enter the credentials provided by your system administrator. The login interface is identical for annotators and experts
+To log into Arbiter, enter the credentials provided by your system administrator. The login interface is identical for annotators and experts.
 
 :::{figure} screenshots/login.png
 :width: 500px
 :align: center
 :alt: Arbiter Login Interface
 
-**Figure 1: Arbiter Login Screen**. Authentication page for Annotators and Experts
+**Figure 1: Arbiter Login**. Authentication page for Annotators and Experts.
 :::
 
 ## User Roles and Workflow Description
@@ -37,49 +42,49 @@ Arbiter structures data labeling around three distinct user roles and a multi-st
 
 ### Users
 
-- **Annotator**: Independently label data batches, deliberate with peers in real-time chat regarding disagreed samples to resolve misapplications, and review codebook updates prior to starting subsequent batches.
-- **Expert**: Create projects, upload data batches, review annotators' unresolved disagreements, assign final adjudicated labels, provide explanatory rationales, and edit the codebook.
-- **Administrator**: Manage groups and users.
+- **Annotator**: Independently label data batches, deliberate with peers in real-time chat regarding disagreed samples to resolve misapplications, and review codebook updates before starting subsequent batches annotation.
+- **Expert**: Create projects, upload data batches, review annotators' unresolved disagreements, assign final adjudicated labels, provide explanatory rationales, edit the codebook and export projects.
+- **Administrator**: Manage user accounts and groups.
 
 ### Workflow
+
+1. **First batch and codebook upload**: Expert user uploads batches and writes the first version of the annotation guidelines.
+2. **Annotation**: Annotators independently assign labels according to current codebook guidelines.
+3. **Discussion (Resolving Misapplication)**: Once independent labeling for a batch is complete, samples with divergent labels automatically enter the discussion stage. Annotators use the real-time chat interface to discuss their reasoning. If they reach consensus, updated labels are saved. If they don't, the sample is passed to the Expert.
+4. **Expert adjudication and codebook update (Resolving Underspecification)**: The expert selects the final decision for the samples with divergent label and, where needed, updates the codebook to clarify the rule or edge case, writing the rationale on which is based the final decision.
+5. **Codebook synchronization and maturation**: Before beginning the next batch, annotators read the updated codebook with changes highlighted. Over time, as guidelines mature, discussion counts and annotation guidelines edits decrease, signaling that the team has converged on a relatively stable, shared understanding.
 
 :::{figure} screenshots/workflow_diagram.png
 :width: 500px
 :align: center
-:alt: Arbiter Login Interface
+:alt: Arbiter Workflow Diagram
 
 **Figure 2: Arbiter Workflow**
 :::
 
-1. **First batch and codebook upload**: Expert user uploads batches and the first version of the annotation guidelines.
-2. **Annotation**: Annotators independently assign labels according to current codebook guidelines.
-3. **Discussion (Resolving Misapplication)**: Once independent labeling for a batch is complete, samples with divergent labels automatically enter the discussion stage. Annotators use the real-time chat interface to discuss their reasoning. If they reach consensus, updated labels are saved. If they don't, the sample is passed to the Expert.
-4. **Expert adjudication and codebook update (Resolving Underspecification)**: The expert selects the final decision for the samples with divergent label and updates the codebook to clarify the rule or edge case, writing the rationale on which is based the final decision.
-5. **Codebook synchronization and maturation**: Before beginning the next batch, annotators read the updated codebook with changes highlighted. Over time, as guidelines mature, discussion counts and instruction edits decrease, signaling that the team has converged on a relatively stable, shared understanding.
-
 ---
 
-## 2. Expert User Guide
+## Expert User Guide
 
 ### 1. Create a Project
 
 To set up a new annotation project:
 
-1. Log in with an Expert account and click **Create Project** in the navigation menu.
+1. Log in with an Expert account and click **+** in the navigation menu or **New Project** on the right side of the page, at the top of **Your Projects** section.
 2. Fill out the project configuration form:
    - **Project title**: A name for your project.
    - **Description**: A summary defining the project scope and goals.
    - **Annotators & Experts**: Assign user profiles to their respective roles for this project.
    - **Labels**: Define labels along with custom display colors and hotkeys.
 
-3. Click **Create Project** at the bottom of the page to finalize setup.
+3. Click **Create Project** at the bottom of the page to save and create the project.
 
 :::{figure} screenshots/expert_create_project_filled.png
 :width: 650px
 :align: center
 :alt: Create Project Form
 
-**Figure 3: Project Creation Form**. Filling in project title, description, user assignments, labels, display colors, and hotkeys.
+**Figure 3: Project Creation Form**. Fill in project info and save.
 :::
 
 ---
@@ -88,27 +93,27 @@ To set up a new annotation project:
 
 Once a project is created, data samples must be grouped and uploaded in batches:
 
-1. Navigate to the project dashboard and click **Create Batch**.
-2. In the modal dialog, select a dataset file (`CSV` or `XLSX` containing a `text` column) and select the designated annotators and experts for that batch.
+1. Navigate to the project dashboard and click **New Batch** at the top of the page.
+2. In the batch upload page, select a dataset file (`CSV` or `XLSX` containing a `text` column) and select the designated annotators and experts for that batch.
    Every other column (for example an `id`, the source or a date) is kept as metadata of the sample and included in the exports, so you can join the labels back to your data.
    Every row needs a text; the upload is rejected and names the rows that are empty.
    Put each piece of metadata in its own column, and save files from pandas with `df.to_csv(..., index=False)`; otherwise the row index is stored as an extra column called `Unnamed: 0`.
-3. Upon upload, the new batch appears in the project's **Batches** list in `Annotation` mode.
+3. Upon upload, the new batch appears in the project's **Batches** list in **Annotation** mode.
 
 :::{figure} screenshots/expert_upload_first_batch.png
 :width: 550px
 :align: center
 :alt: Empty Project Dashboard
 
-**Figure 4: Initial Project Dashboard**. Dashboard view prior to uploading dataset batches.
+**Figure 4: Initial Project Dashboard**. Dashboard view before uploading dataset batches.
 :::
 
 :::{figure} screenshots/expert_create_first_batch.png
 :width: 550px
 :align: center
-:alt: Create Batch Modal
+:alt: Create Batch Page
 
-**Figure 5: Batch Creation Modal**. Uploading a dataset file and assigning specific annotators and experts to the batch.
+**Figure 5: Batch Creation Page**. Uploading a dataset file and assigning specific annotators and experts to the batch.
 :::
 
 :::{figure} screenshots/expert_batch_uploaded.png
@@ -116,7 +121,19 @@ Once a project is created, data samples must be grouped and uploaded in batches:
 :align: center
 :alt: Active Batch Overview
 
-**Figure 6: Active Batch Dashboard**. Overview card displaying Batch 1 in the Annotation phase, showing real-time annotation progress per user.
+**Figure 6: Active Batch Dashboard**. Overview card displaying Batch 1 in the _Annotation_ phase, showing real-time annotation progress per user.
+:::
+
+### 2.1 Reorder samples within a batch
+
+Once a batch is uploaded, it's possible to reorder the samples within that batch by clicking on "Batch #" (e.g., **Batch 1**) in the batch overview card. Once the samples view is open, click on the button at the left side of each sample row and drag it to change order.
+
+:::{figure} screenshots/expert_reorder_samples.png
+:width: 650px
+:align: center
+:alt: Reorder batch samples
+
+**Figure 5: Reorder batch samples**. Click and drag on the samples to change order.
 :::
 
 ---
@@ -125,37 +142,35 @@ Once a project is created, data samples must be grouped and uploaded in batches:
 
 After creating a batch, the Expert writes the initial annotation guidelines (Codebook):
 
-1. Click **View Codebook** on the project dashboard.
-2. Click **Edit**, enter the initial guideline instructions, write a rationale for the initial setup, and save.
+1. Click **Open** in the Codebook card on the project dashboard, or on **Codebook** on the menu on the left side of the page.
+2. Click **Edit**, enter the initial guideline instructions, write an explanatory rationale, and click on **Save changes**.
 
 :::{figure} screenshots/expert_first_codebook.png
 :width: 650px
 :align: center
 :alt: Initial Codebook Editor
 
-**Figure 7: Initial Codebook Setup**. Editor interface where Experts input first instructions and save the initial Codebook commit.
+**Figure 7: Initial Codebook Setup**. Editor interface where Experts input first instructions and save the first version of the Codebook.
 :::
 
 ---
 
 ### 4. Resolve Disagreements and Edit the Codebook
 
-When annotators complete peer discussion without reaching consensus on a sample, the batch transitions to the _Expert decision_ phase.
+When annotators complete peer discussion without reaching consensus on a sample, the batch moves to the _Expert decision_ phase.
 
-1. Click **Resolve** on the batch card to open the adjudication panel.
+1. Click **Resolve disagreements** on the batch card to open the adjudication panel.
 2. Review the sample text, individual annotator labels, and the Annotators chat transcript.
-3. Select the final adjudicated label for the sample.
+3. Select the final adjudicated label for the sample and click on **Save and next case**.
 4. Edit the Codebook instructions in the right-hand panel to address the underlying underspecification (e.g., adding an edge case rule).
-5. Enter a detailed rationale explaining your decision and click **Save**.
-
-> **Important Note**: In order for annotators to see highlighted Codebook changes when starting a new batch, the subsequent batch must already be created and in `Setup` mode when the Codebook edit takes place.
+5. Enter a detailed rationale explaining your decision and click **Save draft**.
 
 :::{figure} screenshots/expert_resolve.png
 :width: 650px
 :align: center
 :alt: Unresolved Disagreements Alert
 
-**Figure 8: Unresolved Disagreement Alert**. Batch dashboard card indicating cases needing expert adjudication via the "Resolve" button.
+**Figure 8: Unresolved Disagreement Alert**. Batch dashboard card indicating cases needing expert adjudication via the "Resolve disagreements" button.
 :::
 
 :::{figure} screenshots/expert_codebook_editing.png
@@ -163,7 +178,7 @@ When annotators complete peer discussion without reaching consensus on a sample,
 :align: center
 :alt: Expert Adjudication Interface
 
-**Figure 9: Expert Adjudication & Codebook Revision Interface**. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook rule editing, and rationale logging.
+**Figure 9: Expert Adjudication & Codebook Revision Interface**. Comprehensive panel displaying sample text, annotator labels, chat history, final label selection, Codebook editing, and rationale logging.
 :::
 
 ---
@@ -172,8 +187,8 @@ When annotators complete peer discussion without reaching consensus on a sample,
 
 When all annotations, discussions, and expert adjudications for a batch are complete:
 
-- Click **Export** on an individual batch card to download its final labels, discussion transcripts, and revision history.
-- Click **Export Project** to download the complete dataset and full Git-backed audit trail for the entire project.
+- Click **...** and **Export batch** on an individual batch card to download its final labels, discussion transcripts, and revision history.
+- Click **Export Project** at the top right of the project page to download the complete dataset and full Git-backed audit trail for the entire project.
 - Both exports are JSON Lines files with one sample per line. The extra columns of the uploaded file appear under `metadata`, e.g. `"metadata": {"id": 4711, "source": "twitter"}`.
 
 :::{figure} screenshots/expert_export_project.png
@@ -181,51 +196,43 @@ When all annotations, discussions, and expert adjudications for a batch are comp
 :align: center
 :alt: Export Project Dashboard
 
-**Figure 10: Data Export Dashboard**. Finalized batch view offering individual batch or full project data export options.
+**Figure 10: Data Export**. Project dashboard view offering individual batch or full project data export options.
 :::
 
 ---
 
-## 3. Annotator User Guide
+## Annotator User Guide
 
 The Annotator role focuses on independent labeling, peer discussion of conflicting samples, and staying synchronized with evolving Codebook guidelines.
 
 ### Project Dashboard View
 
-When logging in, Annotators see a summary of all assigned projects, active batches, and current phase statuses.
+When logging in, Annotators see a summary of all assigned projects, active batches, and current phase statuses. Batches in _Discussion_ phase are highlited and displayed first.
 
 :::{figure} screenshots/annotator_start.png
 :width: 650px
 :align: center
 :alt: Annotator Home Dashboard
 
-**Figure 11: Annotator Home Dashboard**. Overview of assigned projects, count of active batches, and current phase indicator.
+**Figure 11: Annotator Home Dashboard**. Overview of assigned projects, active batches, and current phase indicator.
 :::
 
 ---
 
 ### 1. First Batch Overview & Codebook View
 
-Clicking on a project opens the batch management view:
+Clicking on a project opens the project view:
 
-- **Start Annotation**: Opens the labeling interface for the assigned batch.
-- **View Codebook**: Opens the current annotation guidelines.
-- **Open Codebook Changes**: Displays the codebook view showing newly added rules since the previous batch.
+- **Start Annotating** (Batch section): Opens the labeling interface for the assigned batch.
+- **Open** (Codebook section): Opens the current annotation guidelines.
+- **Codebook Changes** (Batch section): Displays the codebook view showing newly added rules since the previous batch.
 
 :::{figure} screenshots/annotator_first_batch_overview.png
 :width: 650px
 :align: center
 :alt: Annotator Batch Overview
 
-**Figure 12: Annotator Batch Overview Card**. Displaying assigned samples (0/11 annotated) and action buttons.
-:::
-
-:::{figure} screenshots/annotator_first_codebook_view.png
-:width: 650px
-:align: center
-:alt: Initial Codebook View Modal
-
-**Figure 13: Codebook**. Displaying instructions before any batch edits occur.
+**Figure 12: Annotator Batch Overview Card**. Displaying assigned samples for the current project, codebook and action buttons.
 :::
 
 ---
@@ -235,9 +242,11 @@ Clicking on a project opens the batch management view:
 In the Annotation phase, annotators label each sample independently:
 
 1. Read the presented text sample.
-2. Click the appropriate candidate label button (or use custom keyboard shortcuts).
+2. Click the appropriate candidate label button and save to move to the next sample (or use custom keyboard shortcuts).
 3. Navigate through samples using arrow buttons or keyboard shortcuts.
-4. When finished, click **Finalize annotation**.
+4. When all samples for the current batch are annotated, you can either check and change your labels by clicking on **Review my labels** or lock in your annotations for the current batch by clicking on **Finalize annotation**. When all annotators have finalized, the batch moves to the _Discussion_ phase in case of disagreements.
+
+You can click on the **Codebook** button anytime to display the annotation guidelines next to the sample you're annotating.
 
 :::{figure} screenshots/annotator_annotation_interface.png
 :width: 550px
@@ -247,7 +256,7 @@ In the Annotation phase, annotators label each sample independently:
 **Figure 14: Annotation Interface**. Single-sample labeling screen with progress bar, label selection buttons, and navigation controls.
 :::
 
-:::{figure} screenshots/finalize_annotation.png
+:::{figure} screenshots/annotator_finalize_annotation.png
 :width: 550px
 :align: center
 :alt: Finalize Batch Screen
@@ -259,30 +268,30 @@ In the Annotation phase, annotators label each sample independently:
 
 The annotation interface supports hotkeys for rapid labeling and navigation:
 
-- **Left Arrow Key ($\leftarrow$)**: Move to the previous sample.
-- **Right Arrow Key ($\rightarrow$)**: Move to the next sample.
-- **Enter Key ($\hookleftarrow$)**: Save annotation (transmits current label selections to the server).
-- **Custom Hotkeys**: Custom key bindings defined during project setup (e.g., key `A` for Positive, key `B` for Negative).
+- **Left Arrow Key (←)**: Move to the previous sample.
+- **Right Arrow Key (→)**: Move to the next sample.
+- **Enter Key (↵)**: Save annotation.
+- **Custom Hotkeys**: Custom key bindings defined during project setup.
 
 ---
 
 ### 3. Peer Discussion Phase
 
-When independent annotation is complete and label mismatches exist between annotators, the batch transitions to the `Discussion` phase.
+When independent annotation is complete and label mismatches exist between annotators, the batch moves to the _Discussion_ phase.
 
-1. Click **Start Discussion** on the batch card.
+1. Click **Join Discussion** on the batch card.
 2. The split-screen discussion interface displays:
-   - **Left Panel**: The sample text, your label, and your peer's label.
-   - **Right Panel**: A real-time chat window.
-3. Discuss the sample with your peer.
-4. If you reach consensus, update your label selections. If you remain in disagreement, leave the conflicting labels as-is to escalate the sample to the Expert. Click **Save & Done**.
+   - Left Panel: The sample text, labels before discussion, label choice after discussion.
+   - Right Panel: A real-time chat window.
+3. Discuss the sample with your peer, writing messages in the designated box at the bottom-right corner of the page.
+4. If you reach consensus, update your label selections. If you remain in disagreement, leave the conflicting labels as-is to escalate the sample to the Expert. Click **Save my label**.
 
 :::{figure} screenshots/annotator_start_discussion.png
 :width: 550px
 :align: center
 :alt: Start Discussion Alert
 
-**Figure 16: Peer Discussion Alert**. Batch card notifying annotators that independent labeling is complete and peer discussion is open.
+**Figure 16: Peer Discussion Open**. Batch card notifying annotators that independent labeling is complete and peer discussion is open.
 :::
 
 :::{figure} screenshots/annotator_discussion_interface.png
@@ -299,15 +308,15 @@ When independent annotation is complete and label mismatches exist between annot
 
 When the Expert adjudicates an escalated sample and updates the guidelines:
 
-1. Upon entering the next batch, click **Open Codebook Changes**.
+1. In the project page, click **Codebook changes** in the new batch section.
 2. The Codebook view highlights all newly added or modified rules in highlighted format.
 
 :::{figure} screenshots/annotator_open_codebook_changes.png
 :width: 550px
 :align: center
-:alt: Codebook Update Notification
+:alt: Codebook Update
 
-**Figure 18: Codebook Update**. Button on new batch card indicating updated guidelines are available.
+**Figure 18: Codebook Update**. Click on codebook changes button on new batch card to see updates in the codebook.
 :::
 
 :::{figure} screenshots/annotator_codebook_view_edited.png
@@ -315,12 +324,12 @@ When the Expert adjudicates an escalated sample and updates the guidelines:
 :align: center
 :alt: Diff-Highlighted Codebook View
 
-**Figure 19: Highlighted Codebook Edits View**. Updated guideline screen with newly added rules highlighted in green.
+**Figure 19: Highlighted Codebook Edits View**. Updated guideline screen with edits highlighted.
 :::
 
 ---
 
-## 4. Admin User Guide
+## Admin User Guide
 
 Administrators manage system deployment, user account creation, user group assignments, and Django permissions. Access the admin interface at `/admin` using administrator credentials.
 
@@ -333,7 +342,7 @@ Log in at `http://<your-server-ip>/admin`. The dashboard provides quick access t
 :align: center
 :alt: Django Admin Homepage
 
-**Figure 20: Django Administration Homepage** — Central management portal for site administration, user accounts, and system logs.
+**Figure 20: Django Administration Homepage**. Central management portal for site administration, user accounts, and system logs.
 :::
 
 ---
@@ -351,7 +360,7 @@ To register new Annotators or Experts:
 :align: center
 :alt: Add User Form
 
-**Figure 21: User Registration Form** — Admin form for creating new user credentials.
+**Figure 21: User Registration Form**. Admin form for creating new user credentials.
 :::
 
 ---
@@ -368,7 +377,7 @@ Organize users into functional groups to streamline role assignments:
 :align: center
 :alt: User Group Assignment
 
-**Figure 22: User Group Management** — Interface for assigning users to designated functional groups.
+**Figure 22: User Group Management**. Interface for assigning users to designated functional groups.
 :::
 
 ---
@@ -386,5 +395,5 @@ Fine-tune model-level access rights for specific accounts or groups:
 :align: center
 :alt: User Permissions Selector
 
-**Figure 23: Fine-Grained User Permissions** — Selector panel for assigning specific system and model permissions to user profiles.
+**Figure 23: Fine-Grained User Permissions**. Selector panel for assigning specific system and model permissions to user profiles.
 :::
