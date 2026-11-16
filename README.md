@@ -4,11 +4,9 @@
 <!-- PLACEHOLDER: Docker badge, couldn't find the link -->
 <!-- PLACEHOLDER: JOSS / DOI badge in the future -->
 
-
 **Arbiter** is an open-source, collaborative web application for data annotation that treats
 disagreement as useful information to use during the annotation process rather than noise to resolve post-hoc. Annotators label data in batches, discuss conflicting labels in a real-time chat, and pass unresolved cases to an expert who decides the
 final label and revises the annotation guidelines (the _codebook_). Every label, discussion, and codebook revision is logged, so the evolution of the team's shared understanding of the task is documented alongside the dataset.
-
 
 <!-- PLACEHOLDER: GIF of the workflow -->
 
@@ -19,7 +17,7 @@ Low inter-annotator agreement in subjective or complex tasks usually has one of 
 1. **Task underspecification:** the annotation guidelines are too generic, leaving the space for personal interpretation, especially for edge cases.
 2. **Misapplication:** annotators misunderstand or wrongly apply the guidelines.
 
-Post-hoc statistical methods model disagreement after the data has been collected. 
+Post-hoc statistical methods model disagreement after the data has been collected.
 Arbiter addresses it **during** annotation: misapplication is resolved by synchronous discussion between
 annotators, underspecification by expert adjudication and in-tool codebook revisions.
 
@@ -108,7 +106,6 @@ In addition to the database variables, set `DJANGO_ALLOWED_HOSTS` and
 `DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated) in `.env`. `./backup.sh` creates a full backup
 (database dump plus media files, including all codebooks) in `./backups/`.
 
-
 ## Documentation
 
 Documentation is built with Sphinx and published at **<https://luerhard.github.io/arbiter>**:
@@ -150,6 +147,7 @@ starting larger changes, and send changes as a pull request against `main`.
 - Code is formatted with [Ruff](https://docs.astral.sh/ruff/) and [Prettier](https://prettier.io/); the repository ships a [`.pre-commit-config.yaml`](.pre-commit-config.yaml) so this happens on commit
 
 Complete guide for contributions: [Contributing Guidelines](CONTRIBUTING.md)
+
 ## Citation
 
 If you use Arbiter in your research, please cite:
@@ -164,14 +162,11 @@ If you use Arbiter in your research, please cite:
 }
 ```
 
-
 ## License
 
 Arbiter is released under the [MIT License](LICENSE).
 
 ## Acknowledgements
-
-
 
 ## Contact
 
