@@ -8,7 +8,6 @@
 disagreement as useful information to use during the annotation process rather than noise to resolve post-hoc. Annotators label data in batches, discuss conflicting labels in a real-time chat, and pass unresolved cases to an expert who decides the
 final label and revises the annotation guidelines (the _codebook_). Every label, discussion, and codebook revision is logged, so the evolution of the team's shared understanding of the task is documented alongside the dataset.
 
-
 <!-- PLACEHOLDER: GIF of the workflow using screenshots from user doc?-->
 
 ## Why Arbiter?
@@ -59,16 +58,41 @@ annotators, underspecification by expert adjudication and in-tool codebook revis
 
 ## Installation and quick start
 
-Arbiter runs as a set of Docker containers (web app, Vite, PostgreSQL, Redis). 
+Arbiter runs as a set of Docker containers (web app, Vite, PostgreSQL, Redis).
 
 [Get Docker](https://docs.docker.com/get-docker/).
 
 To get the code run:
+
 ```bash
 git clone https://github.com/luerhard/arbiter.git
 cd arbiter
 ```
 More information in the [guide for devs](docs/dev/index.md).
+=======
+
+Then open <http://127.0.0.1:8000>.
+
+`populatedb` creates demo accounts for trying the tool: `admin`, `annotator1`, `annotator2`,
+`expert1` and `expert2`, all with the password `123`. **These are for local development only; never
+load them on a server that others can reach.**
+
+To remove everything, including the database volume, run `docker compose down --volumes`.
+`docker compose exec web uv run manage.py resetdb --noinput` drops and recreates the database
+without removing the volume.
+
+### Production deployment
+
+`docker-compose.prod.yml` builds the production image (compiled frontend, Daphne ASGI server):
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+In addition to the database variables, set `DJANGO_ALLOWED_HOSTS` and
+`DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated) in `.env`. `./backup.sh` creates a full backup
+(database dump plus media files, including all codebooks) in `./backups/`.
+>>>>>>> 9282879aad3598fc333f5cbc3678b09cdd3fc900
 
 ## Documentation
 
@@ -76,6 +100,7 @@ Documentation is built with Sphinx and published at **<https://luerhard.github.i
 
 - **User guide** (experts, annotators, administrators): [`docs/usage`](docs/usage/index.md)
 - **Developer guide** (setup, tests, debugging, architecture): [`docs/dev`](docs/dev/index.md)
+
 <!-- - **API reference** (generated from the docstrings with Sphinx autodoc): [`docs/api`](docs/api/index.md) -->
 
 ## Tests
@@ -85,7 +110,7 @@ To run them yourself, see the [developer guide](docs/dev/index.md#run-tests).
 
 ## Contributing
 
-Contributions are welcome! 
+Contributions are welcome!
 Complete guide for contributions: [Contributing Guidelines](CONTRIBUTING.md)
 
 ## Citation

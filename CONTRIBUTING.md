@@ -6,9 +6,8 @@ Thank you for your interest in contributing to Arbiter! Bug reports, feature ide
 
 ## Ways to Contribute
 
-* **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
-* **Improve the documentation**: Help refine the user guide (`docs/usage/index.md`) or the developer guide (`docs/dev/index.md`).
-
+- **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
+- **Improve the documentation**: Help refine the user guide (`docs/usage/index.md`) or the developer guide (`docs/dev/index.md`).
 
 # Contributing to Arbiter
 
@@ -31,13 +30,11 @@ When reporting a bug, include:
 
 Never post real, sensitive annotation data in a public issue.
 
-
 ## 2. Development setup
 
 Arbiter is developed with Docker Compose. Follow the
 [installation instructions in the README](README.md#installation-and-quick-start) and
-[developer guide](docs/dev/index.md) 
-
+[developer guide](docs/dev/index.md)
 
 ## 3. Testing
 
@@ -50,7 +47,6 @@ docker compose run --rm web uv run pytest -v
 
 The tests also run automatically with GitHub Actions on every push and pull request to `main`.
 See the [developer guide](docs/dev/index.md#run-tests) for more information on how to run tests.
-
 
 ## 4. Documenting changes
 
@@ -70,15 +66,8 @@ docker compose run --rm web sh -c "cd ../docs; make html"
 ## 5. Submitting a pull request
 
 1. Fork the repository and clone your fork.
-2. Create a branch from `main`. 
+2. Create a branch from `main`.
 3. Push your branch to your fork.
 4. Open a pull request against `main`.
 5. Clearly describe what your pull request does and reference any related issues.
 6. A maintainer will review your pull request and may request changes.
-
-
-
-
-
-
-
