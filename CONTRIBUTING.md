@@ -1,10 +1,6 @@
-<!-- Everything marked $$PLACEHOLDER: ...$$ is information that could not be found in the repository. Fill it in or delete the line before publishing. -->
-
 # Contributing to Arbiter
 
 Thank you for your interest in contributing to Arbiter! Bug reports, feature ideas, UX/UI improvements, documentation updates, and code contributions are all very welcome.
-
-$$PLACEHOLDER: ADD CODE OF CONDUCT? $$
 
 ---
 
@@ -12,98 +8,76 @@ $$PLACEHOLDER: ADD CODE OF CONDUCT? $$
 
 * **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
 * **Improve the documentation**: Help refine the user guide (`docs/usage/index.md`) or the developer guide (`docs/dev/index.md`).
-* **Fix a bug or implement a feature**: Submit a pull request addressing an open issue.
 
-For anything larger than a small fix, please open an issue first so the planned approach can be discussed before investing time in implementation.
 
-### Reporting a Bug
-When submitting a bug report, please include:
-* A clear title and description of what you did, what you expected to happen, and what actually occurred.
-* Your role in the application (Annotator, Expert, or Administrator) and the phase involved (Annotation, Discussion, Expert Decision).
-* Your execution environment (Docker development stack or production Compose file) along with the commit hash or release version.
-* Error logs (`docker compose logs web`) and screenshots if it is a visual/UI display issue.
+# Contributing to Arbiter
 
-> ⚠️ **Important**: Never post real or sensitive annotation data in public GitHub issues.
+Thank you for your interest in contributing! We welcome bug reports, feature requests,
+documentation improvements and code contributions.
 
-$$PLACEHOLDER: ADD ISSUE TEMPLATE? $$
+## 1. Reporting issues
 
----
+Use [GitHub issues](https://github.com/luerhard/arbiter/issues) to report bugs or suggest
+features.
 
-## Setting Up a Development Environment
+When reporting a bug, include:
 
-Arbiter is developed using Docker Compose. The stack bundles the web application, a Vite dev server for the frontend, PostgreSQL, and Redis.
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- Environment details: how you run Arbiter and your role in the app (annotator, expert or administrator) and the
+  phase involved (annotation, discussion, expert decision)
+- Error messages or log output (`docker compose logs web`), and a screenshot for display problems
 
-1. Follow the installation and setup steps in the [README](README.md#installation-and-quick-start).
-2. Consult the [Developer Guide](docs/dev/index.md) for details on:
-   * Resetting the database (`resetdb`) and loading demo data (`populatedb`).
-   * Running and debugging tests (including debugging in VS Code).
-   * The structure of the Django apps (`annotation`, `codebook`, `discuss`, `expert`, `notifications`, `projects`, `users`, `data`).
+Never post real, sensitive annotation data in a public issue.
 
-The Python environment is managed with [uv](https://docs.astral.sh/uv/) (requires Python 3.13 or newer; run `uv sync` to install locked dependencies). Frontend assets are managed with `npm`.
 
----
+## 2. Development setup
 
-## Making a Change
+Arbiter is developed with Docker Compose. Follow the
+[installation instructions in the README](README.md#installation-and-quick-start) and
+[developer guide](docs/dev/index.md) 
 
-1. **Fork** the repository and clone your fork locally.
-2. **Create a branch** from `main`. Use a descriptive name following the project pattern (e.g., `87-codebook-diff-expert` or `144-fix-export-batch` matching the issue number).
-3. **Implement your changes**:
-   * If you modify a Django model, create and commit the migration (`docker compose exec web uv run manage.py makemigrations`).
-   * If you update templates, styles, or scripts, the Vite container automatically rebuilds them in the development stack.
-4. **Add or update tests** for your changes.
-5. **Update documentation** if user-visible behavior or developer workflows change.
-6. **Open a Pull Request against `main`**:
-   * Describe what changed and why.
-   * Reference the related issue (e.g., `Closes #123`).
-   * Automated CI checks (GitHub Actions) will run tests and linters. Address any feedback from reviewers.
 
-### Commit Message Guidelines
-Commit messages should be concise sentences describing the change, for example:
-`Refuse a codebook draft without rationale`
+## 3. Testing
 
----
+Every code contribution should include tests to help maintain quality and reliability. We use pytest and pytest-django; the tests live in `core/tests/`, with one folder per Django app. Run
+the full suite inside the development stack:
 
-## Code Style and Quality
-
-* **Python**: Formatted and linted with [Ruff](https://docs.astral.sh/ruff/) (line length 100, Google-style docstrings, single import per line). Rules are defined in `pyproject.toml`.
-* **Templates, CSS, JS, JSON, YAML, Markdown**: Formatted with [Prettier](https://prettier.io/) (configured in `.prettierrc`).
-* **Pre-commit Hooks**: Configured in `.pre-commit-config.yaml`. To enable them locally, install [pre-commit](https://pre-commit.com/) and run `pre-commit install`. Note that the Prettier hook requires frontend dependencies (`npm ci`).
-* **GitHub Actions**: Runs Ruff and Prettier on every push. If formatting adjustments are needed, CI automatically commits them back to the branch (`auto-commit: fixes by ruff & prettier`). Always run `git pull` before pushing new commits.
-
----
-
-## Tests
-
-The test suite is written with `pytest` and `pytest-django` under `core/tests/` (organized by Django app). 
-
-Run the full test suite inside the development stack:
 ```bash
 docker compose run --rm web uv run pytest -v
 ```
 
-All tests must pass prior to merging. CI executes the suite automatically on every pull request to `main`. Refer to the [Developer Guide](docs/dev/index.md#run-tests) to run specific single tests from your editor.
+The tests also run automatically with GitHub Actions on every push and pull request to `main`.
+See the [developer guide](docs/dev/index.md#run-tests) for more information on how to run tests.
 
-*(Optional)* Selenium smoke tests are located in `browser_tests/` and run on the host system. Requirements and instructions are documented in `browser_tests/conftest.py`.
 
----
+## 4. Documenting changes
 
-## Documentation
+If your contribution changes the behavior of Arbiter or adds features, please make sure the
+changes are reflected in the documentation:
 
-* **User Guide**: `docs/usage/index.md` (screenshots stored in `docs/usage/screenshots/`)
-* **Developer Guide**: `docs/dev/index.md`
-* **API Reference**: `docs/api/` (generated automatically via Sphinx autodoc)
+- User guide: `docs/usage/index.md` (screenshots in `docs/usage/screenshots/`)
+- Developer guide: `docs/dev/index.md`
+- API reference: `docs/api/`.
 
-Build the documentation locally:
+Build the documentation locally with:
+
 ```bash
 docker compose run --rm web sh -c "cd ../docs; make html"
 ```
-The compiled HTML output is generated at `docs/_build/html/index.html`.
 
----
+## 5. Submitting a pull request
 
-## Questions and Support
+1. Fork the repository and clone your fork.
+2. Create a branch from `main`. 
+3. Push your branch to your fork.
+4. Open a pull request against `main`.
+5. Clearly describe what your pull request does and reference any related issues.
+6. A maintainer will review your pull request and may request changes.
 
-For questions regarding usage, architecture, or contributing to Arbiter, please open a GitHub issue.
+
+
 
 
 
