@@ -68,32 +68,7 @@ To get the code run:
 git clone https://github.com/luerhard/arbiter.git
 cd arbiter
 ```
-<<<<<<< HEAD
 More information in the [guide for devs](docs/dev/index.md).
-=======
-
-Then open <http://127.0.0.1:8000>.
-
-`populatedb` creates demo accounts for trying the tool: `admin`, `annotator1`, `annotator2`,
-`expert1` and `expert2`, all with the password `123`. **These are for local development only; never
-load them on a server that others can reach.**
-
-To remove everything, including the database volume, run `docker compose down --volumes`.
-`docker compose exec web uv run manage.py resetdb --noinput` drops and recreates the database
-without removing the volume.
-
-### Production deployment
-
-`docker-compose.prod.yml` builds the production image (compiled frontend, Daphne ASGI server):
-
-```bash
-docker compose -f docker-compose.prod.yml up --build -d
-```
-
-In addition to the database variables, set `DJANGO_ALLOWED_HOSTS` and
-`DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated) in `.env`. `./backup.sh` creates a full backup
-(database dump plus media files, including all codebooks) in `./backups/`.
->>>>>>> 9282879aad3598fc333f5cbc3678b09cdd3fc900
 
 ## Documentation
 
