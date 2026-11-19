@@ -68,6 +68,7 @@ To get the code run:
 git clone https://github.com/luerhard/arbiter.git
 cd arbiter
 ```
+
 More information in the [guide for devs](docs/dev/index.md).
 
 ## Documentation
