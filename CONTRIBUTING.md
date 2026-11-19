@@ -7,7 +7,7 @@ Thank you for your interest in contributing to Arbiter! Bug reports, feature ide
 ## Ways to Contribute
 
 - **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
-- **Improve the documentation**: Help refine the user guide (`docs/usage/index.md`) or the developer guide (`docs/dev/index.md`).
+- **Improve the documentation**: Help refine the user guide (https://luerhard.github.io/arbiter/usage/index.html) or the developer guide (https://luerhard.github.io/arbiter/dev/index.html).
 
 # How to contribute
 
@@ -31,7 +31,7 @@ Never post real, sensitive annotation data in a public issue.
 
 Arbiter is developed with Docker Compose. Follow the
 [installation instructions in the README](README.md#installation-and-quick-start) and
-[developer guide](docs/dev/index.md)
+[developer guide](https://luerhard.github.io/arbiter/dev/index.html)
 
 ## 3. Testing
 
@@ -43,7 +43,7 @@ docker compose run --rm web uv run pytest -v
 ```
 
 The tests also run automatically with GitHub Actions on every push and pull request to `main`.
-See the [developer guide](docs/dev/index.md#run-tests) for more information on how to run tests.
+See the [developer guide](https://luerhard.github.io/arbiter/dev/index.html) for more information on how to run tests.
 
 ## 4. Documenting changes
 
@@ -52,7 +52,6 @@ changes are reflected in the documentation:
 
 - User guide: `docs/usage/index.md` (screenshots in `docs/usage/screenshots/`)
 - Developer guide: `docs/dev/index.md`
-- API reference: `docs/api/`.
 
 Build the documentation locally with:
 
@@ -72,6 +71,5 @@ docker compose run --rm web sh -c "cd ../docs; make html"
 # AI usage for contributers
 
 Using AI tools to help write issues and pull requests is fine with us. Please read and edit
-the result yourself before you submit it, and keep it short and to the point. Long,
-unedited AI-generated text is hard to review, so we may close such issues and pull requests
+the result yourself before you submit it, and keep it short and to the point. Long AI-generated text is hard to review, so we may close such issues and pull requests
 without reading them.
