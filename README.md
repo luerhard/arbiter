@@ -23,7 +23,7 @@ annotators, underspecification by expert adjudication and in-tool codebook revis
 
 ## Workflow
 
-![Arbiter workflow](docs/usage/screenshots/workflow_diagram.png)
+<img src="docs/usage/screenshots/workflow_diagram.png" alt="Arbiter workflow" width="400">
 
 1. **Setup:** an expert creates a project (labels, annotators, experts), writes the first
    codebook and uploads the first batch of data.
@@ -69,26 +69,26 @@ git clone https://github.com/luerhard/arbiter.git
 cd arbiter
 ```
 
-More information in the [guide for devs](docs/dev/index.md).
+More information in the [guide for devs](https://luerhard.github.io/arbiter/dev/index.html)
 
 ## Documentation
 
 Documentation is built with Sphinx and published at **<https://luerhard.github.io/arbiter>**:
 
-- **User guide** (experts, annotators, administrators): [`docs/usage`](docs/usage/index.md)
-- **Developer guide** (setup, tests, debugging, architecture): [`docs/dev`](docs/dev/index.md)
+- **User guide** (experts, annotators, administrators): [`user documentation`](https://luerhard.github.io/arbiter/usage/index.html)
+- **Developer guide** (setup, tests, debugging, architecture): [`dev documentation`](https://luerhard.github.io/arbiter/dev/index.html)
 
 ## Tests
 
 Tests are run automatically with GitHub Actions on every push and pull request to `main`.
-To run them yourself, see the [developer guide](docs/dev/index.md#run-tests).
+To run them yourself, see the [developer guide](https://luerhard.github.io/arbiter/dev/index.html)
 
 ## Contributing
 
 Contributions are welcome!
 Complete guide for contributions: [Contributing Guidelines](CONTRIBUTING.md)
 
-## Citation
+<!-- ## Citation
 
 If you use Arbiter in your research, please cite:
 
@@ -100,13 +100,15 @@ If you use Arbiter in your research, please cite:
   year    = {PLACEHOLDER},
   doi     = {PLACEHOLDER}
 }
-```
+``` -->
 
 ## License
 
 Arbiter is released under the [MIT License](LICENSE).
 
 ## Acknowledgements
+
+Arbiter development was funded by the State Ministry of Science, Research, and the Arts Baden-Wuerttemberg (grant number: Az.MWK11-0430.0-1/7/5).
 
 ## Contact
 

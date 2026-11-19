@@ -9,10 +9,7 @@ Thank you for your interest in contributing to Arbiter! Bug reports, feature ide
 - **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
 - **Improve the documentation**: Help refine the user guide (`docs/usage/index.md`) or the developer guide (`docs/dev/index.md`).
 
-# Contributing to Arbiter
-
-Thank you for your interest in contributing! We welcome bug reports, feature requests,
-documentation improvements and code contributions.
+# How to contribute
 
 ## 1. Reporting issues
 
@@ -71,3 +68,10 @@ docker compose run --rm web sh -c "cd ../docs; make html"
 4. Open a pull request against `main`.
 5. Clearly describe what your pull request does and reference any related issues.
 6. A maintainer will review your pull request and may request changes.
+
+# AI usage for contributers
+
+Using AI tools to help write issues and pull requests is fine with us. Please read and edit
+the result yourself before you submit it, and keep it short and to the point. Long,
+unedited AI-generated text is hard to review, so we may close such issues and pull requests
+without reading them.
