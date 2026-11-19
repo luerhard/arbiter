@@ -4,7 +4,6 @@
 <!-- PLACEHOLDER: Docker badge, couldn't find the link -->
 <!-- PLACEHOLDER: JOSS / DOI badge in the future -->
 
-
 **Arbiter** is an open-source, collaborative web application for data annotation that treats
 disagreement as useful information to use during the annotation process rather than noise to resolve post-hoc. Annotators label data in batches, discuss conflicting labels in a real-time chat, and pass unresolved cases to an expert who decides the
 final label and revises the annotation guidelines (the _codebook_). Every label, discussion, and codebook revision is logged, so the evolution of the team's shared understanding of the task is documented alongside the dataset.
@@ -19,7 +18,7 @@ Low inter-annotator agreement in subjective or complex tasks usually has one of 
 1. **Task underspecification:** the annotation guidelines are too generic, leaving the space for personal interpretation, especially for edge cases.
 2. **Misapplication:** annotators misunderstand or wrongly apply the guidelines.
 
-Post-hoc statistical methods model disagreement after the data has been collected. 
+Post-hoc statistical methods model disagreement after the data has been collected.
 Arbiter addresses it **during** annotation: misapplication is resolved by synchronous discussion between
 annotators, underspecification by expert adjudication and in-tool codebook revisions.
 
@@ -69,7 +68,32 @@ To get the code run:
 git clone https://github.com/luerhard/arbiter.git
 cd arbiter
 ```
+<<<<<<< HEAD
 More information in the [guide for devs](docs/dev/index.md).
+=======
+
+Then open <http://127.0.0.1:8000>.
+
+`populatedb` creates demo accounts for trying the tool: `admin`, `annotator1`, `annotator2`,
+`expert1` and `expert2`, all with the password `123`. **These are for local development only; never
+load them on a server that others can reach.**
+
+To remove everything, including the database volume, run `docker compose down --volumes`.
+`docker compose exec web uv run manage.py resetdb --noinput` drops and recreates the database
+without removing the volume.
+
+### Production deployment
+
+`docker-compose.prod.yml` builds the production image (compiled frontend, Daphne ASGI server):
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+In addition to the database variables, set `DJANGO_ALLOWED_HOSTS` and
+`DJANGO_CSRF_TRUSTED_ORIGINS` (comma-separated) in `.env`. `./backup.sh` creates a full backup
+(database dump plus media files, including all codebooks) in `./backups/`.
+>>>>>>> 9282879aad3598fc333f5cbc3678b09cdd3fc900
 
 ## Documentation
 
@@ -103,14 +127,11 @@ If you use Arbiter in your research, please cite:
 }
 ```
 
-
 ## License
 
 Arbiter is released under the [MIT License](LICENSE).
 
 ## Acknowledgements
-
-
 
 ## Contact
 
