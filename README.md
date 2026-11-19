@@ -78,8 +78,6 @@ Documentation is built with Sphinx and published at **<https://luerhard.github.i
 - **User guide** (experts, annotators, administrators): [`docs/usage`](docs/usage/index.md)
 - **Developer guide** (setup, tests, debugging, architecture): [`docs/dev`](docs/dev/index.md)
 
-
-
 ## Tests
 
 Tests are run automatically with GitHub Actions on every push and pull request to `main`.
