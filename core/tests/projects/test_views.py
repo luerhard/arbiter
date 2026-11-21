@@ -558,8 +558,8 @@ class TestExportBatchView:
             example=example,
             phase=BatchPhase.ANNOTATION,
         )
-        a1.set_user_annotations(label_ids=[label_1.id])
-        a2.set_user_annotations(label_ids=[label_2.id])
+        a1.set_user_annotations([label_1.id])
+        a2.set_user_annotations([label_2.id])
 
         batch.set_phase(BatchPhase.DISCUSSION)
         d1 = ExampleAssignment.objects.get(
@@ -574,8 +574,8 @@ class TestExportBatchView:
             example=example,
             phase=BatchPhase.DISCUSSION,
         )
-        d1.set_user_annotations(label_ids=[label_1.id])
-        d2.set_user_annotations(label_ids=[label_2.id])
+        d1.set_user_annotations([label_1.id])
+        d2.set_user_annotations([label_2.id])
 
         batch.set_phase(BatchPhase.EXPERT)
         ex = ExampleAssignment.objects.get(
@@ -584,7 +584,7 @@ class TestExportBatchView:
             example=example,
             phase=BatchPhase.EXPERT,
         )
-        ex.set_user_annotations(label_ids=[label_1.id])
+        ex.set_user_annotations([label_1.id])
 
         room = Room.objects.create()
         Message.objects.create(
@@ -647,7 +647,7 @@ class TestExportBatchView:
             example=example,
             phase=BatchPhase.ANNOTATION,
         )
-        assignment.set_user_annotations(label_ids=[data["labels"][0].id])
+        assignment.set_user_annotations([data["labels"][0].id])
 
         client.login(username=data["expert"].username, password="123")
         response = client.get(reverse("project-export-batch", args=(batch.id,)))
@@ -694,7 +694,7 @@ class TestExportBatchView:
             example=first,
             phase=BatchPhase.ANNOTATION,
         )
-        assignment.set_user_annotations(label_ids=[data["labels"][0].id])
+        assignment.set_user_annotations([data["labels"][0].id])
 
         client.login(username=data["expert"].username, password="123")
         response = client.get(reverse("project-export-batch", args=(batch.id,)))
@@ -731,7 +731,7 @@ class TestExportBatchView:
             example=example,
             phase=BatchPhase.ANNOTATION,
         )
-        assignment.set_user_annotations(label_ids=[label.id])
+        assignment.set_user_annotations([label.id])
 
         project.name = "My Project 2026 !!!"
         project.save()

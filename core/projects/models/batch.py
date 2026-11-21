@@ -6,7 +6,7 @@ from django.db import models
 from django.db import transaction
 
 from .project_user import ProjectRole
-from project_types import for_project
+from project_types import get_project_type
 
 User = get_user_model()
 
@@ -97,7 +97,7 @@ class Batch(models.Model):
             phase=phase,
         ).prefetch_related("annotations")
 
-        project_type = for_project(self.project)
+        project_type = get_project_type(self.project)
         by_example = defaultdict(dict)
         unsaved = set()
         for assignment in assignments:

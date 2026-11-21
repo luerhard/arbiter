@@ -18,6 +18,7 @@ from data.models import Annotation
 from data.models import Example
 from data.models import ExampleAssignment
 from data.models import Label
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import BatchUser
@@ -222,16 +223,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def _validated_labels(self, labels) -> list[int]:
         """The label ids a client sent, if they all are labels of this project."""
-        if not isinstance(labels, list) or not all(
-            isinstance(i, int) and not isinstance(i, bool) for i in labels
-        ):
-            msg = f"labels must be a list of label ids, got {labels!r}"
-            raise ValueError(msg)
-        unknown = set(labels) - set(self.batch.labels.values_list("id", flat=True))
-        if unknown:
-            msg = f"labels {sorted(unknown)} are not labels of this project"
-            raise ValueError(msg)
-        return labels
+        project = self.batch.project
+        return get_project_type(project).validated_value(project, labels)
 
     @database_sync_to_async
     def save_labels_to_db(self):
@@ -253,7 +246,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     batch=self.batch,
                     phase=BatchPhase.DISCUSSION,
                 ).get()
-                assignment.set_user_annotations(label_ids=label_ids)
+                assignment.set_user_annotations(label_ids)
 
     @staticmethod
     def _decides_example(state, example_id) -> bool:

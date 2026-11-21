@@ -32,7 +32,7 @@ from data.models import Example
 from data.models import Label
 from discuss.models import Message
 from project_types import ProjectType
-from project_types import for_project
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import BatchUser
@@ -461,7 +461,7 @@ def _sample_states(batch, examples) -> dict[int, dict]:
             list(assignment.annotations.all()) if assignment.done else None
         )
     n_annotators = batch.assignees(role=ProjectRole.ANNOTATOR).count()
-    project_type = for_project(batch.project)
+    project_type = get_project_type(batch.project)
     states = {}
     for example_id, phases in by_example.items():
         status, labels = _sample_state(phases, n_annotators, project_type)

@@ -34,4 +34,4 @@ class MultiLabelForm(forms.Form):
     def save(self, commit=True):  # noqa: ARG002
         data = self.cleaned_data
         labels = [int(i) for i in data["labels"] if i.strip()]
-        self.assignment.set_user_annotations(label_ids=labels)
+        self.assignment.set_user_annotations(labels)

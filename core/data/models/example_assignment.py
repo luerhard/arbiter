@@ -4,6 +4,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from .models import Annotation
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 
@@ -74,7 +75,9 @@ class ExampleAssignment(models.Model):
 
         return query.order_by("order").first()
 
-    def set_user_annotations(self, label_ids: list[int]):
+    def set_user_annotations(self, value):
+        """Replace this person's annotations of the example; value as the project type
+        expects it, see ProjectType.build_annotations."""
         # Atomic so a failure between delete and create can never wipe the
         # previously stored labels.
         with transaction.atomic():
@@ -86,13 +89,8 @@ class ExampleAssignment(models.Model):
             # delete previous annotations if any
             self.annotations.all().delete()
 
-            # set new annotations
-            updates = []
-            for label in self.example.labels.all():
-                if label.pk in label_ids:
-                    new = Annotation(assignment=self, label=label)
-                    updates.append(new)
-            Annotation.objects.bulk_create(updates)
+            project_type = get_project_type(self.batch.project)
+            Annotation.objects.bulk_create(project_type.build_annotations(self, value))
             self.done = timezone.now()
             self.save()
 

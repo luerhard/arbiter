@@ -1,5 +1,7 @@
 from types import SimpleNamespace
 
+import pytest
+
 from project_types import PROJECT_TYPES
 
 classification = PROJECT_TYPES["classification"]
@@ -24,3 +26,18 @@ def test_disagree_on_different_labels():
 def test_no_label_is_an_answer_of_its_own():
     assert classification.agree([signature(), signature()])
     assert not classification.agree([signature(1), signature()])
+
+
+@pytest.mark.django_db
+def test_validated_value_accepts_labels_of_the_project(project_annotation):
+    project = project_annotation["project"]
+    label_ids = [label.id for label in project_annotation["labels"]]
+    assert classification.validated_value(project, label_ids) == label_ids
+    assert classification.validated_value(project, []) == []
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("value", ["1", [True], ["1"], None, [999_999_999]])
+def test_validated_value_rejects_anything_else(project_annotation, value):
+    with pytest.raises(ValueError, match="label"):
+        classification.validated_value(project_annotation["project"], value)

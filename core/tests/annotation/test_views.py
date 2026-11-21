@@ -543,7 +543,7 @@ class TestEditAssignmentView:
         # (the test client drops an empty list the same way).
         labels = Label.objects.filter(project=self.assignment.example.batch.project)
         label_ids = list(labels.values_list("id", flat=True)[:1])
-        self.assignment.set_user_annotations(label_ids=label_ids)
+        self.assignment.set_user_annotations(label_ids)
         assert self.assignment.annotations.count() == 1
 
         resp = client.post(

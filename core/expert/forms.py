@@ -68,4 +68,4 @@ class MultiLabelFormExpert(forms.Form):
                 self.example.id,
                 self.user.username,
             )
-        self.assignment.set_user_annotations(label_ids=labels)
+        self.assignment.set_user_annotations(labels)

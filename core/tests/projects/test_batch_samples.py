@@ -169,7 +169,7 @@ class TestAnnotationsInTable:
             example=example,
             phase=BatchPhase.ANNOTATION,
         )
-        assignment.set_user_annotations(label_ids=[label.id for label in labels])
+        assignment.set_user_annotations([label.id for label in labels])
 
     def test_status_and_label_instead_of_a_column_per_person(self, client, batch_with_three):
         # as wide for two annotators as for six: who chose what is on the sample's page
@@ -231,7 +231,7 @@ class TestSampleDetail:
                 user=user,
                 example=example,
                 phase=phase,
-            ).set_user_annotations(label_ids=[x.id for x in labels])
+            ).set_user_annotations([x.id for x in labels])
 
         label(first, BatchPhase.ANNOTATION, [label_1])
         label(second, BatchPhase.ANNOTATION, [label_2])
@@ -301,7 +301,7 @@ class TestDisagreementMarker:
             user=annotator,
             example=example,
             phase=BatchPhase.ANNOTATION,
-        ).set_user_annotations(label_ids=[label.id for label in labels])
+        ).set_user_annotations([label.id for label in labels])
 
     def _marked(self, client, data):
         _login(client, data["expert"])
@@ -337,7 +337,7 @@ def _label(batch, user, example, labels, phase=BatchPhase.ANNOTATION):
         user=user,
         example=example,
         phase=phase,
-    ).set_user_annotations(label_ids=[label.id for label in labels])
+    ).set_user_annotations([label.id for label in labels])
 
 
 @pytest.mark.django_db

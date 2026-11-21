@@ -14,6 +14,16 @@ class ProjectType:
 
     key: str = ""
 
+    def validated_value(self, project, value):
+        """value as a client sent it, checked to be a valid answer in this project; raises
+        ValueError otherwise."""
+        raise NotImplementedError
+
+    def build_annotations(self, assignment, value) -> "list[Annotation]":
+        """The annotations (not saved yet) for what one person chose for one example; for
+        classification, value is a list of label ids."""
+        raise NotImplementedError
+
     def signature(self, annotations: "Iterable[Annotation]") -> Hashable:
         """What one person's annotations of one example amount to, in a form that can be
         compared: two people agree if their signatures are equal."""

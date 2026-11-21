@@ -6,10 +6,10 @@ PROJECT_TYPES: dict[str, ProjectType] = {
 }
 
 
-def for_project(project) -> ProjectType:  # noqa: ARG001
+def get_project_type(project) -> ProjectType:  # noqa: ARG001
     """The type of a project. Every project is a classification project until projects
     can choose their type."""
     return PROJECT_TYPES[Classification.key]
 
 
-__all__ = ["PROJECT_TYPES", "ProjectType", "for_project"]
+__all__ = ["PROJECT_TYPES", "ProjectType", "get_project_type"]
