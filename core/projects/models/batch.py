@@ -6,6 +6,7 @@ from django.db import models
 from django.db import transaction
 
 from .project_user import ProjectRole
+from project_types import for_project
 
 User = get_user_model()
 
@@ -96,21 +97,21 @@ class Batch(models.Model):
             phase=phase,
         ).prefetch_related("annotations")
 
+        project_type = for_project(self.project)
         by_example = defaultdict(dict)
         unsaved = set()
         for assignment in assignments:
-            label_ids = [annotation.label_id for annotation in assignment.annotations.all()]
-            by_example[assignment.example_id][assignment.user_id] = label_ids
+            signature = project_type.signature(assignment.annotations.all())
+            by_example[assignment.example_id][assignment.user_id] = signature
             if assignment.done is None:
                 unsaved.add(assignment.example_id)
 
         disagreements = []
         required_user_count = len(annotators)
-        for example_id, user_labels in by_example.items():
-            if len(user_labels) != required_user_count:
+        for example_id, user_signatures in by_example.items():
+            if len(user_signatures) != required_user_count:
                 continue
-            unique_label_sets = {frozenset(labels) for labels in user_labels.values()}
-            if len(unique_label_sets) > 1 or example_id in unsaved:
+            if not project_type.agree(user_signatures.values()) or example_id in unsaved:
                 disagreements.append(example_id)
 
         return Example.objects.filter(id__in=disagreements)

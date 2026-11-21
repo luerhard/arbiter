@@ -31,6 +31,8 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import Label
 from discuss.models import Message
+from project_types import ProjectType
+from project_types import for_project
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import BatchUser
@@ -398,18 +400,27 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
         return context
 
 
-def _sample_state(by_phase: dict, n_annotators: int) -> tuple[str, list | None]:
+def _sample_state(
+    by_phase: dict,
+    n_annotators: int,
+    project_type: ProjectType,
+) -> tuple[str, list | None]:
     """How far one sample got, and its label so far: (status, labels), labels None while
-    open, [] for no label. by_phase: phase -> {username: sorted labels, None if not done}.
+    open, [] for no label. by_phase: phase -> {username: annotations, None if not done}.
     The furthest phase counts: expert decision, discussion, annotation."""
 
     def same(found):
-        return len({frozenset(label.id for label in labels) for labels in found}) == 1
+        return project_type.agree(project_type.signature(a) for a in found)
+
+    def labels(annotations):
+        return sorted((a.label for a in annotations), key=lambda label: label.name)
 
     expert = by_phase.get(BatchPhase.EXPERT, {})
-    decided = [labels for labels in expert.values() if labels is not None]
+    decided = [annotations for annotations in expert.values() if annotations is not None]
     if decided:
-        return ("Expert decided", decided[0]) if same(decided) else ("Experts disagree", None)
+        if same(decided):
+            return "Expert decided", labels(decided[0])
+        return "Experts disagree", None
     if expert:
         return "Waiting for expert", None
 
@@ -419,16 +430,18 @@ def _sample_state(by_phase: dict, n_annotators: int) -> tuple[str, list | None]:
             return "In discussion", None
         found = list(discussion.values())
         if same(found):
-            return "Agreed in discussion", found[0]
+            return "Agreed in discussion", labels(found[0])
         return "Disagree after discussion", None
 
     labeled = [
-        labels for labels in by_phase.get(BatchPhase.ANNOTATION, {}).values() if labels is not None
+        annotations
+        for annotations in by_phase.get(BatchPhase.ANNOTATION, {}).values()
+        if annotations is not None
     ]
     if len(labeled) < n_annotators or not labeled:
         return f"Labeled {len(labeled)} of {n_annotators}", None
     if same(labeled):
-        return "Agreed", labeled[0]
+        return "Agreed", labels(labeled[0])
     return "To be discussed", None
 
 
@@ -443,20 +456,20 @@ def _sample_states(batch, examples) -> dict[int, dict]:
         .prefetch_related("annotations__label")
     )
     for assignment in assignments:
-        labels = sorted((a.label for a in assignment.annotations.all()), key=lambda lb: lb.name)
         phases = by_example.setdefault(assignment.example_id, {})
         phases.setdefault(assignment.phase, {})[assignment.user.username] = (
-            labels if assignment.done else None
+            list(assignment.annotations.all()) if assignment.done else None
         )
     n_annotators = batch.assignees(role=ProjectRole.ANNOTATOR).count()
+    project_type = for_project(batch.project)
     states = {}
     for example_id, phases in by_example.items():
-        status, labels = _sample_state(phases, n_annotators)
+        status, labels = _sample_state(phases, n_annotators, project_type)
         annotated = list(phases.get(BatchPhase.ANNOTATION, {}).values())
         disagreement = (
             len(annotated) >= 2  # noqa: PLR2004
             and None not in annotated
-            and len({frozenset(label.id for label in found) for found in annotated}) > 1
+            and not project_type.agree(project_type.signature(a) for a in annotated)
         )
         states[example_id] = {"status": status, "labels": labels, "disagreement": disagreement}
     return states

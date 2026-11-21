@@ -99,12 +99,6 @@ class ExampleAssignment(models.Model):
     def get_user_annotations(self):
         return {annotation.label for annotation in self.annotations.all()}
 
-    def check_for_disagreement(self):
-        return self.example.has_disagreement
-
-    def check_for_disagreement_after_discussion(self):
-        return self.example.has_disagreement_after_discussion
-
     def save(self, *args, **kwargs):
         # auto set order for the first time: append to this user's queue
         if self.order is None:
