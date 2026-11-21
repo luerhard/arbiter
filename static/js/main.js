@@ -58,6 +58,7 @@ window.Coloris({
 });
 
 import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
+import { spanEditor } from "./spans.js";
 import * as ui from "./ui.js";
 import * as discuss from "./discuss.js";
 import { initToasts } from "./toasts.js";
@@ -70,6 +71,7 @@ window.lib.discuss = discuss;
 Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 Alpine.data("skipAnnotatedToggle", skipAnnotatedToggle);
+Alpine.data("spanEditor", spanEditor);
 Alpine.store("panels", panelsStore());
 watchWidth(Alpine.store("panels"));
 Alpine.start();

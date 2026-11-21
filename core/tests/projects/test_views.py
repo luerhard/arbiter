@@ -13,7 +13,7 @@ import pytest
 
 from data.models import Example
 from data.models import ExampleAssignment
-from data.models import Label
+from data.models import label_color
 from discuss.models import Message
 from discuss.models import Room
 from projects.models import Batch
@@ -426,9 +426,9 @@ class TestProjectAndBatchCreationViews:
         )
 
         project = Project.objects.get(name=f"Plain Labels {suffix}")
-        default_color = Label._meta.get_field("color").default
+        # without a color, a label gets the one of its row
         assert sorted(project.labels.values_list("name", "color", "hotkey")) == [
-            ("Irony", default_color, None),
+            ("Irony", label_color(0), None),
             ("Offensive", "#d64545", "o"),
         ]
 
@@ -959,7 +959,10 @@ class TestPhaseMenu:
 
     def test_finished_annotation_moves_on_without_confirmation(self, client, project_annotation):
         label1, _ = project_annotation["labels"]
-        for assignment in ExampleAssignment.objects.filter(phase=BatchPhase.ANNOTATION):
+        for assignment in ExampleAssignment.objects.filter(
+            batch=project_annotation["batch"],
+            phase=BatchPhase.ANNOTATION,
+        ):
             assignment.set_user_annotations([label1.id])
 
         card, confirm, content = self._card(client, project_annotation)

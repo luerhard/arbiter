@@ -30,8 +30,3 @@ class MultiLabelForm(forms.Form):
         self.fields["labels"].initial = label_details
         self.fields["labels"].choices = [(label["id"], label["name"]) for label in label_details]
         self.label_details = label_details
-
-    def save(self, commit=True):  # noqa: ARG002
-        data = self.cleaned_data
-        labels = [int(i) for i in data["labels"] if i.strip()]
-        self.assignment.set_user_annotations(labels)

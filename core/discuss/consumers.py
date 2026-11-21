@@ -17,7 +17,6 @@ from .room_state import update_state
 from data.models import Annotation
 from data.models import Example
 from data.models import ExampleAssignment
-from data.models import Label
 from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
@@ -200,7 +199,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         elif "clicked-done" in data.keys():
             example_id = self._validated_example_id(data.get("example_id"))
-            labels = await self._validated_labels(data.get("labels"))
+            labels = await self._validated_value(example_id, data.get("labels"))
             if await self._save_decision(example_id, labels):
                 await self.save_labels_to_db()
                 await self._set_next_and_reset()
@@ -221,10 +220,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return example_id
 
     @database_sync_to_async
-    def _validated_labels(self, labels) -> list[int]:
-        """The label ids a client sent, if they all are labels of this project."""
-        project = self.batch.project
-        return get_project_type(project).validated_value(project, labels)
+    def _validated_value(self, example_id, value):
+        """The decision a client sent, if it is a valid answer for the example."""
+        example = Example.objects.select_related("batch__project").get(
+            pk=example_id,
+            batch=self.batch,
+        )
+        return get_project_type(example.batch.project).validated_value(example, value)
 
     @database_sync_to_async
     def save_labels_to_db(self):
@@ -285,11 +287,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.info(f"Batch {self.batch_id}: ignored a save of {self.username} for {example_id}")
             return False
 
-        label_dict = await database_sync_to_async(Label.objects.in_bulk)(labels)
-        label_names = ", ".join(label_dict[i].name for i in labels) or "no labels"
-        msg = f"{self.username} saved: {label_names}"
+        summary = await database_sync_to_async(self._summary)(labels)
+        msg = f"{self.username} saved: {summary}"
         await self._append_chat_message(username="system", message=msg)
         return "complete" in outcome
+
+    def _summary(self, value) -> str:
+        project = self.batch.project
+        return get_project_type(project).summary(project, value)
 
     async def _undo_decision(self, example_id):
         """Withdraw the user's saved decision while the others have not all saved."""
@@ -345,7 +350,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug("Discussion ended.")
             return
 
-        example, annotations, page, total_pages = await database_sync_to_async(
+        example, annotations, page, total_pages, editor = await database_sync_to_async(
             self.get_example,
         )(state=state)
 
@@ -372,6 +377,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
                 state["annotation_labels"] = annotations
+                state["span_editor"] = editor
                 state["total_pages"] = total_pages
 
                 state["clicked_done"] = dict.fromkeys(state["required_users"], 0)
@@ -468,19 +474,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
         annotator has decided yet. The DISCUSSION assignments in the database are the
         source of truth, so a lost or stale room state resumes at the right example.
 
-        Returns (example, annotation labels by user, page, total pages); example is
-        None when nothing is left to discuss."""
+        Returns (example, annotation labels by user, page, total pages, span editor);
+        example is None when nothing is left to discuss. The span editor (span projects
+        only) has the words of the example and everyone's spans before the discussion."""
         log.debug("Getting example")
         total_pages = self.batch.discussion_examples().count()
         open_examples = self.batch.open_discussion_examples()
         example = open_examples.first()
         if example is None:
-            return None, None, total_pages, total_pages
+            return None, None, total_pages, total_pages, None
         page = total_pages - open_examples.count() + 1
 
         log.debug("Getting annotations")
         all_labels = example.labels.all()
 
+        project_type = get_project_type(self.batch.project)
+        values = {}
         by_user = defaultdict(list)
         for user in state["required_users"]:
             query = Annotation.objects.filter(
@@ -488,6 +497,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 assignment__user__username=user,
                 assignment__phase=BatchPhase.ANNOTATION,
             ).select_related("label")
+            values[user] = project_type.value(query)
             label_set = {anno.label for anno in query}
 
             for label in all_labels:
@@ -501,7 +511,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 by_user[user].append(label)
 
-        return example, by_user, page, total_pages
+        editor = project_type.editor_data(example)
+        if editor:
+            editor["spans"] = values
+        return example, by_user, page, total_pages, editor
 
     @database_sync_to_async
     def _is_open(self, example_id):

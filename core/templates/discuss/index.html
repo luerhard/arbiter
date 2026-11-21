@@ -36,6 +36,21 @@ never slides away), below md a block under the disagreement.
       <div class="contents" x-show="!$store.room_closed">
         <span class="eyebrow" x-text="$store.progress.heading">Disagreement</span>
 
+        {% if project_type.key == "span" %}
+        {# recreated for every example: room.key is the example id #}
+        <template x-for="room in $store.span_room ? [$store.span_room] : []" :key="room.key">
+          <div class="flex flex-col gap-6">
+            <c-span-compare people="room.people" editor="room.editor" title="How you marked it before the discussion" />
+            <section id="current-spans" class="card flex flex-col gap-4 p-5 sm:px-9 sm:py-8">
+              <h2 class="card-title">Your spans after discussing</h2>
+              <c-span-editor
+                config="{ ...room.editor, spans: room.mine, locked: $store.saved }"
+                text_class="text-lg leading-relaxed"
+              />
+            </section>
+          </div>
+        </template>
+        {% else %}
         <article class="card px-5 py-5 sm:px-9 sm:py-8">
           <p
             id="current-example"
@@ -58,6 +73,7 @@ never slides away), below md a block under the disagreement.
           <h2 class="text-md font-semibold">Your label after discussing</h2>
           <c-discuss.labels user="self" id="current-labels" enabled />
         </section>
+        {% endif %}
 
         <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
           <span class="inline-flex items-center gap-2 text-meta text-ink-2">
@@ -71,11 +87,15 @@ never slides away), below md a block under the disagreement.
               id="save-done"
               class="btn btn-primary btn-lg"
               x-show="!$store.saved"
+              {% if project_type.key == "span" %}
+              hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': JSON.parse(document.querySelector('#current-spans input[name=value]').value)}"
+              {% else %}
               hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+              {% endif %}
               :disabled="$store.save_disabled"
               ws-send
             >
-              Save my label
+              {% if project_type.key == "span" %}Save my spans{% else %}Save my label{% endif %}
             </button>
             <button
               type="button"
@@ -408,6 +428,30 @@ never slides away), below md a block under the disagreement.
               checked: i.is_set,
             })),
           );
+
+          // span projects: everyone's spans before the discussion, faded where all agree
+          const editor = server_state.span_editor;
+          if (editor) {
+            const before = editor.spans;
+            const person = (user, name) => ({
+              name,
+              spans: before[user],
+              others: Object.keys(before)
+                .filter((u) => u !== user)
+                .map((u) => before[u]),
+            });
+            Alpine.store('span_room', {
+              key: server_state.cur_example_id,
+              editor: { tokens: editor.tokens, labels: editor.labels },
+              people: [
+                person(user_self, 'You'),
+                ...Object.keys(before)
+                  .filter((u) => u !== user_self)
+                  .map((u) => person(u, u)),
+              ],
+              mine: decided ?? before[user_self],
+            });
+          }
         }
 
         Alpine.store('chat').last_render_id = server_state.messages.length - 1;

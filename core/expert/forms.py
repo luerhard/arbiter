@@ -1,11 +1,7 @@
-import logging
-
 from django import forms
 
 from data.models import Label
 from projects.models import BatchPhase
-
-log = logging.getLogger(__name__)
 
 
 class MultiLabelFormExpert(forms.Form):
@@ -47,25 +43,3 @@ class MultiLabelFormExpert(forms.Form):
         ).prefetch_related("annotations")
         label_sets = [{a.label_id for a in d.annotations.all()} for d in discussion]
         return sorted(set.intersection(*label_sets)) if label_sets else []
-
-    def save(self):
-        data = self.cleaned_data
-        labels = [int(i) for i in data["labels"] if i.strip()]
-        # Audit trail for expert decisions. Zero labels is a valid verdict
-        # ("non-offensive" under multi-label), so it is logged rather than
-        # rejected -- but logged distinctly so a silently-dropped selection
-        # (as opposed to a genuine no-label decision) is visible.
-        if labels:
-            log.info(
-                "Expert decision saved: example=%s user=%s labels=%s",
-                self.example.id,
-                self.user.username,
-                labels,
-            )
-        else:
-            log.info(
-                "Expert decision saved with no labels (non-offensive): example=%s user=%s",
-                self.example.id,
-                self.user.username,
-            )
-        self.assignment.set_user_annotations(labels)

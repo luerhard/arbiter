@@ -8,6 +8,8 @@ import pandas as pd
 
 from data.models import Example
 from data.models import Label
+from project_types import PROJECT_TYPES
+from project_types.span import tokens
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
@@ -24,12 +26,12 @@ def uniform_choices(elementary_events: list):
     return events
 
 
-def create_batch(project):
+def create_batch(project, examples_file="examples.csv"):
     batch = Batch.objects.create(
         project=project,
         current_phase=BatchPhase.ANNOTATION,
     )
-    test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata/examples.csv")
+    test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata" / examples_file)
 
     batch.users.add(*project.annotators, through_defaults={"role": ProjectRole.ANNOTATOR})
     batch.users.add(*project.experts, through_defaults={"role": ProjectRole.EXPERT})
@@ -44,11 +46,29 @@ def create_batch(project):
     return batch
 
 
-def create_project(name, description, labels, annotators, experts):
+def random_spans(example, label_ids):
+    """One or two spans over a few words that every annotator marks (chosen by the
+    example), sometimes plus one of their own: some examples are disagreements."""
+    words = tokens(example.content)
+
+    def span(rng):
+        first = rng.randrange(len(words))
+        last = min(len(words) - 1, first + rng.randint(0, 4))
+        return [rng.choice(label_ids), words[first][0], words[last][1]]
+
+    shared = random.Random(example.id)
+    spans = [span(shared) for _ in range(shared.randint(1, 2))]
+    if random.random() < 0.4:  # noqa: PLR2004
+        spans.append(span(random))
+    return PROJECT_TYPES["span"].validated_value(example, spans)
+
+
+def create_project(name, description, labels, annotators, experts, project_type="classification"):
     project = Project.objects.create(
         name=name,
         description=description,
         owner=experts[0],
+        project_type=project_type,
     )
 
     project.users.add(*annotators, through_defaults={"default_role": ProjectRole.ANNOTATOR})
@@ -148,3 +168,30 @@ class Command(BaseCommand):
         ).read_text()
         codebook.save(content=codebook_content)
         batch = create_batch(project)
+
+        # span project: one batch per phase
+        project = create_project(
+            "Populist rhetoric (spans)",
+            "Mark the passages of populist rhetoric in the text.",
+            ["People-centrism", "Anti-elitism", "Sovereignty"],
+            annotators,
+            experts,
+            project_type="span",
+        )
+        colors = ["#16a34a", "#dc2626", "#2563eb"]
+        for label, color in zip(project.labels.order_by("pk"), colors, strict=True):
+            label.color = color
+            label.save()
+        label_ids = [label.id for label in project.labels.all()]
+        random.seed(7)
+        create_batch(project, "examples_populism.csv")
+        for phase in (BatchPhase.DISCUSSION, BatchPhase.EXPERT):
+            batch = create_batch(project, "examples_populism.csv")
+            for assignment in batch.assignments.select_related("example"):
+                assignment.set_user_annotations(random_spans(assignment.example, label_ids))
+            batch.set_phase(BatchPhase.DISCUSSION)
+            if phase == BatchPhase.EXPERT:
+                discussion = batch.assignments.filter(phase=BatchPhase.DISCUSSION)
+                for assignment in discussion.select_related("example"):
+                    assignment.set_user_annotations(random_spans(assignment.example, label_ids))
+                batch.set_phase(BatchPhase.EXPERT)

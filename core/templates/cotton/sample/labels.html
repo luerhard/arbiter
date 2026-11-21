@@ -12,7 +12,15 @@ not labeled the example yet. <c-sample.labels :by_user="before" empty_text="Nobo
     <span class="text-meta text-ink-3">Not labeled yet</span>
     {% else %}
     {% for annotation in annotations %}
+    {% if annotation.text %}
+    {# span projects: one line per span, the label and its passage #}
+    <div class="flex w-full min-w-0 items-center gap-2">
+      <c-label-tag :label="annotation.label" />
+      <span class="reading truncate text-ink-2">{{ annotation.text }}</span>
+    </div>
+    {% else %}
     <c-label-tag :label="annotation.label" />
+    {% endif %}
     {% empty %}
     <span class="text-meta text-ink-3 italic">No label</span>
     {% endfor %}

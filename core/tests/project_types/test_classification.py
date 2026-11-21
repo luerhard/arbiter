@@ -35,14 +35,14 @@ def test_exported_value_is_the_sorted_label_names():
 
 @pytest.mark.django_db
 def test_validated_value_accepts_labels_of_the_project(project_annotation):
-    project = project_annotation["project"]
+    example = project_annotation["example"]
     label_ids = [label.id for label in project_annotation["labels"]]
-    assert classification.validated_value(project, label_ids) == label_ids
-    assert classification.validated_value(project, []) == []
+    assert classification.validated_value(example, label_ids) == label_ids
+    assert classification.validated_value(example, []) == []
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize("value", ["1", [True], ["1"], None, [999_999_999]])
 def test_validated_value_rejects_anything_else(project_annotation, value):
     with pytest.raises(ValueError, match="label"):
-        classification.validated_value(project_annotation["project"], value)
+        classification.validated_value(project_annotation["example"], value)

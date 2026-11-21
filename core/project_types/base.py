@@ -13,15 +13,37 @@ class ProjectType:
     of them."""
 
     key: str = ""
+    # shown when creating a project
+    name: str = ""
+    description: str = ""
 
-    def validated_value(self, project, value):
-        """value as a client sent it, checked to be a valid answer in this project; raises
-        ValueError otherwise."""
+    def validated_value(self, example, value):
+        """value as a client sent it, checked to be a valid answer for this example;
+        raises ValueError otherwise."""
+        raise NotImplementedError
+
+    def editor_data(self, example, annotations=()) -> dict | None:  # noqa: ARG002
+        """What the editor in the browser (cotton/span_editor.html) needs for an example,
+        starting from these annotations; None for a type that is annotated with the label
+        checkboxes instead."""
+        return None
+
+    def value_from_post(self, example, post):
+        """The validated value a form in the browser posted (see validated_value)."""
         raise NotImplementedError
 
     def build_annotations(self, assignment, value) -> "list[Annotation]":
         """The annotations (not saved yet) for what one person chose for one example; for
         classification, value is a list of label ids."""
+        raise NotImplementedError
+
+    def value(self, annotations: "Iterable[Annotation]"):
+        """One person's annotations of one example as the value build_annotations takes,
+        e.g. to show them in the browser again."""
+        raise NotImplementedError
+
+    def summary(self, project, value) -> str:
+        """A value in a few words, e.g. for the chat when someone saves their decision."""
         raise NotImplementedError
 
     def exported_value(self, annotations: "Iterable[Annotation]"):

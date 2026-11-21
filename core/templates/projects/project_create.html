@@ -23,6 +23,29 @@ New project · Arbiter
       <h2 class="card-title">About</h2>
       <c-field :field="form.name" />
       <c-field :field="form.description" />
+      <fieldset>
+        <legend class="field-label">What do annotators label?</legend>
+        <div class="grid grid-cols-1 gap-3 @xl:grid-cols-2">
+          {% for key, project_type in project_types.items %}
+          <label
+            class="flex cursor-pointer gap-3 rounded-lg border border-line-strong p-4 has-checked:border-accent has-checked:bg-accent-soft"
+          >
+            <input
+              type="radio"
+              name="project_type"
+              value="{{ key }}"
+              class="mt-1 accent-accent"
+              {% if form.project_type.value == key %}checked{% endif %}
+            />
+            <span class="flex flex-col gap-0.5">
+              <span class="font-semibold text-ink">{{ project_type.name }}</span>
+              <span class="text-meta text-ink-2">{{ project_type.description }}</span>
+            </span>
+          </label>
+          {% endfor %}
+        </div>
+        <p class="field-help">This can not be changed once the project exists.</p>
+      </fieldset>
     </section>
 
     <section class="card flex flex-col gap-5 p-6">

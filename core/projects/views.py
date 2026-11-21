@@ -31,6 +31,7 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import Label
 from discuss.models import Message
+from project_types import PROJECT_TYPES
 from project_types import ProjectType
 from project_types import get_project_type
 from projects.models import Batch
@@ -121,12 +122,14 @@ class ProjectCreateView(FormView):
         ] or [{}]
         context["annotators_selected_users"] = _posted_users_json(post, "annotators")
         context["experts_selected_users"] = _posted_users_json(post, "experts")
+        context["project_types"] = PROJECT_TYPES
         return context
 
     def form_valid(self, form):
         self.project = Project.objects.create(
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
+            project_type=form.cleaned_data["project_type"],
             owner=self.request.user,
         )
         ProjectUser.objects.bulk_create(
@@ -412,8 +415,8 @@ def _sample_state(
     def same(found):
         return project_type.agree(project_type.signature(a) for a in found)
 
-    def labels(annotations):
-        return sorted((a.label for a in annotations), key=lambda label: label.name)
+    def labels(annotations):  # once each: in span projects a label can mark several spans
+        return sorted({a.label for a in annotations}, key=lambda label: label.name)
 
     expert = by_phase.get(BatchPhase.EXPERT, {})
     decided = [annotations for annotations in expert.values() if annotations is not None]
@@ -622,7 +625,7 @@ def _generate_batch_data(batch):
 
     assignments = (
         batch.assignments.filter(done__isnull=False, phase__in=_LABEL_KEYS)
-        .select_related("user")
+        .select_related("user", "example")
         .prefetch_related("annotations__label")
         .order_by("example_id", "user__username")
     )

@@ -3,6 +3,8 @@ from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
 
+from project_types import PROJECT_TYPES
+
 User = get_user_model()
 
 
@@ -16,6 +18,14 @@ class Project(models.Model):
     description = models.TextField()
     owner = models.ForeignKey(User, related_name="owned_projects", on_delete=models.CASCADE)
     users = models.ManyToManyField(User, related_name="projects", through="ProjectUser")
+    # what an annotation is, see project_types; chosen when the project is created and
+    # fixed afterwards: the annotations of every batch depend on it
+    project_type = models.CharField(
+        max_length=20,
+        choices=[(key, project_type.name) for key, project_type in PROJECT_TYPES.items()],
+        default="classification",
+        editable=False,
+    )
 
     @property
     def annotators(self):

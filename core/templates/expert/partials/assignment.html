@@ -53,15 +53,28 @@
       </div>
     </div>
 
+    {% if span_editor %}
+    {{ span_editor|json_script:"span-editor-data" }}
+    <div x-data="{ room: JSON.parse(document.getElementById('span-editor-data').textContent) }" class="contents">
+      <c-span-compare people="room.people" editor="room" title="How the annotators marked it after the discussion" />
+    </div>
+    {% else %}
     <article class="card px-5 py-5 sm:px-8 sm:py-7">
       <p id="current-example" class="reading text-[22px] leading-normal whitespace-pre-line">{{ sentence }}</p>
     </article>
+    {% endif %}
 
     <c-sample.trace :before="prev_annotations" :chat="chat_messages" :after="post_annotations" :highlight="annotator" />
 
     {% if review %}
     <section class="card flex flex-col gap-3.5 border-success/40 px-5.5 py-5">
       <h2 class="card-title">Your decision</h2>
+      {% if span_editor %}
+      <c-span-editor
+        config="{ ...JSON.parse(document.getElementById('span-editor-data').textContent), readonly: true }"
+        text_class="text-lg leading-relaxed"
+      />
+      {% else %}
       <div class="flex flex-wrap gap-2">
         {% for annotation in decision_annotations %}
         <c-label
@@ -76,6 +89,7 @@
         <span class="text-ink-2">No labels.</span>
         {% endfor %}
       </div>
+      {% endif %}
       <div>
         <button
           hx-get="{% url 'expert-assignment' batch_id assignment.id %}?edit=1"
@@ -102,6 +116,15 @@
       {% csrf_token %}
       {% if editing %}<input type="hidden" name="edit" value="1" />{% endif %}
       <h2 class="card-title">{% if editing %}Correct your decision{% else %}Your decision{% endif %}</h2>
+      {% if span_editor %}
+      <c-span-editor
+        config="JSON.parse(document.getElementById('span-editor-data').textContent)"
+        text_class="text-lg leading-relaxed"
+      />
+      <button type="submit" class="btn btn-primary btn-lg self-end">
+        {% if editing %}Save correction{% else %}Save and next case{% endif %}
+      </button>
+      {% else %}
       <div class="flex flex-wrap items-center gap-3">
         {% for checkbox, detail in labels_form.labels|zip_lists:labels_form.label_details %}
         <c-label
@@ -118,6 +141,7 @@
           {% if editing %}Save correction{% else %}Save and next case{% endif %}
         </button>
       </div>
+      {% endif %}
       {% if draft_has_changes %}
       <p class="text-meta text-ink-2">Saving also commits your codebook draft together with its rationale.</p>
       {% endif %}

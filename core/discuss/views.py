@@ -7,6 +7,7 @@ from django.shortcuts import reverse
 from django.views.generic import View
 
 from core.mixins import BatchAnnotatorRequiredMixin
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 
@@ -29,6 +30,7 @@ class DiscussView(BatchAnnotatorRequiredMixin, View):
             messages.info(request, "This batch is not in the discussion phase.")
             return redirect("project-detail", batch.project_id)
         context["batch"] = batch
+        context["project_type"] = get_project_type(batch.project)
 
         codebook = batch.project.codebook.get()
         # the annotators last worked on this batch: what changed since it started

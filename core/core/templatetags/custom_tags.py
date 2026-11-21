@@ -13,6 +13,14 @@ def zip_lists(a, b):
 
 
 @register.filter
+def label_color(index: int) -> str:
+    """The color a new label gets by its position, see data.models.label_color."""
+    from data.models import label_color  # noqa: PLC0415
+
+    return label_color(int(index))
+
+
+@register.filter
 def initials(username: str) -> str:
     """Two characters for an avatar: "jane.doe" -> "JD", "annotator1" -> "A1", "lukas" -> "LU"."""
     name = str(username or "").strip()

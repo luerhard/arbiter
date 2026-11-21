@@ -97,6 +97,36 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
     }
 
 
+def _span_editor(assignment: ExampleAssignment, posted=None) -> dict[str, Any] | None:
+    """The span editor of an expert decision, with everyone's spans after the discussion
+    to compare; None if the project type has no editor. An open decision starts with the
+    words all annotators marked with the same label."""
+    project_type = get_project_type(assignment.batch.project)
+    example = assignment.example
+    editor = project_type.editor_data(example)
+    if editor is None:
+        return None
+    after = {
+        user: project_type.value(annotations)
+        for user, annotations in example.labels_by_user(BatchPhase.DISCUSSION).items()
+        if annotations is not None
+    }
+    if posted is not None:
+        try:
+            spans = project_type.value_from_post(example, posted)
+        except ValueError:
+            spans = []
+    elif assignment.done is not None:
+        spans = project_type.value(assignment.annotations.all())
+    else:
+        spans = project_type.common_value(example, after.values())
+    people = [
+        {"name": user, "spans": value, "others": [v for u, v in after.items() if u != user]}
+        for user, value in after.items()
+    ]
+    return {**editor, "spans": spans, "people": people}
+
+
 def _codebook_panel_context(assignment: ExampleAssignment, mode: str = "view") -> dict[str, Any]:
     codebook = assignment.batch.project.codebook.get()
     draft = CodebookDraft.objects.filter(assignment=assignment).first()
@@ -163,16 +193,20 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
             return render(request, self.partial_name, context, status=status)
         return render(request, self.template_name, context, status=status)
 
-    def _build_context(self, assignment, *, review, editing, labels_form=None):
+    def _build_context(self, assignment, *, review, editing, posted=None):
+        """posted: the decision the expert sent, shown again when it could not be saved."""
         context = _assignment_context(assignment)
         context["review"] = review
         context["editing"] = editing
-        if review:
+        span_editor = _span_editor(assignment, posted)
+        if span_editor:
+            context["span_editor"] = span_editor
+        elif review:
             context["decision_annotations"] = list(
                 assignment.annotations.select_related("label"),
             )
         else:
-            context["labels_form"] = labels_form or MultiLabelFormExpert(assignment=assignment)
+            context["labels_form"] = MultiLabelFormExpert(posted, assignment=assignment)
         context.update(_codebook_panel_context(assignment))
         return context
 
@@ -203,17 +237,21 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
             context = self._build_context(assignment, review=True, editing=False)
             return self._render(request, context, status=409)
 
-        labels_form = MultiLabelFormExpert(request.POST, assignment=assignment)
-        if not labels_form.is_valid():
-            log.debug(f"Invalid expert decision: {labels_form.errors}")
-            messages.error(request, "Something was invalid")
+        def retry(message):
+            messages.error(request, message)
             context = self._build_context(
                 assignment,
                 review=False,
                 editing=editing,
-                labels_form=labels_form,
+                posted=request.POST,
             )
             return self._render(request, context)
+
+        project_type = get_project_type(assignment.batch.project)
+        try:
+            value = project_type.value_from_post(assignment.example, request.POST)
+        except ValueError:
+            return retry("Something was invalid")
 
         codebook = assignment.batch.project.codebook.get()
         draft = CodebookDraft.objects.filter(assignment=assignment).first()
@@ -226,39 +264,26 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
         # submission never half-saves.
         if draft:
             if not draft.rationale.strip():
-                messages.error(
-                    request,
-                    "The codebook was changed: a rationale is required before saving.",
-                )
-                context = self._build_context(
-                    assignment,
-                    review=False,
-                    editing=editing,
-                    labels_form=labels_form,
-                )
-                return self._render(request, context)
+                return retry("The codebook was changed: a rationale is required before saving.")
             if not draft.is_based_on_current(codebook):
-                messages.error(
-                    request,
+                return retry(
                     "The codebook was changed since you started this draft. Discard the "
                     "draft and make your change again on the current version.",
                 )
-                context = self._build_context(
-                    assignment,
-                    review=False,
-                    editing=editing,
-                    labels_form=labels_form,
-                )
-                return self._render(request, context)
 
         previous_decision = None
         if editing:
-            project_type = get_project_type(assignment.batch.project)
             previous_decision = project_type.exported_value(
                 assignment.annotations.select_related("label"),
             )
 
-        labels_form.save()
+        assignment.set_user_annotations(value)
+        log.info(
+            "Expert decision saved: example=%s user=%s value=%s",
+            assignment.example_id,
+            request.user.username,
+            value,
+        )
 
         metadata = build_decision_metadata(assignment)
         if editing:
