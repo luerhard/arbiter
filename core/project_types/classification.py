@@ -25,5 +25,8 @@ class Classification(ProjectType):
         labels = assignment.batch.project.labels.filter(pk__in=value)
         return [Annotation(assignment=assignment, label=label) for label in labels]
 
+    def exported_value(self, annotations):
+        return sorted(annotation.label.name for annotation in annotations)
+
     def signature(self, annotations):
         return frozenset(annotation.label_id for annotation in annotations)

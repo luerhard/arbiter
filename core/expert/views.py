@@ -14,10 +14,9 @@ from django.views.generic import View
 from .forms import MultiLabelFormExpert
 from .models import CodebookDraft
 from core.mixins import BatchExpertRequiredMixin
-from data.models import Example
 from data.models import ExampleAssignment
-from data.models import Label
 from discuss.models import Message
+from project_types import get_project_type
 from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
@@ -25,24 +24,15 @@ log = logging.getLogger(__name__)
 NOT_YOURS = "This case is not assigned to you."
 
 
-def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dict[str, Any]:
-    """Collect the context of an expert decision to embed in the codebook commit."""
-    batch = example.batch
+def build_decision_metadata(assignment: ExampleAssignment) -> dict[str, Any]:
+    """Collect the context of a saved expert decision to embed in the codebook commit."""
+    example = assignment.example
+    project_type = get_project_type(example.batch.project)
 
-    def labels_by_user(phase: BatchPhase) -> dict[str, list[str]]:
-        assignments = (
-            ExampleAssignment.objects.filter(batch=batch, example=example, phase=phase)
-            .select_related("user")
-            .prefetch_related("annotations__label")
-            .order_by("user__username")
-        )
+    def exported_by_user(phase: BatchPhase) -> dict[str, Any]:
         return {
-            assignment.user.username: [
-                annotation.label.name
-                for annotation in assignment.annotations.all()
-                if annotation.label
-            ]
-            for assignment in assignments
+            username: None if annotations is None else project_type.exported_value(annotations)
+            for username, annotations in example.labels_by_user(phase).items()
         }
 
     chat_history = [
@@ -56,19 +46,15 @@ def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dic
         .order_by("created_at")
     ]
 
-    final_decision = list(
-        Label.objects.filter(
-            id__in=[int(i) for i in final_label_ids if str(i).strip()],
-        ).values_list("name", flat=True),
-    )
-
     return {
         "example_id": example.id,
         "text": example.content,
-        "labels_before_discussion": labels_by_user(BatchPhase.ANNOTATION),
-        "labels_after_discussion": labels_by_user(BatchPhase.DISCUSSION),
+        "labels_before_discussion": exported_by_user(BatchPhase.ANNOTATION),
+        "labels_after_discussion": exported_by_user(BatchPhase.DISCUSSION),
         "chat_history": chat_history,
-        "final_decision": final_decision,
+        "final_decision": project_type.exported_value(
+            assignment.annotations.select_related("label"),
+        ),
     }
 
 
@@ -267,18 +253,14 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
 
         previous_decision = None
         if editing:
-            previous_decision = sorted(
-                annotation.label.name
-                for annotation in assignment.annotations.select_related("label")
-                if annotation.label
+            project_type = get_project_type(assignment.batch.project)
+            previous_decision = project_type.exported_value(
+                assignment.annotations.select_related("label"),
             )
 
         labels_form.save()
 
-        metadata = build_decision_metadata(
-            assignment.example,
-            labels_form.cleaned_data["labels"],
-        )
+        metadata = build_decision_metadata(assignment)
         if editing:
             # Append-only decision log: the original commit is never
             # rewritten, a revision entry supersedes it.

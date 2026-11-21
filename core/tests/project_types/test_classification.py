@@ -28,6 +28,11 @@ def test_no_label_is_an_answer_of_its_own():
     assert not classification.agree([signature(1), signature()])
 
 
+def test_exported_value_is_the_sorted_label_names():
+    annotations = [SimpleNamespace(label=SimpleNamespace(name=n)) for n in ["Hate", "Abuse"]]
+    assert classification.exported_value(annotations) == ["Abuse", "Hate"]
+
+
 @pytest.mark.django_db
 def test_validated_value_accepts_labels_of_the_project(project_annotation):
     project = project_annotation["project"]

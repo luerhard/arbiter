@@ -24,6 +24,11 @@ class ProjectType:
         classification, value is a list of label ids."""
         raise NotImplementedError
 
+    def exported_value(self, annotations: "Iterable[Annotation]"):
+        """One person's annotations of one example as JSON data, for the export and the
+        decision log in the codebook history."""
+        raise NotImplementedError
+
     def signature(self, annotations: "Iterable[Annotation]") -> Hashable:
         """What one person's annotations of one example amount to, in a form that can be
         compared: two people agree if their signatures are equal."""

@@ -626,11 +626,12 @@ def _generate_batch_data(batch):
         .prefetch_related("annotations__label")
         .order_by("example_id", "user__username")
     )
+    project_type = get_project_type(batch.project)
     for assignment in assignments:
         rows[assignment.example_id][_LABEL_KEYS[assignment.phase]].append(
             {
                 "user": assignment.user.username,
-                "labels": sorted(a.label.name for a in assignment.annotations.all()),
+                "labels": project_type.exported_value(assignment.annotations.all()),
                 "at": _timestamp(assignment.done),
             },
         )
