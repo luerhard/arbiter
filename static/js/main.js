@@ -70,6 +70,7 @@ Alpine.data("labelButton", labelButton);
 Alpine.data("navBlock", navBlock);
 Alpine.data("skipAnnotatedToggle", skipAnnotatedToggle);
 Alpine.data("spanEditor", spanEditor);
+Alpine.data("chatResizer", discuss.chatResizer);
 Alpine.store("panels", panelsStore());
 watchWidth(Alpine.store("panels"));
 Alpine.start();
