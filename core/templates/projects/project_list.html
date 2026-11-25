@@ -27,7 +27,6 @@ Projects · Arbiter
           <th class="text-right">Active batches</th>
           <th>Annotation</th>
           <th>Discussion</th>
-          <th class="px-5.5"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
@@ -67,26 +66,11 @@ Projects · Arbiter
             <span class="badge">Closed</span>
             {% endif %}
           </td>
-          <td class="px-5.5 py-4 text-right">
-            {% if project.owner_id == user.id %}
-            <button
-              type="button"
-              command="show-modal"
-              commandfor="delete-project-{{ project.pk }}"
-              class="btn btn-ghost btn-sm btn-icon hover:text-danger"
-              aria-label="Delete {{ project.name }}"
-              title="Delete project"
-            >
-              {% heroicon_mini "trash" class="size-4" %}
-            </button>
-            {% include "projects/partials/delete_project_dialog.html" with role=project_user.default_role %}
-            {% endif %}
-          </td>
         </tr>
         {% endwith %}
         {% empty %}
         <tr>
-          <td colspan="6" class="px-5.5 py-12 text-center text-ink-2">You are not part of any project yet.</td>
+          <td colspan="5" class="px-5.5 py-12 text-center text-ink-2">You are not part of any project yet.</td>
         </tr>
         {% endfor %}
       </tbody>

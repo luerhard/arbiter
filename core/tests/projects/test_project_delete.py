@@ -89,36 +89,8 @@ class TestProjectDelete:
 
 
 @pytest.mark.django_db
-class TestDeleteButton:
-    def _list(self, client, user):
-        client.login(username=user.username, password="123")
-        return client.get(reverse("project-list")).content.decode()
-
-    def test_owner_sees_button_and_dialog(self, client, project_annotation):
-        project = project_annotation["project"]
-
-        content = self._list(client, project_annotation["expert"])
-
-        assert f'commandfor="delete-project-{project.pk}"' in content
-        assert f'id="delete-project-{project.pk}"' in content
-        assert f'action="{reverse("project-delete", args=[project.pk])}"' in content
-        assert "csrfmiddlewaretoken" in content
-        assert re.search(r"its\s+1\s+batch:", content)
-        assert reverse("project-export-project", args=[project.pk]) in content
-
-    def test_other_members_do_not_see_it(self, client, project_annotation):
-        project = project_annotation["project"]
-        expert = User.objects.create_user(username=f"other_expert_{project.pk}", password="123")
-        ProjectUser.objects.create(project=project, user=expert, default_role=ProjectRole.EXPERT)
-
-        for user in (expert, project_annotation["annotators"][0]):
-            content = self._list(client, user)
-            assert f"delete-project-{project.pk}" not in content
-
-
-@pytest.mark.django_db
 class TestDeleteButtonOnProjectPage:
-    """The red button in the side column of the expert page, with the same dialog as the list."""
+    """The red button in the side column of the expert page; the only place to delete a project."""
 
     def _page(self, client, user, project):
         client.force_login(user)
@@ -134,6 +106,17 @@ class TestDeleteButtonOnProjectPage:
         assert f'commandfor="delete-project-{project.pk}"' in content
         assert f'id="delete-project-{project.pk}"' in content
         assert f'action="{reverse("project-delete", args=[project.pk])}"' in content
+        assert "csrfmiddlewaretoken" in content
+        assert re.search(r"its\s+1\s+batch:", content)
+        assert reverse("project-export-project", args=[project.pk]) in content
+
+    def test_not_on_the_project_list(self, client, project_annotation):
+        project = project_annotation["project"]
+        client.force_login(project_annotation["expert"])
+
+        content = client.get(reverse("project-list")).content.decode()
+
+        assert f"delete-project-{project.pk}" not in content
 
     def test_other_expert_does_not_see_it(self, client, project_annotation):
         project = project_annotation["project"]
