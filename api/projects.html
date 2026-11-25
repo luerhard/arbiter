@@ -93,6 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.backup.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.uniform_choices"><code class="docutils literal notranslate"><span class="pre">uniform_choices()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.create_batch"><code class="docutils literal notranslate"><span class="pre">create_batch()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.random_spans"><code class="docutils literal notranslate"><span class="pre">random_spans()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.create_project"><code class="docutils literal notranslate"><span class="pre">create_project()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.resetdb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
@@ -791,7 +792,7 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="projects.models.Project">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Project" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Project" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">projects_project</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -799,6 +800,7 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 <li><p><strong>id</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BigAutoField" title="(in Django v6.1)"><em>BigAutoField</em></a>) – Primary key: ID</p></li>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.1)"><em>CharField</em></a>) – Name</p></li>
 <li><p><strong>description</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.1)"><em>TextField</em></a>) – Description</p></li>
+<li><p><strong>project_type</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.1)"><em>CharField</em></a>) – Project type</p></li>
 </ul>
 </dd>
 </dl>
@@ -883,6 +885,12 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experts</span></span><a class="headerlink" href="#projects.models.Project.experts" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.models.Project.get_project_type_display">
+<span class="sig-name descname"><span class="pre">get_project_type_display</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field=&lt;django.db.models.CharField:</span> <span class="pre">project_type&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Project.get_project_type_display" title="Link to this definition"></a></dt>
+<dd><p>Shows the label of the <a class="reference internal" href="#projects.models.Project.project_type" title="projects.models.Project.project_type"><code class="xref py py-attr docutils literal notranslate"><span class="pre">project_type</span></code></a>. See <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/instances/#django.db.models.Model.get_FOO_display" title="(in Django v6.1)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_FOO_display()</span></code></a> for more information.</p>
+</dd></dl>
+
 <dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Project.id">
 <span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#projects.models.Project.id" title="Link to this definition"></a></dt>
@@ -925,6 +933,18 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 <dt class="sig sig-object py" id="projects.models.Project.owner_id">
 <span class="sig-name descname"><span class="pre">owner_id</span></span><a class="headerlink" href="#projects.models.Project.owner_id" title="Link to this definition"></a></dt>
 <dd><p>Internal field, use <a class="reference internal" href="#projects.models.Project.owner" title="projects.models.Project.owner"><code class="xref py py-class docutils literal notranslate"><span class="pre">owner</span></code></a> instead.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.Project.project_type">
+<span class="sig-name descname"><span class="pre">project_type</span></span><a class="headerlink" href="#projects.models.Project.project_type" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a></p>
+<p>Project type</p>
+<p>Choices:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">classification</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">span</span></code></p></li>
+</ul>
 </dd></dl>
 
 <dl class="py attribute">
@@ -1072,12 +1092,18 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: Project title (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">description</span></code>: Description (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project_type</span></code>: Project Type (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChoiceField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">annotators</span></code>: Annotators (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ModelMultipleChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelMultipleChoiceField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">experts</span></code>: Experts (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ModelMultipleChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelMultipleChoiceField</span></code></a>)</p></li>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="projects.forms.ProjectCreateForm.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.forms.ProjectCreateForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.forms.ProjectCreateForm.clean_project_type">
+<span class="sig-name descname"><span class="pre">clean_project_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#projects.forms.ProjectCreateForm.clean_project_type" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1185,12 +1211,19 @@ by using a Poisson process modelled as a stream of bits.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="projects.management.commands.populatedb.create_batch">
-<span class="sig-prename descclassname"><span class="pre">projects.management.commands.populatedb.</span></span><span class="sig-name descname"><span class="pre">create_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.management.commands.populatedb.create_batch" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">projects.management.commands.populatedb.</span></span><span class="sig-name descname"><span class="pre">create_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">project</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">examples_file</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'examples.csv'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.management.commands.populatedb.create_batch" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="projects.management.commands.populatedb.random_spans">
+<span class="sig-prename descclassname"><span class="pre">projects.management.commands.populatedb.</span></span><span class="sig-name descname"><span class="pre">random_spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">example</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_ids</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.management.commands.populatedb.random_spans" title="Link to this definition"></a></dt>
+<dd><p>One or two spans over a few words that every annotator marks (chosen by the
+example), sometimes plus one of their own: some examples are disagreements.</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="projects.management.commands.populatedb.create_project">
-<span class="sig-prename descclassname"><span class="pre">projects.management.commands.populatedb.</span></span><span class="sig-name descname"><span class="pre">create_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experts</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.management.commands.populatedb.create_project" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">projects.management.commands.populatedb.</span></span><span class="sig-name descname"><span class="pre">create_project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotators</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'classification'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.management.commands.populatedb.create_project" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py class">

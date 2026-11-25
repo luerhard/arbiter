@@ -289,10 +289,6 @@
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer">ChatConsumer (class in discuss.consumers)</a>
 </li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.check_for_disagreement">check_for_disagreement() (data.models.ExampleAssignment method)</a>
-</li>
-      <li><a href="api/data.html#data.models.ExampleAssignment.check_for_disagreement_after_discussion">check_for_disagreement_after_discussion() (data.models.ExampleAssignment method)</a>
-</li>
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.clean">clean() (codebook.forms.CodebookForm method)</a>
 
       <ul>
@@ -304,6 +300,8 @@
       <li><a href="api/projects.html#projects.forms.BatchCreateForm.clean_file">clean_file() (projects.forms.BatchCreateForm method)</a>
 </li>
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.clean_modified">clean_modified() (codebook.forms.CodebookForm method)</a>
+</li>
+      <li><a href="api/projects.html#projects.forms.ProjectCreateForm.clean_project_type">clean_project_type() (projects.forms.ProjectCreateForm method)</a>
 </li>
       <li><a href="api/discuss.html#discuss.room_state.close_room">close_room() (in module discuss.room_state)</a>
 </li>
@@ -378,10 +376,10 @@
 </li>
       <li><a href="api/expert.html#expert.models.CodebookDraft">CodebookDraft (class in expert.models)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/expert.html#expert.models.CodebookDraft.DoesNotExist">CodebookDraft.DoesNotExist</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/expert.html#expert.models.CodebookDraft.MultipleObjectsReturned">CodebookDraft.MultipleObjectsReturned</a>
 </li>
       <li><a href="api/expert.html#expert.models.CodebookDraft.NotUpdated">CodebookDraft.NotUpdated</a>
@@ -589,6 +587,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/users.html#users.models.User.email">email (users.models.User attribute)</a>
 </li>
+      <li><a href="api/data.html#data.models.Annotation.end">end (data.models.Annotation attribute)</a>
+</li>
       <li><a href="api/data.html#data.models.Example">Example (class in data.models)</a>
 </li>
       <li><a href="api/data.html#data.models.ExampleAssignment.example">example (data.models.ExampleAssignment attribute)</a>
@@ -776,10 +776,10 @@
 </li>
       <li><a href="api/projects.html#projects.models.ProjectUser.get_default_role_display">get_default_role_display() (projects.models.ProjectUser method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.get_example">get_example() (discuss.consumers.ChatConsumer method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/codebook.html#codebook.views.CodebookUpdateView.get_form_kwargs">get_form_kwargs() (codebook.views.CodebookUpdateView method)</a>
 
       <ul>
@@ -817,6 +817,8 @@
       <li><a href="api/expert.html#expert.models.CodebookDraft.get_previous_by_updated_at">get_previous_by_updated_at() (expert.models.CodebookDraft method)</a>
 </li>
       <li><a href="api/annotation.html#annotation.views.get_progress">get_progress() (in module annotation.views)</a>
+</li>
+      <li><a href="api/projects.html#projects.models.Project.get_project_type_display">get_project_type_display() (projects.models.Project method)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectListView.get_queryset">get_queryset() (projects.views.ProjectListView method)</a>
 </li>
@@ -866,14 +868,10 @@
         <li><a href="api/codebook.html#codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor.handleMatch">(codebook.markdown_extensions.git_diff_insertion.InsertionInlineProcessor method)</a>
 </li>
       </ul></li>
-      <li><a href="api/data.html#data.models.Example.has_disagreement">has_disagreement (data.models.Example property)</a>
-</li>
-      <li><a href="api/data.html#data.models.Example.has_disagreement_after_discussion">has_disagreement_after_discussion (data.models.Example property)</a>
+      <li><a href="api/data.html#data.models.Example.has_expert_decision">has_expert_decision (data.models.Example property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#data.models.Example.has_expert_decision">has_expert_decision (data.models.Example property)</a>
-</li>
       <li><a href="api/projects.html#projects.management.commands.backup.Command.help">help (projects.management.commands.backup.Command attribute)</a>
 
       <ul>
@@ -962,8 +960,12 @@
 </li>
       <li><a href="api/data.html#data.models.Label.NotUpdated">Label.NotUpdated</a>
 </li>
+      <li><a href="api/data.html#data.models.label_color">label_color() (in module data.models)</a>
+</li>
       <li><a href="api/data.html#data.models.Annotation.label_id">label_id (data.models.Annotation attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.Example.labels">labels (data.models.Example property)</a>
 
       <ul>
@@ -972,8 +974,6 @@
         <li><a href="api/projects.html#projects.models.Project.labels">(projects.models.Project attribute)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#data.models.Example.labels_by_user">labels_by_user() (data.models.Example method)</a>
 </li>
       <li><a href="api/codebook.html#codebook.models.Codebook.last_batch_of">last_batch_of() (codebook.models.Codebook method)</a>
@@ -1329,10 +1329,10 @@
       </ul></li>
       <li><a href="api/projects.html#projects.models.Project.DoesNotExist">Project.DoesNotExist</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Project.MultipleObjectsReturned">Project.MultipleObjectsReturned</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/projects.html#projects.models.Project.NotUpdated">Project.NotUpdated</a>
 </li>
       <li><a href="api/codebook.html#codebook.models.Codebook.project_id">project_id (codebook.models.Codebook attribute)</a>
@@ -1345,6 +1345,8 @@
         <li><a href="api/projects.html#projects.models.ProjectUser.project_id">(projects.models.ProjectUser attribute)</a>
 </li>
       </ul></li>
+      <li><a href="api/projects.html#projects.models.Project.project_type">project_type (projects.models.Project attribute)</a>
+</li>
       <li><a href="api/projects.html#projects.models.Project.project_users">project_users (projects.models.Project attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.views.ProjectAnnotatorDetailView">ProjectAnnotatorDetailView (class in projects.views)</a>
@@ -1427,6 +1429,8 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/projects.html#projects.management.commands.populatedb.random_spans">random_spans() (in module projects.management.commands.populatedb)</a>
+</li>
       <li><a href="api/codebook.html#codebook.models.CodebookChange.rationale">rationale (codebook.models.CodebookChange attribute)</a>
 
       <ul>
@@ -1488,11 +1492,7 @@
       <ul>
         <li><a href="api/codebook.html#codebook.models.Codebook.save">(codebook.models.Codebook method)</a>
 </li>
-        <li><a href="api/data.html#data.forms.MultiLabelForm.save">(data.forms.MultiLabelForm method)</a>
-</li>
         <li><a href="api/data.html#data.models.ExampleAssignment.save">(data.models.ExampleAssignment method)</a>
-</li>
-        <li><a href="api/expert.html#expert.forms.MultiLabelFormExpert.save">(expert.forms.MultiLabelFormExpert method)</a>
 </li>
         <li><a href="api/projects.html#projects.models.Batch.save">(projects.models.Batch method)</a>
 </li>
@@ -1503,10 +1503,10 @@
 </li>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.save_message_to_db">save_message_to_db() (discuss.consumers.ChatConsumer method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send">send() (discuss.consumers.ChatConsumer method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/discuss.html#discuss.consumers.ChatConsumer.send_state">send_state() (discuss.consumers.ChatConsumer method)</a>
 </li>
       <li><a href="api/data.html#data.models.Annotation.sentence">sentence (data.models.Annotation property)</a>
@@ -1522,6 +1522,8 @@
       <li><a href="api/projects.html#projects.models.BatchPhase.SETUP">SETUP (projects.models.BatchPhase attribute)</a>
 </li>
       <li><a href="api/codebook.html#codebook.models.CodebookChange.sha">sha (codebook.models.CodebookChange attribute)</a>
+</li>
+      <li><a href="api/data.html#data.models.Annotation.start">start (data.models.Annotation attribute)</a>
 </li>
       <li><a href="api/projects.html#projects.models.Batch.start_next_setup_batch">start_next_setup_batch() (projects.models.Batch method)</a>
 </li>
@@ -1567,6 +1569,8 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data.html#data.models.Annotation.text">text (data.models.Annotation property)</a>
+</li>
       <li><a href="api/codebook.html#codebook.forms.CodebookForm.textarea_class">textarea_class (codebook.forms.CodebookForm attribute)</a>
 </li>
   </ul></td>

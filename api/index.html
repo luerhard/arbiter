@@ -305,11 +305,14 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Annotation.NotUpdated</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.assignment"><code class="docutils literal notranslate"><span class="pre">Annotation.assignment</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.assignment_id"><code class="docutils literal notranslate"><span class="pre">Annotation.assignment_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.end"><code class="docutils literal notranslate"><span class="pre">Annotation.end</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.id"><code class="docutils literal notranslate"><span class="pre">Annotation.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.label"><code class="docutils literal notranslate"><span class="pre">Annotation.label</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.label_id"><code class="docutils literal notranslate"><span class="pre">Annotation.label_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.objects"><code class="docutils literal notranslate"><span class="pre">Annotation.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.sentence"><code class="docutils literal notranslate"><span class="pre">Annotation.sentence</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.start"><code class="docutils literal notranslate"><span class="pre">Annotation.start</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Annotation.text"><code class="docutils literal notranslate"><span class="pre">Annotation.text</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="data.html#data.models.Example"><code class="docutils literal notranslate"><span class="pre">Example</span></code></a><ul>
@@ -321,8 +324,6 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.batch_id"><code class="docutils literal notranslate"><span class="pre">Example.batch_id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.content"><code class="docutils literal notranslate"><span class="pre">Example.content</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.get_user_annotations"><code class="docutils literal notranslate"><span class="pre">Example.get_user_annotations()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.has_disagreement"><code class="docutils literal notranslate"><span class="pre">Example.has_disagreement</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.has_disagreement_after_discussion"><code class="docutils literal notranslate"><span class="pre">Example.has_disagreement_after_discussion</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.has_expert_decision"><code class="docutils literal notranslate"><span class="pre">Example.has_expert_decision</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.id"><code class="docutils literal notranslate"><span class="pre">Example.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Example.labels"><code class="docutils literal notranslate"><span class="pre">Example.labels</span></code></a></li>
@@ -340,8 +341,6 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.annotations"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.annotations</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.batch"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.batch</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.batch_id"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.batch_id</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.check_for_disagreement"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.check_for_disagreement()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.check_for_disagreement_after_discussion"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.check_for_disagreement_after_discussion()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.codebook_draft"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.codebook_draft</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.done"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.done</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.ExampleAssignment.example"><code class="docutils literal notranslate"><span class="pre">ExampleAssignment.example</span></code></a></li>
@@ -374,13 +373,13 @@
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.models.Label.project_id"><code class="docutils literal notranslate"><span class="pre">Label.project_id</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data.models.label_color"><code class="docutils literal notranslate"><span class="pre">label_color()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html#module-data.views">Views</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html#module-data.forms">Forms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#data.forms.MultiLabelForm"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.__init__"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.save"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#data.forms.MultiLabelForm.media"><code class="docutils literal notranslate"><span class="pre">MultiLabelForm.media</span></code></a></li>
 </ul>
 </li>
@@ -514,7 +513,6 @@
 <li class="toctree-l2"><a class="reference internal" href="expert.html#module-expert.forms">Forms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.__init__"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.save"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="expert.html#expert.forms.MultiLabelFormExpert.media"><code class="docutils literal notranslate"><span class="pre">MultiLabelFormExpert.media</span></code></a></li>
 </ul>
 </li>
@@ -716,6 +714,7 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.codebook"><code class="docutils literal notranslate"><span class="pre">Project.codebook</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.description"><code class="docutils literal notranslate"><span class="pre">Project.description</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.experts"><code class="docutils literal notranslate"><span class="pre">Project.experts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.get_project_type_display"><code class="docutils literal notranslate"><span class="pre">Project.get_project_type_display()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.id"><code class="docutils literal notranslate"><span class="pre">Project.id</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.labels"><code class="docutils literal notranslate"><span class="pre">Project.labels</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.max_batch_number"><code class="docutils literal notranslate"><span class="pre">Project.max_batch_number</span></code></a></li>
@@ -723,6 +722,7 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.objects"><code class="docutils literal notranslate"><span class="pre">Project.objects</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.owner"><code class="docutils literal notranslate"><span class="pre">Project.owner</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.owner_id"><code class="docutils literal notranslate"><span class="pre">Project.owner_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.project_type"><code class="docutils literal notranslate"><span class="pre">Project.project_type</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.project_users"><code class="docutils literal notranslate"><span class="pre">Project.project_users</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.save"><code class="docutils literal notranslate"><span class="pre">Project.save()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.models.Project.users"><code class="docutils literal notranslate"><span class="pre">Project.users</span></code></a></li>
@@ -752,6 +752,7 @@
 <li class="toctree-l2"><a class="reference internal" href="projects.html#module-projects.forms">Forms</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.__init__"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.clean_project_type"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.clean_project_type()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.clean"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.clean()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.forms.ProjectCreateForm.media"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm.media</span></code></a></li>
 </ul>
@@ -778,6 +779,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.uniform_choices"><code class="docutils literal notranslate"><span class="pre">uniform_choices()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.create_batch"><code class="docutils literal notranslate"><span class="pre">create_batch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.random_spans"><code class="docutils literal notranslate"><span class="pre">random_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.create_project"><code class="docutils literal notranslate"><span class="pre">create_project()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.management.commands.populatedb.Command.help"><code class="docutils literal notranslate"><span class="pre">Command.help</span></code></a></li>
