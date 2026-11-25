@@ -1,4 +1,8 @@
 {% load custom_tags %}
+{% comment %}
+One label of the project form; "Add label" fetches another with the next index. "row" holds the values: for a new row
+the defaults from projects.views._new_label_row, after an error what was entered.
+{% endcomment %}
 <div class="label-row grid grid-cols-[1fr_110px] gap-3 @xl:grid-cols-[1fr_200px_110px]">
   {# narrow: the name on its own line, color and key below #}
   <div class="col-span-2 @xl:col-span-1">
@@ -25,7 +29,24 @@
     />
   </div>
   <div>
+    {# the explanation only once, at the top row; all key fields refer to it #}
+    {% if index == 0 %}
+    <div class="mb-1.5 flex items-center gap-1">
+      <label class="field-label mb-0" for="label-hotkey-{{ index }}">Key</label>
+      <span class="group relative inline-flex text-ink-3 hover:text-ink-2 focus:text-ink-2" tabindex="0">
+        {% heroicon_mini "question-mark-circle" class="size-4" %}
+        <span
+          id="label-hotkey-help"
+          role="tooltip"
+          class="pointer-events-none invisible absolute right-0 bottom-full z-10 mb-1.5 w-56 rounded-md bg-night px-2.5 py-1.5 text-xs text-night-ink opacity-0 transition-opacity group-hover:visible group-hover:opacity-100 group-focus:visible group-focus:opacity-100"
+        >
+          Keyboard shortcut: while annotating, pressing this key selects the label. Leave empty for none.
+        </span>
+      </span>
+    </div>
+    {% else %}
     <label class="field-label" for="label-hotkey-{{ index }}">Key</label>
+    {% endif %}
     <input
       id="label-hotkey-{{ index }}"
       name="label_hotkey"
@@ -33,7 +54,7 @@
       type="text"
       maxlength="1"
       class="input font-mono"
-      placeholder="1"
+      aria-describedby="label-hotkey-help"
     />
   </div>
 </div>

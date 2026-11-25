@@ -1,5 +1,5 @@
 {% load markdownify %}
-{# Side cards of the project pages (the aside slot of c-columns): codebook, team and labels. #}
+{# Side cards of the project pages (the aside slot of c-columns): codebook, team, labels; for experts settings. #}
 <section class="card flex flex-col gap-3.5 p-5">
   <div class="flex items-center justify-between">
     <h2 class="card-title">Codebook</h2>
@@ -53,3 +53,47 @@
 </section>
 {% endif %}
 {% endwith %}
+
+{% if is_expert_view %}
+{% include "projects/partials/project_settings.html" %}
+{% if project.owner_id == user.id %}
+<section id="project-danger-zone" class="card flex flex-col gap-3 border-danger-line p-5" aria-label="Delete project">
+  <h2 class="card-title">Delete project</h2>
+  <p class="text-meta text-ink-3">Removes the project with all batches, annotations, discussions and the codebook.</p>
+  <button
+    type="button"
+    command="show-modal"
+    commandfor="delete-project-{{ project.pk }}"
+    class="btn btn-danger-solid btn-sm self-start"
+  >
+    {% heroicon_mini "trash" class="size-4" %}
+    Delete project
+  </button>
+</section>
+{% with n_batches=project.batches.count %}
+{% url "project-delete" project.pk as delete_url %}
+<c-confirm-dialog
+  id="delete-project-{{ project.pk }}"
+  title="Delete {{ project.name }}?"
+  :action="delete_url"
+  confirm="Delete project"
+>
+  <p>
+    This permanently deletes the project with its
+    {{ n_batches }}
+    batch{{ n_batches|pluralize:"es" }}: all samples, annotations, discussions, expert decisions and the codebook with
+    its history. This cannot be undone.
+  </p>
+  {% if n_batches %}
+  <p>
+    To keep the data,
+    <a href="{% url 'project-export-project' project.pk %}" class="font-medium text-ink underline"
+      >export the project</a
+    >
+    first.
+  </p>
+  {% endif %}
+</c-confirm-dialog>
+{% endwith %}
+{% endif %}
+{% endif %}

@@ -432,13 +432,43 @@ class TestProjectAndBatchCreationViews:
             ("Offensive", "#d64545", "o"),
         ]
 
-    def test_create_project_form_starts_with_one_empty_label_row(self, client):
+    def test_create_project_form_starts_with_one_new_label_row(self, client):
         assert client.login(username="expert1", password="123")
 
         response = client.get(reverse("project-create"))
 
-        assert response.context["label_rows"] == [{}]
+        assert response.context["label_rows"] == [{"color": label_color(0), "hotkey": "1"}]
+        content = response.content.decode()
+        assert content.count('role="tooltip"') == 1
+        assert 'id="label-hotkey-help"' in content
         assert response.context["annotators_selected_users"] == "[]"
+
+    @pytest.mark.parametrize(
+        ("index", "used_keys", "hotkey"),
+        [
+            (1, "1", "2"),
+            (2, "ab", "1"),  # letters picked by hand leave the numbers free
+            (1, "2", "1"),  # a number picked by hand is not given out again
+            (3, "132", "4"),
+            (9, "123456789", ""),
+        ],
+    )
+    def test_added_label_row_gets_next_color_and_free_key(self, client, index, used_keys, hotkey):
+        # Regression: every new row showed the placeholder "1" and saved no key at all
+        assert client.login(username="expert1", password="123")
+
+        response = client.get(
+            reverse("project-label-row"), {"index": index, "used_keys": used_keys}
+        )
+
+        content = response.content.decode()
+        assert f'id="label-color-{index}"' in content
+        assert f'value="{label_color(index)}"' in content
+        assert f'id="label-hotkey-{index}"' in content
+        assert re.search(rf'name="label_hotkey"\s+value="{hotkey}"', content)
+        # the explanation of the key is only on the first row
+        assert 'role="tooltip"' not in content
+        assert 'aria-describedby="label-hotkey-help"' in content
 
     def test_batch_create_invalid_keeps_the_chosen_users(self, client, project_annotation):
         # Regression: after an error all project annotators were preselected again,
@@ -993,3 +1023,57 @@ class TestPhaseMenu:
         assert response.status_code == expected
         batch.refresh_from_db()
         assert batch.current_phase == BatchPhase.DISCUSSION
+
+
+@pytest.mark.django_db
+class TestProjectSettings:
+    """The settings card on the expert page: only experts of the project see and change it."""
+
+    def _post(self, client, project, show):
+        data = {"show_metadata_in_annotation": "on"} if show else {}
+        # the confirmation dialog posts a plain form
+        return client.post(reverse("project-settings", args=(project.id,)), data)
+
+    @pytest.mark.parametrize("show", [True, False])
+    def test_expert_switches_metadata_on_and_off(self, client, project_annotation, show):
+        project = project_annotation["project"]
+        project.show_metadata_in_annotation = not show
+        project.save()
+        client.force_login(project_annotation["expert"])
+
+        response = self._post(client, project, show)
+
+        assert response.status_code == 302
+        assert response.url == reverse("project-detail-expert", args=(project.id,))
+        project.refresh_from_db()
+        assert project.show_metadata_in_annotation is show
+
+    @pytest.mark.parametrize("who", ["anonymous", "outsider", "annotator", "other expert"])
+    def test_others_cannot_change_the_setting(self, client, project_annotation, intruder, who):
+        project = project_annotation["project"]
+        if who == "outsider":
+            client.force_login(
+                User.objects.create_user(f"out_{uuid.uuid4().hex[:8]}", password="123")
+            )
+        elif who == "annotator":
+            client.force_login(project_annotation["annotators"][0])
+        elif who == "other expert":  # an expert, but of another project
+            client.force_login(intruder[0])
+
+        response = self._post(client, project, show=True)
+
+        assert response.status_code == (302 if who == "anonymous" else 403)
+        project.refresh_from_db()
+        assert project.show_metadata_in_annotation is False
+
+    def test_card_only_on_the_expert_page(self, client, project_annotation):
+        project = project_annotation["project"]
+        client.force_login(project_annotation["expert"])
+
+        expert_page = client.get(reverse("project-detail-expert", args=(project.id,)))
+        annotator_page = client.get(reverse("project-detail-annotator", args=(project.id,)))
+
+        # the card, and the confirmation dialog its button opens
+        assert b'id="project-settings"' in expert_page.content
+        assert b'id="project-settings-metadata"' in expert_page.content
+        assert b'id="project-settings"' not in annotator_page.content

@@ -7,6 +7,7 @@ import pandas as pd
 from data.models import label_color
 from project_types import PROJECT_TYPES
 from projects.models import Batch
+from projects.models import Project
 from users.models import User
 
 
@@ -180,6 +181,14 @@ class BatchCreateForm(forms.ModelForm):
             raise ValidationError(msg)
         self.examples = [(str(row.pop("text")), row) for row in rows]
         return file
+
+
+class ProjectSettingsForm(forms.ModelForm):
+    """What experts can change once the project exists (the settings card on their page)."""
+
+    class Meta:
+        model = Project
+        fields = ["show_metadata_in_annotation"]
 
 
 class BatchPhaseForm(forms.ModelForm):

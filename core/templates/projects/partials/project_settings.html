@@ -1,0 +1,50 @@
+{# Settings card of the expert page. Changing a setting asks for confirmation first, like deleting a batch. #}
+{% url "project-settings" project.id as project_settings_url %}
+<section id="project-settings" class="card flex flex-col gap-3 p-5" aria-label="Settings">
+  <h2 class="card-title">Settings</h2>
+  <div class="flex items-start justify-between gap-3">
+    <div class="flex flex-col gap-0.5">
+      <span class="text-sm font-semibold text-ink">Show metadata while annotating</span>
+      <span class="text-meta text-ink-3">
+        {% if project.show_metadata_in_annotation %}On:{% else %}Off:{% endif %}
+        annotators
+        {% if not project.show_metadata_in_annotation %}don't
+        {% endif %}see the other columns of the uploaded file below each sample.
+      </span>
+    </div>
+    <button
+      type="button"
+      command="show-modal"
+      commandfor="project-settings-metadata"
+      class="btn btn-secondary btn-sm shrink-0"
+    >
+      {% if project.show_metadata_in_annotation %}Turn off{% else %}Turn on{% endif %}
+    </button>
+  </div>
+</section>
+{% if project.show_metadata_in_annotation %}
+<c-confirm-dialog
+  id="project-settings-metadata"
+  title="Hide metadata from annotators?"
+  :action="project_settings_url"
+  confirm="Turn off"
+>
+  <p>
+    From now on, annotators see only the text of each sample. Labels they already gave were made with the metadata in
+    view.
+  </p>
+</c-confirm-dialog>
+{% else %}
+<c-confirm-dialog
+  id="project-settings-metadata"
+  title="Show metadata to annotators?"
+  :action="project_settings_url"
+  confirm="Turn on"
+>
+  <p>
+    From now on, annotators see the other columns of the uploaded file (e.g. id, source) below each sample, in every
+    batch of this project. A column like the source or a party can sway their labels.
+  </p>
+  <c-slot name="fields"><input type="hidden" name="show_metadata_in_annotation" value="on" /></c-slot>
+</c-confirm-dialog>
+{% endif %}

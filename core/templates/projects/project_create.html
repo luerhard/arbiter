@@ -106,7 +106,7 @@ New project · Arbiter
           hx-get="{% url 'project-label-row' %}"
           hx-target="#label-rows"
           hx-swap="beforeend"
-          hx-vals="js:{index: document.querySelectorAll('#label-rows .label-row').length}"
+          hx-vals="js:{index: document.querySelectorAll('#label-rows .label-row').length, used_keys: Array.from(document.querySelectorAll('#label-rows [name=label_hotkey]'), (el) => el.value.trim().toLowerCase()).join('')}"
         >
           {% heroicon_micro "plus" class="size-4" %}
           Add label
