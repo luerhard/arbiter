@@ -7,8 +7,17 @@
     {# A form, not a link: following it marks the notification read, so the toast does not come back (#198). #}
     <form method="post" action="{% url 'notification-read' notification.id %}">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{% url 'project-detail' notification.batch.project_id %}" />
-      <button type="submit" class="link cursor-pointer text-meta">Open project</button>
+      {% with task=notification.task %}
+      <input
+        type="hidden"
+        name="next"
+        value="{% if task %}{{ task.url }}{% else %}{% url 'project-detail' notification.batch.project_id %}{% endif %}"
+      />
+      <button type="submit" class="link cursor-pointer text-meta">
+        {% if task.kind == "annotate" %}Start annotating{% elif task.kind == "discuss" %}Join discussion{% elif task.kind == "decide" %}Resolve
+        disagreements{% else %}Open project{% endif %}
+      </button>
+      {% endwith %}
     </form>
     {% endif %}
   </div>

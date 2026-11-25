@@ -10,6 +10,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.generic import View
+from notifications.models import Notification
 
 from .forms import MultiLabelFormExpert
 from .models import CodebookDraft
@@ -215,6 +216,8 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
         if assignment is None:
             raise PermissionDenied(NOT_YOURS)
 
+        if not request.htmx:
+            Notification.mark_batch_read(request.user, batch_id)
         editing = request.GET.get("edit") == "1" and assignment.done is not None
         review = assignment.done is not None and not editing
         context = self._build_context(assignment, review=review, editing=editing)

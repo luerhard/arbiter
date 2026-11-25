@@ -483,6 +483,30 @@ class TestUndoFinalize:
         self.batch.refresh_from_db()
         assert self.batch.current_phase == BatchPhase.DISCUSSION
 
+    def test_go_to_discussion_once_the_discussion_starts(self, client):
+        # #199: the done page offered only "Back to project" after the batch moved on
+        discuss_link = f'href="{reverse("discuss-batch", args=(self.batch.id,))}"'
+        self._finalize(client, self.a1)
+        assert discuss_link not in client.get(self.done_url).content.decode()
+
+        self._finalize(client, self.a2)  # the last one: the discussion starts
+
+        for annotator in (self.a1, self.a2):
+            client.force_login(annotator)
+            assert discuss_link in client.get(self.done_url).content.decode()
+
+    def test_no_go_to_discussion_without_disagreements_or_after_it(self, client):
+        discuss_url = reverse("discuss-batch", args=(self.batch.id,))
+        self._finalize(client, self.a1)
+        self._finalize(client, self.a2)
+
+        ExampleAssignment.objects.filter(user=self.a2, phase=BatchPhase.DISCUSSION).delete()
+        assert discuss_url not in client.get(self.done_url).content.decode()
+
+        Batch.objects.filter(pk=self.batch.pk).update(current_phase=BatchPhase.EXPERT)
+        client.force_login(self.a1)
+        assert discuss_url not in client.get(self.done_url).content.decode()
+
     @pytest.mark.parametrize("who", ["expert", "outsider"])
     def test_only_annotators_of_the_batch(self, client, project_annotation, who):
         BatchUser.objects.filter(batch=self.batch).update(finalized_at=timezone.now())

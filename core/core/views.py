@@ -2,13 +2,11 @@ from django.contrib.auth.decorators import login_not_required
 from django.db.models import Prefetch
 from django.shortcuts import redirect
 from django.shortcuts import render
-from django.urls import reverse
 
 from data.models import ExampleAssignment
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import BatchUser
-from projects.models import ProjectRole
 from projects.models import ProjectUser
 
 # discussions need the partner online, so they come first
@@ -24,33 +22,19 @@ def open_tasks(user) -> list[dict]:
 
     tasks = []
     for batch_user in batch_users:
+        task = batch_user.task()
+        if task is None:
+            continue
         batch = batch_user.batch
-        phase = batch.current_phase
-        mine = ExampleAssignment.objects.filter(batch=batch, user=user, phase=phase)
-
-        if batch_user.role == ProjectRole.ANNOTATOR and phase == BatchPhase.ANNOTATION:
-            if batch_user.finalized_at is not None:
-                continue
-            kind, url = "annotate", reverse("annotate-batch", args=(batch.id,))
-            done, total = mine.done().count(), mine.count()
-        elif batch_user.role == ProjectRole.ANNOTATOR and phase == BatchPhase.DISCUSSION:
-            # one DISCUSSION assignment per example to discuss
-            kind, url = "discuss", reverse("discuss-batch", args=(batch.id,))
-            done, total = mine.done().count(), mine.count()
-        elif batch_user.role == ProjectRole.EXPERT and phase == BatchPhase.EXPERT:
-            kind, url = "decide", reverse("expert-batch", args=(batch.id,))
-            done, total = mine.done().count(), mine.count()
-        else:
-            continue
-
-        if total == 0:
-            continue
+        # in the discussion one assignment per example to discuss
+        mine = ExampleAssignment.objects.filter(batch=batch, user=user, phase=batch.current_phase)
+        done, total = mine.done().count(), mine.count()
 
         tasks.append(
             {
-                "kind": kind,
+                "kind": task.kind,
                 "batch": batch,
-                "url": url,
+                "url": task.url,
                 "done": done,
                 "total": total,
                 "percent": round(100 * done / total) if total else 0,

@@ -29,6 +29,14 @@ class Notification(models.Model):
     def __str__(self):
         return f"Notification for {self.user}: {self.message}"
 
+    @classmethod
+    def mark_batch_read(cls, user, batch_id):
+        """The user opened the batch's annotation, discussion or expert page: its phase
+        notifications have done their job, so their toasts stop coming back."""
+        cls.objects.filter(user=user, batch_id=batch_id, read_at__isnull=True).update(
+            read_at=timezone.now(),
+        )
+
     def mark_read(self):
         if self.read_at is None:
             self.read_at = timezone.now()
