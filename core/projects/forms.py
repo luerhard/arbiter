@@ -28,6 +28,10 @@ class ProjectCreateForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=True,
     )
+    show_metadata_in_annotation = forms.BooleanField(
+        required=False,
+        label="Show metadata while annotating",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
