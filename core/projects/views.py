@@ -31,6 +31,7 @@ from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import Label
+from data.models import label_color
 from discuss.models import Message
 from project_types import PROJECT_TYPES
 from project_types import ProjectType
@@ -120,7 +121,7 @@ class ProjectCreateView(FormView):
             {"name": name, "color": color, "hotkey": hotkey}
             for name, color, hotkey in rows
             if (name + color + hotkey).strip()
-        ] or [{}]
+        ] or [_new_label_row(0)]
         context["annotators_selected_users"] = _posted_users_json(post, "annotators")
         context["experts_selected_users"] = _posted_users_json(post, "experts")
         context["project_types"] = PROJECT_TYPES
@@ -190,10 +191,20 @@ class ProjectBatchCreateView(ExpertRequiredMixin, FormView):
         return super().form_valid(form)
 
 
+def _new_label_row(index: int, used_keys: str = "") -> dict:
+    """A new label row of the project form: the color of its position and the first number
+    key that no other row uses yet (none once 1-9 are taken), so the shortcuts never clash."""
+    hotkey = next((key for key in "123456789" if key not in used_keys), "")
+    return {"color": label_color(index), "hotkey": hotkey}
+
+
 class ProjectLabelRowView(View):
+    """Another label row for "Add label"; it sends the number of rows and the keys in use."""
+
     def get(self, request):
         index = int(request.GET.get("index", 0))
-        return render(request, "projects/partials/label_row.html", {"index": index})
+        row = _new_label_row(index, used_keys=request.GET.get("used_keys", ""))
+        return render(request, "projects/partials/label_row.html", {"index": index, "row": row})
 
 
 class ProjectDetailView(RedirectView):

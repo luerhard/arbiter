@@ -432,13 +432,43 @@ class TestProjectAndBatchCreationViews:
             ("Offensive", "#d64545", "o"),
         ]
 
-    def test_create_project_form_starts_with_one_empty_label_row(self, client):
+    def test_create_project_form_starts_with_one_new_label_row(self, client):
         assert client.login(username="expert1", password="123")
 
         response = client.get(reverse("project-create"))
 
-        assert response.context["label_rows"] == [{}]
+        assert response.context["label_rows"] == [{"color": label_color(0), "hotkey": "1"}]
+        content = response.content.decode()
+        assert content.count('role="tooltip"') == 1
+        assert 'id="label-hotkey-help"' in content
         assert response.context["annotators_selected_users"] == "[]"
+
+    @pytest.mark.parametrize(
+        ("index", "used_keys", "hotkey"),
+        [
+            (1, "1", "2"),
+            (2, "ab", "1"),  # letters picked by hand leave the numbers free
+            (1, "2", "1"),  # a number picked by hand is not given out again
+            (3, "132", "4"),
+            (9, "123456789", ""),
+        ],
+    )
+    def test_added_label_row_gets_next_color_and_free_key(self, client, index, used_keys, hotkey):
+        # Regression: every new row showed the placeholder "1" and saved no key at all
+        assert client.login(username="expert1", password="123")
+
+        response = client.get(
+            reverse("project-label-row"), {"index": index, "used_keys": used_keys}
+        )
+
+        content = response.content.decode()
+        assert f'id="label-color-{index}"' in content
+        assert f'value="{label_color(index)}"' in content
+        assert f'id="label-hotkey-{index}"' in content
+        assert re.search(rf'name="label_hotkey"\s+value="{hotkey}"', content)
+        # the explanation of the key is only on the first row
+        assert 'role="tooltip"' not in content
+        assert 'aria-describedby="label-hotkey-help"' in content
 
     def test_batch_create_invalid_keeps_the_chosen_users(self, client, project_annotation):
         # Regression: after an error all project annotators were preselected again,

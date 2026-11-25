@@ -32,11 +32,6 @@ window.Coloris({
   selectInput: true,
   defaultColor: "#3b82f6",
   swatches: [
-    "#64748b", // slate-500
-    "#6b7280", // gray-500
-    "#71717a", // zinc-500
-    "#737373", // neutral-500
-    "#78716c", // stone-500
     "#ef4444", // red-500
     "#f97316", // orange-500
     "#f59e0b", // amber-500
@@ -56,6 +51,9 @@ window.Coloris({
     "#f43f5e", // rose-500
   ],
 });
+// Coloris adds its swatch (the colored square in the field) only to fields present at the call above; fields that htmx
+// adds later, like a new label row on the project form, get it here.
+htmx.onLoad((el) => window.Coloris.wrap(Array.from(el.querySelectorAll("[data-coloris]"))));
 
 import { navBlock, labelButton, skipAnnotatedToggle } from "./annotation.js";
 import { spanEditor } from "./spans.js";
