@@ -1,5 +1,5 @@
 {% load markdownify %}
-{# Side cards of the project pages (the aside slot of c-columns): codebook, team and labels. #}
+{# Side cards of the project pages (the aside slot of c-columns): codebook, team, labels; for experts settings. #}
 <section class="card flex flex-col gap-3.5 p-5">
   <div class="flex items-center justify-between">
     <h2 class="card-title">Codebook</h2>
@@ -53,3 +53,7 @@
 </section>
 {% endif %}
 {% endwith %}
+
+{% if is_expert_view %}
+{% include "projects/partials/project_settings.html" %}
+{% endif %}

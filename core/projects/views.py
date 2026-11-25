@@ -26,6 +26,7 @@ import pandas as pd
 from .forms import BatchCreateForm
 from .forms import BatchPhaseForm
 from .forms import ProjectCreateForm
+from .forms import ProjectSettingsForm
 from core.mixins import AnyRoleRequiredMixin
 from core.mixins import ExpertRequiredMixin
 from data.models import Example
@@ -553,6 +554,20 @@ class BatchOrderView(ExpertRequiredMixin, View):
             return HttpResponseBadRequest(str(exc))
         messages.success(request, "Order saved.")
         return render(request, "projects/partials/samples_rows.html", _samples_table(batch))
+
+
+class ProjectSettingsView(ExpertRequiredMixin, View):
+    """Save the settings card of the expert page; its confirmation dialog posts a plain form.
+    Only experts of the project get here (ExpertRequiredMixin checks the project in the URL)."""
+
+    def post(self, request, project_id):
+        project = get_object_or_404(Project, id=project_id)
+        form = ProjectSettingsForm(request.POST, instance=project)
+        if not form.is_valid():
+            return HttpResponseBadRequest("Invalid settings.")
+        form.save()
+        messages.success(request, "Settings saved.")
+        return redirect("project-detail-expert", project_id=project.id)
 
 
 class ChangeBatchPhase(ExpertRequiredMixin, View):
