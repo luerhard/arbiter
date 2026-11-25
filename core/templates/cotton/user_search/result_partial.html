@@ -1,9 +1,16 @@
 {% comment %}
 Swapped by htmx into the picker's results list, inside its Alpine component (cotton/user_search/index.html), so add() is
-in scope.
+in scope. mousedown.prevent keeps the focus in the search input: Safari does not focus a clicked button, so without it
+the input's focusout closes the list before the click arrives and nobody is added. After adding, the input is blurred so
+that clicking it again loads a fresh list.
 {% endcomment %}
 {% for user in users %}
-<button type="button" class="menu-item" @click="add({ id: {{ user.id }}, username: '{{ user.username|escapejs }}' })">
+<button
+  type="button"
+  class="menu-item"
+  @mousedown.prevent
+  @click="add({ id: {{ user.id }}, username: '{{ user.username|escapejs }}' }); $refs.searchInput.blur()"
+>
   {{ user.username }}
 </button>
 {% empty %}
