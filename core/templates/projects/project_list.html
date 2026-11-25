@@ -79,31 +79,7 @@ Projects · Arbiter
             >
               {% heroicon_mini "trash" class="size-4" %}
             </button>
-            {% with n_batches=project.batches.count %}
-            {% url "project-delete" project.pk as delete_url %}
-            <c-confirm-dialog
-              id="delete-project-{{ project.pk }}"
-              title="Delete {{ project.name }}?"
-              :action="delete_url"
-              confirm="Delete project"
-            >
-              <p>
-                This permanently deletes the project with its
-                {{ n_batches }}
-                batch{{ n_batches|pluralize:"es" }}: all samples, annotations, discussions, expert decisions and the
-                codebook with its history. This cannot be undone.
-              </p>
-              {% if n_batches and project_user.default_role == "E" %}
-              <p>
-                To keep the data,
-                <a href="{% url 'project-export-project' project.pk %}" class="font-medium text-ink underline"
-                  >export the project</a
-                >
-                first.
-              </p>
-              {% endif %}
-            </c-confirm-dialog>
-            {% endwith %}
+            {% include "projects/partials/delete_project_dialog.html" with role=project_user.default_role %}
             {% endif %}
           </td>
         </tr>

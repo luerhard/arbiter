@@ -114,3 +114,33 @@ class TestDeleteButton:
         for user in (expert, project_annotation["annotators"][0]):
             content = self._list(client, user)
             assert f"delete-project-{project.pk}" not in content
+
+
+@pytest.mark.django_db
+class TestDeleteButtonOnProjectPage:
+    """The red button in the side column of the expert page, with the same dialog as the list."""
+
+    def _page(self, client, user, project):
+        client.force_login(user)
+        url = reverse("project-detail-expert", args=[project.pk])
+        return client.get(url).content.decode()
+
+    def test_owner_sees_button_and_dialog(self, client, project_annotation):
+        project = project_annotation["project"]
+
+        content = self._page(client, project_annotation["expert"], project)
+
+        assert 'id="project-danger-zone"' in content
+        assert f'commandfor="delete-project-{project.pk}"' in content
+        assert f'id="delete-project-{project.pk}"' in content
+        assert f'action="{reverse("project-delete", args=[project.pk])}"' in content
+
+    def test_other_expert_does_not_see_it(self, client, project_annotation):
+        project = project_annotation["project"]
+        expert = User.objects.create_user(username=f"other_expert_{project.pk}", password="123")
+        ProjectUser.objects.create(project=project, user=expert, default_role=ProjectRole.EXPERT)
+
+        content = self._page(client, expert, project)
+
+        assert 'id="project-danger-zone"' not in content
+        assert f"delete-project-{project.pk}" not in content

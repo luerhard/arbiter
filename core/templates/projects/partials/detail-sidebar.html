@@ -56,4 +56,20 @@
 
 {% if is_expert_view %}
 {% include "projects/partials/project_settings.html" %}
+{% if project.owner_id == user.id %}
+<section id="project-danger-zone" class="card flex flex-col gap-3 border-danger-line p-5" aria-label="Delete project">
+  <h2 class="card-title">Delete project</h2>
+  <p class="text-meta text-ink-3">Removes the project with all batches, annotations, discussions and the codebook.</p>
+  <button
+    type="button"
+    command="show-modal"
+    commandfor="delete-project-{{ project.pk }}"
+    class="btn btn-danger-solid btn-sm self-start"
+  >
+    {% heroicon_mini "trash" class="size-4" %}
+    Delete project
+  </button>
+</section>
+{% include "projects/partials/delete_project_dialog.html" with role="E" %}
+{% endif %}
 {% endif %}
