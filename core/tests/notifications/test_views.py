@@ -146,6 +146,31 @@ class TestNotificationViews:
         self.notification.refresh_from_db()
         assert self.notification.read_at is not None
 
+    def test_open_project_marks_read_and_redirects(self):
+        # Regression for #198: following "Open project" left the toast unread, so it came back.
+        project_url = reverse("project-detail", args=[self.batch.project_id])
+        content = self.client.get(self.unread_url).content.decode()
+        assert f'name="next" value="{project_url}"' in content
+
+        response = self.client.post(
+            reverse("notification-read", args=[self.notification.id]),
+            data={"next": project_url},
+        )
+
+        assert response.status_code == 302
+        assert response["Location"] == project_url
+        self.notification.refresh_from_db()
+        assert self.notification.read_at is not None
+        assert self.notification.message not in self.client.get(self.unread_url).content.decode()
+
+    def test_open_project_ignores_external_next(self):
+        response = self.client.post(
+            reverse("notification-read", args=[self.notification.id]),
+            data={"next": "https://evil.example/"},
+        )
+
+        assert response.status_code == 200
+
     def test_mark_read_is_idempotent(self):
         self.notification.mark_read()
         first_read_at = self.notification.read_at

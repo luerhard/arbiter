@@ -4,7 +4,12 @@
   <div class="flex min-w-0 flex-1 flex-col gap-1">
     <p class="font-medium">{{ notification.message }}</p>
     {% if notification.batch %}
-    <a href="{% url 'project-detail' notification.batch.project_id %}" class="link text-meta">Open project</a>
+    {# A form, not a link: following it marks the notification read, so the toast does not come back (#198). #}
+    <form method="post" action="{% url 'notification-read' notification.id %}">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{% url 'project-detail' notification.batch.project_id %}" />
+      <button type="submit" class="link cursor-pointer text-meta">Open project</button>
+    </form>
     {% endif %}
   </div>
   <button

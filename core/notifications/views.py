@@ -1,8 +1,10 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import View
 
 from .models import Notification
@@ -28,6 +30,10 @@ class MarkNotificationReadView(LoginRequiredMixin, View):
     def post(self, request, notification_id):
         notification = get_object_or_404(Notification, pk=notification_id, user=request.user)
         notification.mark_read()
+        # "Open project" posts with the page to go to next.
+        next_url = request.POST.get("next")
+        if next_url and url_has_allowed_host_and_scheme(next_url, {request.get_host()}):
+            return HttpResponseRedirect(next_url)
         # Empty 200 lets the htmx close button remove the toast (hx-swap="delete"); the
         # poller then shows the next one.
         return HttpResponse(status=200, headers=CHANGED)
