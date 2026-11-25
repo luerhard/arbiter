@@ -1,9 +1,11 @@
 from collections import defaultdict
+from typing import NamedTuple
 
 from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db import transaction
+from django.urls import reverse
 
 from .project_user import ProjectRole
 from project_types import get_project_type
@@ -25,6 +27,19 @@ class BatchQuerySet(models.QuerySet):
         return ExampleAssignment.objects.filter(batch__in=self, user=user, phase=phase)
 
 
+class Task(NamedTuple):
+    kind: str  # "annotate", "discuss" or "decide"
+    url: str
+
+
+# What a batch member does in each phase, and the page for it.
+_TASKS = {
+    (ProjectRole.ANNOTATOR, BatchPhase.ANNOTATION): ("annotate", "annotate-batch"),
+    (ProjectRole.ANNOTATOR, BatchPhase.DISCUSSION): ("discuss", "discuss-batch"),
+    (ProjectRole.EXPERT, BatchPhase.EXPERT): ("decide", "expert-batch"),
+}
+
+
 class BatchUser(models.Model):
     batch = models.ForeignKey("Batch", on_delete=models.CASCADE, db_index=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, db_index=True)
@@ -37,6 +52,23 @@ class BatchUser(models.Model):
         db_index=True,
     )
     finalized_at = models.DateTimeField(null=True, blank=True)
+
+    def task(self) -> Task | None:
+        """The work this member has in the batch right now (the dashboard's cards, the link
+        of a phase notification). None when the phase is not theirs, they finalized their
+        annotations, or nothing is assigned to them (no disagreements to discuss)."""
+        phase = self.batch.current_phase
+        kind_and_url = _TASKS.get((self.role, phase))
+        if kind_and_url is None:
+            return None
+        kind, url_name = kind_and_url
+        if kind == "annotate" and self.finalized_at is not None:
+            return None
+        ExampleAssignment = apps.get_model("data", "ExampleAssignment")
+        mine = ExampleAssignment.objects.filter(batch_id=self.batch_id, user_id=self.user_id)
+        if not mine.filter(phase=phase).exists():
+            return None
+        return Task(kind, reverse(url_name, args=(self.batch_id,)))
 
 
 class Batch(models.Model):

@@ -5,6 +5,7 @@ from django.shortcuts import redirect
 from django.shortcuts import render
 from django.shortcuts import reverse
 from django.views.generic import View
+from notifications.models import Notification
 
 from core.mixins import BatchAnnotatorRequiredMixin
 from project_types import get_project_type
@@ -29,6 +30,7 @@ class DiscussView(BatchAnnotatorRequiredMixin, View):
         if batch.current_phase != BatchPhase.DISCUSSION:
             messages.info(request, "This batch is not in the discussion phase.")
             return redirect("project-detail", batch.project_id)
+        Notification.mark_batch_read(request.user, batch.id)
         context["batch"] = batch
         context["project_type"] = get_project_type(batch.project)
 

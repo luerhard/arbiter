@@ -8,6 +8,7 @@ from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import View
 
 from .models import Notification
+from projects.models import BatchUser
 
 # More toasts would cover the page and its buttons; the rest is counted below them.
 SHOWN = 3
@@ -19,6 +20,14 @@ class UnreadNotificationsView(LoginRequiredMixin, View):
     def get(self, request):
         unread = request.user.notifications.filter(read_at__isnull=True)
         notifications = list(unread.select_related("batch").order_by("-created_at")[:SHOWN])
+        # the toast leads to the user's work in the batch, else to the project
+        members = BatchUser.objects.filter(
+            user=request.user,
+            batch_id__in={n.batch_id for n in notifications},
+        ).select_related("batch")
+        tasks = {member.batch_id: member.task() for member in members}
+        for notification in notifications:
+            notification.task = tasks.get(notification.batch_id)
         return render(
             request,
             "notifications/partials/unread.html",

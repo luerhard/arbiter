@@ -4,6 +4,7 @@ from django.urls import reverse
 from notifications.models import Notification
 import pytest
 
+from data.models import ExampleAssignment
 from projects.models import BatchPhase
 
 
@@ -146,19 +147,20 @@ class TestNotificationViews:
         self.notification.refresh_from_db()
         assert self.notification.read_at is not None
 
-    def test_open_project_marks_read_and_redirects(self):
+    def test_following_the_toast_marks_read_and_redirects(self):
         # Regression for #198: following "Open project" left the toast unread, so it came back.
-        project_url = reverse("project-detail", args=[self.batch.project_id])
-        content = self.client.get(self.unread_url).content.decode()
-        assert f'name="next" value="{project_url}"' in content
+        # The annotator of this batch is annotating, so the toast now leads there.
+        work_url = reverse("annotate-batch", args=[self.batch.id])
+        content = " ".join(self.client.get(self.unread_url).content.decode().split())
+        assert f'name="next" value="{work_url}"' in content
 
         response = self.client.post(
             reverse("notification-read", args=[self.notification.id]),
-            data={"next": project_url},
+            data={"next": work_url},
         )
 
         assert response.status_code == 302
-        assert response["Location"] == project_url
+        assert response["Location"] == work_url
         self.notification.refresh_from_db()
         assert self.notification.read_at is not None
         assert self.notification.message not in self.client.get(self.unread_url).content.decode()
@@ -258,3 +260,47 @@ class TestNotificationPile:
         )
 
         assert response["HX-Trigger"] == "notifications-changed"
+
+
+@pytest.mark.django_db
+class TestToastLeadsToTheWork:
+    """The toast's link goes to what the phase change gives the user to do, else the project."""
+
+    def _toast(self, client, user, batch):
+        client.force_login(user)
+        content = client.get(reverse("notifications-unread")).content.decode()
+        # one per phase change: the newest
+        notification = Notification.objects.filter(user=user, batch=batch).latest("created_at")
+        start = content.index(f'data-notification-id="{notification.id}"')
+        return " ".join(content[start : content.index("</form>", start)].split())
+
+    @pytest.mark.parametrize(
+        ("fixture", "who", "url_name", "text"),
+        [
+            ("project_annotation", "annotator", "annotate-batch", "Start annotating"),
+            ("project_discussion", "annotator", "discuss-batch", "Join discussion"),
+            ("project_expert", "expert", "expert-batch", "Resolve disagreements"),
+            # nothing to do for them in this phase
+            ("project_annotation", "expert", "project-detail", "Open project"),
+            ("project_discussion", "expert", "project-detail", "Open project"),
+        ],
+    )
+    def test_link(self, client, request, fixture, who, url_name, text):
+        data = request.getfixturevalue(fixture)
+        user = data["expert"] if who == "expert" else data["annotators"][0]
+        batch = data["batch"]
+        target = batch.project_id if url_name == "project-detail" else batch.id
+
+        toast = self._toast(client, user, batch)
+
+        assert f'name="next" value="{reverse(url_name, args=(target,))}"' in toast
+        assert text in toast
+
+    def test_no_discussion_link_without_disagreements(self, client, project_discussion):
+        a1 = project_discussion["annotators"][0]
+        batch = project_discussion["batch"]
+        ExampleAssignment.objects.filter(user=a1, phase=BatchPhase.DISCUSSION).delete()
+
+        toast = self._toast(client, a1, batch)
+
+        assert reverse("project-detail", args=(batch.project_id,)) in toast

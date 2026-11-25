@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView
 from django.views.generic import View
+from notifications.models import Notification
 
 from core.mixins import BatchAnnotatorRequiredMixin
 from data.forms import MultiLabelForm
@@ -173,6 +174,7 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
         if request.htmx:
             return render(request, "annotation/panel.html", context)
 
+        Notification.mark_batch_read(request.user, batch.id)
         codebook = batch.project.codebook.get()
         # what changed since the annotator's previous batch started; in their first batch,
         # since this one started
@@ -293,6 +295,7 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
 class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
     def _context(self, request, batch):
         batch_user = BatchUser.objects.filter(batch=batch, user=request.user).first()
+        task = batch_user.task() if batch_user else None
         first = (
             ExampleAssignment.objects.filter(
                 batch=batch,
@@ -317,6 +320,8 @@ class AnnotationDoneView(BatchAnnotatorRequiredMixin, View):
             ).count(),
             "annotator_count": batch.assignees(role=ProjectRole.ANNOTATOR).count(),
             "phase_advanced": batch.current_phase != BatchPhase.ANNOTATION,
+            # phase_advanced holds for every later phase; the discussion needs its own check
+            "discuss_url": task.url if task and task.kind == "discuss" else "",
         }
 
     def get(self, request, batch_id):
