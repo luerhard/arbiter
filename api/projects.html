@@ -67,6 +67,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.BatchSamplesView"><code class="docutils literal notranslate"><span class="pre">BatchSamplesView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.SampleDetailView"><code class="docutils literal notranslate"><span class="pre">SampleDetailView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.BatchOrderView"><code class="docutils literal notranslate"><span class="pre">BatchOrderView</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectSettingsView"><code class="docutils literal notranslate"><span class="pre">ProjectSettingsView</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.ChangeBatchPhase"><code class="docutils literal notranslate"><span class="pre">ChangeBatchPhase</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.DeleteBatch"><code class="docutils literal notranslate"><span class="pre">DeleteBatch</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.views.ExportProject"><code class="docutils literal notranslate"><span class="pre">ExportProject</span></code></a></li>
@@ -86,6 +87,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#module-projects.forms">Forms</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#projects.forms.ProjectCreateForm"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.forms.BatchCreateForm"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#projects.forms.ProjectSettingsForm"><code class="docutils literal notranslate"><span class="pre">ProjectSettingsForm</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#projects.forms.BatchPhaseForm"><code class="docutils literal notranslate"><span class="pre">BatchPhaseForm</span></code></a></li>
 </ul>
 </li>
@@ -264,7 +266,8 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="projects.views.ProjectLabelRowView">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.views.</span></span><span class="sig-name descname"><span class="pre">ProjectLabelRowView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.ProjectLabelRowView" title="Link to this definition"></a></dt>
-<dd><dl class="py method">
+<dd><p>Another label row for “Add label”; it sends the number of rows and the keys in use.</p>
+<dl class="py method">
 <dt class="sig sig-object py" id="projects.views.ProjectLabelRowView.get">
 <span class="sig-name descname"><span class="pre">get</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.ProjectLabelRowView.get" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -365,6 +368,18 @@ and the expert decision. Previous/next follow the batch order.</p>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="projects.views.BatchOrderView.post">
 <span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.BatchOrderView.post" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="projects.views.ProjectSettingsView">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.views.</span></span><span class="sig-name descname"><span class="pre">ProjectSettingsView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.ProjectSettingsView" title="Link to this definition"></a></dt>
+<dd><p>Save the settings card of the expert page; its confirmation dialog posts a plain form.
+Only experts of the project get here (ExpertRequiredMixin checks the project in the URL).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="projects.views.ProjectSettingsView.post">
+<span class="sig-name descname"><span class="pre">post</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_id</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.ProjectSettingsView.post" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1165,6 +1180,22 @@ metadata holds the row’s other columns, e.g. {“id”: 7, “source”: “tw
 <dl class="py property">
 <dt class="sig sig-object py" id="projects.forms.BatchCreateForm.media">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#projects.forms.BatchCreateForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="projects.forms.ProjectSettingsForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.forms.</span></span><span class="sig-name descname"><span class="pre">ProjectSettingsForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auto_id='id_%s'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_class=&lt;class</span> <span class="pre">'django.forms.utils.ErrorList'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_suffix=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">empty_permitted=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_required_attribute=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">renderer=None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.forms.ProjectSettingsForm" title="Link to this definition"></a></dt>
+<dd><p>What experts can change once the project exists (the settings card on their page).</p>
+<p><strong>Form fields:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">show_metadata_in_annotation</span></code>: Show metadata in annotation (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.BooleanField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a>)</p></li>
+</ul>
+<dl class="py property">
+<dt class="sig sig-object py" id="projects.forms.ProjectSettingsForm.media">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#projects.forms.ProjectSettingsForm.media" title="Link to this definition"></a></dt>
 <dd><p>Return all media required to render the widgets on this form.</p>
 </dd></dl>
 
