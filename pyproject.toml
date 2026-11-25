@@ -112,6 +112,7 @@ known-local-folder = [
   "core",
   "data",
   "discuss",
+  "project_types",
   "projects",
   "users",
 ]

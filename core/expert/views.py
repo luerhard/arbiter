@@ -14,10 +14,9 @@ from django.views.generic import View
 from .forms import MultiLabelFormExpert
 from .models import CodebookDraft
 from core.mixins import BatchExpertRequiredMixin
-from data.models import Example
 from data.models import ExampleAssignment
-from data.models import Label
 from discuss.models import Message
+from project_types import get_project_type
 from projects.models import BatchPhase
 
 log = logging.getLogger(__name__)
@@ -25,24 +24,15 @@ log = logging.getLogger(__name__)
 NOT_YOURS = "This case is not assigned to you."
 
 
-def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dict[str, Any]:
-    """Collect the context of an expert decision to embed in the codebook commit."""
-    batch = example.batch
+def build_decision_metadata(assignment: ExampleAssignment) -> dict[str, Any]:
+    """Collect the context of a saved expert decision to embed in the codebook commit."""
+    example = assignment.example
+    project_type = get_project_type(example.batch.project)
 
-    def labels_by_user(phase: BatchPhase) -> dict[str, list[str]]:
-        assignments = (
-            ExampleAssignment.objects.filter(batch=batch, example=example, phase=phase)
-            .select_related("user")
-            .prefetch_related("annotations__label")
-            .order_by("user__username")
-        )
+    def exported_by_user(phase: BatchPhase) -> dict[str, Any]:
         return {
-            assignment.user.username: [
-                annotation.label.name
-                for annotation in assignment.annotations.all()
-                if annotation.label
-            ]
-            for assignment in assignments
+            username: None if annotations is None else project_type.exported_value(annotations)
+            for username, annotations in example.labels_by_user(phase).items()
         }
 
     chat_history = [
@@ -56,19 +46,15 @@ def build_decision_metadata(example: Example, final_label_ids: list[str]) -> dic
         .order_by("created_at")
     ]
 
-    final_decision = list(
-        Label.objects.filter(
-            id__in=[int(i) for i in final_label_ids if str(i).strip()],
-        ).values_list("name", flat=True),
-    )
-
     return {
         "example_id": example.id,
         "text": example.content,
-        "labels_before_discussion": labels_by_user(BatchPhase.ANNOTATION),
-        "labels_after_discussion": labels_by_user(BatchPhase.DISCUSSION),
+        "labels_before_discussion": exported_by_user(BatchPhase.ANNOTATION),
+        "labels_after_discussion": exported_by_user(BatchPhase.DISCUSSION),
         "chat_history": chat_history,
-        "final_decision": final_decision,
+        "final_decision": project_type.exported_value(
+            assignment.annotations.select_related("label"),
+        ),
     }
 
 
@@ -109,6 +95,36 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         "prev_assignment": assignment.previous(),
         "next_assignment": assignment.next(),
     }
+
+
+def _span_editor(assignment: ExampleAssignment, posted=None) -> dict[str, Any] | None:
+    """The span editor of an expert decision, with everyone's spans after the discussion
+    to compare; None if the project type has no editor. An open decision starts with the
+    words all annotators marked with the same label."""
+    project_type = get_project_type(assignment.batch.project)
+    example = assignment.example
+    editor = project_type.editor_data(example)
+    if editor is None:
+        return None
+    after = {
+        user: project_type.value(annotations)
+        for user, annotations in example.labels_by_user(BatchPhase.DISCUSSION).items()
+        if annotations is not None
+    }
+    if posted is not None:
+        try:
+            spans = project_type.value_from_post(example, posted)
+        except ValueError:
+            spans = []
+    elif assignment.done is not None:
+        spans = project_type.value(assignment.annotations.all())
+    else:
+        spans = project_type.common_value(example, after.values())
+    people = [
+        {"name": user, "spans": value, "others": [v for u, v in after.items() if u != user]}
+        for user, value in after.items()
+    ]
+    return {**editor, "spans": spans, "people": people}
 
 
 def _codebook_panel_context(assignment: ExampleAssignment, mode: str = "view") -> dict[str, Any]:
@@ -177,16 +193,20 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
             return render(request, self.partial_name, context, status=status)
         return render(request, self.template_name, context, status=status)
 
-    def _build_context(self, assignment, *, review, editing, labels_form=None):
+    def _build_context(self, assignment, *, review, editing, posted=None):
+        """posted: the decision the expert sent, shown again when it could not be saved."""
         context = _assignment_context(assignment)
         context["review"] = review
         context["editing"] = editing
-        if review:
+        span_editor = _span_editor(assignment, posted)
+        if span_editor:
+            context["span_editor"] = span_editor
+        elif review:
             context["decision_annotations"] = list(
                 assignment.annotations.select_related("label"),
             )
         else:
-            context["labels_form"] = labels_form or MultiLabelFormExpert(assignment=assignment)
+            context["labels_form"] = MultiLabelFormExpert(posted, assignment=assignment)
         context.update(_codebook_panel_context(assignment))
         return context
 
@@ -217,17 +237,21 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
             context = self._build_context(assignment, review=True, editing=False)
             return self._render(request, context, status=409)
 
-        labels_form = MultiLabelFormExpert(request.POST, assignment=assignment)
-        if not labels_form.is_valid():
-            log.debug(f"Invalid expert decision: {labels_form.errors}")
-            messages.error(request, "Something was invalid")
+        def retry(message):
+            messages.error(request, message)
             context = self._build_context(
                 assignment,
                 review=False,
                 editing=editing,
-                labels_form=labels_form,
+                posted=request.POST,
             )
             return self._render(request, context)
+
+        project_type = get_project_type(assignment.batch.project)
+        try:
+            value = project_type.value_from_post(assignment.example, request.POST)
+        except ValueError:
+            return retry("Something was invalid")
 
         codebook = assignment.batch.project.codebook.get()
         draft = CodebookDraft.objects.filter(assignment=assignment).first()
@@ -240,45 +264,28 @@ class ExpertAssignmentView(_AssignmentAccessMixin, View):
         # submission never half-saves.
         if draft:
             if not draft.rationale.strip():
-                messages.error(
-                    request,
-                    "The codebook was changed: a rationale is required before saving.",
-                )
-                context = self._build_context(
-                    assignment,
-                    review=False,
-                    editing=editing,
-                    labels_form=labels_form,
-                )
-                return self._render(request, context)
+                return retry("The codebook was changed: a rationale is required before saving.")
             if not draft.is_based_on_current(codebook):
-                messages.error(
-                    request,
+                return retry(
                     "The codebook was changed since you started this draft. Discard the "
                     "draft and make your change again on the current version.",
                 )
-                context = self._build_context(
-                    assignment,
-                    review=False,
-                    editing=editing,
-                    labels_form=labels_form,
-                )
-                return self._render(request, context)
 
         previous_decision = None
         if editing:
-            previous_decision = sorted(
-                annotation.label.name
-                for annotation in assignment.annotations.select_related("label")
-                if annotation.label
+            previous_decision = project_type.exported_value(
+                assignment.annotations.select_related("label"),
             )
 
-        labels_form.save()
-
-        metadata = build_decision_metadata(
-            assignment.example,
-            labels_form.cleaned_data["labels"],
+        assignment.set_user_annotations(value)
+        log.info(
+            "Expert decision saved: example=%s user=%s value=%s",
+            assignment.example_id,
+            request.user.username,
+            value,
         )
+
+        metadata = build_decision_metadata(assignment)
         if editing:
             # Append-only decision log: the original commit is never
             # rewritten, a revision entry supersedes it.

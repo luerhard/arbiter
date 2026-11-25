@@ -4,7 +4,8 @@ from django import forms
 from django.core.exceptions import ValidationError
 import pandas as pd
 
-from data.models import Label
+from data.models import label_color
+from project_types import PROJECT_TYPES
 from projects.models import Batch
 from users.models import User
 
@@ -12,6 +13,11 @@ from users.models import User
 class ProjectCreateForm(forms.Form):
     name = forms.CharField(max_length=100, label="Project title")
     description = forms.CharField(widget=forms.Textarea, required=False)
+    project_type = forms.ChoiceField(
+        choices=[(key, project_type.name) for key, project_type in PROJECT_TYPES.items()],
+        initial="classification",
+        required=False,
+    )
     annotators = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
         widget=forms.CheckboxSelectMultiple,
@@ -40,6 +46,9 @@ class ProjectCreateForm(forms.Form):
                 {"class": "space-y-2 text-sm text-ink-2"},
             )
 
+    def clean_project_type(self):
+        return self.cleaned_data["project_type"] or "classification"
+
     def clean(self):
         cleaned = super().clean()
         self.labels = self._clean_labels()
@@ -55,7 +64,6 @@ class ProjectCreateForm(forms.Form):
     def _clean_labels(self) -> list[dict]:
         """The label rows (not Django form fields), without empty rows. A name or key used
         twice is an error: dropping one of the labels would go unnoticed."""
-        default_color = Label._meta.get_field("color").default
         rows = zip(
             self.data.getlist("label_name"),
             self.data.getlist("label_color"),
@@ -63,13 +71,13 @@ class ProjectCreateForm(forms.Form):
             strict=False,
         )
         labels = []
-        for name, color, hotkey in rows:
+        for i, (name, color, hotkey) in enumerate(rows):
             name = (name or "").strip()
             if name:
                 labels.append(
                     {
                         "name": name,
-                        "color": (color or "").strip() or default_color,
+                        "color": (color or "").strip() or label_color(i),
                         "hotkey": (hotkey or "").strip() or None,
                     },
                 )

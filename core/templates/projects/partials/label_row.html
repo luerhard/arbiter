@@ -1,3 +1,4 @@
+{% load custom_tags %}
 <div class="label-row grid grid-cols-[1fr_110px] gap-3 @xl:grid-cols-[1fr_200px_110px]">
   {# narrow: the name on its own line, color and key below #}
   <div class="col-span-2 @xl:col-span-1">
@@ -19,7 +20,7 @@
       value="{{ row.color|default:'' }}"
       type="text"
       class="input"
-      placeholder="#155596"
+      placeholder="{{ index|label_color }}"
       data-coloris
     />
   </div>

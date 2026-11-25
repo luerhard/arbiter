@@ -596,25 +596,29 @@
   @apply outline-2 outline-offset-2 outline-accent-ink;
 }
 
-/* selected */
-.label-input:checked + .label {
+/* selected; a pressed label button (span editor) looks the same */
+.label-input:checked + .label,
+.label[aria-pressed="true"] {
   @apply pl-3 font-semibold;
   border-width: 1.5px;
   border-color: var(--label-color);
   background: color-mix(in srgb, var(--label-color) 12%, var(--c-surface));
   color: color-mix(in srgb, var(--label-color) 65%, var(--c-ink));
 }
-.label-input:checked + .label::before {
+.label-input:checked + .label::before,
+.label[aria-pressed="true"]::before {
   @apply hidden;
 }
 .label-input:checked + .label .check-icon {
   @apply block;
 }
-.label-input:checked + .label .label-hotkey {
+.label-input:checked + .label .label-hotkey,
+.label[aria-pressed="true"] .label-hotkey {
   border-color: color-mix(in srgb, var(--label-color) 35%, transparent);
   color: inherit;
 }
-.dark .label-input:checked + .label {
+.dark .label-input:checked + .label,
+.dark .label[aria-pressed="true"] {
   background: color-mix(in srgb, var(--label-color) 24%, var(--c-surface));
   color: color-mix(in srgb, var(--label-color) 35%, #ffffff);
 }

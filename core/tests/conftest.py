@@ -154,13 +154,13 @@ def project_discussion(project_annotation):
         .filter(user=a1, example=example, phase=BatchPhase.ANNOTATION)
         .first()
     )
-    ea_a1.set_user_annotations(label_ids=[label1.id])
+    ea_a1.set_user_annotations([label1.id])
     ea_a2 = (
         ExampleAssignment.objects.from_project(project=project)
         .filter(user=a2, example=example, phase=BatchPhase.ANNOTATION)
         .first()
     )
-    ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
+    ea_a2.set_user_annotations([label1.id, label2.id])
     batch.set_phase(BatchPhase.DISCUSSION)
     return data
 
@@ -179,13 +179,13 @@ def project_expert(project_discussion):
         .filter(user=a1, example=example, phase=BatchPhase.DISCUSSION)
         .first()
     )
-    ea_a1.set_user_annotations(label_ids=[label1.id])
+    ea_a1.set_user_annotations([label1.id])
     ea_a2 = (
         ExampleAssignment.objects.from_project(project=project)
         .filter(user=a2, example=example, phase=BatchPhase.DISCUSSION)
         .first()
     )
-    ea_a2.set_user_annotations(label_ids=[label1.id, label2.id])
+    ea_a2.set_user_annotations([label1.id, label2.id])
     batch.set_phase(BatchPhase.EXPERT)
     return data
 

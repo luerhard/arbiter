@@ -31,6 +31,9 @@ from core.mixins import ExpertRequiredMixin
 from data.models import Example
 from data.models import Label
 from discuss.models import Message
+from project_types import PROJECT_TYPES
+from project_types import ProjectType
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import BatchUser
@@ -119,12 +122,14 @@ class ProjectCreateView(FormView):
         ] or [{}]
         context["annotators_selected_users"] = _posted_users_json(post, "annotators")
         context["experts_selected_users"] = _posted_users_json(post, "experts")
+        context["project_types"] = PROJECT_TYPES
         return context
 
     def form_valid(self, form):
         self.project = Project.objects.create(
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
+            project_type=form.cleaned_data["project_type"],
             owner=self.request.user,
         )
         ProjectUser.objects.bulk_create(
@@ -398,18 +403,27 @@ class ProjectAnnotatorDetailView(AnyRoleRequiredMixin, _ProjectPageMixin, Detail
         return context
 
 
-def _sample_state(by_phase: dict, n_annotators: int) -> tuple[str, list | None]:
+def _sample_state(
+    by_phase: dict,
+    n_annotators: int,
+    project_type: ProjectType,
+) -> tuple[str, list | None]:
     """How far one sample got, and its label so far: (status, labels), labels None while
-    open, [] for no label. by_phase: phase -> {username: sorted labels, None if not done}.
+    open, [] for no label. by_phase: phase -> {username: annotations, None if not done}.
     The furthest phase counts: expert decision, discussion, annotation."""
 
     def same(found):
-        return len({frozenset(label.id for label in labels) for labels in found}) == 1
+        return project_type.agree(project_type.signature(a) for a in found)
+
+    def labels(annotations):  # once each: in span projects a label can mark several spans
+        return sorted({a.label for a in annotations}, key=lambda label: label.name)
 
     expert = by_phase.get(BatchPhase.EXPERT, {})
-    decided = [labels for labels in expert.values() if labels is not None]
+    decided = [annotations for annotations in expert.values() if annotations is not None]
     if decided:
-        return ("Expert decided", decided[0]) if same(decided) else ("Experts disagree", None)
+        if same(decided):
+            return "Expert decided", labels(decided[0])
+        return "Experts disagree", None
     if expert:
         return "Waiting for expert", None
 
@@ -419,16 +433,18 @@ def _sample_state(by_phase: dict, n_annotators: int) -> tuple[str, list | None]:
             return "In discussion", None
         found = list(discussion.values())
         if same(found):
-            return "Agreed in discussion", found[0]
+            return "Agreed in discussion", labels(found[0])
         return "Disagree after discussion", None
 
     labeled = [
-        labels for labels in by_phase.get(BatchPhase.ANNOTATION, {}).values() if labels is not None
+        annotations
+        for annotations in by_phase.get(BatchPhase.ANNOTATION, {}).values()
+        if annotations is not None
     ]
     if len(labeled) < n_annotators or not labeled:
         return f"Labeled {len(labeled)} of {n_annotators}", None
     if same(labeled):
-        return "Agreed", labeled[0]
+        return "Agreed", labels(labeled[0])
     return "To be discussed", None
 
 
@@ -443,20 +459,20 @@ def _sample_states(batch, examples) -> dict[int, dict]:
         .prefetch_related("annotations__label")
     )
     for assignment in assignments:
-        labels = sorted((a.label for a in assignment.annotations.all()), key=lambda lb: lb.name)
         phases = by_example.setdefault(assignment.example_id, {})
         phases.setdefault(assignment.phase, {})[assignment.user.username] = (
-            labels if assignment.done else None
+            list(assignment.annotations.all()) if assignment.done else None
         )
     n_annotators = batch.assignees(role=ProjectRole.ANNOTATOR).count()
+    project_type = get_project_type(batch.project)
     states = {}
     for example_id, phases in by_example.items():
-        status, labels = _sample_state(phases, n_annotators)
+        status, labels = _sample_state(phases, n_annotators, project_type)
         annotated = list(phases.get(BatchPhase.ANNOTATION, {}).values())
         disagreement = (
             len(annotated) >= 2  # noqa: PLR2004
             and None not in annotated
-            and len({frozenset(label.id for label in found) for found in annotated}) > 1
+            and not project_type.agree(project_type.signature(a) for a in annotated)
         )
         states[example_id] = {"status": status, "labels": labels, "disagreement": disagreement}
     return states
@@ -609,15 +625,16 @@ def _generate_batch_data(batch):
 
     assignments = (
         batch.assignments.filter(done__isnull=False, phase__in=_LABEL_KEYS)
-        .select_related("user")
+        .select_related("user", "example")
         .prefetch_related("annotations__label")
         .order_by("example_id", "user__username")
     )
+    project_type = get_project_type(batch.project)
     for assignment in assignments:
         rows[assignment.example_id][_LABEL_KEYS[assignment.phase]].append(
             {
                 "user": assignment.user.username,
-                "labels": sorted(a.label.name for a in assignment.annotations.all()),
+                "labels": project_type.exported_value(assignment.annotations.all()),
                 "at": _timestamp(assignment.done),
             },
         )

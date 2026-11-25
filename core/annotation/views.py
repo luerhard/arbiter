@@ -16,6 +16,7 @@ from django.views.generic import View
 from core.mixins import BatchAnnotatorRequiredMixin
 from data.forms import MultiLabelForm
 from data.models import ExampleAssignment
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import ProjectRole
@@ -100,7 +101,6 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
         "assignment": assignment,
         "assignment_id": assignment.id,
         "example": assignment.example,
-        "label_form": MultiLabelForm(assignment=assignment),
         "skip_annotated": skip_annotated,
         "has_prev": bool(prev_assignment),
         "has_next": bool(next_assignment),
@@ -129,6 +129,14 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
         ),
     }
 
+    editor = get_project_type(batch.project).editor_data(
+        assignment.example,
+        assignment.annotations.all(),
+    )
+    if editor:
+        context["span_editor"] = editor
+    else:
+        context["label_form"] = MultiLabelForm(assignment=assignment)
     return context
 
 
@@ -239,12 +247,14 @@ class AnnotateView(BatchAnnotatorRequiredMixin, DetailView):
                 messages.warning(request, "Not saved: your annotations for this batch are locked.")
                 return _redirect_to_done(request, batch)
 
-            form = MultiLabelForm(request.POST, assignment=assignment)
-            if form.is_valid():
-                form.save()
-                messages.success(request, "Saved.")
+            example = assignment.example
+            try:
+                value = get_project_type(batch.project).value_from_post(example, request.POST)
+            except ValueError:
+                messages.error(request, "Not saved: something was invalid.")
             else:
-                messages.error(request, f"Something was invalid: {form}")
+                assignment.set_user_annotations(value)
+                messages.success(request, "Saved.")
 
         skip_annotated = request.GET.get("skip_annotated") == "1"
         progress = get_progress(request.user, batch)

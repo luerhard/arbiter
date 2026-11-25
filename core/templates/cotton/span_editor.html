@@ -1,0 +1,72 @@
+{% comment %}
+Text with labeled spans (static/js/spans.js). config is a JS expression for spanEditor(): { tokens, labels, spans,
+readonly, others }, see ProjectType Span.editor_data.
+<c-span-editor config="JSON.parse(document.getElementById('span-editor-data').textContent)" />
+The spans are posted as JSON in the hidden input "value".
+{% endcomment %}
+<c-vars config="" text_class="text-xl sm:text-2xl" />
+<div
+  x-data="spanEditor({{ config }})"
+  @lock-labels.window="locked = true"
+  @unlock-labels.window="locked = false"
+  class="flex flex-col gap-4"
+  :class="editable && 'selection:bg-transparent'"
+>
+  <div x-show="editable" class="flex flex-col gap-2">
+    <div class="flex flex-wrap gap-2.5" role="group" aria-label="Labels">
+      <template x-for="l in labels" :key="l.id">
+        <button
+          type="button"
+          class="label"
+          :style="{ '--label-color': l.color }"
+          :aria-pressed="active === l.id"
+          @mousedown.prevent
+          @click="choose(l.id)"
+        >
+          <span class="label-content">
+            <span x-text="l.name"></span>
+            <span class="label-hotkey" x-show="l.hotkey" x-text="l.hotkey"></span>
+          </span>
+        </button>
+      </template>
+    </div>
+    <p class="text-meta text-ink-3" x-text="hint"></p>
+  </div>
+
+  <p x-ref="text" class="reading {{ text_class }}" :class="editable && 'cursor-text'">
+    <template x-for="(t, i) in tokens" :key="i"
+      ><span
+        ><span :data-i="i" :style="style(i)" class="box-decoration-clone" x-text="t.text"></span
+        ><span :data-gap="i" :style="style(i, true)" class="whitespace-pre-wrap" x-text="t.gap"></span></span
+    ></template>
+  </p>
+
+  <input type="hidden" name="value" :value="value" />
+  {# the list is for editing; read-only, the highlights say enough #}
+  <ul class="flex flex-col border-t border-line" x-show="editable && spans.length">
+    <template x-for="span in sorted" :key="span.join()">
+      <li
+        class="flex items-center gap-3 border-b border-line py-1.5"
+        @mouseenter="hovered = span"
+        @mouseleave="hovered = null"
+      >
+        <span class="label-tag" :style="{ '--label-color': label(span[0]).color }" x-text="label(span[0]).name"></span>
+        <span class="reading min-w-0 flex-1 truncate" :class="shared(span) && 'text-ink-3'" x-text="quote(span)"></span>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm btn-icon"
+          x-show="editable"
+          @click="remove(span)"
+          aria-label="Remove"
+        >
+          {% heroicon_micro "x-mark" class="size-4" %}
+        </button>
+      </li>
+    </template>
+  </ul>
+  <p
+    class="text-meta text-ink-3"
+    x-show="!spans.length"
+    x-text="editable ? 'No spans. That is a valid answer too.' : 'No spans.'"
+  ></p>
+</div>
