@@ -792,7 +792,7 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="projects.models.Project">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Project" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">projects.models.</span></span><span class="sig-name descname"><span class="pre">Project</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">owner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_metadata_in_annotation</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.models.Project" title="Link to this definition"></a></dt>
 <dd><p><strong>Database table:</strong> <code class="docutils literal notranslate"><span class="pre">projects_project</span></code></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -801,6 +801,7 @@ stay untouched), only in SETUP phase, and only with examples.</p>
 <li><p><strong>name</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.1)"><em>CharField</em></a>) – Name</p></li>
 <li><p><strong>description</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.TextField" title="(in Django v6.1)"><em>TextField</em></a>) – Description</p></li>
 <li><p><strong>project_type</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.CharField" title="(in Django v6.1)"><em>CharField</em></a>) – Project type</p></li>
+<li><p><strong>show_metadata_in_annotation</strong> (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.1)"><em>BooleanField</em></a>) – Show metadata in annotation</p></li>
 </ul>
 </dd>
 </dl>
@@ -965,6 +966,13 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="projects.models.Project.show_metadata_in_annotation">
+<span class="sig-name descname"><span class="pre">show_metadata_in_annotation</span></span><a class="headerlink" href="#projects.models.Project.show_metadata_in_annotation" title="Link to this definition"></a></dt>
+<dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.BooleanField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a></p>
+<p>Show metadata in annotation</p>
+</dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="projects.models.Project.users">
 <span class="sig-name descname"><span class="pre">users</span></span><a class="headerlink" href="#projects.models.Project.users" title="Link to this definition"></a></dt>
 <dd><p>Type: <a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/models/fields/#django.db.models.ManyToManyField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> to <a class="reference internal" href="users.html#users.models.User" title="users.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a></p>
@@ -1095,6 +1103,7 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">project_type</span></code>: Project Type (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChoiceField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">annotators</span></code>: Annotators (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ModelMultipleChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelMultipleChoiceField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">experts</span></code>: Experts (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ModelMultipleChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelMultipleChoiceField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">show_metadata_in_annotation</span></code>: Show metadata while annotating (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.BooleanField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a>)</p></li>
 </ul>
 <dl class="py method">
 <dt class="sig sig-object py" id="projects.forms.ProjectCreateForm.__init__">
