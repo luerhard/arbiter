@@ -46,6 +46,17 @@ New project · Arbiter
         </div>
         <p class="field-help">This can not be changed once the project exists.</p>
       </fieldset>
+
+      <div>
+        <label for="{{ form.show_metadata_in_annotation.id_for_label }}" class="flex items-center gap-2.5">
+          {{ form.show_metadata_in_annotation }}
+          <span class="field-label mb-0">{{ form.show_metadata_in_annotation.label }}</span>
+        </label>
+        <p class="field-help">
+          Annotators see the other columns of the uploaded file (e.g. id, source) below each sample. Leave this off if a
+          column could sway their labels.
+        </p>
+      </div>
     </section>
 
     <section class="card flex flex-col gap-5 p-6">

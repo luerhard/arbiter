@@ -35,15 +35,7 @@
     <c-span-editor config="JSON.parse(document.getElementById('span-editor-data').textContent)" />
   </form>
   {% else %}
-  {# long texts scroll inside the card, so the labels and buttons stay in view #}
-  <article
-    class="card max-h-[55vh] overflow-y-auto px-5 py-5 scrollbar-thin scrollbar-thumb-line-strong sm:px-11 sm:py-10"
-  >
-    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">
-      {{ example.content }}
-    </p>
-  </article>
-
+  {# labels above the text, as in the span editor #}
   <form
     id="label-form"
     method="post"
@@ -70,6 +62,29 @@
       {% endfor %}
     </div>
   </form>
+
+  {# long texts scroll inside the card, so the buttons stay in view #}
+  <article
+    class="card max-h-[55vh] overflow-y-auto px-5 py-5 scrollbar-thin scrollbar-thumb-line-strong sm:px-11 sm:py-10"
+  >
+    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">
+      {{ example.content }}
+    </p>
+  </article>
+
+  {% if metadata %}
+  {# a two-column grid: keys as wide as the longest key, all values start at the same edge #}
+  <dl
+    id="example-metadata"
+    class="-mt-3 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-6 gap-y-1.5 px-1"
+    aria-label="Metadata"
+  >
+    {% for key, value in metadata.items %}
+    <dt class="text-xs leading-5 text-ink-3">{{ key }}</dt>
+    <dd class="font-mono text-meta leading-5 break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+    {% endfor %}
+  </dl>
+  {% endif %}
   {% endif %}
 
   <div

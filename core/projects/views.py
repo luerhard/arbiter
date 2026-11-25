@@ -130,6 +130,7 @@ class ProjectCreateView(FormView):
             name=form.cleaned_data["name"],
             description=form.cleaned_data["description"],
             project_type=form.cleaned_data["project_type"],
+            show_metadata_in_annotation=form.cleaned_data["show_metadata_in_annotation"],
             owner=self.request.user,
         )
         ProjectUser.objects.bulk_create(

@@ -209,6 +209,26 @@ class TestAnnotateViews:
         assert b'id="annotation-panel"' in resp.content
         assert b"<html" not in resp.content
 
+    @pytest.mark.parametrize("show", [True, False])
+    def test_metadata_shown_only_if_project_enables_it(self, client, show):
+        user = _first_annotator_user()
+        batch_id = _first_annotation_batch_for_user(user)
+        _ensure_batch_unfinished_for_user(batch_id, user)
+        assignment = _first_assignment_for_user_in_batch(user, batch_id)
+        example = assignment.example
+        example.metadata = {"source": "twitter-metadata-marker"}
+        example.save()
+        project = example.batch.project
+        project.show_metadata_in_annotation = show
+        project.save()
+
+        client.force_login(user)
+        resp = client.get(reverse("annotate-assignment", args=(batch_id, assignment.id)))
+
+        assert resp.status_code == 200
+        assert (b'id="example-metadata"' in resp.content) is show
+        assert (b"twitter-metadata-marker" in resp.content) is show
+
 
 @pytest.mark.django_db
 class TestAnnotationDoneFinalize:
