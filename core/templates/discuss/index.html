@@ -18,159 +18,187 @@ Discuss · Batch
 {% block content %}
 {% comment %}
 The chat is the heart of the discussion and always in view: a column on the right from md up (unlike the side panels it
-never slides away), below md a block under the disagreement.
+never slides away), below md a block under the disagreement. Its width can be dragged at its left edge (chatResizer in
+static/js/discuss.js); wider than the default only while the main column keeps half the window (the min() in its width),
+and the main column's min-width protects it on small screens.
 {% endcomment %}
-<div class="flex min-w-0 flex-1 flex-col md:flex-row" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
-  <main class="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-8 lg:px-12 lg:py-10">
-    <div class="flex w-full max-w-3xl flex-col gap-6" x-data>
-      {# the batch left the discussion phase: replaces sentence, labels and Save, the chat stays #}
-      <div
-        id="room-closed"
-        class="card flex flex-col items-center gap-4 px-6 py-14 text-center"
-        x-show="$store.room_closed"
-        x-cloak
-      >
-        <p class="max-w-md text-md font-semibold" x-text="$store.room_closed?.message"></p>
-        <a class="btn btn-primary" :href="$store.room_closed?.project_url">Back to project</a>
-      </div>
-      <div class="contents" x-show="!$store.room_closed">
-        <span class="eyebrow" x-text="$store.progress.heading">Disagreement</span>
+<div class="contents" x-data="chatResizer" :style="vars">
+  <div class="flex min-w-0 flex-1 flex-col md:flex-row" hx-ext="ws" ws-connect="/ws/chat/{{ batch_id }}">
+    <main
+      class="flex min-w-0 flex-1 justify-center px-4 py-6 sm:px-8 md:min-w-[26rem] lg:min-w-[27.5rem] lg:px-12 lg:py-10"
+    >
+      <div class="flex w-full max-w-3xl flex-col gap-6" x-data>
+        {# the batch left the discussion phase: replaces sentence, labels and Save, the chat stays #}
+        <div
+          id="room-closed"
+          class="card flex flex-col items-center gap-4 px-6 py-14 text-center"
+          x-show="$store.room_closed"
+          x-cloak
+        >
+          <p class="max-w-md text-md font-semibold" x-text="$store.room_closed?.message"></p>
+          <a class="btn btn-primary" :href="$store.room_closed?.project_url">Back to project</a>
+        </div>
+        <div class="contents" x-show="!$store.room_closed">
+          <span class="eyebrow" x-text="$store.progress.heading">Disagreement</span>
 
-        {% if project_type.key == "span" %}
-        {# recreated for every example: room.key is the example id #}
-        <template x-for="room in $store.span_room ? [$store.span_room] : []" :key="room.key">
-          <div class="flex flex-col gap-6">
-            <c-span-compare people="room.people" editor="room.editor" title="How you marked it before the discussion" />
-            <section id="current-spans" class="card flex flex-col gap-4 p-5 sm:px-9 sm:py-8">
-              <h2 class="card-title">Your spans after discussing</h2>
-              <c-span-editor
-                config="{ ...room.editor, spans: room.mine, locked: $store.saved }"
-                text_class="text-lg leading-relaxed"
+          {% if project_type.key == "span" %}
+          {# recreated for every example: room.key is the example id #}
+          <template x-for="room in $store.span_room ? [$store.span_room] : []" :key="room.key">
+            <div class="flex flex-col gap-6">
+              <c-span-compare
+                people="room.people"
+                editor="room.editor"
+                title="How you marked it before the discussion"
               />
-            </section>
-          </div>
-        </template>
-        {% else %}
-        <article class="card px-5 py-5 sm:px-9 sm:py-8">
-          <p
-            id="current-example"
-            class="reading text-xl leading-normal sm:text-2xl whitespace-pre-line"
-            x-text="$store.example"
-          ></p>
-        </article>
+              <section id="current-spans" class="card flex flex-col gap-4 p-5 sm:px-9 sm:py-8">
+                <h2 class="card-title">Your spans after discussing</h2>
+                <c-span-editor
+                  config="{ ...room.editor, spans: room.mine, locked: $store.saved }"
+                  text_class="text-lg leading-relaxed"
+                />
+              </section>
+            </div>
+          </template>
+          {% else %}
+          <article class="card px-5 py-5 sm:px-9 sm:py-8">
+            <p
+              id="current-example"
+              class="reading text-xl leading-normal sm:text-2xl whitespace-pre-line"
+              x-text="$store.example"
+            ></p>
+          </article>
 
-        <section class="card flex flex-col gap-4 p-5">
-          <h2 class="card-title">How you labeled it before the discussion</h2>
-          <div class="grid grid-cols-[130px_1fr] items-center gap-x-4 gap-y-3">
-            <span class="text-ink-2">You</span>
-            <c-discuss.labels user="self" id="prev-labels-self" />
-            <span class="truncate text-ink-2" x-text="$store.user_other"></span>
-            <c-discuss.labels user="other" id="prev-labels-other" />
-          </div>
-        </section>
+          <section class="card flex flex-col gap-4 p-5">
+            <h2 class="card-title">How you labeled it before the discussion</h2>
+            <div class="grid grid-cols-[130px_1fr] items-center gap-x-4 gap-y-3">
+              <span class="text-ink-2">You</span>
+              <c-discuss.labels user="self" id="prev-labels-self" />
+              <span class="truncate text-ink-2" x-text="$store.user_other"></span>
+              <c-discuss.labels user="other" id="prev-labels-other" />
+            </div>
+          </section>
 
-        <section class="flex flex-col gap-3">
-          <h2 class="text-md font-semibold">Your label after discussing</h2>
-          <c-discuss.labels user="self" id="current-labels" enabled />
-        </section>
-        {% endif %}
+          <section class="flex flex-col gap-3">
+            <h2 class="text-md font-semibold">Your label after discussing</h2>
+            <c-discuss.labels user="self" id="current-labels" enabled />
+          </section>
+          {% endif %}
 
-        <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
-          <span class="inline-flex items-center gap-2 text-meta text-ink-2">
-            {% heroicon_micro "information-circle" class="size-4" %}
-            <span id="save-status" x-text="$store.save_status"></span>
-          </span>
-          <div>
-            {# Save and Undo name the example they are meant for: the server ignores them once the room moved on. #}
-            <button
-              type="button"
-              id="save-done"
-              class="btn btn-primary btn-lg"
-              x-show="!$store.saved"
-              {% if project_type.key == "span" %}
-              hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': JSON.parse(document.querySelector('#current-spans input[name=value]').value)}"
-              {% else %}
-              hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
-              {% endif %}
-              :disabled="$store.save_disabled"
-              ws-send
-            >
-              {% if project_type.key == "span" %}Save my spans{% else %}Save my label{% endif %}
-            </button>
-            <button
-              type="button"
-              id="undo-done"
-              class="btn btn-secondary btn-lg"
-              x-show="$store.saved"
-              x-cloak
-              hx-vals="js:{'undo-done': 'undo', 'example_id': local_state.cur_example_id}"
-              :disabled="$store.save_disabled"
-              ws-send
-            >
-              Undo save
-            </button>
+          <div class="flex items-center justify-between gap-4 border-t border-line pt-5">
+            <span class="inline-flex items-center gap-2 text-meta text-ink-2">
+              {% heroicon_micro "information-circle" class="size-4" %}
+              <span id="save-status" x-text="$store.save_status"></span>
+            </span>
+            <div>
+              {# Save and Undo name the example they are meant for: the server ignores them once the room moved on. #}
+              <button
+                type="button"
+                id="save-done"
+                class="btn btn-primary btn-lg"
+                x-show="!$store.saved"
+                {% if project_type.key == "span" %}
+                hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': JSON.parse(document.querySelector('#current-spans input[name=value]').value)}"
+                {% else %}
+                hx-vals="js:{'clicked-done': 'done', 'example_id': local_state.cur_example_id, 'labels': Alpine.store('labels_self').flatMap((i) => i.checked ? [i.id] : [])}"
+                {% endif %}
+                :disabled="$store.save_disabled"
+                ws-send
+              >
+                {% if project_type.key == "span" %}Save my spans{% else %}Save my label{% endif %}
+              </button>
+              <button
+                type="button"
+                id="undo-done"
+                class="btn btn-secondary btn-lg"
+                x-show="$store.saved"
+                x-cloak
+                hx-vals="js:{'undo-done': 'undo', 'example_id': local_state.cur_example_id}"
+                :disabled="$store.save_disabled"
+                ws-send
+              >
+                Undo save
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
 
-  <aside
-    aria-label="Chat"
-    class="flex flex-col border-line bg-surface max-md:h-[70dvh] max-md:border-t md:sticky md:top-topbar md:h-[calc(100dvh-var(--spacing-topbar))] md:w-[340px] md:shrink-0 md:border-l lg:w-[400px]"
-  >
-    <div class="border-b border-line px-5 py-3.5">
-      <h2 class="card-title">Chat</h2>
-    </div>
-    <div
-      id="messages"
-      class="flex flex-1 flex-col gap-3 overflow-y-auto overscroll-none bg-canvas/60 p-5 scrollbar-thin scrollbar-thumb-line-strong"
+    <aside
+      x-ref="chat"
+      aria-label="Chat"
+      class="flex flex-col border-line bg-surface max-md:h-[70dvh] max-md:border-t md:sticky md:top-topbar md:h-[calc(100dvh-var(--spacing-topbar))] md:w-[min(var(--chat-w,340px),max(340px,100%_-_50vw))] md:min-w-[280px] md:border-l lg:w-[min(var(--chat-w,400px),max(400px,100%_-_50vw))]"
     >
-      <c-discuss.chat />
-    </div>
-    <div x-data class="flex h-6 items-center gap-1.5 bg-canvas/60 px-5 text-xs text-ink-3 italic">
-      <template x-if="$store.typing_user">
-        <span class="flex items-center gap-1.5">
-          <span x-text="$store.typing_user"></span> is typing
-          <span class="inline-flex gap-0.5">
-            <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 0ms"></span>
-            <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 150ms"></span>
-            <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 300ms"></span>
-          </span>
-        </span>
-      </template>
-    </div>
-    <form x-data class="flex gap-2 border-t border-line p-3.5" ws-send>
-      <input
-        type="text"
-        id="message-input"
-        class="input h-[42px]"
-        autocomplete="off"
-        name="message"
-        :placeholder="$store.chat_hint || 'Write a message'"
-        :disabled="!!$store.chat_hint"
-        aria-label="Message"
-      />
-      <button
-        type="submit"
-        :disabled="!!$store.chat_hint"
-        class="btn btn-primary btn-icon h-[42px] w-[42px] shrink-0"
-        aria-label="Send"
-        aria-describedby="message-input"
+      <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize chat"
+        title="Drag to resize the chat, double click for the default width"
+        tabindex="0"
+        :aria-valuenow="actual"
+        @pointerdown="startDrag"
+        @dblclick="reset()"
+        @keydown.left.prevent="step(1)"
+        @keydown.right.prevent="step(-1)"
+        class="group absolute inset-y-0 -left-1.5 z-10 flex w-3 cursor-col-resize touch-none justify-center focus:outline-none max-md:hidden"
       >
-        {% heroicon_mini "arrow-right" class="size-5" %}
-      </button>
-    </form>
-  </aside>
+        <span
+          class="w-0.5 bg-transparent transition-colors group-hover:bg-line-strong group-focus-visible:bg-accent"
+        ></span>
+      </div>
+      <div class="border-b border-line px-5 py-3.5">
+        <h2 class="card-title">Chat</h2>
+      </div>
+      <div
+        id="messages"
+        class="flex flex-1 flex-col gap-3 overflow-y-auto overscroll-none bg-canvas/60 p-5 scrollbar-thin scrollbar-thumb-line-strong"
+      >
+        <c-discuss.chat />
+      </div>
+      <div x-data class="flex h-6 items-center gap-1.5 bg-canvas/60 px-5 text-xs text-ink-3 italic">
+        <template x-if="$store.typing_user">
+          <span class="flex items-center gap-1.5">
+            <span x-text="$store.typing_user"></span> is typing
+            <span class="inline-flex gap-0.5">
+              <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 0ms"></span>
+              <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 150ms"></span>
+              <span class="size-1 animate-bounce rounded-full bg-current" style="animation-delay: 300ms"></span>
+            </span>
+          </span>
+        </template>
+      </div>
+      <form x-data class="flex gap-2 border-t border-line p-3.5" ws-send>
+        <input
+          type="text"
+          id="message-input"
+          class="input h-[42px]"
+          autocomplete="off"
+          name="message"
+          :placeholder="$store.chat_hint || 'Write a message'"
+          :disabled="!!$store.chat_hint"
+          aria-label="Message"
+        />
+        <button
+          type="submit"
+          :disabled="!!$store.chat_hint"
+          class="btn btn-primary btn-icon h-[42px] w-[42px] shrink-0"
+          aria-label="Send"
+          aria-describedby="message-input"
+        >
+          {% heroicon_mini "arrow-right" class="size-5" %}
+        </button>
+      </form>
+    </aside>
+  </div>
+  {# below xl the codebook slides in left of the chat, so it never covers it #}
+  <c-codebook.panel
+    class="md:max-xl:right-(--chat-width) md:max-xl:max-w-[min(28rem,calc(100vw-var(--chat-width)))]"
+    :codebook="codebook"
+    :content_diff="content_diff"
+    :changes="codebook_changes"
+    :since="codebook_since"
+  />
 </div>
-{# below xl the codebook slides in left of the chat, so it never covers it #}
-<c-codebook.panel
-  class="md:max-xl:right-[340px] lg:max-xl:right-[400px]"
-  :codebook="codebook"
-  :content_diff="content_diff"
-  :changes="codebook_changes"
-  :since="codebook_since"
-/>
 <script>
   window.local_state = {
     version: -1,
