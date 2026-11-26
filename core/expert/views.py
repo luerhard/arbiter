@@ -84,6 +84,7 @@ def _assignment_context(assignment: ExampleAssignment) -> dict[str, Any]:
         "assignment": assignment,
         "example": example,
         "sentence": example,
+        "metadata": example.shown_metadata(),
         "prev_annotations": before_by_user,
         "post_annotations": example.labels_by_user(BatchPhase.DISCUSSION),
         # Presentational only (right-aligns this user's chat messages); an

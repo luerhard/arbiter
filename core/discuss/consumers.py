@@ -350,7 +350,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             log.debug("Discussion ended.")
             return
 
-        example, annotations, page, total_pages, editor = await database_sync_to_async(
+        example, annotations, page, total_pages, editor, metadata = await database_sync_to_async(
             self.get_example,
         )(state=state)
 
@@ -376,6 +376,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 state["page"] = page
                 state["cur_example_id"] = example.id
                 state["cur_example"] = example.content
+                state["cur_metadata"] = metadata
                 state["annotation_labels"] = annotations
                 state["span_editor"] = editor
                 state["total_pages"] = total_pages
@@ -474,15 +475,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         annotator has decided yet. The DISCUSSION assignments in the database are the
         source of truth, so a lost or stale room state resumes at the right example.
 
-        Returns (example, annotation labels by user, page, total pages, span editor);
-        example is None when nothing is left to discuss. The span editor (span projects
-        only) has the words of the example and everyone's spans before the discussion."""
+        Returns (example, annotation labels by user, page, total pages, span editor,
+        metadata); example is None when nothing is left to discuss. The span editor (span
+        projects only) has the words of the example and everyone's spans before the
+        discussion. The metadata are [key, value] pairs, so the browser keeps their order
+        (a JS object would put keys like "7" first), and empty unless the project shows them."""
         log.debug("Getting example")
         total_pages = self.batch.discussion_examples().count()
         open_examples = self.batch.open_discussion_examples()
         example = open_examples.first()
         if example is None:
-            return None, None, total_pages, total_pages, None
+            return None, None, total_pages, total_pages, None, []
         page = total_pages - open_examples.count() + 1
 
         log.debug("Getting annotations")
@@ -514,7 +517,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         editor = project_type.editor_data(example)
         if editor:
             editor["spans"] = values
-        return example, by_user, page, total_pages, editor
+        metadata = [[key, value] for key, value in example.shown_metadata().items()]
+        return example, by_user, page, total_pages, editor, metadata
 
     @database_sync_to_async
     def _is_open(self, example_id):

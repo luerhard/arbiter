@@ -229,6 +229,29 @@ class TestAnnotateViews:
         assert (b'id="example-metadata"' in resp.content) is show
         assert (b"twitter-metadata-marker" in resp.content) is show
 
+    def test_metadata_shown_in_span_projects(self, client, project_annotation):
+        project = project_annotation["project"]
+        project.project_type = "span"
+        project.show_metadata_in_annotation = True
+        project.save()
+        example = project_annotation["example"]
+        example.metadata = {"source": "span-metadata-marker"}
+        example.save()
+        user = project_annotation["annotators"][0]
+        assignment = ExampleAssignment.objects.get(
+            example=example, user=user, phase=BatchPhase.ANNOTATION
+        )
+
+        client.force_login(user)
+        resp = client.get(
+            reverse("annotate-assignment", args=(project_annotation["batch"].id, assignment.id))
+        )
+
+        assert resp.status_code == 200
+        assert b'id="span-editor-data"' in resp.content
+        assert b'id="example-metadata"' in resp.content
+        assert b"span-metadata-marker" in resp.content
+
 
 @pytest.mark.django_db
 class TestAnnotationDoneFinalize:

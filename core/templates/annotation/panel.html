@@ -67,25 +67,13 @@
   <article
     class="card max-h-[55vh] overflow-y-auto px-5 py-5 scrollbar-thin scrollbar-thumb-line-strong sm:px-11 sm:py-10"
   >
-    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">
-      {{ example.content }}
-    </p>
+    {# on one line: with whitespace-pre-line a line break inside the tag shows as an empty line #}
+    <!-- prettier-ignore -->
+    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">{{ example.content }}</p>
   </article>
+  {% endif %}
 
-  {% if metadata %}
-  {# a two-column grid: keys as wide as the longest key, all values start at the same edge #}
-  <dl
-    id="example-metadata"
-    class="-mt-3 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-6 gap-y-1.5 px-1"
-    aria-label="Metadata"
-  >
-    {% for key, value in metadata.items %}
-    <dt class="text-xs leading-5 text-ink-3">{{ key }}</dt>
-    <dd class="font-mono text-meta leading-5 break-all text-ink">{{ value|default_if_none:"–" }}</dd>
-    {% endfor %}
-  </dl>
-  {% endif %}
-  {% endif %}
+  <c-sample.metadata :metadata="metadata" />
 
   <div
     id="nav-buttons"

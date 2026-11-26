@@ -25,6 +25,11 @@ class Example(models.Model):
     def labels(self):
         return self.batch.project.labels
 
+    def shown_metadata(self) -> dict:
+        """The metadata as annotation, discussion and expert decision show it below the text:
+        all of it if the project shows metadata, else nothing."""
+        return self.metadata if self.batch.project.show_metadata_in_annotation else {}
+
     @property
     def has_expert_decision(self) -> bool:
         return ExampleAssignment.objects.filter(

@@ -1,3 +1,4 @@
+import json
 import random
 
 from codebook.models import Codebook
@@ -31,14 +32,19 @@ def create_batch(project, examples_file="examples.csv"):
         project=project,
         current_phase=BatchPhase.ANNOTATION,
     )
-    test_df = pd.read_csv(settings.BASE_DIR / "core/tests/testdata" / examples_file)
+    test_df = pd.read_csv(
+        settings.BASE_DIR / "core/tests/testdata" / examples_file, keep_default_na=False
+    )
 
     batch.users.add(*project.annotators, through_defaults={"role": ProjectRole.ANNOTATOR})
     batch.users.add(*project.experts, through_defaults={"role": ProjectRole.EXPERT})
 
-    examples = []
-    for _i, row in test_df.iterrows():
-        examples.append(Example(batch=batch, content=row["text"]))
+    # as an upload would store them: every column but the text is metadata, empty cells None
+    rows = json.loads(test_df.replace("", None).to_json(orient="records", date_format="iso"))
+    examples = [
+        Example(batch=batch, content=row.pop("text"), metadata=row, position=position)
+        for position, row in enumerate(rows, start=1)
+    ]
     Example.objects.bulk_create(examples, ignore_conflicts=False)
 
     batch.set_phase(BatchPhase.ANNOTATION)
@@ -63,12 +69,21 @@ def random_spans(example, label_ids):
     return PROJECT_TYPES["span"].validated_value(example, spans)
 
 
-def create_project(name, description, labels, annotators, experts, project_type="classification"):
+def create_project(
+    name,
+    description,
+    labels,
+    annotators,
+    experts,
+    project_type="classification",
+    show_metadata_in_annotation=False,
+):
     project = Project.objects.create(
         name=name,
         description=description,
         owner=experts[0],
         project_type=project_type,
+        show_metadata_in_annotation=show_metadata_in_annotation,
     )
 
     project.users.add(*annotators, through_defaults={"default_role": ProjectRole.ANNOTATOR})
@@ -105,6 +120,7 @@ class Command(BaseCommand):
             ["Anti-Elitism", "People-Centrism"],
             annotators,
             experts,
+            show_metadata_in_annotation=True,
         )
         codebook = Codebook.objects.get(project=project)
         codebook_content = (
@@ -177,6 +193,7 @@ class Command(BaseCommand):
             annotators,
             experts,
             project_type="span",
+            show_metadata_in_annotation=True,
         )
         colors = ["#16a34a", "#dc2626", "#2563eb"]
         for label, color in zip(project.labels.order_by("pk"), colors, strict=True):

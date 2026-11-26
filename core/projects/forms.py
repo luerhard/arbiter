@@ -31,7 +31,7 @@ class ProjectCreateForm(forms.Form):
     )
     show_metadata_in_annotation = forms.BooleanField(
         required=False,
-        label="Show metadata while annotating",
+        label="Show metadata",
     )
 
     def __init__(self, *args, **kwargs):

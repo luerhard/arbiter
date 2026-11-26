@@ -41,6 +41,7 @@ def _defaults() -> dict[str, Any]:
         "discussion_ended": False,
         "cur_example_id": 0,
         "cur_example": "",
+        "cur_metadata": [],  # [key, value] pairs, see ChatConsumer.get_example
         "annotation_labels": {},
         "discussion_labels": {},
         "clicked_done": {},  # {username: 0|1}, a saved decision for the current example

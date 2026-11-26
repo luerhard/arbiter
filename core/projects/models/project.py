@@ -26,8 +26,9 @@ class Project(models.Model):
         default="classification",
         editable=False,
     )
-    # show annotators the other columns of the uploaded file (Example.metadata) next to the
-    # text; off by default, since e.g. a "source" or "party" column can bias the labels
+    # show the other columns of the uploaded file (Example.metadata) below the text, while
+    # annotating, discussing and in the expert decision (Example.shown_metadata); off by
+    # default, since e.g. a "source" or "party" column can bias the labels
     show_metadata_in_annotation = models.BooleanField(default=False)
 
     @property

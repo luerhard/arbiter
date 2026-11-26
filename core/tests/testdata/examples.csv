@@ -1,21 +1,21 @@
-,metadata,text
-0,"{""uuid"": ""efebf071-d7d3-4ebe-92b1-a71c9df3e879"", ""some_random_metadata"": ""some_random_34"", ""orig_file"": ""/mnt/some_file.csv""}",I love the new design of your website!
-1,"{""uuid"": ""6a9f3292-17b0-4ba9-9496-65899ec54326"", ""some_random_metadata"": ""some_random_30"", ""orig_file"": ""/mnt/some_file.csv""}",The customer service was terrible.
-2,"{""uuid"": ""91caa6e5-dbc5-4a5f-906b-b45081a79e48"", ""some_random_metadata"": ""some_random_1"", ""orig_file"": ""/mnt/some_file.csv""}",I'm feeling okay today.
-3,"{""uuid"": ""82b45f96-dfea-458f-a1b8-5b5effa524b4"", ""some_random_metadata"": ""some_random_5"", ""orig_file"": ""/mnt/some_file.csv""}",The weather is beautiful outside.
-4,"{""uuid"": ""ea5a2b4f-a780-4734-a13e-011b70fe017b"", ""some_random_metadata"": ""some_random_35"", ""orig_file"": ""/mnt/some_file.csv""}",I'm very disappointed with this product.
-5,"{""uuid"": ""36d594ef-dbcd-42bd-9f50-2e7da41410fd"", ""some_random_metadata"": ""some_random_55"", ""orig_file"": ""/mnt/some_file.csv""}",This book is fantastic!
-6,"{""uuid"": ""2504a65d-aa45-4595-8677-9886d3b79797"", ""some_random_metadata"": ""some_random_10"", ""orig_file"": ""/mnt/some_file.csv""}",The movie was just average.
-7,"{""uuid"": ""3142896a-114a-4b98-a0c7-25bdfec2ff6a"", ""some_random_metadata"": ""some_random_13"", ""orig_file"": ""/mnt/some_file.csv""}",I can't believe how bad the traffic is.
-8,"{""uuid"": ""9def6bea-b457-4010-852d-6cd35a946908"", ""some_random_metadata"": ""some_random_12"", ""orig_file"": ""/mnt/some_file.csv""}",She did a great job on her presentation.
-9,"{""uuid"": ""155c5dd7-1e43-463b-baf2-6d82496e0798"", ""some_random_metadata"": ""some_random_48"", ""orig_file"": ""/mnt/some_file.csv""}",I'm not sure how I feel about this.
-10,"{""uuid"": ""c7077a9e-47bf-45a1-a016-a30f8642b3cf"", ""some_random_metadata"": ""some_random_33"", ""orig_file"": ""/mnt/some_file.csv""}",The food at the restaurant was delicious.
-11,"{""uuid"": ""605d1fd6-d804-400e-ac25-218225832aa6"", ""some_random_metadata"": ""some_random_11"", ""orig_file"": ""/mnt/some_file.csv""}",The project deadline has been extended.
-12,"{""uuid"": ""38ce7773-340f-4448-993c-661380c4af32"", ""some_random_metadata"": ""some_random_22"", ""orig_file"": ""/mnt/some_file.csv""}",I am so frustrated with this situation.
-13,"{""uuid"": ""7e8dea75-f49b-489a-a534-126d02504b53"", ""some_random_metadata"": ""some_random_55"", ""orig_file"": ""/mnt/some_file.csv""}",This is the best day of my life!
-14,"{""uuid"": ""fc84d54a-560d-4314-910f-707aeb319256"", ""some_random_metadata"": ""some_random_34"", ""orig_file"": ""/mnt/some_file.csv""}",The instructions were unclear and confusing.
-15,"{""uuid"": ""373d4255-3050-4982-ac5e-bfc3e79f8e4e"", ""some_random_metadata"": ""some_random_41"", ""orig_file"": ""/mnt/some_file.csv""}",It's a decent solution to the problem.
-16,"{""uuid"": ""bc928300-2798-4cf9-a874-e771208c18f6"", ""some_random_metadata"": ""some_random_32"", ""orig_file"": ""/mnt/some_file.csv""}",He is always so helpful and kind.
-17,"{""uuid"": ""6ee947bd-8500-4b20-a233-a602da18bc36"", ""some_random_metadata"": ""some_random_48"", ""orig_file"": ""/mnt/some_file.csv""}",I'm indifferent to the outcome of the game.
-18,"{""uuid"": ""5c4f5eda-38a3-4852-b180-45fe5de84c41"", ""some_random_metadata"": ""some_random_43"", ""orig_file"": ""/mnt/some_file.csv""}",What a terrible experience that was!
-19,"{""uuid"": ""8998e226-961e-49f0-896c-795cbd976a6d"", ""some_random_metadata"": ""some_random_5"", ""orig_file"": ""/mnt/some_file.csv""}",I'm very pleased with the service provided.
+id,text,source,author,posted_at,likes,url
+1001,I love the new design of your website!,twitter,@maria_k,2024-01-10,0,https://example.org/twitter/posts/100231?ref=export&utm_source=arbiter-test-data
+1002,The customer service was terrible.,reddit,u/throwaway_42,2024-02-11,17,https://example.org/reddit/posts/100268?ref=export&utm_source=arbiter-test-data
+1003,I'm feeling okay today.,trustpilot,Jonas B.,2024-03-12,34,https://example.org/trustpilot/posts/100305?ref=export&utm_source=arbiter-test-data
+1004,The weather is beautiful outside.,facebook,,2024-04-13,51,https://example.org/facebook/posts/100342?ref=export&utm_source=arbiter-test-data
+1005,I'm very disappointed with this product.,twitter,@daily_news,2024-05-14,68,https://example.org/twitter/posts/100379?ref=export&utm_source=arbiter-test-data
+1006,This book is fantastic!,reddit,@maria_k,2024-06-15,85,
+1007,The movie was just average.,trustpilot,u/throwaway_42,2024-07-16,102,https://example.org/trustpilot/posts/100453?ref=export&utm_source=arbiter-test-data
+1008,I can't believe how bad the traffic is.,facebook,Jonas B.,2024-08-17,119,https://example.org/facebook/posts/100490?ref=export&utm_source=arbiter-test-data
+1009,She did a great job on her presentation.,twitter,,2024-09-18,136,https://example.org/twitter/posts/100527?ref=export&utm_source=arbiter-test-data
+1010,I'm not sure how I feel about this.,reddit,@daily_news,2024-01-19,153,https://example.org/reddit/posts/100564?ref=export&utm_source=arbiter-test-data
+1011,The food at the restaurant was delicious.,trustpilot,@maria_k,2024-02-20,170,https://example.org/trustpilot/posts/100601?ref=export&utm_source=arbiter-test-data
+1012,The project deadline has been extended.,facebook,u/throwaway_42,2024-03-21,187,
+1013,I am so frustrated with this situation.,twitter,Jonas B.,2024-04-22,204,https://example.org/twitter/posts/100675?ref=export&utm_source=arbiter-test-data
+1014,This is the best day of my life!,reddit,,2024-05-23,221,https://example.org/reddit/posts/100712?ref=export&utm_source=arbiter-test-data
+1015,The instructions were unclear and confusing.,trustpilot,@daily_news,2024-06-24,8,https://example.org/trustpilot/posts/100749?ref=export&utm_source=arbiter-test-data
+1016,It's a decent solution to the problem.,facebook,@maria_k,2024-07-25,25,https://example.org/facebook/posts/100786?ref=export&utm_source=arbiter-test-data
+1017,He is always so helpful and kind.,twitter,u/throwaway_42,2024-08-26,42,https://example.org/twitter/posts/100823?ref=export&utm_source=arbiter-test-data
+1018,I'm indifferent to the outcome of the game.,reddit,Jonas B.,2024-09-27,59,
+1019,What a terrible experience that was!,trustpilot,,2024-01-28,76,https://example.org/trustpilot/posts/100897?ref=export&utm_source=arbiter-test-data
+1020,I'm very pleased with the service provided.,facebook,@daily_news,2024-02-29,93,https://example.org/facebook/posts/100934?ref=export&utm_source=arbiter-test-data

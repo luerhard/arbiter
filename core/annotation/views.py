@@ -102,10 +102,7 @@ def _annotation_panel_context(batch, assignment, skip_annotated: bool = False):
         "assignment": assignment,
         "assignment_id": assignment.id,
         "example": assignment.example,
-        # the other columns of the uploaded file, only if the project shows them to annotators
-        "metadata": (
-            assignment.example.metadata if batch.project.show_metadata_in_annotation else {}
-        ),
+        "metadata": assignment.example.shown_metadata(),
         "skip_annotated": skip_annotated,
         "has_prev": bool(prev_assignment),
         "has_next": bool(next_assignment),

@@ -50,6 +50,7 @@ and the main column's min-width protects it on small screens.
                 editor="room.editor"
                 title="How you marked it before the discussion"
               />
+              <c-sample.metadata pairs="$store.metadata" />
               <section id="current-spans" class="card flex flex-col gap-4 p-5 sm:px-9 sm:py-8">
                 <h2 class="card-title">Your spans after discussing</h2>
                 <c-span-editor
@@ -67,6 +68,7 @@ and the main column's min-width protects it on small screens.
               x-text="$store.example"
             ></p>
           </article>
+          <c-sample.metadata pairs="$store.metadata" />
 
           <section class="card flex flex-col gap-4 p-5">
             <h2 class="card-title">How you labeled it before the discussion</h2>
@@ -214,6 +216,7 @@ and the main column's min-width protects it on small screens.
 
   document.addEventListener('alpine:init', () => {
     Alpine.store('example', 'Waiting for the others to join…');
+    Alpine.store('metadata', []);
     Alpine.store('chat', {
       messages: [],
       last_render_id: 0,
@@ -426,6 +429,7 @@ and the main column's min-width protects it on small screens.
 
         if (server_state.cur_example_id !== local_state.cur_example_id && server_state.cur_example) {
           Alpine.store('example', server_state.cur_example);
+          Alpine.store('metadata', server_state.cur_metadata ?? []);
 
           // The property `checked` should be modifiable and then read when saving.
           // Flatten, then add checked property to each label, then pass it to Alpine.store.

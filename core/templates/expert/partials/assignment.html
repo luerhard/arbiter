@@ -63,6 +63,7 @@
       <p id="current-example" class="reading text-[22px] leading-normal whitespace-pre-line">{{ sentence }}</p>
     </article>
     {% endif %}
+    <c-sample.metadata :metadata="metadata" />
 
     <c-sample.trace :before="prev_annotations" :chat="chat_messages" :after="post_annotations" :highlight="annotator" />
 
