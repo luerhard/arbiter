@@ -197,3 +197,16 @@ class TestProfile:
 
     def test_page_does_not_contain_the_password_hash(self, client, member):
         assert member.password not in client.get(reverse("user-profile")).content.decode()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("who", ["anonymous", "annotator"])
+def test_links_to_docs_and_source(client, who):
+    if who == "annotator":
+        client.login(username="annotator1", password="123")
+        response = client.get(reverse("home"))
+    else:
+        response = client.get(reverse("login"))
+    content = response.content.decode()
+    assert "https://github.com/luerhard/arbiter" in content
+    assert "https://luerhard.github.io/arbiter/" in content
