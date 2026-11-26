@@ -1,5 +1,7 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AdminUserCreationForm
+from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
 from django.contrib.auth.forms import UserChangeForm as OrigUserChangeForm
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.password_validation import password_validators_help_texts
@@ -64,3 +66,31 @@ class UserRegistrationForm(DjangoUserCreationForm):
         self.fields["email"].label = "Email"
         # Django's help text for it is an HTML list; the page shows plain text
         self.fields["password1"].help_text = " ".join(password_validators_help_texts())
+
+
+class ProfileForm(forms.ModelForm):
+    """What users change about themselves on the profile page."""
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email")
+        labels = {"email": "Email"}
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, autocomplete in (
+            ("first_name", "given-name"),
+            ("last_name", "family-name"),
+            ("email", "email"),
+        ):
+            self.fields[name].widget.attrs.update({"class": "input", "autocomplete": autocomplete})
+
+
+class PasswordChangeForm(DjangoPasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs["class"] = "input"
+        self.fields["old_password"].widget.attrs.pop("autofocus", None)
+        # Django's help text for it is an HTML list; the page shows plain text
+        self.fields["new_password1"].help_text = " ".join(password_validators_help_texts())

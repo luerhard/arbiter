@@ -5,37 +5,39 @@ Profile · Arbiter
 {% block content %}
 <div class="mx-auto flex max-w-3xl flex-col gap-7">
   <header class="flex items-center gap-4">
-    <c-avatar :name="username" size="size-14 text-lg" />
+    <c-avatar :name="user.username" size="size-14 text-lg" />
     <div class="flex flex-col gap-0.5">
-      <h1 class="page-title">{{ username }}</h1>
-      <p class="page-subtitle">Your account</p>
+      <h1 class="page-title">{{ user.username }}</h1>
+      <p class="page-subtitle">
+        Your account · user ID <span class="font-mono">{{ user.id }}</span>
+      </p>
     </div>
   </header>
 
-  <section class="card">
-    <dl class="divide-y divide-line">
-      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
-        <dt class="text-ink-3">Username</dt>
-        <dd class="@md:col-span-2">{{ username }}</dd>
-      </div>
-      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
-        <dt class="text-ink-3">Full name</dt>
-        <dd class="@md:col-span-2">
-          {% if first_name or last_name %}{{ first_name }}
-          {{ last_name }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
-        </dd>
-      </div>
-      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
-        <dt class="text-ink-3">Email address</dt>
-        <dd class="@md:col-span-2">
-          {% if email %}{{ email }}{% else %}<span class="text-ink-3">Not set</span>{% endif %}
-        </dd>
-      </div>
-      <div class="grid grid-cols-1 gap-1 px-6 py-4 @md:grid-cols-3 @md:gap-4">
-        <dt class="text-ink-3">User ID</dt>
-        <dd class="@md:col-span-2 font-mono">{{ user_id }}</dd>
-      </div>
-    </dl>
-  </section>
+  <form method="post" class="card flex flex-col gap-5 p-6">
+    {% csrf_token %}
+    <input type="hidden" name="form" value="profile" />
+    <h2 class="card-title">Profile</h2>
+    <div class="grid grid-cols-1 gap-5 @xl:grid-cols-2">
+      <c-field :field="profile_form.first_name" />
+      <c-field :field="profile_form.last_name" />
+    </div>
+    <c-field :field="profile_form.email" />
+    <div class="flex justify-end">
+      <button type="submit" class="btn btn-primary">Save profile</button>
+    </div>
+  </form>
+
+  <form method="post" class="card flex flex-col gap-5 p-6">
+    {% csrf_token %}
+    <input type="hidden" name="form" value="password" />
+    <h2 class="card-title">Password</h2>
+    <c-field :field="password_form.old_password" />
+    <c-field :field="password_form.new_password1" :help="password_form.new_password1.help_text" />
+    <c-field :field="password_form.new_password2" />
+    <div class="flex justify-end">
+      <button type="submit" class="btn btn-primary">Change password</button>
+    </div>
+  </form>
 </div>
 {% endblock content %}

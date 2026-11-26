@@ -1,13 +1,17 @@
 import logging
 
+from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import logout
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.decorators import login_not_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import Http404
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from .forms import PasswordChangeForm
+from .forms import ProfileForm
 from .forms import UserRegistrationForm
 from core.models import SiteSettings
 
@@ -53,20 +57,27 @@ def user_logout(request):
 
 
 def user_profile(request):
+    """The user's own account: name and email, and the password. Two forms on one page;
+    a hidden "form" field says which one was sent."""
     user = request.user
-    log.debug(user)
-    # groups = {group.name for group in user.groups.all()}
+    profile_form = ProfileForm(instance=user)
+    password_form = PasswordChangeForm(user)
 
-    context = {
-        "username": user.username,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email": user.email,
-        "user_id": user.id,
-        "password": user.password,
-        # "is_admin": "Admin" in groups,
-        # "is_expert": "Expert" in groups,
-        # "is_annotator": "Annotator" in groups,
-    }
-    log.debug(context)
+    if request.method == "POST":
+        if request.POST.get("form") == "password":
+            password_form = PasswordChangeForm(user, request.POST)
+            if password_form.is_valid():
+                password_form.save()
+                # otherwise changing the password signs the user out
+                update_session_auth_hash(request, password_form.user)
+                messages.success(request, "Password changed.")
+                return redirect("user-profile")
+        else:
+            profile_form = ProfileForm(request.POST, instance=user)
+            if profile_form.is_valid():
+                profile_form.save()
+                messages.success(request, "Profile saved.")
+                return redirect("user-profile")
+
+    context = {"profile_form": profile_form, "password_form": password_form}
     return render(request, "users/profile.html", context)

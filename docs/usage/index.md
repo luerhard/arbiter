@@ -30,6 +30,8 @@ To log into Arbiter, enter the credentials provided by your system administrator
 
 If the administrator has opened registration (see "Allow Self-Registration" in the Admin User Guide), the login page also has a **Create one** link. There you choose a username and password (an email address is optional) and are signed in right away. A project lead can then add you to their projects.
 
+Once signed in, click your name at the bottom of the sidebar to open your profile. There you can change your name, your email address and your password.
+
 :::{figure} screenshots/login.png
 :width: 500px
 :align: center

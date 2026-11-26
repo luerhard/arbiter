@@ -117,3 +117,83 @@ class TestSiteSettingsAdmin:
         response = client.get(reverse("admin:users_user_change", args=(user.pk,)))
         assert response.status_code == 200
         assert 'name="email"' in response.content.decode()
+
+
+@pytest.fixture
+def member(client):
+    user = User.objects.create_user("profile_owner", password="old-password-77")
+    client.force_login(user)
+    return user
+
+
+@pytest.mark.django_db
+class TestProfile:
+    def test_saves_name_and_email(self, client, member):
+        response = client.post(
+            reverse("user-profile"),
+            {
+                "form": "profile",
+                "first_name": "Ada",
+                "last_name": "Lovelace",
+                "email": "ada@example.org",
+            },
+        )
+
+        assert response.status_code == 302
+        member.refresh_from_db()
+        assert (member.first_name, member.last_name, member.email) == (
+            "Ada",
+            "Lovelace",
+            "ada@example.org",
+        )
+        assert member.username == "profile_owner"
+
+    def test_ignores_the_username(self, client, member):
+        client.post(reverse("user-profile"), {"form": "profile", "username": "someone_else"})
+        member.refresh_from_db()
+        assert member.username == "profile_owner"
+
+    def test_rejects_an_invalid_email(self, client, member):
+        response = client.post(
+            reverse("user-profile"), {"form": "profile", "email": "not-an-email"}
+        )
+
+        assert response.status_code == 200
+        assert response.context["profile_form"].errors["email"]
+        member.refresh_from_db()
+        assert not member.email
+
+    def test_changes_the_password_and_stays_signed_in(self, client, member):
+        response = client.post(
+            reverse("user-profile"),
+            {
+                "form": "password",
+                "old_password": "old-password-77",
+                "new_password1": "new-password-88",
+                "new_password2": "new-password-88",
+            },
+        )
+
+        assert response.status_code == 302
+        member.refresh_from_db()
+        assert member.check_password("new-password-88")
+        assert client.get(reverse("user-profile")).status_code == 200
+
+    def test_password_needs_the_old_one(self, client, member):
+        response = client.post(
+            reverse("user-profile"),
+            {
+                "form": "password",
+                "old_password": "wrong",
+                "new_password1": "new-password-88",
+                "new_password2": "new-password-88",
+            },
+        )
+
+        assert response.status_code == 200
+        assert response.context["password_form"].errors["old_password"]
+        member.refresh_from_db()
+        assert member.check_password("old-password-77")
+
+    def test_page_does_not_contain_the_password_hash(self, client, member):
+        assert member.password not in client.get(reverse("user-profile")).content.decode()
