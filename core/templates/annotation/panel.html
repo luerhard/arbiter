@@ -67,9 +67,9 @@
   <article
     class="card max-h-[55vh] overflow-y-auto px-5 py-5 scrollbar-thin scrollbar-thumb-line-strong sm:px-11 sm:py-10"
   >
-    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">
-      {{ example.content }}
-    </p>
+    {# on one line: with whitespace-pre-line a line break inside the tag shows as an empty line #}
+    <!-- prettier-ignore -->
+    <p class="reading text-[22px] leading-normal sm:text-[28px] tracking-[-0.005em] whitespace-pre-line">{{ example.content }}</p>
   </article>
 
   {% if metadata %}
