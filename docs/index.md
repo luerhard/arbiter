@@ -15,7 +15,7 @@ Statistical methods deal with disagreement after the data has been collected. Ar
 
 ## How it works
 
-:::{figure} usage/screenshots/workflow_diagram.png
+:::{figure} screenshots/workflow_diagram.png
 :width: 420px
 :align: center
 :alt: The Arbiter workflow: annotation, discussion, expert decision and codebook revision, batch after batch
@@ -39,7 +39,7 @@ Arbiter works with texts, uploaded as a CSV or Excel file with one text per row.
 
 ## Where to start
 
-- **You annotate or lead a project** on a running Arbiter: the [user guide](usage/index.md) explains the work of annotators, experts and administrators step by step.
+- **You annotate or lead a project** on a running Arbiter: start with [how Arbiter works](get-started/how-it-works.md), then read the guide [for annotators](annotators/annotate.md) or [for project leads](project-leads/create-project.md).
 - **You want to run Arbiter yourself or work on its code:** the [guide for developers](dev/index.md) covers installation, tests and the structure of the code; the [API documentation](api/index.md) describes the modules.
 
 The source code is on [GitHub](https://github.com/luerhard/arbiter). Bugs and feature requests go to the [issue tracker](https://github.com/luerhard/arbiter/issues).
@@ -50,9 +50,43 @@ Arbiter is released under the [MIT License](https://github.com/luerhard/arbiter/
 
 ```{toctree}
 :hidden:
-:maxdepth: 2
+:caption: Get started
 
-usage/index.md
+get-started/how-it-works.md
+get-started/sign-in.md
+```
+
+```{toctree}
+:hidden:
+:caption: For annotators
+
+annotators/annotate.md
+annotators/discuss.md
+annotators/codebook-changes.md
+```
+
+```{toctree}
+:hidden:
+:caption: For project leads
+
+project-leads/create-project.md
+project-leads/upload-data.md
+project-leads/codebook.md
+project-leads/decide.md
+project-leads/export.md
+```
+
+```{toctree}
+:hidden:
+:caption: Administration
+
+admin/users.md
+```
+
+```{toctree}
+:hidden:
+:caption: Developers
+
 dev/index.md
 api/index.md
 ```

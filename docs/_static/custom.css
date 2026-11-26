@@ -483,6 +483,10 @@ code,
 
 .rst-content table.docutils td,
 .rst-content table.docutils th {
+  /* the theme keeps cells on one line, which makes tables with sentences scroll sideways */
+  white-space: normal !important;
+  vertical-align: top;
+  line-height: 1.5;
   padding: 10px 14px;
   border: 0;
   border-bottom: 1px solid var(--c-line);

@@ -7,7 +7,7 @@ Thank you for your interest in contributing to Arbiter! Bug reports, feature ide
 ## Ways to Contribute
 
 - **Report a bug or suggest a feature**: Open an issue on our [GitHub Issue Tracker](https://github.com/luerhard/arbiter/issues). Before opening a new issue, please search existing issues to make sure it has not already been reported.
-- **Improve the documentation**: Help refine the user guide (https://luerhard.github.io/arbiter/usage/index.html) or the developer guide (https://luerhard.github.io/arbiter/dev/index.html).
+- **Improve the documentation**: Help refine the user guide (https://luerhard.github.io/arbiter/) or the developer guide (https://luerhard.github.io/arbiter/dev/index.html).
 
 # How to contribute
 
@@ -50,7 +50,7 @@ See the [developer guide](https://luerhard.github.io/arbiter/dev/index.html) for
 If your contribution changes the behavior of Arbiter or adds features, please make sure the
 changes are reflected in the documentation:
 
-- User guide: `docs/usage/index.md` (screenshots in `docs/usage/screenshots/`)
+- User guide: one page per topic in `docs/get-started/`, `docs/annotators/`, `docs/project-leads/` and `docs/admin/` (screenshots in `docs/screenshots/`)
 - Developer guide: `docs/dev/index.md`
 
 Build the documentation locally with:

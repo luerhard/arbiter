@@ -59,7 +59,9 @@ html_title = "Arbiter documentation"
 html_favicon = "_static/favicon.svg"
 html_theme_options = {
     "style_nav_header_background": "#0b0d10",
-    "navigation_depth": 3,
+    # the sidebar lists pages only, the same on every page; no sections of the open page
+    "titles_only": True,
+    "collapse_navigation": False,
 }
 # "Edit on GitHub" instead of "View page source"
 html_context = {
