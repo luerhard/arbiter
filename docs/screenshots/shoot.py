@@ -259,12 +259,38 @@ def create_project(browser):
     shot(lena, "create_project")
 
 
+def codebook(browser):
+    demodata("annotation")
+    lena = new_page(browser, "lena.hoffmann", height=1150)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.locator("nav").get_by_role("link", name="Codebook").first.click()
+    lena.locator("#codebook-history").wait_for()
+    shot(lena, "codebook_expert")
+
+    # Lena adds a rule to People-centrism
+    lena.get_by_role("link", name="Edit").click()
+    content = lena.locator("#id_content")
+    old = '  passports online."\n'
+    rule = (
+        '- Do not code: "the people" as the population of a country, without a shared will.\n'
+        '  "The people of Bavaria elect a new parliament on Sunday."\n'
+    )
+    content.fill(content.input_value().replace(old, old + rule, 1))
+    lena.fill(
+        "#id_rationale",
+        "Anna and Tom disagreed on statements that only mention the population as voters. "
+        "People-centrism needs 'the people' as a group with a shared will.",
+    )
+    shot(lena, "codebook_edit")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
     "discuss": discuss,
     "codebook-changes": codebook_changes,
     "create-project": create_project,
+    "codebook": codebook,
 }
 
 if __name__ == "__main__":
