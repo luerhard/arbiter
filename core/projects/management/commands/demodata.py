@@ -1,9 +1,10 @@
 """Demo data for the screenshots in the documentation: three people and two projects. The
 texts are made up; no real party, politician or commenter.
 
-Each project has one batch in progress, as in real work. In "Populist Communication" a first
-batch is finished, and --stage sets how far the second has got (annotation, discussion,
-expert, final), so every page of the documentation can be shown with a state that occurs.
+Each project has one batch in progress, as in real work: the second batch of "Populist
+Communication" (the first is finished) and the only batch of "Offensive Language". --stage
+sets how far both have got (annotation, discussion, expert, final), so every page of the
+documentation can be shown with a state that occurs.
 
 Run it again to start over: it replaces the demo projects and resets the demo accounts.
 It leaves everything else in the database alone. Labels, finalizing and the expert's
@@ -28,6 +29,7 @@ from data.models import Label
 from data.models import label_color
 from discuss.models import Message
 from discuss.models import Room
+from project_types import get_project_type
 from projects.models import Batch
 from projects.models import BatchPhase
 from projects.models import Project
@@ -397,8 +399,8 @@ COMMENTS = [
     ),
 ]
 
-# What Anna and Tom marked in each comment, (label, passage) by comment_id; from the
-# discussion stage on, the comments are annotated and the batch is in its discussion.
+# What Anna and Tom marked in each comment, (label, passage) by comment_id; in the annotation
+# stage nothing is marked yet.
 # They disagree on where an insult or a threat starts and ends, and whether C-106 threatens.
 COMMENT_SPANS = {
     "C-101": (
@@ -437,6 +439,65 @@ COMMENT_SPANS = {
     ),
 }
 
+# The discussion of the comments they marked differently (comment_id -> chat, the passages
+# both save afterwards or None: each keeps their own), and the expert's decisions
+SPAN_DISCUSSIONS = {
+    "C-101": (
+        [
+            (
+                "tom.keller",
+                "I only marked 'idiot'. 'complete' makes it stronger, but it is not the insult.",
+            ),
+            (
+                "anna.berger",
+                "The codebook says to mark the words that carry it. That is 'idiot', you're right.",
+            ),
+        ],
+        COMMENT_SPANS["C-101"][1],
+    ),
+    "C-104": (
+        [
+            ("anna.berger", "The threat is 'someone will pay you a visit', the rest is around it."),
+            (
+                "tom.keller",
+                "'You have been warned' belongs to it, though. 'Keep talking' does not.",
+            ),
+            ("anna.berger", "Agreed, from 'someone' to 'warned'."),
+        ],
+        [("Threat", "someone will pay you a visit. You have been warned.")],
+    ),
+    "C-105": (
+        [
+            (
+                "anna.berger",
+                "'People like you are the reason this town is going down the drain' degrades "
+                "a whole group.",
+            ),
+            ("tom.keller", "It's harsh, but it is criticism. 'you clown' is the insult."),
+            ("anna.berger", "I'd keep both. Let's see what Lena says."),
+        ],
+        None,
+    ),
+    "C-106": (
+        [
+            ("tom.keller", "'Show your face and we will see how brave you are' is a challenge."),
+            ("anna.berger", "It hints at what happens at the meeting. Veiled threats count."),
+            ("tom.keller", "I don't read it that way. Lena will have to decide."),
+        ],
+        None,
+    ),
+}
+SPAN_DECISIONS = {
+    "C-105": ([("Insult", "you clown.")], None),
+    "C-106": (
+        [
+            ("Profanity", "crap"),
+            ("Threat", "Show your face at the next meeting and we will see how brave you are."),
+        ],
+        None,
+    ),
+}
+
 
 class Command(BaseCommand):
     help = "Create the demo accounts and projects for the documentation's screenshots"
@@ -446,8 +507,7 @@ class Command(BaseCommand):
             "--stage",
             choices=STAGES,
             default="annotation",
-            help="how far the second batch of the populism project has got; from "
-            "discussion on, the offensive language batch is in its discussion too",
+            help="how far the batch in progress of each project has got",
         )
 
     def handle(self, *args, **options):  # noqa: ARG002
@@ -535,6 +595,26 @@ class Command(BaseCommand):
         names = [LABELS[letter] for letter in letters]
         return list(project.labels.filter(name__in=names).values_list("id", flat=True))
 
+    @staticmethod
+    def _key(example):
+        return example.metadata.get("doc_id") or example.metadata["comment_id"]
+
+    def _spans(self, example, passages):
+        """(label, passage) pairs as the span editor posts them: [label_id, start, end]."""
+        labels = dict(example.batch.project.labels.values_list("name", "id"))
+        text = example.content
+        return [
+            [labels[label], text.index(passage), text.index(passage) + len(passage)]
+            for label, passage in passages
+        ]
+
+    def _post_value(self, example, value):
+        """What the annotation and decision pages post: label ids for classification, the
+        spans as JSON for spans. value: label letters or (label, passage) pairs."""
+        if example.batch.project.project_type == "span":
+            return {"value": json.dumps(self._spans(example, value))}
+        return {"labels": self._label_ids(example.batch.project, value)}
+
     def _assignments(self, batch, username, phase):
         return ExampleAssignment.objects.filter(
             batch=batch,
@@ -568,39 +648,37 @@ class Command(BaseCommand):
 
     def _annotate_spans(self, batch):
         """Both annotators mark their passages (COMMENT_SPANS) and finalize."""
-        labels = dict(batch.project.labels.values_list("name", "id"))
         for index, username in enumerate(ANNOTATORS):
             client = self._client(username)
             for assignment in self._assignments(batch, username, BatchPhase.ANNOTATION):
-                text = assignment.example.content
-                spans = [
-                    [labels[label], text.index(passage), text.index(passage) + len(passage)]
-                    for label, passage in COMMENT_SPANS[assignment.example.metadata["comment_id"]][
-                        index
-                    ]
-                ]
+                passages = COMMENT_SPANS[self._key(assignment.example)][index]
                 url = reverse("annotate-assignment", args=(batch.id, assignment.id))
-                client.post(url, {"value": json.dumps(spans)})
+                client.post(url, self._post_value(assignment.example, passages))
             client.post(reverse("annotate-done", args=(batch.id,)))
+        batch.refresh_from_db()
 
-    def _discuss(self, batch):
-        """The chat and the labels saved after it, then the batch moves on as it would when
-        the last text has been discussed."""
+    def _discuss(self, batch, discussions):
+        """The chat and the labels saved after it (discussions: DISCUSSIONS or
+        SPAN_DISCUSSIONS), then the batch moves on as it would when the last text has been
+        discussed."""
         room, _ = Room.objects.get_or_create(pk=batch.id)
+        project_type = get_project_type(batch.project)
         start = timezone.now() - timedelta(days=1)
         for username in ANNOTATORS:
             for assignment in self._assignments(batch, username, BatchPhase.DISCUSSION):
-                doc_id = assignment.example.metadata["doc_id"]
-                chat, agreed = DISCUSSIONS[doc_id]
+                example = assignment.example
+                chat, agreed = discussions[self._key(example)]
                 if agreed is None:
                     # both keep their labels from the annotation
                     before = ExampleAssignment.objects.get(
                         batch=batch,
                         user=assignment.user,
-                        example=assignment.example,
+                        example=example,
                         phase=BatchPhase.ANNOTATION,
                     )
-                    value = sorted(a.label_id for a in before.annotations.all())
+                    value = project_type.value(before.annotations.all())
+                elif batch.project.project_type == "span":
+                    value = project_type.validated_value(example, self._spans(example, agreed))
                 else:
                     value = self._label_ids(batch.project, agreed)
                 assignment.set_user_annotations(value)
@@ -620,11 +698,12 @@ class Command(BaseCommand):
         batch.advance_from_discussion()
         batch.refresh_from_db()
 
-    def _decide(self, batch):
-        """The expert decides on the decision page, with a codebook change where given."""
+    def _decide(self, batch, decisions):
+        """The expert decides on the decision page (decisions: DECISIONS or SPAN_DECISIONS),
+        with a codebook change where given."""
         client = self._client(EXPERTS[0])
         for assignment in self._assignments(batch, EXPERTS[0], BatchPhase.EXPERT):
-            letters, change = DECISIONS[assignment.example.metadata["doc_id"]]
+            value, change = decisions[self._key(assignment.example)]
             args = (batch.id, assignment.id)
             if change:
                 content, rationale = change
@@ -634,7 +713,7 @@ class Command(BaseCommand):
                 )
             client.post(
                 reverse("expert-assignment", args=args),
-                {"labels": self._label_ids(batch.project, letters)},
+                self._post_value(assignment.example, value),
             )
         batch.refresh_from_db()
 
@@ -657,8 +736,8 @@ class Command(BaseCommand):
 
         batch = self._batch(project, BATCH_1)
         self._annotate(batch, BATCH_1, finalize=True)
-        self._discuss(batch)
-        self._decide(batch)
+        self._discuss(batch, DISCUSSIONS)
+        self._decide(batch, DECISIONS)
 
         batch = self._batch(project, BATCH_2)
         if stage == "annotation":
@@ -666,9 +745,9 @@ class Command(BaseCommand):
         else:
             self._annotate(batch, BATCH_2, finalize=True)
         if stage in ("expert", "final"):
-            self._discuss(batch)
+            self._discuss(batch, DISCUSSIONS)
         if stage == "final":
-            self._decide(batch)
+            self._decide(batch, DECISIONS)
 
         phases = ", ".join(
             f"batch {b.batch_number}: {b.get_current_phase_display()}"
@@ -691,5 +770,9 @@ class Command(BaseCommand):
         batch = self._batch(project, COMMENTS)
         if stage != "annotation":
             self._annotate_spans(batch)
+        if stage in ("expert", "final"):
+            self._discuss(batch, SPAN_DISCUSSIONS)
+        if stage == "final":
+            self._decide(batch, SPAN_DECISIONS)
         batch.refresh_from_db()
         self.stdout.write(f"{SPANS}: batch 1: {batch.get_current_phase_display()}")

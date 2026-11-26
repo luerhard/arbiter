@@ -312,6 +312,41 @@ def upload_data(browser):
     shot(lena, "batch_create")
 
 
+def decide(browser):
+    demodata("expert")  # both projects: the discussion left disagreements for Lena
+    lena = new_page(browser, "lena.hoffmann", height=1000)
+
+    # Anna saw anti-elitism in the judges, Tom did not; the decision starts with what both
+    # kept, popular sovereignty, and Lena leaves it at that
+    lena.goto(task_url(lena, CLASSIFICATION))
+    lena.get_by_text("Unelected judges").first.wait_for()
+    shot(lena, "expert_decision")
+
+    # and makes the rule clearer for the next batch
+    lena.locator("#edit-button").click()
+    content = lena.locator("#codebook-content")
+    content.wait_for()
+    old = '- Code: "Let the people vote on the energy transition!"\n'
+    rule = (
+        "- Courts and parliaments are where the people's will is overruled, not an elite as a "
+        'group: "Unelected judges must not overrule our voters" is popular sovereignty only.\n'
+    )
+    content.fill(content.input_value().replace(old, old + rule, 1))
+    lena.fill(
+        "#rationale",
+        "Anna and Tom disagreed whether attacking judges is anti-elitism. It is about who has "
+        "the last word, so popular sovereignty.",
+    )
+    shot(lena, "expert_codebook_draft")
+
+    # the span project: Anna marked a second insult in C-105, Tom only "you clown"
+    lena.goto(task_url(lena, SPANS))
+    lena.get_by_text("you clown").first.wait_for()
+    close_codebook(lena)
+    lena.set_viewport_size({"width": 1280, "height": 1380})  # down to the Save button
+    shot(lena, "expert_decision_spans")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
@@ -320,6 +355,7 @@ PAGES = {
     "create-project": create_project,
     "codebook": codebook,
     "upload-data": upload_data,
+    "decide": decide,
 }
 
 if __name__ == "__main__":

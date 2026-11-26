@@ -26,7 +26,5 @@ def test_demodata_has_one_batch_in_progress_per_project(stage, phase):
     assert phases == [BatchPhase.FINAL, phase]
     # the expert's decision in batch 1 changed the codebook
     assert "so-called experts" in project.codebook.get().content
-    # the span project's only batch is annotated, from the discussion stage on discussed
-    spans = Project.objects.get(name=SPANS).batches.get()
-    expected = BatchPhase.ANNOTATION if stage == "annotation" else BatchPhase.DISCUSSION
-    assert spans.current_phase == expected
+    # the span project's only batch has got as far
+    assert Project.objects.get(name=SPANS).batches.get().current_phase == phase
