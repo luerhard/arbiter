@@ -1,13 +1,13 @@
-text
-The corrupt elites in Brussels have forgotten the ordinary people who pay for their mistakes. It is time we take back control of our own country!
-"Our government listens to lobbyists, not to you. The hard-working families of this nation deserve better than these career politicians."
-We will defend the will of the people against a media establishment that despises them. No more decisions made behind closed doors.
-The committee will publish its report on infrastructure spending next Tuesday.
-"They call us extremists because we say what everyone thinks.
+doc_id,text,speaker,party,medium,date,country
+POP-0001,The corrupt elites in Brussels have forgotten the ordinary people who pay for their mistakes. It is time we take back control of our own country!,Speaker A,Party X,speech,2023-01-05,EU
+POP-0002,"Our government listens to lobbyists, not to you. The hard-working families of this nation deserve better than these career politicians.",Speaker B,Party Y,tweet,2023-02-07,GB
+POP-0003,We will defend the will of the people against a media establishment that despises them. No more decisions made behind closed doors.,Speaker C,Party X,press release,2023-03-09,GB
+POP-0004,The committee will publish its report on infrastructure spending next Tuesday.,Committee press office,,press release,2023-04-11,GB
+POP-0005,"They call us extremists because we say what everyone thinks.
 
-The silent majority is silent no more."
-"Real democracy means the people decide, not unelected judges and bureaucrats."
-"Die da oben in Berlin wissen nicht, wie es den einfachen Leuten geht. 😠 Wir holen uns unser Land zurück!"
-"Interest rates will remain unchanged for the third quarter in a row, the central bank announced."
-Every vote for us is a vote against a political class that has betrayed the nation.
-The so-called experts got it wrong again – ordinary citizens knew better all along.
+The silent majority is silent no more.",Speaker D,Party Z,tweet,2023-05-13,GB
+POP-0006,"Real democracy means the people decide, not unelected judges and bureaucrats.",Speaker A,Party X,interview,2023-06-15,GB
+POP-0007,"Die da oben in Berlin wissen nicht, wie es den einfachen Leuten geht. 😠 Wir holen uns unser Land zurück!",Speaker E,Partei Q,telegram,2023-07-17,DE
+POP-0008,"Interest rates will remain unchanged for the third quarter in a row, the central bank announced.",Central bank press release,,press release,2023-08-19,GB
+POP-0009,Every vote for us is a vote against a political class that has betrayed the nation.,Speaker B,Party Y,speech,2023-09-21,GB
+POP-0010,The so-called experts got it wrong again – ordinary citizens knew better all along.,Speaker F,Party Z,facebook,2023-10-23,GB
