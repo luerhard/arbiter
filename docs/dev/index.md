@@ -1,192 +1,86 @@
-# A guide for devs
+# Development setup
 
-We currently use a couple of techonologies that are required to contribute.
+Arbiter is developed in Docker Compose. The development setup runs four containers:
 
-## Requirements
+| Service | Port | What it does                                                                                      |
+| ------- | ---- | ------------------------------------------------------------------------------------------------- |
+| `web`   | 8000 | the Django app, restarting by itself when Python code changes; a debugger can attach on port 5678 |
+| `vite`  | 5173 | builds the JavaScript and CSS and serves them to the browser, updating the page when they change  |
+| `db`    | 5432 | PostgreSQL                                                                                        |
+| `redis` | 6379 | Redis, which carries the live discussions                                                         |
 
-We use docker to manage requirements.
+The code folder is mounted into the containers: changes take effect without rebuilding. You need [Docker](https://docs.docker.com/get-docker/) with its Compose plugin; for the formatting hooks also [uv](https://docs.astral.sh/uv/) and [Node.js](https://nodejs.org/).
 
-The docker-compose.yaml file contains the necessary services.
-
-Currently, these are:
-
-web: web app
-vite: for compilation of js, css, and npm to manage the packages
-redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators.
-Postgres: Database
-
-## Installation
-
-to start everything for the first time:
+## Get the code and configure it
 
 ```bash
-# start the services
-docker compose up
-
-# create all tables in the database
-docker exec annotationtool-web-1 uv run manage.py migrate
-
-# populate the DB with test data
-docker exec annotationtool-web-1 uv run manage.py populatedb
-
+git clone https://github.com/luerhard/arbiter.git
+cd arbiter
 ```
 
-This should spawn a webserver that is accessible in the browser via [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
-To delete to everything, including the database:
+Create a file `.env` in this folder with the credentials of the development database. The values are up to you:
 
 ```bash
-# stop all containers
-docker compose down
-
-# remove the docker volume that contains the database data
-docker volume rm annotationtool_pgdata
+POSTGRES_DB=arbiter
+POSTGRES_USER=arbiter
+POSTGRES_PASSWORD=arbiter
 ```
 
-To start fresh:
+Leave out `COMPOSE_FILE`: that is for servers and would start the production setup (see [Set up a server](../admin/server.md)).
+
+## Start it
 
 ```bash
-# stop all containers
-docker compose down
-
-# remove all volumes
-docker compose down --volumes
-
-# start fresh
 docker compose up --build
 ```
 
-To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume.
+The first start takes a few minutes. Once it runs, create the database tables and an administrator account in a second terminal:
 
 ```bash
-# reset
-docker exec annotationtool-web-1 uv run manage.py resetdb --noinput
+docker compose exec web python manage.py migrate
+docker compose exec web python manage.py createsuperuser
 ```
 
-## The .env
+Arbiter now runs at <http://localhost:8000>, the admin at <http://localhost:8000/admin/>. Run `migrate` again whenever you pull changes that bring new migrations.
 
-For everything to work properly, it is necessary to create a `.env` file in the root directory with the following variables defined:
+## Demo data
 
-- user, password, and db can changed.
-- do NOT change host or port.
+To see Arbiter with something in it, create the demo projects:
 
 ```bash
-DJANGO_DEBUG=1
-
-POSTGRES_DB=annotationtool
-POSTGRES_USER=myuser
-POSTGRES_PASSWORD=mypassword
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-
-REDIS_HOST=localhost
+docker compose exec web python manage.py demodata --stage discussion
 ```
 
-## Run tests
+This creates two projects, "Populist Communication" (labels for the whole text) and "Offensive Language" (spans in the text), and three accounts with the password `demo`: the annotators `anna.berger` and `tom.keller` and the expert `lena.hoffmann`. `--stage` sets how far the running batch of each project has got: `annotation`, `discussion`, `expert` or `final`. Running the command again replaces the two demo projects and resets the three accounts; everything else in the database stays.
 
-To run the tests locally, there are two options:
+The screenshots of this documentation are taken from the demo data, see [Screenshots](testing.md#screenshots).
 
-1. run tests from command line within in the docker container:
+## Start over
 
-```
-docker compose run --rm web uv run pytest -v
-```
-
-`-v` is optional here but gives some more infos on all tests.
-
-2. run tests locally. This is nice to use, e.g. the test runner in VSCode to run / debug single tests. These, however, require a working installation of the virtual environment outside the container. The docker containers still have to be running to give access to the PostgresDB where a test database is created to run the tests.
-
-So to do this
-
-1. make sure the docker compose containers are running
-2. make sure the virtual environment is installed (run `uv sync` to make sure)
-3. now, either run `uv run pytest` from the command-line or use the built-in test runner in VSCode.
-
-## Debugging with VS Code
-
-You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables.
-To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says "Attach to Django in Docker".
-You can then place breakpoints in the code.
-When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting.
-
-## Build documentation locally
+To delete all data and recreate the empty tables:
 
 ```bash
-docker compose run --rm web sh -c "cd ../docs; make html"
+docker compose exec web python manage.py resetdb --noinput
 ```
 
-This will create `docs/_build/html/index.html` which is the starting page of the documentation.
-
-To open it, run this in the command line
+This also clears the state of the discussions in Redis. The codebooks' git repositories stay on disk; to remove those as well, remove the volumes:
 
 ```bash
-docker compose run --rm --service-ports web sh -c "cd ../docs/_build/html && python -m http.server 8080"
+docker compose down --volumes
+docker compose up
 ```
 
-Then open http://localhost:8080 in private mode in your browser.
+## Debug with VS Code
 
-## Overview and starting point
+The `web` container runs Django with the [debugpy](https://github.com/microsoft/debugpy) debugger listening on port 5678. In VS Code, open the repository folder and start **Attach to Django in Docker (debugpy)** in the Run and Debug view; breakpoints in the code then stop the running app.
 
-### Django web app
+## Formatting
 
-The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/
+Python is formatted and checked with [ruff](https://docs.astral.sh/ruff/), templates, CSS, JavaScript, Markdown and YAML with [Prettier](https://prettier.io/). Install the git hooks once, and both run on every commit:
 
-The Django web framework is based on modular apps.
-Our tool (currently) consists of the following apps
+```bash
+npm install
+uvx pre-commit install
+```
 
-- annotation
-- codebook
-- discuss
-- expert
-- projects
-- users
-  and
-- data
-
-The apps represent modular parts of the tool.
-They each consist of apps.py, models.py, urls.py and views.py files.
-The models.py contains classes for the database models.
-The views.py contain the logic for what to display.
-The urls.py contain the URL declarations for the app.
-
-Data is a bit different from the others, because it contains the connecting bits.
-
-For each app, there also is a template in the templates directory, which contains the html.
-This follows Django's principle to seperate the design from the view functionality.
-
-## Development Server
-
-### Access
-
-We now have a development Server which serves as a showcase of the current state of the project.
-
-The adress is: [http://193.196.54.251](http://193.196.54.251)
-
-To access it, you need to be in the University of Stuttgart VPN (or physically on campus).
-
-### Current Users
-
-#### admin
-
-- can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on [http://193.196.54.251/admin](http://193.196.54.251/admin). If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.
-
-#### annotator1
-
-- default annotator without special permissions
-
-#### annotator2
-
-- same as annotator1. Exists because we want 2 annotators for each project
-
-#### expert1
-
-- A role to show the expert interface.
-
-#### expert2
-
-- A second expert.
-- expert2 should behave the same as expert1.
-
-#### Passwords
-
-every user has a password of "123".
+GitHub Actions runs the same tools on every push and commits their fixes.

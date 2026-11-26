@@ -95,5 +95,6 @@ admin/users.md
 :caption: Developers
 
 dev/index.md
+dev/testing.md
 api/index.md
 ```

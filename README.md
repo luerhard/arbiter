@@ -52,10 +52,6 @@ annotators, underspecification by expert adjudication and in-tool codebook revis
 - Discuss disagreements with peers in a real-time chat
 - See what changed in the codebook since the previous batch
 
-**Administrators**
-
-- Manage user accounts, groups and permissions through the Django admin interface
-
 ## Installation and quick start
 
 Arbiter runs as a set of Docker containers (web app, Vite, PostgreSQL, Redis).
