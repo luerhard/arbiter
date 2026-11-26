@@ -1,0 +1,401 @@
+"""Take the screenshots of the documentation from the local dev server.
+
+Run it on the host (the app containers ship no browser), with the dev stack up:
+
+    uv run --with playwright python docs/screenshots/shoot.py           # every page
+    uv run --with playwright python docs/screenshots/shoot.py discuss   # some pages
+
+Before each page, the demo data is rebuilt in the stage the page needs (manage.py demodata
+--stage ..., run through `docker compose exec`). That replaces the two demo projects and resets
+the three demo accounts in the dev database, and touches nothing else. The pictures are taken
+in light mode at twice the resolution and written next to this file.
+
+It uses the system's Chromium (CHROMIUM, default /usr/bin/chromium-browser). Without one, run
+`uv run --with playwright playwright install chromium` once and set CHROMIUM to "".
+"""
+
+import os
+from pathlib import Path
+import subprocess
+import sys
+import tempfile
+
+from playwright.sync_api import sync_playwright
+
+BASE = os.environ.get("APP_URL", "http://localhost:8000")
+CHROMIUM = os.environ.get("CHROMIUM", "/usr/bin/chromium-browser") or None
+OUT = Path(__file__).parent
+PASSWORD = "demo"  # the demo accounts' password, see core/projects/management/commands/demodata.py
+CLASSIFICATION, SPANS = "Populist Communication", "Offensive Language"
+
+# light mode, and the dev server's debug toolbar out of the picture (and out of the way of clicks)
+INIT = """
+localStorage.setItem('theme', 'light');
+document.addEventListener('DOMContentLoaded', () => {
+  const style = document.createElement('style');
+  style.textContent = '#djDebug { display: none !important; }';
+  document.head.appendChild(style);
+});
+"""
+
+
+def demodata(stage):
+    subprocess.run(
+        [
+            "docker",
+            "compose",
+            "exec",
+            "-T",
+            "web",
+            "python",
+            "manage.py",
+            "demodata",
+            "--stage",
+            stage,
+        ],
+        check=True,
+        stdout=subprocess.DEVNULL,
+    )
+
+
+def new_page(browser, username=None, height=800):
+    context = browser.new_context(
+        viewport={"width": 1280, "height": height},
+        device_scale_factor=2,
+        color_scheme="light",
+    )
+    context.add_init_script(INIT)
+    page = context.new_page()
+    if username:
+        page.goto(f"{BASE}/users/login/")
+        page.fill("#username", username)
+        page.fill("#password", PASSWORD)
+        page.click("button[type=submit]")
+        page.wait_for_url(f"{BASE}/")
+    return page
+
+
+def shot(page, name):
+    page.wait_for_load_state("networkidle")
+    page.wait_for_timeout(600)  # transitions
+    page.evaluate("document.activeElement && document.activeElement.blur()")
+    page.mouse.move(0, 0)
+    page.screenshot(path=str(OUT / f"{name}.png"))
+    print(f"  {name}.png")
+
+
+def task_url(page, project):
+    """The link of the project's card under 'Waiting for you' on the home page."""
+    page.goto(f"{BASE}/")
+    card = page.locator("article.card", has_text=project)
+    return BASE + card.locator("a.btn").get_attribute("href")
+
+
+def mark(page, phrase, key, within="body"):
+    """In the span editor: drag over the words of phrase, then press the label's key. within:
+    the editor's container, where the page shows the text more than once."""
+    editor = page.locator(within)
+    words = [w.strip(",.!") for w in editor.locator("[data-i]").all_inner_texts()]
+    target = [w.strip(",.!") for w in phrase.split()]
+    start = next(i for i in range(len(words)) if words[i : i + len(target)] == target)
+    first = editor.locator(f'[data-i="{start}"]').bounding_box()
+    last = editor.locator(f'[data-i="{start + len(target) - 1}"]').bounding_box()
+    page.mouse.move(first["x"] + 2, first["y"] + first["height"] / 2)
+    page.mouse.down()
+    page.mouse.move(last["x"] + last["width"] - 2, last["y"] + last["height"] / 2, steps=5)
+    page.mouse.up()
+    page.keyboard.press(key)
+
+
+def close_codebook(page):
+    """Close the codebook panel if it is open (the page remembers it for the next one)."""
+    page.wait_for_timeout(300)
+    close = page.get_by_role("button", name="Close Codebook")
+    if close.is_visible():
+        close.click()
+        page.wait_for_timeout(800)  # the panel slides out, the page takes the room
+
+
+def say(page, text):
+    page.fill("#message-input", text)
+    page.press("#message-input", "Enter")
+    page.wait_for_timeout(300)
+
+
+# --- one function per page of the documentation ---------------------------------------------
+
+
+def signin(browser):
+    demodata("annotation")
+    page = new_page(browser)
+    page.goto(f"{BASE}/users/login/")
+    shot(page, "login")
+
+    page = new_page(browser, "anna.berger")
+    page.goto(f"{BASE}/users/profile/")
+    shot(page, "profile")
+
+
+def annotate(browser):
+    demodata("annotation")
+    anna = new_page(browser, "anna.berger")
+    shot(anna, "annotator_start")
+
+    # Anna's first open text is the 4th; the 5th asks for a referendum: Popular sovereignty
+    anna.goto(task_url(anna, CLASSIFICATION))
+    anna.get_by_role("button", name="Next sample").click()
+    anna.get_by_text("Sample 5 of 10").wait_for()
+    anna.keyboard.press("3")
+    shot(anna, "annotator_annotation_interface")
+
+    anna.goto(task_url(anna, SPANS))
+    close_codebook(anna)
+    mark(anna, "complete idiot", "1")
+    mark(anna, "damn", "3")
+    mark(anna, "had better watch out on their way home", "2")
+    shot(anna, "annotator_span_annotation")
+
+    tom = new_page(browser, "tom.keller")  # Tom has labeled every text
+    tom.goto(task_url(tom, CLASSIFICATION))
+    shot(tom, "annotator_finalize_annotation")
+
+
+def discuss(browser):
+    demodata("discussion")
+    anna = new_page(browser, "anna.berger", height=900)
+    url = task_url(anna, CLASSIFICATION)
+
+    # alone in the room: the discussion waits for Tom
+    anna.goto(url)
+    anna.get_by_text("Waiting for tom.keller to join").wait_for()
+    close_codebook(anna)
+    shot(anna, "discussion_waiting")
+
+    # Tom joins; the first disagreement opens and they talk it through
+    tom = new_page(browser, "tom.keller")
+    tom.goto(url)
+    anna.get_by_text("Disagreement 1 of").wait_for()
+    say(anna, "'Unelected judges' sounds like an elite to me.")
+    say(tom, "It's a court, an institution. The point is who decides.")
+    say(anna, "Fair enough, it is about who has the last word. I'll take anti-elitism out.")
+    say(tom, "Saved, see you on the next one.")
+    tom.get_by_role("button", name="Save my label").click()
+    # Anna removes Anti-elitism from her label after discussing, but has not saved yet
+    anna.locator("#current-labels").get_by_text("Anti-elitism").click()
+    anna.get_by_text("tom.keller has saved").wait_for()
+    anna.evaluate("window.scrollTo(0, 0)")
+    shot(anna, "annotator_discussion_interface")
+
+    # the span project: was the insult "complete idiot" or only "idiot"?
+    url = task_url(anna, SPANS)
+    anna.goto(url)
+    tom.goto(url)
+    anna.get_by_text("Disagreement 1 of").wait_for()
+    close_codebook(anna)
+    say(tom, "I only marked 'idiot'. 'complete' makes it stronger, but it is not the insult.")
+    say(anna, "The codebook says to mark the words that carry it. That is 'idiot', you're right.")
+    tom.get_by_role("button", name="Save my spans").click()
+    # Anna shortens her insult to the word itself, but has not saved yet
+    current = anna.locator("#current-spans")
+    current.locator("li", has_text="complete idiot").get_by_role("button", name="Remove").click()
+    mark(anna, "idiot", "1", within="#current-spans")
+    anna.get_by_text("tom.keller has saved").wait_for()
+    anna.set_viewport_size({"width": 1280, "height": 1180})  # down to the Save button
+    anna.evaluate("window.scrollTo(0, 0)")
+    shot(anna, "annotator_discussion_spans")
+
+
+def codebook_changes(browser):
+    # batch 2 has just started; Lena's decision in batch 1 changed the codebook
+    demodata("annotation")
+    anna = new_page(browser, "anna.berger")
+
+    # the project page: the batch card links to what changed before it started
+    anna.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    anna.get_by_text("Batch 2").first.wait_for()
+    shot(anna, "annotator_open_codebook_changes")
+
+    anna.locator("article", has_text="Batch 2").get_by_role("link", name="Codebook changes").click()
+    anna.get_by_text("Why it changed").wait_for()
+    anna.set_viewport_size({"width": 1280, "height": 1250})  # down to the added rule
+    shot(anna, "annotator_codebook_view_edited")
+    anna.set_viewport_size({"width": 1280, "height": 800})
+
+    # the codebook page, with the history of its changes
+    anna.locator("nav").get_by_role("link", name="Codebook").first.click()
+    anna.locator("#codebook-history").wait_for()
+    shot(anna, "codebook_page")
+
+    # while annotating: the changes in the codebook panel
+    anna.goto(task_url(anna, CLASSIFICATION))
+    anna.get_by_role("tab", name="Changes since batch 1").click()
+    shot(anna, "codebook_panel_changes")
+
+
+def create_project(browser):
+    demodata("annotation")
+    lena = new_page(browser, "lena.hoffmann", height=1560)  # the whole form
+    lena.goto(f"{BASE}/projects/create/")
+    lena.fill("#id_name", "Populist Communication")
+    lena.fill(
+        "#id_description",
+        "How do parties address 'the people' and 'the elite' in their press releases?",
+    )
+
+    # the team: Anna and Tom annotate, Lena decides
+    team = [
+        ("annotators", "anna.berger"),
+        ("annotators", "tom.keller"),
+        ("experts", "lena.hoffmann"),
+    ]
+    for role, username in team:
+        search = lena.locator(f"#{role}-results").locator("..").locator("input")
+        search.fill(username.split(".")[0])
+        lena.locator(f"#{role}-results").get_by_role("button", name=username).click()
+
+    for i, label in enumerate(["Anti-elitism", "People-centrism", "Popular sovereignty"]):
+        if i:
+            lena.get_by_role("button", name="Add label").click()
+        lena.fill(f"#label-name-{i}", label)
+    shot(lena, "create_project")
+
+
+def codebook(browser):
+    demodata("annotation")
+    lena = new_page(browser, "lena.hoffmann", height=1150)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.locator("nav").get_by_role("link", name="Codebook").first.click()
+    lena.locator("#codebook-history").wait_for()
+    shot(lena, "codebook_expert")
+
+    # Lena adds a rule to People-centrism
+    lena.get_by_role("link", name="Edit").click()
+    content = lena.locator("#id_content")
+    old = '  passports online."\n'
+    rule = (
+        '- Do not code: "the people" as the population of a country, without a shared will.\n'
+        '  "The people of Bavaria elect a new parliament on Sunday."\n'
+    )
+    content.fill(content.input_value().replace(old, old + rule, 1))
+    lena.fill(
+        "#id_rationale",
+        "Anna and Tom disagreed on statements that only mention the population as voters. "
+        "People-centrism needs 'the people' as a group with a shared will.",
+    )
+    shot(lena, "codebook_edit")
+
+
+def upload_data(browser):
+    demodata("annotation")  # batch 1 finished, batch 2 in annotation
+    lena = new_page(browser, "lena.hoffmann", height=900)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.get_by_text("Batch 2").first.wait_for()
+    shot(lena, "expert_project_page")
+
+    lena.get_by_role("link", name="Batch 2", exact=True).click()
+    lena.locator("table.data-table").wait_for()
+    lena.set_viewport_size({"width": 1600, "height": 900})  # room for the metadata columns
+    shot(lena, "batch_samples")
+    lena.set_viewport_size({"width": 1280, "height": 900})
+
+    # the next batch, from a file as it would come out of pandas
+    lena.go_back()
+    lena.get_by_role("link", name="New batch").first.click()
+    with tempfile.TemporaryDirectory() as folder:
+        data = Path(folder) / "press_releases_batch3.csv"
+        data.write_text(
+            "doc_id,party,date,text\n"
+            'PC-021,Party A,2024-04-02,"The elites in Brussels decide over our heads."\n'
+            'PC-022,Party B,2024-04-03,"Our new rail plan connects every town by 2030."\n'
+        )
+        lena.set_input_files("#id_file", str(data))
+    shot(lena, "batch_create")
+
+
+def decide(browser):
+    demodata("expert")  # both projects: the discussion left disagreements for Lena
+    lena = new_page(browser, "lena.hoffmann", height=1000)
+
+    # Anna saw anti-elitism in the judges, Tom did not; the decision starts with what both
+    # kept, popular sovereignty, and Lena leaves it at that
+    lena.goto(task_url(lena, CLASSIFICATION))
+    lena.get_by_text("Unelected judges").first.wait_for()
+    shot(lena, "expert_decision")
+
+    # and makes the rule clearer for the next batch
+    lena.locator("#edit-button").click()
+    content = lena.locator("#codebook-content")
+    content.wait_for()
+    old = '- Code: "Let the people vote on the energy transition!"\n'
+    rule = (
+        "- Courts and parliaments are where the people's will is overruled, not an elite as a "
+        'group: "Unelected judges must not overrule our voters" is popular sovereignty only.\n'
+    )
+    content.fill(content.input_value().replace(old, old + rule, 1))
+    lena.fill(
+        "#rationale",
+        "Anna and Tom disagreed whether attacking judges is anti-elitism. It is about who has "
+        "the last word, so popular sovereignty.",
+    )
+    shot(lena, "expert_codebook_draft")
+
+    # the span project: Anna marked a second insult in C-105, Tom only "you clown"
+    lena.goto(task_url(lena, SPANS))
+    lena.get_by_text("you clown").first.wait_for()
+    close_codebook(lena)
+    lena.set_viewport_size({"width": 1280, "height": 1380})  # down to the Save button
+    shot(lena, "expert_decision_spans")
+
+
+def export(browser):
+    demodata("final")  # both batches finished
+    lena = new_page(browser, "lena.hoffmann", height=900)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.get_by_role("button", name="Actions for batch 2").click()
+    lena.get_by_text("Export batch").first.wait_for()
+    lena.wait_for_timeout(300)
+    lena.screenshot(path=str(OUT / "export.png"))  # not shot(): it would close the menu
+    print("  export.png")
+
+
+def admin(browser):
+    # an administrator for the admin's pages; the demo accounts are ordinary users
+    script = (
+        "from users.models import User; "
+        "u, _ = User.objects.get_or_create(username='admin'); "
+        "u.is_staff = u.is_superuser = True; u.set_password('demo'); u.save()"
+    )
+    manage = ["docker", "compose", "exec", "-T", "web", "python", "manage.py"]
+    subprocess.run([*manage, "shell", "-c", script], check=True, stdout=subprocess.DEVNULL)
+
+    page = new_page(browser, height=600)
+    page.goto(f"{BASE}/admin/login/")
+    page.fill("#id_username", "admin")
+    page.fill("#id_password", PASSWORD)
+    page.click("input[type=submit]")
+    page.goto(f"{BASE}/admin/core/sitesettings/")
+    page.locator("#id_allow_registration").wait_for()
+    shot(page, "site_settings")
+
+
+PAGES = {
+    "signin": signin,
+    "annotate": annotate,
+    "discuss": discuss,
+    "codebook-changes": codebook_changes,
+    "create-project": create_project,
+    "codebook": codebook,
+    "upload-data": upload_data,
+    "decide": decide,
+    "export": export,
+    "admin": admin,
+}
+
+if __name__ == "__main__":
+    chosen = sys.argv[1:] or list(PAGES)
+    with sync_playwright() as p:
+        browser = p.chromium.launch(executable_path=CHROMIUM)
+        for name in chosen:
+            print(name)
+            PAGES[name](browser)
+        browser.close()

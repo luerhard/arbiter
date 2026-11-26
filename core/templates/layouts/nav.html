@@ -75,7 +75,9 @@ core.context_processors.navigation.
   {% endfor %}
 </div>
 
-<div class="mt-auto flex items-center gap-2.5 border-t border-night-line px-1.5 pt-3">
+<c-project-links class="mt-auto px-2.5 text-night-ink-2 [&_a]:hover:text-white" />
+
+<div class="flex items-center gap-2.5 border-t border-night-line px-1.5 pt-3">
   <c-avatar :name="user.username" />
   <div class="flex min-w-0 flex-1 flex-col">
     <a href="{% url 'user-profile' %}" class="truncate font-medium text-white hover:underline">{{ user.username }}</a>

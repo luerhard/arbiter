@@ -36,6 +36,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 DEBUG = False
 
+# base.py's key is public (it is in the repository): every server needs its own
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "")
+if not SECRET_KEY:
+    msg = "Set DJANGO_SECRET_KEY in the .env file to a long random string."
+    raise ImproperlyConfigured(msg)
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")

@@ -23,7 +23,7 @@ annotators, underspecification by expert adjudication and in-tool codebook revis
 
 ## Workflow
 
-<img src="docs/usage/screenshots/workflow_diagram.png" alt="Arbiter workflow" width="400">
+<img src="docs/screenshots/workflow_diagram.png" alt="Arbiter workflow" width="400">
 
 1. **Setup:** an expert creates a project (labels, annotators, experts), writes the first
    codebook and uploads the first batch of data.
@@ -52,10 +52,6 @@ annotators, underspecification by expert adjudication and in-tool codebook revis
 - Discuss disagreements with peers in a real-time chat
 - See what changed in the codebook since the previous batch
 
-**Administrators**
-
-- Manage user accounts, groups and permissions through the Django admin interface
-
 ## Installation and quick start
 
 Arbiter runs as a set of Docker containers (web app, Vite, PostgreSQL, Redis).
@@ -75,7 +71,7 @@ More information in the [guide for devs](https://luerhard.github.io/arbiter/dev/
 
 Documentation is built with Sphinx and published at **<https://luerhard.github.io/arbiter>**:
 
-- **User guide** (experts, annotators, administrators): [`user documentation`](https://luerhard.github.io/arbiter/usage/index.html)
+- **User guide** (experts, annotators, administrators): [`user documentation`](https://luerhard.github.io/arbiter/)
 - **Developer guide** (setup, tests, debugging, architecture): [`dev documentation`](https://luerhard.github.io/arbiter/dev/index.html)
 
 ## Tests

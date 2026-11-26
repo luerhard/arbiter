@@ -1077,3 +1077,11 @@ class TestProjectSettings:
         assert b'id="project-settings"' in expert_page.content
         assert b'id="project-settings-metadata"' in expert_page.content
         assert b'id="project-settings"' not in annotator_page.content
+
+
+@pytest.mark.django_db
+def test_project_list_offers_new_project_to_everyone(client):
+    # anyone signed in may create projects, self-registered users included
+    assert client.login(username="annotator1", password="123")
+    response = client.get(reverse("project-list"))
+    assert reverse("project-create") in response.content.decode()

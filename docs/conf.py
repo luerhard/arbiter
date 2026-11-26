@@ -12,7 +12,7 @@ import sys
 
 import django
 
-project = "AnnotationTool"
+project = "Arbiter"
 copyright = "2024, Lukas Erhard, Susanne Hindennach"
 author = "Lukas Erhard, Susanne Hindennach"
 release = "0.0.1"
@@ -29,6 +29,8 @@ extensions = [
 myst_enable_extensions = [
     "colon_fence",
 ]
+# headings up to ### get anchors, for links like [annotation](annotate.md#spans-in-the-text)
+myst_heading_anchors = 3
 
 autodoc_member_order = "bysource"
 
@@ -53,4 +55,21 @@ django_show_db_tables_abstract = True  # Boolean, default: False
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+# the Arbiter look (colors, fonts, dark sidebar), see _static/custom.css
 html_css_files = ["custom.css"]
+html_title = "Arbiter documentation"
+html_favicon = "_static/favicon.svg"
+html_theme_options = {
+    "style_nav_header_background": "#0b0d10",
+    # the sidebar lists pages only, the same on every page; no sections of the open page
+    "titles_only": True,
+    "collapse_navigation": False,
+}
+# "Edit on GitHub" instead of "View page source"
+html_context = {
+    "display_github": True,
+    "github_user": "luerhard",
+    "github_repo": "arbiter",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
+}

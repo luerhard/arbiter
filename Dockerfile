@@ -43,8 +43,9 @@ COPY core ./core
 COPY static ./static
 COPY --from=vite-build /app/dist /app/dist
 ENV DJANGO_SETTINGS_MODULE=core.settings.prod
+# collectstatic needs no real key; the server's key comes from .env at runtime
 RUN mkdir -p /app/staticfiles/ && \
-    /.venv/bin/python core/manage.py collectstatic --noinput
+    DJANGO_SECRET_KEY=collectstatic-only /.venv/bin/python core/manage.py collectstatic --noinput
 WORKDIR /app/core
 CMD ["daphne", "-b", "0.0.0.0", "-p", "8000", "-v", "2", "core.asgi:application"]
 

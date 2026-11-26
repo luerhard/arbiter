@@ -1,0 +1,25 @@
+{% comment %}
+Links to Arbiter's documentation and source code, on the sign-in pages and in the sidebar. The colors come with class:
+<c-project-links class="text-night-ink-2 hover:[&_a]:text-white" />
+{% endcomment %}
+<c-vars class="" />
+<div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs {{ class }}">
+  <a
+    href="https://luerhard.github.io/arbiter/"
+    target="_blank"
+    rel="noopener"
+    class="inline-flex items-center gap-1.5 hover:underline"
+  >
+    {% heroicon_micro "book-open" class="size-3.5" %}
+    Documentation
+  </a>
+  <a
+    href="https://github.com/luerhard/arbiter"
+    target="_blank"
+    rel="noopener"
+    class="inline-flex items-center gap-1.5 hover:underline"
+  >
+    {% heroicon_micro "code-bracket" class="size-3.5" %}
+    GitHub
+  </a>
+</div>

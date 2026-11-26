@@ -9,12 +9,10 @@ Projects · Arbiter
     subtitle="Every project you are part of, with your role and where its batches stand."
   >
     <c-slot name="actions">
-      {% if create_url %}
-      <a href="{{ create_url }}" class="btn btn-primary"
+      <a href="{% url 'project-create' %}" class="btn btn-primary"
         >{% heroicon_micro "plus" class="size-4" %}
         New project</a
       >
-      {% endif %}
     </c-slot>
   </c-page-header>
 
