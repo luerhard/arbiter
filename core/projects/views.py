@@ -72,11 +72,6 @@ class ProjectListView(ListView):
             .order_by("-project__pk")
         )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["create_url"] = reverse("project-create") if self.request.user.is_staff else None
-        return context
-
 
 class ProjectDeleteView(View):
     """Delete a project with everything in it. Only its owner may do this."""

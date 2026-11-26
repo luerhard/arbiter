@@ -1,20 +1,25 @@
-{% extends "base.html" %}
+{% extends "layouts/auth.html" %}
 {% block title %}
-Register
+Create account · Arbiter
 {% endblock title %}
-{% block content %}
-{% load widget_tweaks %}
-<section class="content-section">
-  <h1>Register</h1>
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form.visible_fields %}
-    <div class="form-group">
-      {{ field.label_tag }}
-      {% render_field field class="form-control" %}
-    </div>
-    {% endfor %}
-    <button type="submit">Create Account</button>
-  </form>
-</section>
-{% endblock title %}
+{% block auth_content %}
+<form method="post" class="flex flex-col gap-5">
+  {% csrf_token %}
+  <div class="flex flex-col gap-1.5">
+    <h1 class="page-title">Create account</h1>
+    <p class="page-subtitle">A project lead can then add you to their projects.</p>
+  </div>
+  {% if form.non_field_errors %}
+  <div class="alert alert-danger text-meta" role="alert">{{ form.non_field_errors }}</div>
+  {% endif %}
+  <c-field :field="form.username" />
+  <c-field :field="form.email" help="Only shown to admins, so they can reach you." />
+  <c-field :field="form.password1" :help="form.password1.help_text" />
+  <c-field :field="form.password2" />
+  <button type="submit" class="btn btn-primary w-full">Create account</button>
+</form>
+<p class="text-center text-meta text-ink-2">
+  Already have an account?
+  <a href="{% url 'login' %}" class="font-medium text-accent-ink hover:underline">Sign in</a>
+</p>
+{% endblock auth_content %}

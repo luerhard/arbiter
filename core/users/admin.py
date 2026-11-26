@@ -15,6 +15,8 @@ class UserAdmin(OrigUserAdmin):
 
     list_display = (
         "username",
+        "email",
+        "date_joined",
         "is_staff",
         "is_active",
     )
@@ -26,11 +28,11 @@ class UserAdmin(OrigUserAdmin):
     )
 
     fieldsets = (
-        (None, {"fields": ("username",)}),
+        (None, {"fields": ("username", "email")}),
         ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
     )
 
-    search_fields = ("username",)
+    search_fields = ("username", "email")
 
     ordering = (
         "is_superuser",
