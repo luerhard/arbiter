@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 from playwright.sync_api import sync_playwright
 
@@ -284,6 +285,33 @@ def codebook(browser):
     shot(lena, "codebook_edit")
 
 
+def upload_data(browser):
+    demodata("annotation")  # batch 1 finished, batch 2 in annotation
+    lena = new_page(browser, "lena.hoffmann", height=900)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.get_by_text("Batch 2").first.wait_for()
+    shot(lena, "expert_project_page")
+
+    lena.get_by_role("link", name="Batch 2", exact=True).click()
+    lena.locator("table.data-table").wait_for()
+    lena.set_viewport_size({"width": 1600, "height": 900})  # room for the metadata columns
+    shot(lena, "batch_samples")
+    lena.set_viewport_size({"width": 1280, "height": 900})
+
+    # the next batch, from a file as it would come out of pandas
+    lena.go_back()
+    lena.get_by_role("link", name="New batch").first.click()
+    with tempfile.TemporaryDirectory() as folder:
+        data = Path(folder) / "press_releases_batch3.csv"
+        data.write_text(
+            "doc_id,party,date,text\n"
+            'PC-021,Party A,2024-04-02,"The elites in Brussels decide over our heads."\n'
+            'PC-022,Party B,2024-04-03,"Our new rail plan connects every town by 2030."\n'
+        )
+        lena.set_input_files("#id_file", str(data))
+    shot(lena, "batch_create")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
@@ -291,6 +319,7 @@ PAGES = {
     "codebook-changes": codebook_changes,
     "create-project": create_project,
     "codebook": codebook,
+    "upload-data": upload_data,
 }
 
 if __name__ == "__main__":
