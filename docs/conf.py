@@ -12,7 +12,7 @@ import sys
 
 import django
 
-project = "AnnotationTool"
+project = "Arbiter"
 copyright = "2024, Lukas Erhard, Susanne Hindennach"
 author = "Lukas Erhard, Susanne Hindennach"
 release = "0.0.1"
@@ -53,4 +53,19 @@ django_show_db_tables_abstract = True  # Boolean, default: False
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+# the Arbiter look (colors, fonts, dark sidebar), see _static/custom.css
 html_css_files = ["custom.css"]
+html_title = "Arbiter documentation"
+html_favicon = "_static/favicon.svg"
+html_theme_options = {
+    "style_nav_header_background": "#0b0d10",
+    "navigation_depth": 3,
+}
+# "Edit on GitHub" instead of "View page source"
+html_context = {
+    "display_github": True,
+    "github_user": "luerhard",
+    "github_repo": "arbiter",
+    "github_version": "main",
+    "conf_py_path": "/docs/",
+}

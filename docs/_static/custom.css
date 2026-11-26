@@ -1,15 +1,565 @@
+/* Arbiter look for the Read the Docs theme: the colors, fonts and dark sidebar of the app
+   (static/css/main.css). The theme's own rules are specific, so some overrides need !important. */
+
+/* --------------------------------------------------------------------------
+   Fonts: IBM Plex, bundled (as in the app, no requests to Google), see fonts/OFL-IBM-Plex.txt
+   -------------------------------------------------------------------------- */
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin-400-italic.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Sans";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2");
+}
+
+/* --------------------------------------------------------------------------
+   Tokens, copied from the light palette of the app
+   -------------------------------------------------------------------------- */
+:root {
+  --c-canvas: #f6f7f9;
+  --c-surface: #ffffff;
+  --c-subtle: #f1f2f4;
+  --c-line: #e4e6ea;
+  --c-line-strong: #cdd1d7;
+  --c-ink: #111419;
+  --c-ink-2: #4b525c;
+  --c-ink-3: #6b727d;
+  --c-accent: #f5a524;
+  --c-accent-hover: #e8950f;
+  --c-accent-soft: #fef3dc;
+  --c-accent-ink: #8f5506;
+  --c-night: #0b0d10;
+  --c-night-2: #1b2029;
+  --c-night-line: #23272f;
+  --c-night-ink: #c3c8cf;
+  --c-night-ink-2: #8a919c;
+  --c-danger: #c8322f;
+  --c-danger-soft: #fdeceb;
+  --c-success: #17834c;
+  --c-success-soft: #e3f6ec;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+/* --------------------------------------------------------------------------
+   Page
+   -------------------------------------------------------------------------- */
+body,
+.wy-body-for-nav,
+.wy-nav-content-wrap {
+  background: var(--c-canvas);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+}
+
 .wy-nav-content {
   max-width: 900px !important;
+  min-height: 100vh;
+  padding: 2.5rem 3rem;
+  background: var(--c-surface);
+  border-right: 1px solid var(--c-line);
 }
 
-/* margin after code cells */
-div.nbinput.nblast.docutils.container {
-  margin-bottom: 15px;
-  /* Adjust this value for more or less space after code cells */
+.rst-content,
+.rst-content p,
+.rst-content li {
+  font-size: 16px;
+  line-height: 1.65;
 }
 
-/* margin after output cells */
-div.nboutput.nblast.docutils.container {
-  margin-bottom: 25px;
-  /* Adjust this value for more or less space after output cells */
+.rst-content p {
+  margin-bottom: 1.1em;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+legend,
+.rst-content .toctree-wrapper > p.caption {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--c-ink);
+}
+
+.rst-content h1 {
+  font-size: 32px;
+  margin-bottom: 0.75em;
+}
+
+.rst-content h2 {
+  font-size: 23px;
+  margin-top: 1.8em;
+}
+
+.rst-content h3 {
+  font-size: 18px;
+  margin-top: 1.8em;
+}
+
+.rst-content h4 {
+  font-size: 16px;
+}
+
+/* the ¶ link next to headings */
+.rst-content .headerlink {
+  color: var(--c-ink-3) !important;
+  font-weight: 400;
+}
+
+a,
+a:visited,
+.rst-content a,
+.rst-content a:visited {
+  color: var(--c-accent-ink);
+  text-decoration: none;
+}
+
+a:hover,
+.rst-content a:hover {
+  color: var(--c-accent-ink);
+  text-decoration: underline;
+}
+
+strong {
+  font-weight: 600;
+}
+
+hr {
+  border-top-color: var(--c-line);
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar: the dark navigation column of the app
+   -------------------------------------------------------------------------- */
+.wy-nav-side {
+  background: var(--c-night);
+  border-right: 1px solid var(--c-night-line);
+}
+
+.wy-side-nav-search {
+  background: var(--c-night) !important;
+  padding: 1.25rem 1rem 1rem;
+  text-align: left;
+}
+
+/* the wordmark: the logo mark and "arbiter", like in the app */
+.wy-side-nav-search > a,
+.wy-side-nav-search .wy-dropdown > a {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 10px;
+  margin-top: 0.5rem;
+  padding: 0 0.5rem;
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-transform: lowercase;
+}
+
+.wy-side-nav-search > a:hover {
+  background: transparent;
+  text-decoration: none;
+}
+
+.wy-side-nav-search > a.icon-home::before {
+  content: "";
+  display: block;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  margin: 0;
+  background: url("logo-mark.svg") center / contain no-repeat;
+}
+
+.wy-side-nav-search > div.version,
+.wy-side-nav-search > div.switch-menus {
+  display: none;
+}
+
+.wy-side-nav-search input[type="text"] {
+  margin-top: 1rem;
+  padding: 8px 12px;
+  border: 1px solid var(--c-night-line);
+  border-radius: 8px;
+  background: var(--c-night-2);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  box-shadow: none;
+}
+
+.wy-side-nav-search input[type="text"]::placeholder {
+  color: var(--c-night-ink-2);
+}
+
+.wy-side-nav-search input[type="text"]:focus {
+  border-color: var(--c-accent);
+  outline: none;
+}
+
+.wy-menu-vertical {
+  padding: 0 0.75rem 2rem;
+  font-family: var(--font-sans);
+}
+
+.wy-menu-vertical p.caption,
+.wy-menu-vertical header {
+  margin-top: 1rem;
+  padding: 0 0.625rem;
+  color: var(--c-night-ink-2);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* every item on the dark background, whatever level and state */
+.wy-menu-vertical li,
+.wy-menu-vertical li.current,
+.wy-menu-vertical li[class*="toctree-l"],
+.wy-menu-vertical li[class*="toctree-l"].current,
+.wy-menu-vertical li[class*="toctree-l"] a,
+.wy-menu-vertical li[class*="toctree-l"].current > a,
+.wy-menu-vertical li[class*="toctree-l"].current li > a {
+  background: transparent !important;
+  border: 0 !important;
+}
+
+.wy-menu-vertical a,
+.wy-menu-vertical li.current a,
+.wy-menu-vertical li[class*="toctree-l"] a {
+  margin: 1px 0;
+  border-radius: 8px;
+  color: var(--c-night-ink) !important;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.wy-menu-vertical li.toctree-l1 > a {
+  padding: 0.45rem 0.625rem 0.45rem 1.5rem;
+}
+
+.wy-menu-vertical li.toctree-l2 > a {
+  padding: 0.35rem 0.625rem 0.35rem 2.25rem;
+  font-size: 13.5px;
+}
+
+.wy-menu-vertical li.toctree-l3 > a {
+  padding: 0.3rem 0.625rem 0.3rem 3rem;
+  font-size: 13px;
+}
+
+.wy-menu-vertical li.toctree-l4 > a {
+  padding: 0.3rem 0.625rem 0.3rem 3.75rem;
+  font-size: 13px;
+}
+
+.wy-menu-vertical a:hover,
+.wy-menu-vertical li[class*="toctree-l"] a:hover {
+  background: rgb(255 255 255 / 0.05) !important;
+  color: #fff !important;
+}
+
+/* the open path and the page you are on, like the active item in the app */
+.wy-menu-vertical li.current > a {
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.wy-menu-vertical a.current,
+.wy-menu-vertical li[class*="toctree-l"] > a.current,
+.wy-menu-vertical li[class*="toctree-l"].current > a.current {
+  border-radius: 0 8px 8px 0;
+  background: rgb(255 255 255 / 0.07) !important;
+  color: #fff !important;
+  box-shadow: inset 2px 0 0 var(--c-accent);
+}
+
+/* the +/- buttons for opening sections */
+.wy-menu-vertical li button.toctree-expand,
+.wy-menu-vertical li.current > a button.toctree-expand,
+.wy-menu-vertical li[class*="toctree-l"] a button.toctree-expand {
+  color: var(--c-night-ink-2) !important;
+}
+
+/* the bar on top below the tablet width */
+.wy-nav-top {
+  background: var(--c-night);
+  font-family: var(--font-sans);
+}
+
+.wy-nav-top a {
+  color: #fff;
+  font-weight: 600;
+  text-transform: lowercase;
+}
+
+/* --------------------------------------------------------------------------
+   Breadcrumbs, footer, prev/next
+   -------------------------------------------------------------------------- */
+.wy-breadcrumbs,
+.wy-breadcrumbs li {
+  color: var(--c-ink-3);
+  font-size: 13px;
+}
+
+.wy-breadcrumbs li.wy-breadcrumbs-aside a {
+  color: var(--c-ink-3);
+}
+
+.wy-breadcrumbs + hr,
+footer hr,
+.rst-content hr {
+  border-color: var(--c-line);
+}
+
+footer,
+footer p {
+  color: var(--c-ink-3);
+  font-size: 13px;
+}
+
+.btn,
+.btn-neutral,
+.rst-footer-buttons .btn {
+  border: 1px solid var(--c-line-strong) !important;
+  border-radius: 8px;
+  background: var(--c-surface) !important;
+  color: var(--c-ink) !important;
+  box-shadow: none !important;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn:hover,
+.btn-neutral:hover {
+  background: var(--c-subtle) !important;
+  color: var(--c-ink) !important;
+}
+
+/* --------------------------------------------------------------------------
+   Code
+   -------------------------------------------------------------------------- */
+code,
+.rst-content code,
+.rst-content tt,
+.rst-content pre,
+.rst-content div[class^="highlight"] pre {
+  font-family: var(--font-mono);
+}
+
+.rst-content code.literal,
+.rst-content tt.literal {
+  padding: 1px 5px;
+  border: 1px solid var(--c-line);
+  border-radius: 5px;
+  background: var(--c-subtle);
+  color: var(--c-ink);
+  font-size: 0.86em;
+  white-space: normal;
+}
+
+.rst-content a code.literal {
+  color: var(--c-accent-ink);
+}
+
+.rst-content div[class^="highlight"],
+.rst-content pre.literal-block {
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  background: var(--c-subtle);
+  overflow: hidden;
+}
+
+.rst-content div[class^="highlight"] .highlight,
+.highlight {
+  background: var(--c-subtle);
+}
+
+.rst-content div[class^="highlight"] pre {
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+/* --------------------------------------------------------------------------
+   Notes, warnings
+   -------------------------------------------------------------------------- */
+.rst-content .admonition,
+.rst-content .note,
+.rst-content .tip,
+.rst-content .hint,
+.rst-content .important,
+.rst-content .seealso {
+  padding: 14px 18px;
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 10px 10px 0;
+  background: var(--c-accent-soft);
+}
+
+.rst-content .warning,
+.rst-content .caution,
+.rst-content .attention,
+.rst-content .danger,
+.rst-content .error {
+  padding: 14px 18px;
+  border-left: 3px solid var(--c-danger);
+  border-radius: 0 10px 10px 0;
+  background: var(--c-danger-soft);
+}
+
+.rst-content .admonition-title,
+.rst-content .admonition .admonition-title,
+.rst-content .note .admonition-title,
+.rst-content .tip .admonition-title,
+.rst-content .warning .admonition-title,
+.rst-content .danger .admonition-title {
+  margin: 0 0 6px;
+  padding: 0;
+  background: transparent !important;
+  color: var(--c-ink);
+  font-weight: 600;
+}
+
+.rst-content .admonition-title::before {
+  display: none;
+}
+
+/* --------------------------------------------------------------------------
+   Tables
+   -------------------------------------------------------------------------- */
+.rst-content table.docutils,
+.wy-table-bordered-all {
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+.rst-content table.docutils thead th {
+  background: var(--c-subtle);
+  color: var(--c-ink-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rst-content table.docutils td,
+.rst-content table.docutils th {
+  padding: 10px 14px;
+  border: 0;
+  border-bottom: 1px solid var(--c-line);
+  font-size: 14px;
+}
+
+.rst-content table.docutils tr:last-child td {
+  border-bottom: 0;
+}
+
+.rst-content table.docutils:not(.field-list) tr:nth-child(2n-1) td,
+.wy-table-backed,
+.wy-table-odd td,
+.wy-table-striped tr:nth-child(2n-1) td {
+  background: transparent;
+}
+
+/* --------------------------------------------------------------------------
+   Figures: the screenshots
+   -------------------------------------------------------------------------- */
+.rst-content figure img,
+.rst-content .figure img {
+  border: 1px solid var(--c-line);
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgb(11 13 16 / 0.06);
+}
+
+.rst-content figure figcaption,
+.rst-content .figure .caption,
+.rst-content figure .caption-text {
+  margin-top: 10px;
+  color: var(--c-ink-3);
+  font-size: 13.5px;
+  font-style: normal;
+  line-height: 1.5;
+}
+
+.rst-content figure figcaption p {
+  font-size: 13.5px;
+}
+
+/* --------------------------------------------------------------------------
+   API docs (autodoc)
+   -------------------------------------------------------------------------- */
+.rst-content dl:not(.docutils) dt,
+html.writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)
+  > dt {
+  border-top: 0;
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 6px 6px 0;
+  background: var(--c-subtle);
+  color: var(--c-ink);
+  font-family: var(--font-mono);
+}
+
+html.writer-html5
+  .rst-content
+  dl[class]:not(.option-list):not(.field-list):not(.footnote):not(.citation):not(.glossary):not(.simple)
+  dl:not(.field-list)
+  > dt {
+  border-left-color: var(--c-line-strong);
+}
+
+.rst-content dl:not(.docutils) .property,
+.rst-content dl dt .sig-prename,
+.rst-content dl dt .sig-paren {
+  color: var(--c-ink-3);
+}
+
+/* --------------------------------------------------------------------------
+   Narrow screens
+   -------------------------------------------------------------------------- */
+@media screen and (max-width: 768px) {
+  .wy-nav-content {
+    padding: 1.5rem 1.25rem;
+    border-right: 0;
+  }
 }
