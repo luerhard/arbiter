@@ -140,6 +140,33 @@ def test_discuss_connect_sets_users(redis_test_state, discussion_setup):
 
 @pytest.mark.django_db(transaction=True)
 @override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
+@pytest.mark.parametrize("show", [True, False])
+def test_discuss_sends_metadata_only_if_project_shows_it(
+    redis_test_state, discussion_with_disagreement, show
+):
+    user, user2, batch, example, _labels = discussion_with_disagreement
+    example.metadata = {"source": "twitter", "7": None}
+    example.save()
+    batch.project.show_metadata_in_annotation = show
+    batch.project.save()
+    batch.set_phase(BatchPhase.DISCUSSION)
+
+    async def run():
+        communicator = await _connect(batch, user)
+        other = await _connect(batch, user2)
+        state = await _state_where(communicator, lambda s: s["cur_example_id"] == example.id)
+        await communicator.disconnect()
+        await other.disconnect()
+        return state
+
+    state = async_to_sync(run)()
+    # pairs in the stored order: a JS object would move "7" to the front on its own
+    expected = [["7", None], ["source", "twitter"]] if show else []
+    assert state["cur_metadata"] == expected
+
+
+@pytest.mark.django_db(transaction=True)
+@override_settings(CHANNEL_LAYERS=TEST_CHANNEL_LAYERS)
 def test_discuss_message_appends_to_state(redis_test_state, discussion_with_disagreement):
     user, user2, batch, example, _labels = discussion_with_disagreement
     batch.set_phase(BatchPhase.DISCUSSION)

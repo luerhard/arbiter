@@ -1,0 +1,34 @@
+{% comment %}
+The other columns of the uploaded file, below a sample's text: a two-column grid, keys as wide as the longest key, all
+values start at the same edge. Empty: nothing is shown. Rendered by the server from a dict, or in the browser by Alpine
+from a JS expression with [key, value] pairs (the discussion, whose sample comes over the websocket):
+<c-sample.metadata :metadata="metadata" />
+<c-sample.metadata pairs="$store.metadata" />
+Each dt/dd pair sits in a div (valid in a dl), as Alpine's x-for needs one element per entry.
+{% endcomment %}
+<c-vars metadata="" pairs="" />
+{% if pairs or metadata %}
+<dl
+  id="example-metadata"
+  class="-mt-3 grid grid-cols-[max-content_minmax(0,1fr)] gap-x-6 gap-y-1.5 px-1"
+  aria-label="Metadata"
+  {% if pairs %}x-show="{{ pairs }}.length"
+  x-cloak{% endif %}
+>
+  {% if pairs %}
+  <template x-for="[key, value] in {{ pairs }}" :key="key">
+    <div class="contents">
+      <dt class="text-xs leading-5 text-ink-3" x-text="key"></dt>
+      <dd class="font-mono text-meta leading-5 break-all text-ink" x-text="value ?? '–'"></dd>
+    </div>
+  </template>
+  {% else %}
+  {% for key, value in metadata.items %}
+  <div class="contents">
+    <dt class="text-xs leading-5 text-ink-3">{{ key }}</dt>
+    <dd class="font-mono text-meta leading-5 break-all text-ink">{{ value|default_if_none:"–" }}</dd>
+  </div>
+  {% endfor %}
+  {% endif %}
+</dl>
+{% endif %}

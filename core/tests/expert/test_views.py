@@ -86,6 +86,21 @@ class TestExpertNavigation:
         assert response.context["sentence"] == self.data["example"]
         assert response.context["review"] is False
 
+    @pytest.mark.parametrize("show", [True, False])
+    def test_metadata_shown_only_if_project_enables_it(self, show):
+        example = self.data["example"]
+        example.metadata = {"source": "expert-metadata-marker"}
+        example.save()
+        project = self.data["project"]
+        project.show_metadata_in_annotation = show
+        project.save()
+
+        response = self.client.get(_assignment_url(self.batch.id, self.assignment.id))
+
+        assert response.status_code == 200
+        assert (b'id="example-metadata"' in response.content) is show
+        assert (b"expert-metadata-marker" in response.content) is show
+
     def test_assignment_htmx_returns_partial(self):
         response = self.client.get(
             _assignment_url(self.batch.id, self.assignment.id),
