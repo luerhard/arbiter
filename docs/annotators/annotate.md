@@ -59,7 +59,7 @@ Three passages marked, each with its label.
 
 The bar at the top shows how many texts you have labeled. With **Skip labeled** switched on, Previous and Next only stop at texts you have not labeled yet.
 
-**Codebook** in the top bar opens the codebook next to the text. If it has changed since your previous batch, its **Changes** tab shows what is new, see [Codebook changes](codebook-changes.md).
+**Codebook** in the top bar opens the codebook next to the text. If it has changed since your previous batch, its tab **Changes since batch …** shows what is new, see [Codebook changes](codebook-changes.md).
 
 ### Keyboard shortcuts
 

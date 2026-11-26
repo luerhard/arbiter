@@ -204,7 +204,39 @@ def discuss(browser):
     shot(anna, "annotator_discussion_spans")
 
 
-PAGES = {"signin": signin, "annotate": annotate, "discuss": discuss}
+def codebook_changes(browser):
+    # batch 2 has just started; Lena's decision in batch 1 changed the codebook
+    demodata("annotation")
+    anna = new_page(browser, "anna.berger")
+
+    # the project page: the batch card links to what changed before it started
+    anna.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    anna.get_by_text("Batch 2").first.wait_for()
+    shot(anna, "annotator_open_codebook_changes")
+
+    anna.locator("article", has_text="Batch 2").get_by_role("link", name="Codebook changes").click()
+    anna.get_by_text("Why it changed").wait_for()
+    anna.set_viewport_size({"width": 1280, "height": 1250})  # down to the added rule
+    shot(anna, "annotator_codebook_view_edited")
+    anna.set_viewport_size({"width": 1280, "height": 800})
+
+    # the codebook page, with the history of its changes
+    anna.locator("nav").get_by_role("link", name="Codebook").first.click()
+    anna.locator("#codebook-history").wait_for()
+    shot(anna, "codebook_page")
+
+    # while annotating: the changes in the codebook panel
+    anna.goto(task_url(anna, CLASSIFICATION))
+    anna.get_by_role("tab", name="Changes since batch 1").click()
+    shot(anna, "codebook_panel_changes")
+
+
+PAGES = {
+    "signin": signin,
+    "annotate": annotate,
+    "discuss": discuss,
+    "codebook-changes": codebook_changes,
+}
 
 if __name__ == "__main__":
     chosen = sys.argv[1:] or list(PAGES)

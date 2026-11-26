@@ -558,6 +558,14 @@ class Command(BaseCommand):
                 client.post(reverse("annotate-done", args=(batch.id,)))
         batch.refresh_from_db()
 
+    def _write_codebook(self, project, content, rationale):
+        """The expert writes the codebook in the codebook editor."""
+        codebook = Codebook.objects.get(project=project)
+        self._client(EXPERTS[0]).post(
+            reverse("codebook-edit", args=(codebook.pk,)),
+            {"content": content, "rationale": rationale, "modified": "on"},
+        )
+
     def _annotate_spans(self, batch):
         """Both annotators mark their passages (COMMENT_SPANS) and finalize."""
         labels = dict(batch.project.labels.values_list("name", "id"))
@@ -640,8 +648,12 @@ class Command(BaseCommand):
             list(LABELS.values()),
             "classification",
         )
-        codebook = Codebook.objects.get(project=project)
-        codebook.save(content=CODEBOOK_V1, commit_message="First version of the codebook")
+        self._write_codebook(
+            project,
+            CODEBOOK_V1,
+            "First version: the three ideas of populism, each with an example to code and one "
+            "not to code.",
+        )
 
         batch = self._batch(project, BATCH_1)
         self._annotate(batch, BATCH_1, finalize=True)
@@ -671,8 +683,11 @@ class Command(BaseCommand):
             SPAN_LABELS,
             "span",
         )
-        codebook = Codebook.objects.get(project=project)
-        codebook.save(content=SPAN_CODEBOOK, commit_message="First version of the codebook")
+        self._write_codebook(
+            project,
+            SPAN_CODEBOOK,
+            "First version: three kinds of offensive language, and how much of a comment to mark.",
+        )
         batch = self._batch(project, COMMENTS)
         if stage != "annotation":
             self._annotate_spans(batch)
