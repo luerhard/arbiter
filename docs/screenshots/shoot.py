@@ -358,6 +358,26 @@ def export(browser):
     print("  export.png")
 
 
+def admin(browser):
+    # an administrator for the admin's pages; the demo accounts are ordinary users
+    script = (
+        "from users.models import User; "
+        "u, _ = User.objects.get_or_create(username='admin'); "
+        "u.is_staff = u.is_superuser = True; u.set_password('demo'); u.save()"
+    )
+    manage = ["docker", "compose", "exec", "-T", "web", "python", "manage.py"]
+    subprocess.run([*manage, "shell", "-c", script], check=True, stdout=subprocess.DEVNULL)
+
+    page = new_page(browser, height=600)
+    page.goto(f"{BASE}/admin/login/")
+    page.fill("#id_username", "admin")
+    page.fill("#id_password", PASSWORD)
+    page.click("input[type=submit]")
+    page.goto(f"{BASE}/admin/core/sitesettings/")
+    page.locator("#id_allow_registration").wait_for()
+    shot(page, "site_settings")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
@@ -368,6 +388,7 @@ PAGES = {
     "upload-data": upload_data,
     "decide": decide,
     "export": export,
+    "admin": admin,
 }
 
 if __name__ == "__main__":

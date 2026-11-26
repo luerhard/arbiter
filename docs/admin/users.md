@@ -1,71 +1,57 @@
-# Users and permissions
+# Users and site settings
 
-Administrators manage system deployment, user account creation, user group assignments, and Django permissions. Access the admin interface at `/admin` using administrator credentials.
+Administrators manage the accounts and the settings of a server in the admin, at `/admin/` on the server's address, for example `http://arbiter.example.org:8000/admin/`. Only administrator accounts can open it; the first one is created when the server is [set up](server.md#start-it).
 
-## 1. Admin Homepage
+Everything else is done in Arbiter itself: who works in which project, and in which role, is set by the project leads, see [Create a project](../project-leads/create-project.md).
 
-Log in at `http://<your-server-ip>/admin`. The dashboard provides quick access to User and Group management, along with a log of recent administrative actions.
+## Site settings
 
-:::{figure} ../screenshots/admin.png
+**Site settings**, under **Core** in the admin, holds the settings for the whole server. There is one so far:
+
+**Allow registration**: anyone who can reach the server can create an account on the sign-in page. Switched off, which is the default, only administrators create accounts.
+
+:::{figure} ../screenshots/site_settings.png
 :width: 650px
 :align: center
-:alt: Django Admin Homepage
+:alt: The page Change site settings in the admin, with the checkbox Allow registration
 
-**Figure 20: Django Administration Homepage**. Central management portal for site administration, user accounts, and system logs.
+The site settings in the admin.
 :::
 
-## 2. Add Users
+Tick the box and click **Save**. The sign-in page then has a **Create one** link to the registration form, see [Signing in](../get-started/sign-in.md#your-account). Accounts created there are ordinary users: like every user, they can create projects and be added to others, but they cannot open the admin. Untick the box to close registration again; the accounts made in the meantime stay.
 
-To register new Annotators or Experts:
+Open registration suits a server for a course or a large team. On an open server, anyone with the address can create an account and see the usernames of everyone else when a project is set up.
 
-1. Under **Users**, click **+ Add**.
-2. Enter a unique username and password.
-3. Click **Save** to create the user account.
+## Add a user
 
-:::{figure} ../screenshots/admin_add_user.png
-:width: 650px
-:align: center
-:alt: Add User Form
+1. Under **Users**, click **Add user**.
+2. Enter a username and a password twice, and click **Save**.
+3. On the next page, add the email address if you like, and click **Save** again.
 
-**Figure 21: User Registration Form**. Admin form for creating new user credentials.
-:::
+Give the new user their username and password. They can change the password, and add their name and email address, on their [profile](../get-started/sign-in.md#your-profile).
 
-## 3. Allow Self-Registration
+A new user has no projects. A project lead adds them to a project when creating it.
 
-By default only administrators create accounts. To let people create their own:
+## Reset a password
 
-1. Under **Core**, click **Site settings**.
-2. Tick **Allow registration** and click **Save**.
+The admin cannot set a password for someone else. Do it on the server:
 
-The login page then links to a registration page. Accounts made there are ordinary users: like every user they can create projects and be added to others, but they cannot open the admin. Untick the box to close registration again; existing accounts stay.
+```bash
+docker compose exec web python manage.py changepassword USERNAME
+```
 
-## 4. Manage User Groups
+## Lock an account
 
-Organize users into functional groups to streamline role assignments:
+To stop someone from signing in, open their account under **Users**, untick **Active** and click **Save**. Everything they have done stays: their labels, messages and decisions remain part of the projects and their exports. Tick **Active** again to let them back in.
 
-1. Navigate to **Groups** under Authentication and Authorization.
-2. Use the dual-list selector to assign users to specific system groups (e.g., Annotators, Experts).
+Do not delete accounts. Deleting a user also deletes the projects they created, with everything in them, and their labels and decisions in every other project.
 
-:::{figure} ../screenshots/admin_user_groups.png
-:width: 650px
-:align: center
-:alt: User Group Assignment
+## More administrators
 
-**Figure 22: User Group Management**. Interface for assigning users to designated functional groups.
-:::
+To give someone else access to the admin, create an administrator account for them on the server:
 
-## 5. Manage User Permissions
+```bash
+docker compose exec web python manage.py createsuperuser
+```
 
-Fine-tune model-level access rights for specific accounts or groups:
-
-1. Open a user account profile in the admin portal.
-2. In the **User permissions** section, select specific Django model permissions (e.g., `Expert | codebook draft | Can add codebook draft`, `Projects | batch | Can add batch`).
-3. Click **Save** to enforce permission settings.
-
-:::{figure} ../screenshots/admin_user_permissions.png
-:width: 650px
-:align: center
-:alt: User Permissions Selector
-
-**Figure 23: Fine-Grained User Permissions**. Selector panel for assigning specific system and model permissions to user profiles.
-:::
+The admin also offers **Staff status**, **Groups** and **Permissions** for each user. Arbiter does not use them: what someone may do in a project depends only on their role in it.

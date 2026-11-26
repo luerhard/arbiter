@@ -86,6 +86,7 @@ project-leads/export.md
 :hidden:
 :caption: Administration
 
+admin/server.md
 admin/users.md
 ```
 
