@@ -231,11 +231,40 @@ def codebook_changes(browser):
     shot(anna, "codebook_panel_changes")
 
 
+def create_project(browser):
+    demodata("annotation")
+    lena = new_page(browser, "lena.hoffmann", height=1560)  # the whole form
+    lena.goto(f"{BASE}/projects/create/")
+    lena.fill("#id_name", "Populist Communication")
+    lena.fill(
+        "#id_description",
+        "How do parties address 'the people' and 'the elite' in their press releases?",
+    )
+
+    # the team: Anna and Tom annotate, Lena decides
+    team = [
+        ("annotators", "anna.berger"),
+        ("annotators", "tom.keller"),
+        ("experts", "lena.hoffmann"),
+    ]
+    for role, username in team:
+        search = lena.locator(f"#{role}-results").locator("..").locator("input")
+        search.fill(username.split(".")[0])
+        lena.locator(f"#{role}-results").get_by_role("button", name=username).click()
+
+    for i, label in enumerate(["Anti-elitism", "People-centrism", "Popular sovereignty"]):
+        if i:
+            lena.get_by_role("button", name="Add label").click()
+        lena.fill(f"#label-name-{i}", label)
+    shot(lena, "create_project")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
     "discuss": discuss,
     "codebook-changes": codebook_changes,
+    "create-project": create_project,
 }
 
 if __name__ == "__main__":

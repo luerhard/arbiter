@@ -76,8 +76,8 @@ annotators/codebook-changes.md
 :caption: For project leads
 
 project-leads/create-project.md
-project-leads/upload-data.md
 project-leads/codebook.md
+project-leads/upload-data.md
 project-leads/decide.md
 project-leads/export.md
 ```
