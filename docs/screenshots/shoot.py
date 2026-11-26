@@ -347,6 +347,17 @@ def decide(browser):
     shot(lena, "expert_decision_spans")
 
 
+def export(browser):
+    demodata("final")  # both batches finished
+    lena = new_page(browser, "lena.hoffmann", height=900)
+    lena.locator("nav").get_by_role("link", name=CLASSIFICATION).first.click()
+    lena.get_by_role("button", name="Actions for batch 2").click()
+    lena.get_by_text("Export batch").first.wait_for()
+    lena.wait_for_timeout(300)
+    lena.screenshot(path=str(OUT / "export.png"))  # not shot(): it would close the menu
+    print("  export.png")
+
+
 PAGES = {
     "signin": signin,
     "annotate": annotate,
@@ -356,6 +367,7 @@ PAGES = {
     "codebook": codebook,
     "upload-data": upload_data,
     "decide": decide,
+    "export": export,
 }
 
 if __name__ == "__main__":
