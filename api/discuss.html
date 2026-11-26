@@ -407,9 +407,11 @@ or, if anything fails, for none.</p>
 <dd><p>The next example to discuss: the first one (in batch order) that not every
 annotator has decided yet. The DISCUSSION assignments in the database are the
 source of truth, so a lost or stale room state resumes at the right example.</p>
-<p>Returns (example, annotation labels by user, page, total pages, span editor);
-example is None when nothing is left to discuss. The span editor (span projects
-only) has the words of the example and everyone’s spans before the discussion.</p>
+<p>Returns (example, annotation labels by user, page, total pages, span editor,
+metadata); example is None when nothing is left to discuss. The span editor (span
+projects only) has the words of the example and everyone’s spans before the
+discussion. The metadata are [key, value] pairs, so the browser keeps their order
+(a JS object would put keys like “7” first), and empty unless the project shows them.</p>
 </dd></dl>
 
 <dl class="py method">
