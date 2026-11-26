@@ -1025,8 +1025,8 @@ class TestFindingFinalize:
         batch = Batch.objects.get(id=self.batch_id)
         url = reverse(page, args=(batch.project_id,)) if page != "home" else reverse(page)
         assert self._button_text(client.get(url).content.decode(), self.entry_url) in (
-            "Start annotating",
-            "Continue annotating",
+            "Start annotation",
+            "Continue annotation",
         )
 
         self._label(self.assignments)

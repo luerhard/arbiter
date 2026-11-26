@@ -50,6 +50,12 @@ Arbiter is released under the [MIT License](https://github.com/luerhard/arbiter/
 
 ```{toctree}
 :hidden:
+
+Home <self>
+```
+
+```{toctree}
+:hidden:
 :caption: Get started
 
 get-started/how-it-works.md

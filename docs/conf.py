@@ -29,6 +29,8 @@ extensions = [
 myst_enable_extensions = [
     "colon_fence",
 ]
+# headings up to ### get anchors, for links like [annotation](annotate.md#spans-in-the-text)
+myst_heading_anchors = 3
 
 autodoc_member_order = "bysource"
 

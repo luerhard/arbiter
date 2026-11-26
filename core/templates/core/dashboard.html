@@ -37,9 +37,9 @@ Home · Arbiter
         </div>
         <div class="progress"><div class="progress-bar" style="width: {{ task.percent }}%"></div></div>
       </div>
-      <a href="{{ task.url }}" class="btn {% if forloop.first %}btn-primary{% else %}btn-secondary{% endif %}">
+      <a href="{{ task.url }}" class="btn btn-primary">
         {% if task.kind == "annotate" %}
-        {% if task.done >= task.total %}Finalize{% elif task.done %}Continue annotating{% else %}Start annotating{% endif %}
+        {% if task.done >= task.total %}Finalize{% elif task.done %}Continue annotation{% else %}Start annotation{% endif %}
         {% elif task.kind == "discuss" %}
         Join discussion
         {% else %}

@@ -277,7 +277,7 @@ class TestToastLeadsToTheWork:
     @pytest.mark.parametrize(
         ("fixture", "who", "url_name", "text"),
         [
-            ("project_annotation", "annotator", "annotate-batch", "Start annotating"),
+            ("project_annotation", "annotator", "annotate-batch", "Start annotation"),
             ("project_discussion", "annotator", "discuss-batch", "Join discussion"),
             ("project_expert", "expert", "expert-batch", "Resolve disagreements"),
             # nothing to do for them in this phase
