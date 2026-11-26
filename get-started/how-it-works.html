@@ -1,0 +1,218 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How Arbiter works &mdash; Arbiter documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Signing in" href="sign-in.html" />
+    <link rel="prev" title="Arbiter" href="../index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Arbiter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arbiter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">How Arbiter works</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/get-started/how-it-works.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="how-arbiter-works">
+<h1>How Arbiter works<a class="headerlink" href="#how-arbiter-works" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="../index.html"><span class="std std-doc">start page</span></a> gives the short version: annotate, discuss, decide, revise the codebook, batch after batch. This page explains the parts in more detail: who does what, how a batch moves from one phase to the next, and what Arbiter keeps a record of.</p>
+<section id="roles">
+<h2>Roles<a class="headerlink" href="#roles" title="Link to this heading"></a></h2>
+<p>Everyone has an account on the Arbiter server. What they can do in a project depends on their role in it:</p>
+<ul class="simple">
+<li><p><strong>Annotators</strong> label the texts, discuss the ones they disagree on, and read the codebook changes before each new batch.</p></li>
+<li><p><strong>Experts</strong> lead the project. They upload the batches, write and revise the codebook, decide the texts the annotators could not agree on, and export the results.</p></li>
+<li><p><strong>Administrators</strong> manage the user accounts of the server in its admin area. They take no part in projects through this role.</p></li>
+</ul>
+<p>Roles belong to a project: the same person can annotate in one project and be the expert in another. Whoever creates a project chooses its annotators and experts, and when uploading a batch, which of them work on it.</p>
+</section>
+<section id="the-phases-of-a-batch">
+<h2>The phases of a batch<a class="headerlink" href="#the-phases-of-a-batch" title="Link to this heading"></a></h2>
+<p>A project’s texts are annotated in batches. Each batch goes through up to four phases, and moves on by itself once a phase is done:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Phase</p></th>
+<th class="head"><p>Who</p></th>
+<th class="head"><p>What happens</p></th>
+<th class="head"><p>Moves on when</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Annotation</strong></p></td>
+<td><p>annotators</p></td>
+<td><p>Each annotator labels every text of the batch, without seeing the others’ labels.</p></td>
+<td><p>every annotator has clicked <strong>Finalize my annotations</strong></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Discussion</strong></p></td>
+<td><p>annotators</p></td>
+<td><p>The texts the annotators labeled differently are discussed in a chat, one text at a time. After talking it through, each annotator saves their label again.</p></td>
+<td><p>every text has been discussed</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Expert decision</strong></p></td>
+<td><p>experts</p></td>
+<td><p>For the texts still labeled differently, an expert sets the final label, writes down the reason and, where needed, revises the codebook.</p></td>
+<td><p>the expert has decided every text</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Finalized</strong></p></td>
+<td><p>–</p></td>
+<td><p>The batch is done and can be exported.</p></td>
+<td><p>–</p></td>
+</tr>
+</tbody>
+</table>
+<p>A phase with nothing to do is skipped: if the annotators agree on every text, the batch goes from annotation straight to finalized; if the discussion settles every disagreement, there is no expert decision. Everyone in the batch gets a notification when it changes phase. Experts can also move a batch to another phase by hand, for example to give the annotators a second round.</p>
+<p>The discussion starts once all annotators of the batch have the discussion page open, so they need to arrange a time for it.</p>
+<section id="when-annotators-disagree">
+<h3>When annotators disagree<a class="headerlink" href="#when-annotators-disagree" title="Link to this heading"></a></h3>
+<p>What counts as a disagreement depends on the kind of project:</p>
+<ul class="simple">
+<li><p><strong>Labels for the whole text:</strong> the annotators did not choose the same labels.</p></li>
+<li><p><strong>Spans in the text:</strong> the annotators did not mark exactly the same passages with the same labels.</p></li>
+</ul>
+<p>A text that one of the annotators has not labeled yet also counts as a disagreement.</p>
+</section>
+</section>
+<section id="the-codebook">
+<h2>The codebook<a class="headerlink" href="#the-codebook" title="Link to this heading"></a></h2>
+<p>The codebook holds the annotation guidelines of a project, written in <a class="reference external" href="https://commonmark.org/help/">Markdown</a>. Annotators can open it next to every text they label or discuss.</p>
+<p>Only experts change the codebook: freely in the codebook editor, or together with a decision, as the reason for it. Every change is saved as a new version with its reason. When a batch starts, Arbiter notes which version it starts with, so annotators can see what has changed since their previous batch, and everyone can compare any two versions.</p>
+</section>
+<section id="what-arbiter-records">
+<h2>What Arbiter records<a class="headerlink" href="#what-arbiter-records" title="Link to this heading"></a></h2>
+<p>The labels of a later phase never replace those of an earlier one. For every text, Arbiter keeps each annotator’s labels from the annotation phase, their labels after the discussion, the discussion chat and the expert’s decision. For the project, it keeps every version of the codebook together with the reason for each change, including the reasons the experts gave for their decisions.</p>
+<p>Experts can export both: the texts with all their labels and the chat as a data file, and the codebook with its complete history. A dataset can so be handed on together with the record of how its labels came about.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../index.html" class="btn btn-neutral float-left" title="Arbiter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="sign-in.html" class="btn btn-neutral float-right" title="Signing in" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

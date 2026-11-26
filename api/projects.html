@@ -6,12 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Projects &mdash; AnnotationTool 0.0.1 documentation</title>
+  <title>Projects &mdash; Arbiter documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d45e8c67"></script>
@@ -28,12 +29,12 @@
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
 
           
           
           <a href="../index.html" class="icon icon-home">
-            AnnotationTool
+            Arbiter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,9 +44,37 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
@@ -54,55 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Projects</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-projects.views">Views</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectListView"><code class="docutils literal notranslate"><span class="pre">ProjectListView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectDeleteView"><code class="docutils literal notranslate"><span class="pre">ProjectDeleteView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectCreateView"><code class="docutils literal notranslate"><span class="pre">ProjectCreateView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectBatchCreateView"><code class="docutils literal notranslate"><span class="pre">ProjectBatchCreateView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectLabelRowView"><code class="docutils literal notranslate"><span class="pre">ProjectLabelRowView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectDetailView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectExpertDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectExpertDetailView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectAnnotatorDetailView"><code class="docutils literal notranslate"><span class="pre">ProjectAnnotatorDetailView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.BatchSamplesView"><code class="docutils literal notranslate"><span class="pre">BatchSamplesView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.SampleDetailView"><code class="docutils literal notranslate"><span class="pre">SampleDetailView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.BatchOrderView"><code class="docutils literal notranslate"><span class="pre">BatchOrderView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ProjectSettingsView"><code class="docutils literal notranslate"><span class="pre">ProjectSettingsView</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ChangeBatchPhase"><code class="docutils literal notranslate"><span class="pre">ChangeBatchPhase</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.DeleteBatch"><code class="docutils literal notranslate"><span class="pre">DeleteBatch</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ExportProject"><code class="docutils literal notranslate"><span class="pre">ExportProject</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.ExportBatch"><code class="docutils literal notranslate"><span class="pre">ExportBatch</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.views.HtmxUserSearch"><code class="docutils literal notranslate"><span class="pre">HtmxUserSearch</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-projects.models">Models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.Batch"><code class="docutils literal notranslate"><span class="pre">Batch</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.BatchPhase"><code class="docutils literal notranslate"><span class="pre">BatchPhase</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.BatchUser"><code class="docutils literal notranslate"><span class="pre">BatchUser</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.Project"><code class="docutils literal notranslate"><span class="pre">Project</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.ProjectRole"><code class="docutils literal notranslate"><span class="pre">ProjectRole</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.models.ProjectUser"><code class="docutils literal notranslate"><span class="pre">ProjectUser</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-projects.forms">Forms</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#projects.forms.ProjectCreateForm"><code class="docutils literal notranslate"><span class="pre">ProjectCreateForm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.forms.BatchCreateForm"><code class="docutils literal notranslate"><span class="pre">BatchCreateForm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.forms.ProjectSettingsForm"><code class="docutils literal notranslate"><span class="pre">ProjectSettingsForm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.forms.BatchPhaseForm"><code class="docutils literal notranslate"><span class="pre">BatchPhaseForm</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-projects.management.commands.backup">Management commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.backup.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.uniform_choices"><code class="docutils literal notranslate"><span class="pre">uniform_choices()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.create_batch"><code class="docutils literal notranslate"><span class="pre">create_batch()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.random_spans"><code class="docutils literal notranslate"><span class="pre">random_spans()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.create_project"><code class="docutils literal notranslate"><span class="pre">create_project()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.populatedb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#projects.management.commands.resetdb.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Projects</a></li>
 <li class="toctree-l2"><a class="reference internal" href="users.html">Users</a></li>
 </ul>
 </li>
@@ -112,9 +93,9 @@
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">AnnotationTool</a>
+          <a href="../index.html">Arbiter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -125,7 +106,7 @@
           <li class="breadcrumb-item"><a href="index.html">API Documentation</a></li>
       <li class="breadcrumb-item active">Projects</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/projects.md.txt" rel="nofollow"> View page source</a>
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/api/projects.md" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -163,12 +144,6 @@
 <dd><p>Return the list of items for this view.</p>
 <p>The return value must be an iterable and may be an instance of
 <cite>QuerySet</cite> in which case <cite>QuerySet</cite> specific behavior will be enabled.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="projects.views.ProjectListView.get_context_data">
-<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#projects.views.ProjectListView.get_context_data" title="Link to this definition"></a></dt>
-<dd><p>Get the context for this view.</p>
 </dd></dl>
 
 </dd></dl>

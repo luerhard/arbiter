@@ -6,12 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Core &mdash; AnnotationTool 0.0.1 documentation</title>
+  <title>Core &mdash; Arbiter documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d45e8c67"></script>
@@ -28,12 +29,12 @@
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
 
           
           
           <a href="../index.html" class="icon icon-home">
-            AnnotationTool
+            Arbiter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,35 +44,41 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-core.views">Views</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core.views.open_tasks"><code class="docutils literal notranslate"><span class="pre">open_tasks()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.views.core"><code class="docutils literal notranslate"><span class="pre">core()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-core.forms">Forms</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-core.mixins">Mixins</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.RoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">RoleRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchRoleRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.AnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnnotatorRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.ExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">ExpertRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.AnyRoleRequiredMixin"><code class="docutils literal notranslate"><span class="pre">AnyRoleRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchAnnotatorRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchAnnotatorRequiredMixin</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#core.mixins.BatchExpertRequiredMixin"><code class="docutils literal notranslate"><span class="pre">BatchExpertRequiredMixin</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-core.middleware">Middleware</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#core.middleware.HtmxMessageMiddleware"><code class="docutils literal notranslate"><span class="pre">HtmxMessageMiddleware</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Core</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data</a></li>
 <li class="toctree-l2"><a class="reference internal" href="discuss.html">Discussion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
@@ -86,9 +93,9 @@
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">AnnotationTool</a>
+          <a href="../index.html">Arbiter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -99,7 +106,7 @@
           <li class="breadcrumb-item"><a href="index.html">API Documentation</a></li>
       <li class="breadcrumb-item active">Core</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/core.md.txt" rel="nofollow"> View page source</a>
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/api/core.md" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>

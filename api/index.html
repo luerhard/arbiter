@@ -6,12 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API Documentation &mdash; AnnotationTool 0.0.1 documentation</title>
+  <title>API Documentation &mdash; Arbiter documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d45e8c67"></script>
@@ -21,19 +22,19 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Annotation" href="annotation.html" />
-    <link rel="prev" title="A guide for devs" href="../dev/index.html" /> 
+    <link rel="prev" title="Tests and documentation" href="../dev/testing.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
 
           
           
           <a href="../index.html" class="icon icon-home">
-            AnnotationTool
+            Arbiter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,9 +44,37 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
@@ -64,9 +93,9 @@
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">AnnotationTool</a>
+          <a href="../index.html">Arbiter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -76,7 +105,7 @@
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">API Documentation</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/index.md.txt" rel="nofollow"> View page source</a>
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/api/index.md" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -568,7 +597,6 @@
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.model"><code class="docutils literal notranslate"><span class="pre">ProjectListView.model</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.context_object_name"><code class="docutils literal notranslate"><span class="pre">ProjectListView.context_object_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">ProjectListView.get_queryset()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="projects.html#projects.views.ProjectListView.get_context_data"><code class="docutils literal notranslate"><span class="pre">ProjectListView.get_context_data()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="projects.html#projects.views.ProjectDeleteView"><code class="docutils literal notranslate"><span class="pre">ProjectDeleteView</span></code></a><ul>
@@ -811,6 +839,7 @@
 <li class="toctree-l1"><a class="reference internal" href="users.html">Users</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="users.html#module-users.views">Views</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="users.html#users.views.user_login"><code class="docutils literal notranslate"><span class="pre">user_login()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.views.user_register"><code class="docutils literal notranslate"><span class="pre">user_register()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="users.html#users.views.user_logout"><code class="docutils literal notranslate"><span class="pre">user_logout()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="users.html#users.views.user_profile"><code class="docutils literal notranslate"><span class="pre">user_profile()</span></code></a></li>
 </ul>
@@ -865,7 +894,18 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.UserRegistrationForm"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.UserRegistrationForm.__init__"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.UserRegistrationForm.media"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.ProfileForm"><code class="docutils literal notranslate"><span class="pre">ProfileForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.ProfileForm.__init__"><code class="docutils literal notranslate"><span class="pre">ProfileForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.ProfileForm.media"><code class="docutils literal notranslate"><span class="pre">ProfileForm.media</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="users.html#users.forms.PasswordChangeForm"><code class="docutils literal notranslate"><span class="pre">PasswordChangeForm</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.PasswordChangeForm.__init__"><code class="docutils literal notranslate"><span class="pre">PasswordChangeForm.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="users.html#users.forms.PasswordChangeForm.media"><code class="docutils literal notranslate"><span class="pre">PasswordChangeForm.media</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -892,7 +932,7 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../dev/index.html" class="btn btn-neutral float-left" title="A guide for devs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../dev/testing.html" class="btn btn-neutral float-left" title="Tests and documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="annotation.html" class="btn btn-neutral float-right" title="Annotation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

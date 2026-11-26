@@ -1,0 +1,231 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Write the codebook &mdash; Arbiter documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Upload data" href="upload-data.html" />
+    <link rel="prev" title="Create a project" href="create-project.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Arbiter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="create-project.html">Create a project</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arbiter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Write the codebook</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/project-leads/codebook.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="write-the-codebook">
+<h1>Write the codebook<a class="headerlink" href="#write-the-codebook" title="Link to this heading"></a></h1>
+<p>The codebook holds the instructions that all annotators follow: what each label means, what counts and what does not, and how to handle the borderline cases. Annotators keep it open next to the text while they annotate and discuss; experts write it and change it as the project goes on.</p>
+<p>Arbiter keeps every version. Each change is saved with the reason for it, and each batch remembers the version it started with, so you can always say which rules a label was given under.</p>
+<section id="write-the-first-version">
+<h2>Write the first version<a class="headerlink" href="#write-the-first-version" title="Link to this heading"></a></h2>
+<p>A new project starts with an empty codebook. Write the first version before you upload the first batch: the batch starts with the codebook as it is at that moment.</p>
+<ol class="arabic simple">
+<li><p>Open the codebook: <strong>Codebook</strong> under the project in the sidebar, or <strong>Open</strong> on the codebook card of the project page.</p></li>
+<li><p>Click <strong>Edit</strong>.</p></li>
+<li><p>Write the codebook in the large field, and in <strong>Rationale</strong> why you are changing it; for the first version, “First version” is enough.</p></li>
+<li><p>Click <strong>Save changes</strong>.</p></li>
+</ol>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/codebook_edit.png"><img alt="The page Edit codebook, with the codebook in Markdown in a large field and a rationale below it" src="../_images/codebook_edit.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Lena adds a rule to People-centrism and explains why.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<section id="what-belongs-in-it">
+<h3>What belongs in it<a class="headerlink" href="#what-belongs-in-it" title="Link to this heading"></a></h3>
+<p>A good codebook lets two annotators who read the same text reach the same label without talking to each other. For every label, write</p>
+<ul class="simple">
+<li><p>a definition in a few sentences,</p></li>
+<li><p>examples of texts that get the label, and of similar texts that do not,</p></li>
+<li><p>how to decide the cases you expect to be difficult.</p></li>
+</ul>
+<p>Give every label its own heading with the label’s name: annotators find it faster in the panel next to the text. In projects with spans in the text, also say what exactly to mark, for example only the words that carry the insult, or the whole sentence.</p>
+<p>You do not have to foresee everything. Disagreements show where the codebook is unclear, and the experts add rules as they decide them.</p>
+</section>
+<section id="formatting">
+<h3>Formatting<a class="headerlink" href="#formatting" title="Link to this heading"></a></h3>
+<p>The codebook is written in Markdown:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>You write</p></th>
+<th class="head"><p>Annotators see</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Title</span></code>, <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Section</span></code></p></td>
+<td><p>headings</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">**bold**</span></code>, <code class="docutils literal notranslate"><span class="pre">*italic*</span></code></p></td>
+<td><p><strong>bold</strong>, <em>italic</em></p></td>
+</tr>
+<tr class="row-even"><td><p>lines starting with <code class="docutils literal notranslate"><span class="pre">-</span></code> or <code class="docutils literal notranslate"><span class="pre">1.</span></code></p></td>
+<td><p>lists</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;</span> <span class="pre">text</span></code></p></td>
+<td><p>an indented quote</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">[text](https://…)</span></code></p></td>
+<td><p>a link</p></td>
+</tr>
+<tr class="row-odd"><td><p>a table in Markdown syntax</p></td>
+<td><p>a table</p></td>
+</tr>
+</tbody>
+</table>
+<p>Images are not shown.</p>
+</section>
+</section>
+<section id="change-it">
+<h2>Change it<a class="headerlink" href="#change-it" title="Link to this heading"></a></h2>
+<p>Every expert of the project can change the codebook at any time, with <strong>Edit</strong> on the codebook page. The rationale is required: annotators see it with the change, under <strong>Why it changed</strong> (see <a class="reference internal" href="../annotators/codebook-changes.html"><span class="std std-doc">Codebook changes</span></a>). Write it for them: which disagreement the change settles, or what was unclear before.</p>
+<p>Annotators always see the current version, also in the middle of a batch. If you change a rule while they are still annotating, the texts they have labeled already followed the old one; let them know, so they can review those texts before they finalize.</p>
+<p>Most changes come from deciding disagreements: the expert decision page lets you edit the codebook next to the text, and the change is saved together with the decision, see <a class="reference internal" href="decide.html"><span class="std std-doc">Decide disagreements</span></a>.</p>
+</section>
+<section id="history-and-download">
+<h2>History and download<a class="headerlink" href="#history-and-download" title="Link to this heading"></a></h2>
+<p>The codebook page lists every change under <strong>History</strong>: when it was made, before or during which batch, its rationale and, if it was saved with a decision, the text that was decided. <strong>Show changes</strong> opens that change with the added and removed text marked.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/codebook_expert.png"><img alt="The codebook page of an expert, with the buttons Download and Edit at the top and the history of changes on the right" src="../_images/codebook_expert.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The codebook page of an expert.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p><strong>Download (.zip)</strong>, on the codebook page and on the project page, gives you the codebook as a Markdown file (<code class="docutils literal notranslate"><span class="pre">main.md</span></code>) together with its complete history as a git repository: every version, with its date and rationale. Every batch’s starting version is tagged <code class="docutils literal notranslate"><span class="pre">batch_1</span></code>, <code class="docutils literal notranslate"><span class="pre">batch_2</span></code> and so on, so that <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">show</span> <span class="pre">batch_2:main.md</span></code> prints the codebook that batch 2 started with. Keep it with your data: it documents the rules every label was given under.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="create-project.html" class="btn btn-neutral float-left" title="Create a project" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="upload-data.html" class="btn btn-neutral float-right" title="Upload data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

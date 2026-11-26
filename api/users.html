@@ -6,12 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Users &mdash; AnnotationTool 0.0.1 documentation</title>
+  <title>Users &mdash; Arbiter documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d45e8c67"></script>
@@ -27,12 +28,12 @@
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
 
           
           
           <a href="../index.html" class="icon icon-home">
-            AnnotationTool
+            Arbiter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -42,9 +43,37 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">A guide for devs</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="annotation.html">Annotation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="codebook.html">Codebook</a></li>
@@ -54,34 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="expert.html">Expert</a></li>
 <li class="toctree-l2"><a class="reference internal" href="notifications.html">Notifications</a></li>
 <li class="toctree-l2"><a class="reference internal" href="projects.html">Projects</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Users</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#module-users.views">Views</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#users.views.user_login"><code class="docutils literal notranslate"><span class="pre">user_login()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#users.views.user_logout"><code class="docutils literal notranslate"><span class="pre">user_logout()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#users.views.user_profile"><code class="docutils literal notranslate"><span class="pre">user_profile()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-users.models">Models</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#users.models.UserManager"><code class="docutils literal notranslate"><span class="pre">UserManager</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#users.models.User"><code class="docutils literal notranslate"><span class="pre">User</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-users.forms">Forms</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#users.forms.UserCreationForm"><code class="docutils literal notranslate"><span class="pre">UserCreationForm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#users.forms.UserChangeForm"><code class="docutils literal notranslate"><span class="pre">UserChangeForm</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#users.forms.UserRegistrationForm"><code class="docutils literal notranslate"><span class="pre">UserRegistrationForm</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-users.group_permissions">Group permissions</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#users.group_permissions.create_groups"><code class="docutils literal notranslate"><span class="pre">create_groups()</span></code></a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#module-users.management.commands.update_permissions">Management commands</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#users.management.commands.update_permissions.Command"><code class="docutils literal notranslate"><span class="pre">Command</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Users</a></li>
 </ul>
 </li>
 </ul>
@@ -90,9 +92,9 @@
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">AnnotationTool</a>
+          <a href="../index.html">Arbiter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -103,7 +105,7 @@
           <li class="breadcrumb-item"><a href="index.html">API Documentation</a></li>
       <li class="breadcrumb-item active">Users</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/api/users.md.txt" rel="nofollow"> View page source</a>
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/api/users.md" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -123,6 +125,11 @@ User model, profile views etc.</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="users.views.user_register">
+<span class="sig-prename descclassname"><span class="pre">users.views.</span></span><span class="sig-name descname"><span class="pre">user_register</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.views.user_register" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="users.views.user_logout">
 <span class="sig-prename descclassname"><span class="pre">users.views.</span></span><span class="sig-name descname"><span class="pre">user_logout</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.views.user_logout" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -130,7 +137,9 @@ User model, profile views etc.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="users.views.user_profile">
 <span class="sig-prename descclassname"><span class="pre">users.views.</span></span><span class="sig-name descname"><span class="pre">user_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.views.user_profile" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>The user’s own account: name and email, and the password. Two forms on one page;
+a hidden “form” field says which one was sent.</p>
+</dd></dl>
 
 </section>
 <section id="module-users.models">
@@ -439,17 +448,68 @@ admin page.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="users.forms.UserRegistrationForm">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">users.forms.</span></span><span class="sig-name descname"><span class="pre">UserRegistrationForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.UserRegistrationForm" title="Link to this definition"></a></dt>
-<dd><p><strong>Form fields:</strong></p>
+<dd><p>Self-registration on the sign-in page. Accounts made here are plain users: no staff,
+no admin, no groups.</p>
+<p><strong>Form fields:</strong></p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code>: Username (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">email</span></code>: Email (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.EmailField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code>: Username (<code class="xref py py-class docutils literal notranslate"><span class="pre">UsernameField</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">email</span></code>: Email Adress (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.EmailField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">password1</span></code>: Password (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">password2</span></code>: Password confirmation (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">usable_password</span></code>: Password-based authentication (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.ChoiceField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChoiceField</span></code></a>)</p></li>
 </ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="users.forms.UserRegistrationForm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.UserRegistrationForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="users.forms.UserRegistrationForm.media">
 <em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#users.forms.UserRegistrationForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="users.forms.ProfileForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">users.forms.</span></span><span class="sig-name descname"><span class="pre">ProfileForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.ProfileForm" title="Link to this definition"></a></dt>
+<dd><p>What users change about themselves on the profile page.</p>
+<p><strong>Form fields:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">first_name</span></code>: First name (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">last_name</span></code>: Last name (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">email</span></code>: Email (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.EmailField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailField</span></code></a>)</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="users.forms.ProfileForm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.ProfileForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="users.forms.ProfileForm.media">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#users.forms.ProfileForm.media" title="Link to this definition"></a></dt>
+<dd><p>Return all media required to render the widgets on this form.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="users.forms.PasswordChangeForm">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">users.forms.</span></span><span class="sig-name descname"><span class="pre">PasswordChangeForm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.PasswordChangeForm" title="Link to this definition"></a></dt>
+<dd><p><strong>Form fields:</strong></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">new_password1</span></code>: New password (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">new_password2</span></code>: New password confirmation (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">old_password</span></code>: Old password (<a class="reference external" href="https://docs.djangoproject.com/en/stable/ref/forms/fields/#django.forms.CharField" title="(in Django v6.1)"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>)</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="users.forms.PasswordChangeForm.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#users.forms.PasswordChangeForm.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="users.forms.PasswordChangeForm.media">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">media</span></span><a class="headerlink" href="#users.forms.PasswordChangeForm.media" title="Link to this definition"></a></dt>
 <dd><p>Return all media required to render the widgets on this form.</p>
 </dd></dl>
 

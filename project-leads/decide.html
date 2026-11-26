@@ -1,0 +1,207 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Decide disagreements &mdash; Arbiter documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Export" href="export.html" />
+    <link rel="prev" title="Upload data" href="upload-data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Arbiter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upload-data.html">Upload data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arbiter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Decide disagreements</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/project-leads/decide.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="decide-disagreements">
+<h1>Decide disagreements<a class="headerlink" href="#decide-disagreements" title="Link to this heading"></a></h1>
+<p>Texts the annotators still label differently after the discussion go to the experts of the batch. You decide which label each of them gets, and wherever a disagreement shows that the codebook is unclear, you make it clearer in the same step. The next batch then starts with the better rule.</p>
+<section id="find-the-open-cases">
+<h2>Find the open cases<a class="headerlink" href="#find-the-open-cases" title="Link to this heading"></a></h2>
+<p>When the discussion of a batch has ended with disagreements left, its experts get a notification. The home page shows the batch under <strong>Waiting for you</strong> with <strong>Resolve disagreements</strong>; on the project page, the batch card has a button <strong>Resolve … disagreements</strong>.</p>
+</section>
+<section id="decide-a-case">
+<h2>Decide a case<a class="headerlink" href="#decide-a-case" title="Link to this heading"></a></h2>
+<p>The decision page shows one case at a time, with how many are still open at the top:</p>
+<ul class="simple">
+<li><p>the text, with its further information if the project shows it,</p></li>
+<li><p><strong>How the team got here</strong>: how each annotator labeled the text on their own, the chat of their discussion, and their labels after discussing,</p></li>
+<li><p><strong>Your decision</strong>: the labels you give the text,</p></li>
+<li><p>the <strong>codebook</strong> on the right.</p></li>
+</ul>
+<p>Your decision starts with the labels every annotator kept after the discussion; the contested ones are left open. Add or remove labels, as the annotators did, and click <strong>Save and next case</strong>. You are not limited to the labels the annotators chose: if both missed one, choose it. Choosing no label is a decision as well.</p>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/expert_decision.png"><img alt="The expert decision page with a text, the annotators' labels before and after the discussion with their chat, the expert's decision and the codebook" src="../_images/expert_decision.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Anna saw anti-elitism in the judges, Tom did not. The decision starts with Popular sovereignty, which both kept.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>In projects with <strong>spans in the text</strong>, the page shows at the top how each annotator marked the text after the discussion; what everyone marked the same way is faded. Your decision starts with the passages all of them marked, and you change it in the span editor as during <a class="reference internal" href="../annotators/annotate.html#spans-in-the-text"><span class="std std-ref">annotation</span></a>.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/expert_decision_spans.png"><img alt="The expert decision of a reader comment: how each annotator marked it, the chat, and the span editor with the passage both marked" src="../_images/expert_decision_spans.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Anna marked a second insult, Tom did not. The decision starts with “you clown”, which both marked.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The arrows at the top go to the previous and the next case. A case you have decided says <strong>Decision saved</strong>; <strong>Edit decision</strong> lets you correct it, and <strong>Save correction</strong> saves the new decision. The earlier one is not lost: the correction is recorded in the codebook’s history.</p>
+<p>When you have decided the last case, the batch is finished.</p>
+</section>
+<section id="improve-the-codebook-while-you-decide">
+<h2>Improve the codebook while you decide<a class="headerlink" href="#improve-the-codebook-while-you-decide" title="Link to this heading"></a></h2>
+<p>A disagreement often comes from a rule that leaves room for two readings. Change the codebook right there, next to the case:</p>
+<ol class="arabic simple">
+<li><p>Click <strong>Edit</strong> in the codebook panel.</p></li>
+<li><p>Change the text, and write in <strong>Rationale</strong> why: annotators see it with the change, under <strong>Why it changed</strong>.</p></li>
+<li><p>Click <strong>Save draft</strong>. The panel marks the codebook as <strong>Uncommitted draft</strong>; you can <strong>Continue editing</strong> it or <strong>Discard draft</strong>.</p></li>
+<li><p>Save your decision. The draft is saved with it as a new version of the codebook, linked to the case you decided.</p></li>
+</ol>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/expert_codebook_draft.png"><img alt="The codebook panel in edit mode, with a new rule added and the rationale filled in" src="../_images/expert_codebook_draft.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">A new rule and its rationale, saved together with the decision.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The annotators of the next batch see the change on their <strong>Codebook changes</strong> page, and the history of the codebook shows which case it came from, see <a class="reference internal" href="../annotators/codebook-changes.html"><span class="std std-doc">Codebook changes</span></a>.</p>
+<p>If someone else changes the codebook while your draft is open, Arbiter does not save your decision with it: discard the draft and make your change again on the current version.</p>
+</section>
+<section id="several-experts">
+<h2>Several experts<a class="headerlink" href="#several-experts" title="Link to this heading"></a></h2>
+<p>A batch usually has one expert. If it has more, each of them decides every case on their own, and the batch is finished as soon as one of them has decided all. Where the experts decided differently, the list of samples says <strong>Experts disagree</strong>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="upload-data.html" class="btn btn-neutral float-left" title="Upload data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="export.html" class="btn btn-neutral float-right" title="Export" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

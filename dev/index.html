@@ -6,12 +6,13 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>A guide for devs &mdash; AnnotationTool 0.0.1 documentation</title>
+  <title>Development setup &mdash; Arbiter documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
-      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c7ade755" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
 
   
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d45e8c67"></script>
@@ -20,20 +21,20 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API Documentation" href="../api/index.html" />
-    <link rel="prev" title="Usage" href="../usage/index.html" /> 
+    <link rel="next" title="Tests and documentation" href="testing.html" />
+    <link rel="prev" title="Users and site settings" href="../admin/users.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search" >
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
 
           
           
           <a href="../index.html" class="icon icon-home">
-            AnnotationTool
+            Arbiter
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -43,44 +44,58 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../usage/index.html">Usage</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">A guide for devs</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#the-env">The .env</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#run-tests">Run tests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#debugging-with-vs-code">Debugging with VS Code</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#build-documentation-locally">Build documentation locally</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#overview-and-starting-point">Overview and starting point</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#django-web-app">Django web app</a></li>
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../project-leads/export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#development-server">Development Server</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#access">Access</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#current-users">Current Users</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#admin">admin</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotator1">annotator1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#annotator2">annotator2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#expert1">expert1</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#expert2">expert2</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#passwords">Passwords</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a></li>
 </ul>
 
         </div>
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">AnnotationTool</a>
+          <a href="../index.html">Arbiter</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -88,9 +103,9 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">A guide for devs</li>
+      <li class="breadcrumb-item active">Development setup</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/dev/index.md.txt" rel="nofollow"> View page source</a>
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/dev/index.md" class="fa fa-github"> Edit on GitHub</a>
       </li>
   </ul>
   <hr/>
@@ -98,189 +113,95 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="a-guide-for-devs">
-<h1>A guide for devs<a class="headerlink" href="#a-guide-for-devs" title="Link to this heading"></a></h1>
-<p>We currently use a couple of techonologies that are required to contribute.</p>
-<section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p>We use docker to manage requirements.</p>
-<p>The docker-compose.yaml file contains the necessary services.</p>
-<p>Currently, these are:</p>
-<p>web: web app
-vite: for compilation of js, css, and npm to manage the packages
-redis: key,value storage that allows access from multiple processes. This is necessary for the discussion between annotators.
-Postgres: Database</p>
+  <section id="development-setup">
+<h1>Development setup<a class="headerlink" href="#development-setup" title="Link to this heading"></a></h1>
+<p>Arbiter is developed in Docker Compose. The development setup runs four containers:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Service</p></th>
+<th class="head"><p>Port</p></th>
+<th class="head"><p>What it does</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">web</span></code></p></td>
+<td><p>8000</p></td>
+<td><p>the Django app, restarting by itself when Python code changes; a debugger can attach on port 5678</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">vite</span></code></p></td>
+<td><p>5173</p></td>
+<td><p>builds the JavaScript and CSS and serves them to the browser, updating the page when they change</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">db</span></code></p></td>
+<td><p>5432</p></td>
+<td><p>PostgreSQL</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">redis</span></code></p></td>
+<td><p>6379</p></td>
+<td><p>Redis, which carries the live discussions</p></td>
+</tr>
+</tbody>
+</table>
+<p>The code folder is mounted into the containers: changes take effect without rebuilding. You need <a class="reference external" href="https://docs.docker.com/get-docker/">Docker</a> with its Compose plugin; for the formatting hooks also <a class="reference external" href="https://docs.astral.sh/uv/">uv</a> and <a class="reference external" href="https://nodejs.org/">Node.js</a>.</p>
+<section id="get-the-code-and-configure-it">
+<h2>Get the code and configure it<a class="headerlink" href="#get-the-code-and-configure-it" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/luerhard/arbiter.git
+<span class="nb">cd</span><span class="w"> </span>arbiter
+</pre></div>
+</div>
+<p>Create a file <code class="docutils literal notranslate"><span class="pre">.env</span></code> in this folder with the credentials of the development database. The values are up to you:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">POSTGRES_DB</span><span class="o">=</span>arbiter
+<span class="nv">POSTGRES_USER</span><span class="o">=</span>arbiter
+<span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>arbiter
+</pre></div>
+</div>
+<p>Leave out <code class="docutils literal notranslate"><span class="pre">COMPOSE_FILE</span></code>: that is for servers and would start the production setup (see <a class="reference internal" href="../admin/server.html"><span class="std std-doc">Set up a server</span></a>).</p>
 </section>
-<section id="installation">
-<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>to start everything for the first time:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># start the services</span>
+<section id="start-it">
+<h2>Start it<a class="headerlink" href="#start-it" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
+</pre></div>
+</div>
+<p>The first start takes a few minutes. Once it runs, create the database tables and an administrator account in a second terminal:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>web<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>web<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>createsuperuser
+</pre></div>
+</div>
+<p>Arbiter now runs at <a class="reference external" href="http://localhost:8000">http://localhost:8000</a>, the admin at <a class="reference external" href="http://localhost:8000/admin/">http://localhost:8000/admin/</a>. Run <code class="docutils literal notranslate"><span class="pre">migrate</span></code> again whenever you pull changes that bring new migrations.</p>
+</section>
+<section id="demo-data">
+<h2>Demo data<a class="headerlink" href="#demo-data" title="Link to this heading"></a></h2>
+<p>To see Arbiter with something in it, create the demo projects:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>web<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>demodata<span class="w"> </span>--stage<span class="w"> </span>discussion
+</pre></div>
+</div>
+<p>This creates two projects, “Populist Communication” (labels for the whole text) and “Offensive Language” (spans in the text), and three accounts with the password <code class="docutils literal notranslate"><span class="pre">demo</span></code>: the annotators <code class="docutils literal notranslate"><span class="pre">anna.berger</span></code> and <code class="docutils literal notranslate"><span class="pre">tom.keller</span></code> and the expert <code class="docutils literal notranslate"><span class="pre">lena.hoffmann</span></code>. <code class="docutils literal notranslate"><span class="pre">--stage</span></code> sets how far the running batch of each project has got: <code class="docutils literal notranslate"><span class="pre">annotation</span></code>, <code class="docutils literal notranslate"><span class="pre">discussion</span></code>, <code class="docutils literal notranslate"><span class="pre">expert</span></code> or <code class="docutils literal notranslate"><span class="pre">final</span></code>. Running the command again replaces the two demo projects and resets the three accounts; everything else in the database stays.</p>
+<p>The screenshots of this documentation are taken from the demo data, see <a class="reference internal" href="testing.html#screenshots"><span class="std std-ref">Screenshots</span></a>.</p>
+</section>
+<section id="start-over">
+<h2>Start over<a class="headerlink" href="#start-over" title="Link to this heading"></a></h2>
+<p>To delete all data and recreate the empty tables:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>web<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>resetdb<span class="w"> </span>--noinput
+</pre></div>
+</div>
+<p>This also clears the state of the discussions in Redis. The codebooks’ git repositories stay on disk; to remove those as well, remove the volumes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>--volumes
 docker<span class="w"> </span>compose<span class="w"> </span>up
-
-<span class="c1"># create all tables in the database</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>migrate
-
-<span class="c1"># populate the DB with test data</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>populatedb
-</pre></div>
-</div>
-<p>This should spawn a webserver that is accessible in the browser via <a class="reference external" href="http://127.0.0.1:8000">http://127.0.0.1:8000</a>.</p>
-<p>To delete to everything, including the database:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all containers</span>
-docker<span class="w"> </span>compose<span class="w"> </span>down
-
-<span class="c1"># remove the docker volume that contains the database data</span>
-docker<span class="w"> </span>volume<span class="w"> </span>rm<span class="w"> </span>annotationtool_pgdata
-</pre></div>
-</div>
-<p>To start fresh:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># stop all containers</span>
-docker<span class="w"> </span>compose<span class="w"> </span>down
-
-<span class="c1"># remove all volumes</span>
-docker<span class="w"> </span>compose<span class="w"> </span>down<span class="w"> </span>--volumes
-
-<span class="c1"># start fresh</span>
-docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build
-</pre></div>
-</div>
-<p>To delete the db, recreate it and reapply all migrations (build the table structure) without deleting the docker volume.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># reset</span>
-docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>annotationtool-web-1<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>manage.py<span class="w"> </span>resetdb<span class="w"> </span>--noinput
 </pre></div>
 </div>
 </section>
-<section id="the-env">
-<h2>The .env<a class="headerlink" href="#the-env" title="Link to this heading"></a></h2>
-<p>For everything to work properly, it is necessary to create a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file in the root directory with the following variables defined:</p>
-<ul class="simple">
-<li><p>user, password, and db can changed.</p></li>
-<li><p>do NOT change host or port.</p></li>
-</ul>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">DJANGO_DEBUG</span><span class="o">=</span><span class="m">1</span>
-
-<span class="nv">POSTGRES_DB</span><span class="o">=</span>annotationtool
-<span class="nv">POSTGRES_USER</span><span class="o">=</span>myuser
-<span class="nv">POSTGRES_PASSWORD</span><span class="o">=</span>mypassword
-<span class="nv">POSTGRES_HOST</span><span class="o">=</span>localhost
-<span class="nv">POSTGRES_PORT</span><span class="o">=</span><span class="m">5432</span>
-
-<span class="nv">REDIS_HOST</span><span class="o">=</span>localhost
+<section id="debug-with-vs-code">
+<h2>Debug with VS Code<a class="headerlink" href="#debug-with-vs-code" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">web</span></code> container runs Django with the <a class="reference external" href="https://github.com/microsoft/debugpy">debugpy</a> debugger listening on port 5678. In VS Code, open the repository folder and start <strong>Attach to Django in Docker (debugpy)</strong> in the Run and Debug view; breakpoints in the code then stop the running app.</p>
+</section>
+<section id="formatting">
+<h2>Formatting<a class="headerlink" href="#formatting" title="Link to this heading"></a></h2>
+<p>Python is formatted and checked with <a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a>, templates, CSS, JavaScript, Markdown and YAML with <a class="reference external" href="https://prettier.io/">Prettier</a>. Install the git hooks once, and both run on every commit:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>npm<span class="w"> </span>install
+uvx<span class="w"> </span>pre-commit<span class="w"> </span>install
 </pre></div>
 </div>
-</section>
-<section id="run-tests">
-<h2>Run tests<a class="headerlink" href="#run-tests" title="Link to this heading"></a></h2>
-<p>To run the tests locally, there are two options:</p>
-<ol class="arabic simple">
-<li><p>run tests from command line within in the docker container:</p></li>
-</ol>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">web</span> <span class="n">uv</span> <span class="n">run</span> <span class="n">pytest</span> <span class="o">-</span><span class="n">v</span>
-</pre></div>
-</div>
-<p><code class="docutils literal notranslate"><span class="pre">-v</span></code> is optional here but gives some more infos on all tests.</p>
-<ol class="arabic simple" start="2">
-<li><p>run tests locally. This is nice to use, e.g. the test runner in VSCode to run / debug single tests. These, however, require a working installation of the virtual environment outside the container. The docker containers still have to be running to give access to the PostgresDB where a test database is created to run the tests.</p></li>
-</ol>
-<p>So to do this</p>
-<ol class="arabic simple">
-<li><p>make sure the docker compose containers are running</p></li>
-<li><p>make sure the virtual environment is installed (run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">sync</span></code> to make sure)</p></li>
-<li><p>now, either run <code class="docutils literal notranslate"><span class="pre">uv</span> <span class="pre">run</span> <span class="pre">pytest</span></code> from the command-line or use the built-in test runner in VSCode.</p></li>
-</ol>
-</section>
-<section id="debugging-with-vs-code">
-<h2>Debugging with VS Code<a class="headerlink" href="#debugging-with-vs-code" title="Link to this heading"></a></h2>
-<p>You can debug the code with VSCode, which is helpful because it offers breakpoint and inspection of variables.
-To do so, you need to open the directory in VSCode. In the debugging tab, click the green play-button icon that says “Attach to Django in Docker”.
-You can then place breakpoints in the code.
-When the app is running, and you navigate with the GUI to a breakpoint, the code will stop there, and you can start debugging/inspecting.</p>
-</section>
-<section id="build-documentation-locally">
-<h2>Build documentation locally<a class="headerlink" href="#build-documentation-locally" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"cd ../docs; make html"</span>
-</pre></div>
-</div>
-<p>This will create <code class="docutils literal notranslate"><span class="pre">docs/_build/html/index.html</span></code> which is the starting page of the documentation.</p>
-<p>To open it, run this in the command line</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--service-ports<span class="w"> </span>web<span class="w"> </span>sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">"cd ../docs/_build/html &amp;&amp; python -m http.server 8080"</span>
-</pre></div>
-</div>
-<p>Then open http://localhost:8080 in private mode in your browser.</p>
-</section>
-<section id="overview-and-starting-point">
-<h2>Overview and starting point<a class="headerlink" href="#overview-and-starting-point" title="Link to this heading"></a></h2>
-<section id="django-web-app">
-<h3>Django web app<a class="headerlink" href="#django-web-app" title="Link to this heading"></a></h3>
-<p>The web app is built with Django. A starting point is here: https://docs.djangoproject.com/en/6.0/intro/tutorial01/</p>
-<p>The Django web framework is based on modular apps.
-Our tool (currently) consists of the following apps</p>
-<ul class="simple">
-<li><p>annotation</p></li>
-<li><p>codebook</p></li>
-<li><p>discuss</p></li>
-<li><p>expert</p></li>
-<li><p>projects</p></li>
-<li><p>users
-and</p></li>
-<li><p>data</p></li>
-</ul>
-<p>The apps represent modular parts of the tool.
-They each consist of apps.py, models.py, urls.py and views.py files.
-The models.py contains classes for the database models.
-The views.py contain the logic for what to display.
-The urls.py contain the URL declarations for the app.</p>
-<p>Data is a bit different from the others, because it contains the connecting bits.</p>
-<p>For each app, there also is a template in the templates directory, which contains the html.
-This follows Django’s principle to seperate the design from the view functionality.</p>
-</section>
-</section>
-<section id="development-server">
-<h2>Development Server<a class="headerlink" href="#development-server" title="Link to this heading"></a></h2>
-<section id="access">
-<h3>Access<a class="headerlink" href="#access" title="Link to this heading"></a></h3>
-<p>We now have a development Server which serves as a showcase of the current state of the project.</p>
-<p>The adress is: <a class="reference external" href="http://193.196.54.251">http://193.196.54.251</a></p>
-<p>To access it, you need to be in the University of Stuttgart VPN (or physically on campus).</p>
-</section>
-<section id="current-users">
-<h3>Current Users<a class="headerlink" href="#current-users" title="Link to this heading"></a></h3>
-<section id="admin">
-<h4>admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>can log in to the admin page where all the adding of project, batches, users etc. happens. This is available on <a class="reference external" href="http://193.196.54.251/admin">http://193.196.54.251/admin</a>. If you are not logged in, you might are currently referred to the wrong page, so you might have to use the link twice.</p></li>
-</ul>
-</section>
-<section id="annotator1">
-<h4>annotator1<a class="headerlink" href="#annotator1" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>default annotator without special permissions</p></li>
-</ul>
-</section>
-<section id="annotator2">
-<h4>annotator2<a class="headerlink" href="#annotator2" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>same as annotator1. Exists because we want 2 annotators for each project</p></li>
-</ul>
-</section>
-<section id="expert1">
-<h4>expert1<a class="headerlink" href="#expert1" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>A role to show the expert interface.</p></li>
-</ul>
-</section>
-<section id="expert2">
-<h4>expert2<a class="headerlink" href="#expert2" title="Link to this heading"></a></h4>
-<ul class="simple">
-<li><p>A second expert.</p></li>
-<li><p>expert2 should behave the same as expert1.</p></li>
-</ul>
-</section>
-<section id="passwords">
-<h4>Passwords<a class="headerlink" href="#passwords" title="Link to this heading"></a></h4>
-<p>every user has a password of “123”.</p>
-</section>
-</section>
+<p>GitHub Actions runs the same tools on every push and commits their fixes.</p>
 </section>
 </section>
 
@@ -288,8 +209,8 @@ This follows Django’s principle to seperate the design from the view functiona
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../usage/index.html" class="btn btn-neutral float-left" title="Usage" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api/index.html" class="btn btn-neutral float-right" title="API Documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../admin/users.html" class="btn btn-neutral float-left" title="Users and site settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="testing.html" class="btn btn-neutral float-right" title="Tests and documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

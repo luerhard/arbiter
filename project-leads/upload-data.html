@@ -1,0 +1,228 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload data &mdash; Arbiter documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Decide disagreements" href="decide.html" />
+    <link rel="prev" title="Write the codebook" href="codebook.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Arbiter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="codebook.html">Write the codebook</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decide.html">Decide disagreements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="export.html">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arbiter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Upload data</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/project-leads/upload-data.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="upload-data">
+<h1>Upload data<a class="headerlink" href="#upload-data" title="Link to this heading"></a></h1>
+<p>The texts of a project come in batches. Each batch goes through annotation, discussion and expert decision on its own (see <a class="reference internal" href="../get-started/how-it-works.html"><span class="std std-doc">How Arbiter works</span></a>), and the codebook can improve between one batch and the next. Smaller batches give you that chance more often.</p>
+<section id="prepare-the-file">
+<h2>Prepare the file<a class="headerlink" href="#prepare-the-file" title="Link to this heading"></a></h2>
+<p>Upload a CSV or Excel (<code class="docutils literal notranslate"><span class="pre">.xlsx</span></code>) file with one text per row. It needs a column named <code class="docutils literal notranslate"><span class="pre">text</span></code>; every other column is kept with the text, for example an id, the source or a date:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>doc_id</p></th>
+<th class="head"><p>party</p></th>
+<th class="head"><p>date</p></th>
+<th class="head"><p>text</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>PC-021</p></td>
+<td><p>Party A</p></td>
+<td><p>2024-04-02</p></td>
+<td><p>The elites in Brussels decide over our heads.</p></td>
+</tr>
+<tr class="row-odd"><td><p>PC-022</p></td>
+<td><p>Party B</p></td>
+<td><p>2024-04-03</p></td>
+<td><p>Our new rail plan connects every town by 2030.</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Keep an id column: the exports contain all columns again, so you can join the labels back to your data.</p></li>
+<li><p>Put each piece of information in its own column. Annotators and experts see them below the text only if <strong>Show metadata</strong> is switched on in the project’s settings.</p></li>
+<li><p>Every row needs a text. A file with empty texts is rejected, with the rows named.</p></li>
+<li><p>Saving a CSV from pandas, use <code class="docutils literal notranslate"><span class="pre">df.to_csv(...,</span> <span class="pre">index=False)</span></code>. Otherwise the row numbers end up as an extra column <code class="docutils literal notranslate"><span class="pre">Unnamed:</span> <span class="pre">0</span></code>.</p></li>
+</ul>
+<p>The texts are taken exactly as they are in the file: a text “007” stays “007”, a text “NA” stays “NA”.</p>
+</section>
+<section id="upload-a-batch">
+<h2>Upload a batch<a class="headerlink" href="#upload-a-batch" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>On the project page, click <strong>New batch</strong>.</p></li>
+<li><p>Choose the file under <strong>Data file</strong>.</p></li>
+<li><p>Under <strong>Team for this batch</strong>, choose who annotates and who decides. Everyone in the project is preselected in the role they have in the project; you can leave people out or give someone the other role for this batch, but nobody can have both.</p></li>
+<li><p>Click <strong>Create batch</strong>.</p></li>
+</ol>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/batch_create.png"><img alt="The page New batch, with a CSV file chosen and the team of the batch: two annotators and one expert" src="../_images/batch_create.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">A new batch for the project on populist communication.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The batch starts right away: it gets the next number, the codebook as it is now becomes its starting version, and the annotators find it on their home page. They annotate the texts in the order of the file.</p>
+</section>
+<section id="follow-a-batch">
+<h2>Follow a batch<a class="headerlink" href="#follow-a-batch" title="Link to this heading"></a></h2>
+<p>The project page shows a card for every batch, the newest first. It shows the phase the batch is in and how far it got: how many texts each annotator has labeled, how many disagreements have been discussed and how many the experts have decided.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/expert_project_page.png"><img alt="The project page of an expert, with a card for batch 2 in annotation and one for batch 1, finished" src="../_images/expert_project_page.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The project page: batch 2 is being annotated, batch 1 is finished.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>A batch moves from one phase to the next by itself: when the last annotator finalizes, when the discussion has gone through every disagreement, when the experts have decided every text that is left. You do not have to do anything in between, other than deciding as an expert.</p>
+<p>The menu <strong>⋯</strong> on the card holds everything else:</p>
+<ul class="simple">
+<li><p><strong>View samples</strong> lists the texts of the batch with their state, such as <em>Labeled 1 of 2</em> or <em>To be discussed</em>, and, where it is settled, their label. A dot marks the texts the annotators labeled differently. Before the discussion starts, you can drag the rows to change the order in which annotators get the texts.</p></li>
+<li><p><strong>Export batch</strong> downloads the batch, see <a class="reference internal" href="export.html"><span class="std std-doc">Export</span></a>.</p></li>
+<li><p><strong>Codebook changes</strong> shows what changed in the codebook before the batch started.</p></li>
+<li><p><strong>Move to phase</strong> moves the batch to another phase by hand. Use it when a batch is stuck, for example because an annotator can no longer take part. If work is still open, Arbiter tells you what and asks before it moves on. Nothing anyone has entered is deleted: moved back to annotation, everyone has to finalize again, with their labels kept.</p></li>
+<li><p><strong>Delete batch</strong> deletes the batch with all its texts, annotations, discussions and decisions. Changes to the codebook stay. Export the batch first if you want to keep anything.</p></li>
+</ul>
+<figure class="align-center" id="id3">
+<a class="reference internal image-reference" href="../_images/batch_samples.png"><img alt="The sample list of batch 2, with a drag handle, the text, its state and its label in each row" src="../_images/batch_samples.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><strong>View samples</strong>: the texts of batch 2 with their state.</span><a class="headerlink" href="#id3" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="codebook.html" class="btn btn-neutral float-left" title="Write the codebook" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="decide.html" class="btn btn-neutral float-right" title="Decide disagreements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

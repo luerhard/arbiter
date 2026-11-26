@@ -1,0 +1,245 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Export &mdash; Arbiter documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=087cf589" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.svg"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d45e8c67"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Set up a server" href="../admin/server.html" />
+    <link rel="prev" title="Decide disagreements" href="decide.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #0b0d10" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Arbiter
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Home</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Get started</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/how-it-works.html">How Arbiter works</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../get-started/sign-in.html">Signing in</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For annotators</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/annotate.html">Annotate</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/discuss.html">Discuss</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../annotators/codebook-changes.html">Codebook changes</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">For project leads</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="create-project.html">Create a project</a></li>
+<li class="toctree-l1"><a class="reference internal" href="codebook.html">Write the codebook</a></li>
+<li class="toctree-l1"><a class="reference internal" href="upload-data.html">Upload data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="decide.html">Decide disagreements</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Export</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Administration</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../admin/server.html">Set up a server</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/users.html">Users and site settings</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developers</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dev/index.html">Development setup</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev/testing.html">Tests and documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/annotation.html">Annotation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/codebook.html">Codebook</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/core.html">Core</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/data.html">Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/discuss.html">Discussion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/expert.html">Expert</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/notifications.html">Notifications</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/projects.html">Projects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/users.html">Users</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #0b0d10" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Arbiter</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Export</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/luerhard/arbiter/blob/main/docs/project-leads/export.md" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="export">
+<h1>Export<a class="headerlink" href="#export" title="Link to this heading"></a></h1>
+<p>Experts can download a project’s data at any time, also while batches are still running. An export holds everything Arbiter has recorded for each text: every label at every stage, who gave it and when, and the discussion.</p>
+<section id="download">
+<h2>Download<a class="headerlink" href="#download" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Export project</strong>, at the top of the project page, downloads all batches in one file.</p></li>
+<li><p><strong>Export batch</strong>, in the menu <strong>⋯</strong> of a batch card or on its list of samples, downloads one batch.</p></li>
+</ul>
+<figure class="align-center" id="id1">
+<a class="reference internal image-reference" href="../_images/export.png"><img alt="The project page with the button Export project at the top and the menu of a batch card opened, showing Export batch" src="../_images/export.png" style="width: 650px;" />
+</a>
+<figcaption>
+<p><span class="caption-text"><strong>Export project</strong> for everything, <strong>Export batch</strong> for one batch.</span><a class="headerlink" href="#id1" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The codebook with its history is a separate download, see <a class="reference internal" href="codebook.html#history-and-download"><span class="std std-ref">Write the codebook</span></a>. Keep both together: the codebook documents the rules every label was given under.</p>
+</section>
+<section id="what-is-in-the-file">
+<h2>What is in the file<a class="headerlink" href="#what-is-in-the-file" title="Link to this heading"></a></h2>
+<p>The export is a <a class="reference external" href="https://jsonlines.org/">JSON Lines</a> file: one line per text, each a JSON object. Texts nobody has labeled yet are included, with empty lists.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>What it holds</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">text_id</span></code></p></td>
+<td><p>Arbiter’s id of the text</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">text</span></code></p></td>
+<td><p>the text</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">metadata</span></code></p></td>
+<td><p>the other columns of the uploaded file, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;doc_id&quot;:</span> <span class="pre">&quot;PC-011&quot;,</span> <span class="pre">&quot;party&quot;:</span> <span class="pre">&quot;Party</span> <span class="pre">A&quot;}</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">labels_annotation</span></code></p></td>
+<td><p>each annotator’s labels from the annotation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">labels_discussion</span></code></p></td>
+<td><p>each annotator’s labels after the discussion; empty if the text was not discussed</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">messages_discussion</span></code></p></td>
+<td><p>the chat about this text</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">labels_expert</span></code></p></td>
+<td><p>the experts’ decisions; empty if the text needed none</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">batch_number</span></code></p></td>
+<td><p>the batch</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">batch_annotators</span></code>, <code class="docutils literal notranslate"><span class="pre">batch_experts</span></code></p></td>
+<td><p>who annotated and decided in the batch</p></td>
+</tr>
+</tbody>
+</table>
+<p>The label fields are lists with one entry per person, <code class="docutils literal notranslate"><span class="pre">{&quot;user&quot;:</span> <span class="pre">…,</span> <span class="pre">&quot;labels&quot;:</span> <span class="pre">…,</span> <span class="pre">&quot;at&quot;:</span> <span class="pre">…}</span></code>, where <code class="docutils literal notranslate"><span class="pre">at</span></code> is when the labels were saved; a chat message has <code class="docutils literal notranslate"><span class="pre">user</span></code>, <code class="docutils literal notranslate"><span class="pre">at</span></code> and <code class="docutils literal notranslate"><span class="pre">content</span></code>. Only saved labels are included: an annotator who has not saved a text yet does not appear in its list.</p>
+<p><code class="docutils literal notranslate"><span class="pre">labels</span></code> holds the names of the chosen labels:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="w"> </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"lena.hoffmann"</span><span class="p">,</span><span class="w"> </span><span class="nt">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"Popular sovereignty"</span><span class="p">],</span><span class="w"> </span><span class="nt">"at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-11-26T15:02:30.328+00:00"</span><span class="w"> </span><span class="p">}</span>
+</pre></div>
+</div>
+<p>In projects with spans in the text, it holds the marked passages instead, with their position in the text (<code class="docutils literal notranslate"><span class="pre">start</span></code> and <code class="docutils literal notranslate"><span class="pre">end</span></code> count characters, from 0):</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tom.keller"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Insult"</span><span class="p">,</span><span class="w"> </span><span class="nt">"start"</span><span class="p">:</span><span class="w"> </span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="nt">"end"</span><span class="p">:</span><span class="w"> </span><span class="mi">21</span><span class="p">,</span><span class="w"> </span><span class="nt">"text"</span><span class="p">:</span><span class="w"> </span><span class="s2">"idiot"</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">  </span><span class="nt">"at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-11-26T15:02:31.376+00:00"</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="the-final-label">
+<h2>The final label<a class="headerlink" href="#the-final-label" title="Link to this heading"></a></h2>
+<p>The export keeps every stage, so it has no single field for the result. For a finished batch, a text’s final label is the expert’s decision if there is one, otherwise what the annotators agreed on after the discussion, otherwise what they agreed on in the annotation. With pandas:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_json</span><span class="p">(</span><span class="s2">"project_populist-communication.jsonl"</span><span class="p">,</span> <span class="n">lines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">final_label</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""The labels a text ended with: the expert's decision, otherwise what the annotators</span>
+<span class="sd">    agreed on in the discussion, otherwise in the annotation."""</span>
+    <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">"labels_expert"</span><span class="p">,</span> <span class="s2">"labels_discussion"</span><span class="p">,</span> <span class="s2">"labels_annotation"</span><span class="p">):</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">entry</span><span class="p">[</span><span class="s2">"labels"</span><span class="p">]</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[</span><span class="n">phase</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="n">values</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">v</span> <span class="o">==</span> <span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">values</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="kc">None</span>
+
+
+<span class="n">df</span><span class="p">[</span><span class="s2">"label"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">final_label</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">"doc_id"</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s2">"metadata"</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="s2">"doc_id"</span><span class="p">]</span>  <span class="c1"># your id column, to join the labels to your data</span>
+</pre></div>
+</div>
+<p>Use it on finished batches: in a running batch, one annotator’s labels can be there while the others’ are still missing. <code class="docutils literal notranslate"><span class="pre">None</span></code> means that the experts of the batch decided the text differently.</p>
+<p>The labels from the annotation are the independent judgments. Use them to compute the agreement between annotators before any discussion.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="decide.html" class="btn btn-neutral float-left" title="Decide disagreements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../admin/server.html" class="btn btn-neutral float-right" title="Set up a server" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Lukas Erhard, Susanne Hindennach.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
